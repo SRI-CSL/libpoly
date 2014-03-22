@@ -1,1 +1,2 @@
-add_library(interval interval.c interval_internal.c)
+add_library(interval OBJECT 
+    interval.c interval_internal.c)
