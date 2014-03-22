@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "rational.h"
+#include "number/rational.h"
 
 #include <assert.h>
 

@@ -11,7 +11,7 @@
 
 #include "number/integer.h"
 #include "number/rational.h"
-#include "number/dyadic_rational_internal.h"
+#include "number/dyadic_rational.h"
 
 #include "upolynomial/upolynomial_internal.h"
 

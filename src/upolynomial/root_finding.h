@@ -10,7 +10,7 @@
 #include "upolynomial/upolynomial_internal.h"
 #include "upolynomial/upolynomial_dense.h"
 
-#include "number/dyadic_rational_internal.h"
+#include "number/dyadic_rational.h"
 #include "algebraic_number.h"
 
 #include "interval/interval.h"

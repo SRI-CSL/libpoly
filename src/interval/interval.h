@@ -10,7 +10,7 @@
 #include <interval.h>
 
 #include "number/rational.h"
-#include "number/dyadic_rational_internal.h"
+#include "number/dyadic_rational.h"
 
 #include <assert.h>
 #include <limits.h>
