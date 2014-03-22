@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "polynomial_internal.h"
+#include "polynomial/polynomial.h"
 #include "polynomial/monomial.h"
 #include "polynomial/coefficient.h"
 

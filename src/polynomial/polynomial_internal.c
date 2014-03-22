@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "polynomial/polynomial_internal.h"
+#include "polynomial/polynomial.h"
 
 #include "utils/debug_trace_internal.h"
 

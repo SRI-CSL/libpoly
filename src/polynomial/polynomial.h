@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "polynomial.h"
+#include <polynomial.h>
+
 #include "polynomial/coefficient.h"
 
 typedef struct {
