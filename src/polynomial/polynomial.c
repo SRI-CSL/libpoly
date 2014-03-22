@@ -5,8 +5,7 @@
  *      Author: dejan
  */
 
-#include "polynomial/polynomial.h"
-#include "polynomial/internal.h"
+#include "polynomial/polynomial_internal.h"
 
 #include <printf.h>
 

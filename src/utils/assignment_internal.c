@@ -5,10 +5,10 @@
  *      Author: dejan
  */
 
-#include "assignment_internal.h"
+#include "utils/assignment_internal.h"
 
-#include "interval/internal.h"
-#include "polynomial/internal.h"
+#include "interval/interval_internal.h"
+#include "polynomial/polynomial_internal.h"
 
 #include <malloc.h>
 

@@ -8,7 +8,7 @@
 #include "number/algebraic_number.h"
 
 #include "number/integer_internal.h"
-#include "interval/internal.h"
+#include "interval/interval_internal.h"
 #include "polynomial/coefficient.h"
 #include "polynomial/polynomial_context.h"
 

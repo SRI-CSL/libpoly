@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "interval/internal.h"
+#include "interval/interval_internal.h"
 
 #include <assert.h>
 #include <limits.h>

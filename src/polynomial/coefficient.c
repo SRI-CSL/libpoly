@@ -10,7 +10,7 @@
 #include "polynomial/coefficient.h"
 
 #include "number/integer_internal.h"
-#include "interval/internal.h"
+#include "interval/interval_internal.h"
 
 #include "utils/assignment_internal.h"
 #include "utils/debug_trace_internal.h"

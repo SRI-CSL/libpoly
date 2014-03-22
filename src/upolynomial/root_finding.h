@@ -8,7 +8,7 @@
 #pragma once
 
 #include "upolynomial/upolynomial.h"
-#include "upolynomial/internal.h"
+#include "upolynomial/upolynomial_internal.h"
 #include "upolynomial/upolynomial_dense.h"
 
 #include "number/dyadic_rational.h"

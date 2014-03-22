@@ -14,7 +14,7 @@
 #include "number/dyadic_rational.h"
 
 #include "upolynomial/upolynomial.h"
-#include "upolynomial/internal.h"
+#include "upolynomial/upolynomial_internal.h"
 
 /**
  * Buffer for dense polynomial operations. When computing with a buffer the

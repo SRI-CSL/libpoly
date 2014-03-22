@@ -5,8 +5,7 @@
  *      Author: dejan
  */
 
-#include "interval/interval.h"
-#include "interval/internal.h"
+#include "interval/interval_internal.h"
 
 const interval_ops_t interval_ops = {
     interval_construct,
