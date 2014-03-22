@@ -180,9 +180,6 @@ typedef struct {
   /** Set the power symbol for printouts */
   void (*set_power_symbol) (const char* power);
 
-  /** Register printf extensions (%P) */
-  void (*register_printf_extension) (void);
-
 } polynomial_ops_t;
 
 extern const polynomial_ops_t polynomial_ops;

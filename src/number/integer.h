@@ -291,11 +291,6 @@ typedef struct {
    */
   void (*lcm_Z) (integer_t* lcm, const integer_t* a, const integer_t* b);
 
-  /**
-   * Register printf extension %C for integers.
-   */
-  void (*register_printf_extension) (void);
-
 } integer_ops_struct;
 
 /** Implementation: function table for integer operations */

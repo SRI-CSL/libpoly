@@ -65,23 +65,8 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
       upolynomial_dense_ops.negate(&S[i], Z);
     }
 
-    if (debug_trace_ops.is_enabled("sturm_sequence_check")) {
-      // Check that a*S[-2] = div*S[-1] - S[0]
-      fprintf(stderr, "P = %C * (", &a);
-      upolynomial_dense_ops.print(&S[i-2], stderr);
-      fprintf(stderr, ") + (");
-      upolynomial_dense_ops.print(&S[i], stderr);
-      fprintf(stderr, ")\n");
-      fprintf(stderr, "Q = ");
-      upolynomial_dense_ops.print(&S[i-1], stderr);
-      fprintf(stderr, "\n");
-      fprintf(stderr, "Q.divides(P)\n");
-    }
-
     if (debug_trace_ops.is_enabled("roots")) {
-      tracef("S[%d] = ", i);
-      upolynomial_dense_ops.print(&S[i], trace_out);
-      tracef("\n");
+      tracef("S[%d] = ", i); upolynomial_dense_ops.print(&S[i], trace_out); tracef("\n");
     }
   }
 

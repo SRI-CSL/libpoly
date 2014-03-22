@@ -8,35 +8,6 @@
 #include "integer.h"
 #include "integer_internal.h"
 
-// Has the integer_t printf handler been set
-static
-int integer_printf_handler_set = 0;
-
-static
-int integer_printf_handler(FILE* out, const struct printf_info* info, const void *const *args) {
-  const integer_t* c;
-  // Get the coefficient
-  c = *((const integer_t **) (args[0]));
-  // Print the polynomial
-  return integer_ops.print(c, out);
-}
-
-static
-int integer_printf_arginfo(const struct printf_info *info, size_t n, int *argtypes, int *size) {
-  if (n > 0) {
-    argtypes[0] = PA_POINTER;
-  }
-  return 1;
-}
-
-static
-void integer_register_prinf_extension(void) {
-  if (!integer_printf_handler_set) {
-    integer_printf_handler_set = 1;
-    register_printf_specifier('C', integer_printf_handler, integer_printf_arginfo);
-  }
-}
-
 static
 int_ring integer_ring_create(const integer_t* M, int is_prime) {
 
@@ -207,7 +178,6 @@ const integer_ops_struct integer_ops = {
     integer_div_rem_Z,
     integer_div_rem_pow2_Z,
     integer_gcd_Z,
-    integer_lcm_Z,
-    integer_register_prinf_extension
+    integer_lcm_Z
 };
 

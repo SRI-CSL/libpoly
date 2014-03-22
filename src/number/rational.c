@@ -8,10 +8,6 @@
 #include "rational.h"
 #include "rational_internal.h"
 
-void rational_register_prinf_extension(void) {
-  assert(0);
-}
-
 const rational_ops_t rational_ops = {
     rational_construct,
     rational_construct_from_int,
@@ -37,6 +33,5 @@ const rational_ops_t rational_ops = {
     rational_mul_2exp,
     rational_pow,
     rational_div,
-    rational_div_2exp,
-    rational_register_prinf_extension,
+    rational_div_2exp
 };

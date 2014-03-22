@@ -9,10 +9,6 @@
 
 #include <stdio.h>
 
-// We define extra % flags for printf so we ignore format issues
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-
 /** Interface to the tracing functionality */
 typedef struct {
 

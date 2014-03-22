@@ -145,11 +145,6 @@ typedef struct {
    */
   void (*div_2exp) (rational_t* div, const rational_t* a, unsigned n);
 
-  /**
-   * Register printf extension %C for coefficients.
-   */
-  void (*register_printf_extension) (void);
-
 } rational_ops_t;
 
 /** Implementation */

@@ -370,13 +370,13 @@ void upolynomial_dense_negate(upolynomial_dense_t* p_d, int_ring K) {
 void upolynomial_dense_div_general(int_ring K, int exact, const upolynomial_dense_t* p, const upolynomial_dense_t* q, upolynomial_dense_t* div, upolynomial_dense_t* rem) {
 
   if (debug_trace_ops.is_enabled("division")) {
-    fprintf(stderr, "upolynomial_div_general(");
-    int_ring_ops.print(K, stderr);
-    fprintf(stderr, ", ");
-    upolynomial_dense_ops.print(p, stderr);
-    fprintf(stderr, ", ");
-    upolynomial_dense_ops.print(q, stderr);
-    fprintf(stderr, ")\n");
+    tracef("upolynomial_div_general(");
+    int_ring_ops.print(K, trace_out);
+    tracef(", ");
+    upolynomial_dense_ops.print(p, trace_out);
+    tracef(", ");
+    upolynomial_dense_ops.print(q, trace_out);
+    tracef(")\n");
   }
 
   assert(p);
@@ -409,13 +409,13 @@ void upolynomial_dense_div_general(int_ring K, int exact, const upolynomial_dens
     if (k >= (int) q_deg) {
 
       if (debug_trace_ops.is_enabled("division")) {
-        fprintf(stderr, "q = ");
-        upolynomial_dense_ops.print(q, stderr);
-        fprintf(stderr, "\nrem = ");
-        upolynomial_dense_ops.print(rem, stderr);
-        fprintf(stderr, "\ndiv = ");
-        upolynomial_dense_ops.print(div, stderr);
-        fprintf(stderr, "\n");
+        tracef("q = ");
+        upolynomial_dense_ops.print(q, trace_out);
+        tracef("\nrem = ");
+        upolynomial_dense_ops.print(rem, trace_out);
+        tracef("\ndiv = ");
+        upolynomial_dense_ops.print(div, trace_out);
+        tracef("\n");
       }
 
       assert(!exact || integer_ops.divides(K, q->coefficients + q_deg, rem->coefficients + k));
@@ -465,11 +465,11 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
   integer_ops.construct_from_int(Z, &red_mult, 0);
 
   if (debug_trace_ops.is_enabled("division")) {
-    fprintf(stderr, "upolynomial_dense_reduce_Z(");
-    upolynomial_dense_ops.print(p, stderr);
-    fprintf(stderr, ", ");
-    upolynomial_dense_ops.print(q, stderr);
-    fprintf(stderr, ")\n");
+    tracef("upolynomial_dense_reduce_Z(");
+    upolynomial_dense_ops.print(p, trace_out);
+    tracef(", ");
+    upolynomial_dense_ops.print(q, trace_out);
+    tracef(")\n");
   }
 
   assert(p);
@@ -500,11 +500,11 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
     if (k >= (int) q_deg) {
 
       if (debug_trace_ops.is_enabled("division")) {
-        fprintf(stderr, "q = ");
-        upolynomial_dense_ops.print(q, stderr);
-        fprintf(stderr, "\nred = ");
-        upolynomial_dense_ops.print(red, stderr);
-        fprintf(stderr, "\n");
+        tracef("q = ");
+        upolynomial_dense_ops.print(q, trace_out);
+        tracef("\nred = ");
+        upolynomial_dense_ops.print(red, trace_out);
+        tracef("\n");
       }
 
       // Eliminate the coefficient using q*m
@@ -530,8 +530,8 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
       upolynomial_dense_ops.sub_mult_mon(red, Z, q, &m);
 
       if (debug_trace_ops.is_enabled("division")) {
-        fprintf(stderr, "red' = ");
-        upolynomial_dense_ops.print(red, stderr);
+        tracef("red' = ");
+        upolynomial_dense_ops.print(red, trace_out);
       }
     }
   }

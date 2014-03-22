@@ -114,25 +114,25 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
     upolynomial_dense_ops.div_general(K, 1 /* exact */, &r_0, &r_1, &q, &r_2);
 
     if (debug_trace_ops.is_enabled("gcd")) {
-      fprintf(stderr, "r_0 = ");
-      upolynomial_dense_ops.print(&r_0, stderr);
-      fprintf(stderr, "\nr_1 = ");
-      upolynomial_dense_ops.print(&r_1, stderr);
-      fprintf(stderr, "\nq = ");
-      upolynomial_dense_ops.print(&q, stderr);
-      fprintf(stderr, "\nr_2 = ");
-      upolynomial_dense_ops.print(&r_2, stderr);
+      tracef("r_0 = ");
+      upolynomial_dense_ops.print(&r_0, trace_out);
+      tracef("\nr_1 = ");
+      upolynomial_dense_ops.print(&r_1, trace_out);
+      tracef("\nq = ");
+      upolynomial_dense_ops.print(&q, trace_out);
+      tracef("\nr_2 = ");
+      upolynomial_dense_ops.print(&r_2, trace_out);
       if (extended_gcd) {
-        fprintf(stderr, "\ns_0 = ");
-        upolynomial_dense_ops.print(&s_0, stderr);
-        fprintf(stderr, "\ns_1 = ");
-        upolynomial_dense_ops.print(&s_1, stderr);
-        fprintf(stderr, "\nt_0 = ");
-        upolynomial_dense_ops.print(&t_0, stderr);
-        fprintf(stderr, "\nt_1 = ");
-        upolynomial_dense_ops.print(&t_1, stderr);
+        tracef("\ns_0 = ");
+        upolynomial_dense_ops.print(&s_0, trace_out);
+        tracef("\ns_1 = ");
+        upolynomial_dense_ops.print(&s_1, trace_out);
+        tracef("\nt_0 = ");
+        upolynomial_dense_ops.print(&t_0, trace_out);
+        tracef("\nt_1 = ");
+        upolynomial_dense_ops.print(&t_1, trace_out);
       }
-      fprintf(stderr, "\n");
+      tracef("\n");
     }
 
     // Check we are done
@@ -262,15 +262,15 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
     upolynomial_dense_ops.div_general(K, 0, &r_0, &r_1, &q, &r_2);
 
     if (debug_trace_ops.is_enabled("gcd")) {
-      fprintf(stderr, "r_0 = ");
-      upolynomial_dense_ops.print(&r_0, stderr);
-      fprintf(stderr, "\nr_q = ");
-      upolynomial_dense_ops.print(&r_1, stderr);
-      fprintf(stderr, "\nq = ");
-      upolynomial_dense_ops.print(&q, stderr);
-      fprintf(stderr, "\nr_w = ");
-      upolynomial_dense_ops.print(&r_2, stderr);
-      fprintf(stderr, "\n");
+      tracef("r_0 = ");
+      upolynomial_dense_ops.print(&r_0, trace_out);
+      tracef("\nr_q = ");
+      upolynomial_dense_ops.print(&r_1, trace_out);
+      tracef("\nq = ");
+      upolynomial_dense_ops.print(&q, trace_out);
+      tracef("\nr_w = ");
+      upolynomial_dense_ops.print(&r_2, trace_out);
+      tracef("\n");
     }
 
     // Check if the remainder is of degree 0

@@ -319,11 +319,6 @@ typedef struct {
    */
   void (*roots_isolate) (const upolynomial_t* p, algebraic_number_t* roots, size_t* roots_size);
 
-  /**
-   * Registers the printf extension %P for printing polynomials.
-   */
-  void (*register_printf_extension) (void);
-
 } upolynomial_ops_struct;
 
 /** Function table of the polynomial operations */

@@ -18,32 +18,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include <printf.h>
-
-// Has the upolynomial printf handler been set
-static int upolynomial_printf_handler_set = 0;
-
-static int upolynomial_printf_handler(FILE* out, const struct printf_info* info, const void *const *args) {
-  const upolynomial_t* p;
-  // Get the polynomial
-  p = *((const upolynomial_t **) (args[0]));
-  // Print the polynomial
-  return upolynomial_ops.print(p, out);
-}
-
-static int upolynomial_printf_arginfo(const struct printf_info *info, size_t n, int *argtypes, int *size) {
-  if (n > 0) {
-    argtypes[0] = PA_POINTER;
-  }
-  return 1;
-}
-
-static void upolynomial_register_prinf_extension(void) {
-  if (!upolynomial_printf_handler_set) {
-    upolynomial_printf_handler_set = 1;
-    register_printf_specifier('P', upolynomial_printf_handler, upolynomial_printf_arginfo);
-  }
-}
 
 // Construct the polynomial, but don't construct monomials
 static upolynomial_t* upolynomial_construct_empty(int_ring K, size_t size) {
@@ -572,12 +546,12 @@ static void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t*
     if (k >= q_deg) {
 
       if (debug_trace_ops.is_enabled("division")) {
-        fprintf(stderr, "dividing with %P at degree %d\n", q, k);
-        fprintf(stderr, "rem = ");
-        upolynomial_dense_ops.print(rem, stderr);
-        fprintf(stderr, "\ndiv = ");
-        upolynomial_dense_ops.print(div, stderr);
-        fprintf(stderr, "\n");
+        tracef("dividing with %P at degree %d\n", q, k);
+        tracef("rem = ");
+        upolynomial_dense_ops.print(rem, trace_out);
+        tracef("\ndiv = ");
+        upolynomial_dense_ops.print(div, trace_out);
+        tracef("\n");
       }
 
       assert(!exact || integer_ops.divides(K, upolynomial_lead_coeff(q), rem->coefficients + k));
@@ -1131,8 +1105,7 @@ const upolynomial_ops_struct upolynomial_ops = {
     upolynomial_factor_square_free,
     upolynomial_roots_sturm_sequence,
     upolynomial_roots_count,
-    upolynomial_roots_isolate,
-    upolynomial_register_prinf_extension
+    upolynomial_roots_isolate
 };
 
 static upolynomial_factors_t* factors_construct(void) {

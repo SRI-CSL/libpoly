@@ -90,7 +90,7 @@ int variable_db_print(const variable_db_t* var_db, FILE* out) {
   int i, ret = 0;
   for (i = 0; i < var_db->size; ++ i) {
     if (var_db->variable_names[i]) {
-      fprintf(out, "[%d] = %s\n", var_db->variable_names[i]);
+      fprintf(out, "[%d] = %s\n", i, var_db->variable_names[i]);
     }
   }
   return ret;

@@ -9,34 +9,6 @@
 
 #include <printf.h>
 
-static
-int polynomial_printf_handler_set = 0;
-
-static int
-polynomial_printf_handler(FILE* out, const struct printf_info* info, const void *const *args) {
-  const polynomial_t* P;
-  // Get the coefficient
-  P = *((const polynomial_t **) (args[0]));
-  // Print the polynomial
-  return polynomial_ops.print(P, out);
-}
-
-static int
-polynomial_printf_arginfo(const struct printf_info *info, size_t n, int *argtypes, int *size) {
-  if (n > 0) {
-    argtypes[0] = PA_POINTER;
-  }
-  return 1;
-}
-
-static
-void polynomial_register_printf_extension(void) {
-  if (!polynomial_printf_handler_set) {
-    polynomial_printf_handler_set = 1;
-    register_printf_specifier('P', polynomial_printf_handler, polynomial_printf_arginfo);
-  }
-}
-
 /** Set the power symbol for printouts */
 void polynomial_set_power_symbol(const char* power) {
   coefficient_ops.set_power_symbol(power);
@@ -81,7 +53,6 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_lcm,
   polynomial_resultant,
   polynomial_psc,
-  polynomial_set_power_symbol,
-  polynomial_register_printf_extension
+  polynomial_set_power_symbol
 };
 
