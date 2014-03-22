@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "upolynomial/internal.h"
+#include "upolynomial/upolynomial_internal.h"
 
 #include <assert.h>
 
