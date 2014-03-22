@@ -6,7 +6,7 @@
  */
 
 #include "upolynomial/bounds.h"
-#include "upolynomial/upolynomial_internal.h"
+#include "upolynomial/upolynomial.h"
 
 #include <assert.h>
 

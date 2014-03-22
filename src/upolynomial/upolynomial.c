@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "upolynomial/upolynomial_internal.h"
+#include "upolynomial/umonomial.h"
 #include "upolynomial/upolynomial_dense.h"
 
 #include "upolynomial/gcd.h"

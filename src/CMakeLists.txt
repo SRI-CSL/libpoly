@@ -10,7 +10,8 @@ set(poly_SOURCES
     upolynomial/gcd.c
     upolynomial/upolynomial_dense.c
     upolynomial/root_finding.c
-    upolynomial/upolynomial_internal.c
+    upolynomial/upolynomial.c
+    upolynomial/umonomial.c
     number/rational.c
     number/algebraic_number.c
     number/dyadic_rational.c

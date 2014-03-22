@@ -6,7 +6,7 @@
  */
 
 #include "upolynomial/factorization.h"
-#include "upolynomial/upolynomial_internal.h"
+#include "upolynomial/upolynomial.h"
 #include "upolynomial/bounds.h"
 
 #include "utils/statistics_internal.h"

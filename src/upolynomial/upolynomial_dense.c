@@ -6,7 +6,7 @@
  */
 
 #include "upolynomial/upolynomial_dense.h"
-#include "upolynomial/upolynomial_internal.h"
+#include "upolynomial/upolynomial.h"
 
 #include "utils/debug_trace_internal.h"
 

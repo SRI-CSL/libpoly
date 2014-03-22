@@ -1,11 +1,11 @@
 /*
- * univatiate_polynomial_internal.c
+ * umonomial.c
  *
- *  Created on: Nov 17, 2013
+ *  Created on: Mar 22, 2014
  *      Author: dejan
  */
 
-#include "upolynomial/upolynomial_internal.h"
+#include "upolynomial/umonomial.h"
 
 #include <assert.h>
 
