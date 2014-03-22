@@ -12,7 +12,7 @@
 #include "polynomial/coefficient.h"
 #include "polynomial/polynomial_context.h"
 
-#include "utils/debug_trace.h"
+#include "utils/debug_trace_internal.h"
 
 
 #include <assert.h>

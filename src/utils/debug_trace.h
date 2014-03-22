@@ -27,27 +27,3 @@ typedef struct {
 /** Implementation of  the tracing functionality */
 extern const debug_trace_ops_t debug_trace_ops;
 
-/** Where the output goes */
-FILE* trace_out;
-
-/** Print to the debug trace printf style */
-void tracef(const char* format, ...);
-
-#ifndef NDEBUG
-
-#define TRACE(tag, ...) { \
-  if (debug_trace_ops.is_enabled(tag)) { \
-    tracef(__VA_ARGS__); \
-  } \
-}
-
-#define TRACE_CMD(tag, cmd) { \
-  if (debug_trace_ops.is_enabled(tag)) { \
-    cmd; \
-  } \
-} \
-
-#else
-#define TRACE(tag, fmt, ...)
-#define TRACE_CMD(tag, cmd)
-#endif

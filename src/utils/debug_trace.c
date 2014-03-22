@@ -7,10 +7,6 @@
 
 #include "debug_trace.h"
 
-#include "number/integer.h"
-#include "upolynomial/upolynomial.h"
-#include "polynomial/polynomial.h"
-
 #include <string.h>
 #include <malloc.h>
 #include <stdarg.h>
@@ -20,9 +16,6 @@ size_t tags_to_trace_size = 0;
 
 void trace_enable(const char* tag) {
 #ifndef NDEBUG
-  integer_ops.register_printf_extension();
-  upolynomial_ops.register_printf_extension();
-  polynomial_ops.register_printf_extension();
   tags_to_trace[tags_to_trace_size++] = strdup(tag);
 #endif
 }
@@ -65,4 +58,5 @@ const debug_trace_ops_t debug_trace_ops = {
     trace_enable,
     trace_disable,
     trace_is_enabled,
+    trace_set_output
 };
