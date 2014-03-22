@@ -7,7 +7,7 @@
 
 #include "utils/assignment_internal.h"
 
-#include "interval/interval_internal.h"
+#include "interval/interval.h"
 #include "polynomial/polynomial_internal.h"
 
 #include <malloc.h>

@@ -10,7 +10,7 @@
 #include "variable.h"
 #include "assignment.h"
 
-#include "number/integer_internal.h"
+#include "number/integer.h"
 
 /** Type of the coefficients */
 typedef enum {

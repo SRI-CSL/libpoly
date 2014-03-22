@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "integer.h"
+#include <integer.h>
 
 #include <assert.h>
 #include <malloc.h>

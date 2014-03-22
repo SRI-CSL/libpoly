@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "interval.h"
+#include <interval.h>
 
-#include "number/rational_internal.h"
+#include "number/rational.h"
 #include "number/dyadic_rational_internal.h"
 
 #include <assert.h>

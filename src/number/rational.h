@@ -7,9 +7,8 @@
 
 #pragma once
 
+#include <rational.h>
 #include <assert.h>
-
-#include "rational.h"
 
 static inline
 void rational_construct(rational_t* q) {

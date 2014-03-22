@@ -18,7 +18,6 @@ set(poly_SOURCES
     variable/variable.c
     variable/variable_order.c
     interval/interval.c
-    interval/interval_internal.c
     utils/debug_trace.c
     utils/assignment_internal.c
     utils/assignment.c

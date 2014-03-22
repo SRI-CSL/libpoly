@@ -9,8 +9,8 @@
 
 #include <stddef.h>
 
-#include "number/integer_internal.h"
-#include "number/rational_internal.h"
+#include "number/integer.h"
+#include "number/rational.h"
 #include "number/dyadic_rational_internal.h"
 
 #include "upolynomial/upolynomial_internal.h"

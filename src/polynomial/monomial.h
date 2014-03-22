@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "number/integer_internal.h"
+#include "number/integer.h"
 
 #include "variable.h"
 

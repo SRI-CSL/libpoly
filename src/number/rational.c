@@ -5,7 +5,7 @@
  *Author: dejan
  */
 
-#include "number/rational_internal.h"
+#include "number/rational.h"
 
 const rational_ops_t rational_ops = {
     rational_construct,

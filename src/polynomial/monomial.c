@@ -8,7 +8,7 @@
 #include "polynomial/monomial.h"
 #include "polynomial/polynomial_internal.h"
 
-#include "number/integer_internal.h"
+#include "number/integer.h"
 
 #include <malloc.h>
 #include <assert.h>

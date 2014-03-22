@@ -9,8 +9,8 @@
 #include "polynomial/monomial.h"
 #include "polynomial/coefficient.h"
 
-#include "number/integer_internal.h"
-#include "interval/interval_internal.h"
+#include "number/integer.h"
+#include "interval/interval.h"
 
 #include "utils/assignment_internal.h"
 #include "utils/debug_trace_internal.h"

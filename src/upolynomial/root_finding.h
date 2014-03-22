@@ -13,7 +13,7 @@
 #include "number/dyadic_rational_internal.h"
 #include "algebraic_number.h"
 
-#include "interval/interval_internal.h"
+#include "interval/interval.h"
 
 /**
  * Compute the Sturm sequence of f. A Sturm sequence is a sequence
