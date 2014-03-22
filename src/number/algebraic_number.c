@@ -12,7 +12,7 @@
 #include "interval/interval.h"
 #include "polynomial/coefficient.h"
 
-#include "utils/debug_trace_internal.h"
+#include "utils/debug_trace.h"
 
 #include <assert.h>
 

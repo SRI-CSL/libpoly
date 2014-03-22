@@ -8,7 +8,7 @@
 #include "upolynomial/upolynomial_dense.h"
 #include "upolynomial/upolynomial.h"
 
-#include "utils/debug_trace_internal.h"
+#include "utils/debug_trace.h"
 
 #include <malloc.h>
 #include <assert.h>

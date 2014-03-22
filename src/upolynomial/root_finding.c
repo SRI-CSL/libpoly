@@ -12,7 +12,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-#include "utils/debug_trace_internal.h"
+#include "utils/debug_trace.h"
 
 /** Negative infinity */
 #define INF_N (void*) 0

@@ -9,8 +9,8 @@
 #include "upolynomial/upolynomial_dense.h"
 #include "upolynomial/upolynomial.h"
 
-#include "utils/debug_trace_internal.h"
-#include "utils/statistics_internal.h"
+#include "utils/debug_trace.h"
+#include "utils/statistics.h"
 
 #include <assert.h>
 

@@ -9,8 +9,8 @@
 #include "upolynomial/upolynomial.h"
 #include "upolynomial/bounds.h"
 
-#include "utils/statistics_internal.h"
-#include "utils/debug_trace_internal.h"
+#include "utils/statistics.h"
+#include "utils/debug_trace.h"
 
 #include <assert.h>
 #include <malloc.h>

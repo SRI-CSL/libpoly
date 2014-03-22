@@ -7,7 +7,7 @@
 
 #include <variable.h>
 
-#include "utils/debug_trace_internal.h"
+#include "utils/debug_trace.h"
 
 #include <assert.h>
 #include <string.h>

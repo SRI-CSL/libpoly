@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "debug_trace.h"
+#include <debug_trace.h>
 
 /** Where the output goes */
 extern FILE* trace_out;

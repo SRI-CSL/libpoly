@@ -1,7 +1,5 @@
 set(poly_SOURCES 
     polynomial/polynomial.c
-    polynomial/polynomial.c
-    polynomial/polynomial_api.c
     polynomial/polynomial_context.c
     polynomial/coefficient.c
     polynomial/monomial.c
@@ -21,7 +19,6 @@ set(poly_SOURCES
     variable/variable_order.c
     interval/interval.c
     utils/debug_trace.c
-    utils/assignment_internal.c
     utils/assignment.c
     utils/statistics.c
 )

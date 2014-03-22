@@ -5,12 +5,11 @@
  *      Author: dejan
  */
 
-#include "variable_order.h"
+#include "variable/variable_order.h"
 
 #include <assert.h>
 #include <malloc.h>
 
-static
 void variable_order_simple_construct(variable_order_simple_t* var_order) {
   // No-one pointing yet
   var_order->ref_count = 0;
@@ -20,18 +19,15 @@ void variable_order_simple_construct(variable_order_simple_t* var_order) {
   variable_list_ops.construct(&var_order->list);
 }
 
-static
 void variable_order_simple_destruct(variable_order_simple_t* var_order) {
   variable_list_ops.destruct(&var_order->list);
 }
 
-static
 void variable_order_simple_attach(variable_order_t* var_order) {
   variable_order_simple_t* self = (variable_order_simple_t*) var_order;
   self->ref_count ++;
 }
 
-static
 void variable_order_simple_detach(variable_order_t* var_order) {
   variable_order_simple_t* self = (variable_order_simple_t*) var_order;
   assert(self->ref_count > 0);
@@ -42,7 +38,6 @@ void variable_order_simple_detach(variable_order_t* var_order) {
   }
 }
 
-static
 variable_order_t* variable_order_simple_new(void) {
   variable_order_simple_t* var_order = malloc(sizeof(variable_order_simple_t));
   variable_order_simple_construct(var_order);
@@ -50,7 +45,6 @@ variable_order_t* variable_order_simple_new(void) {
   return (variable_order_t*) var_order;
 }
 
-static
 int variable_order_simple_cmp(const variable_order_t* var_order, variable_t x, variable_t y) {
   const variable_order_simple_t* self = (variable_order_simple_t*) var_order;
 
@@ -64,29 +58,24 @@ int variable_order_simple_cmp(const variable_order_t* var_order, variable_t x, v
   }
 }
 
-static
 size_t variable_order_simple_size(const variable_order_simple_t* var_order) {
   return variable_list_ops.size(&var_order->list);
 }
 
-static
 void variable_order_simple_clear(variable_order_simple_t* var_order) {
   while (variable_list_ops.size(&var_order->list)) {
     variable_list_ops.pop(&var_order->list);
   }
 }
 
-static
 void variable_order_simple_push(variable_order_simple_t* var_order, variable_t var) {
   variable_list_ops.push(&var_order->list, var);
 }
 
-static
 void variable_order_simple_pop(variable_order_simple_t* var_order) {
   variable_list_ops.pop(&var_order->list);
 }
 
-static
 int variable_order_simple_print(const variable_order_simple_t* var_order, const variable_db_t* var_db, FILE* out) {
   int i, ret = 0;
   ret += fprintf(out, "[");
@@ -100,7 +89,6 @@ int variable_order_simple_print(const variable_order_simple_t* var_order, const 
   return ret;
 }
 
-static
 char* variable_order_simple_to_string(const variable_order_simple_t* var_order, const variable_db_t* var_db) {
   char* str = 0;
   size_t size = 0;
@@ -110,7 +98,6 @@ char* variable_order_simple_to_string(const variable_order_simple_t* var_order, 
   return str;
 }
 
-static
 int variable_order_simple_contains(variable_order_simple_t* var_order, variable_t x) {
   return variable_list_ops.index(&var_order->list, x) != -1;
 }

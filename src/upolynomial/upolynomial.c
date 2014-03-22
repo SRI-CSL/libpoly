@@ -12,7 +12,7 @@
 #include "upolynomial/factorization.h"
 #include "upolynomial/root_finding.h"
 
-#include "utils/debug_trace_internal.h"
+#include "utils/debug_trace.h"
 
 #include <stdlib.h>
 #include <assert.h>
