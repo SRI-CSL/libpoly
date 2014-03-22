@@ -6,7 +6,7 @@
  */
 
 #include "polynomial/monomial.h"
-#include "polynomial/polynomial.h"
+#include "polynomial/polynomial_internal.h"
 
 #include "number/integer_internal.h"
 

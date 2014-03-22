@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "number/rational.h"
-#include "number/dyadic_rational.h"
+#include "rational.h"
+#include "dyadic_rational.h"
 
 /**
  * An interval (a, b) with both points rationals. The side is open if

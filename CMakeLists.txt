@@ -19,7 +19,7 @@ else()
 endif()
 
 # Add our sources to the include
-include_directories(${libpoly_SOURCE_DIR}/src)
+include_directories(${libpoly_SOURCE_DIR}/src ${libpoly_SOURCE_DIR}/include)
 
 # Configure the subdirectories
 add_subdirectory(src)

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "variable/variable.h"
-#include "variable/variable_order.h"
-#include "number/integer.h"
-#include "polynomial/polynomial_context.h"
-#include "utils/assignment.h"
+#include "variable.h"
+#include "variable_order.h"
+#include "integer.h"
+#include "polynomial_context.h"
+#include "assignment.h"
 
 typedef struct polynomial_rec_struct polynomial_rec_t;
 

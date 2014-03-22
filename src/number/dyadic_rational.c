@@ -5,8 +5,7 @@
  *      Author: dejan
  */
 
-#include "dyadic_rational.h"
-#include "dyadic_rational_internal.h"
+#include "number/dyadic_rational_internal.h"
 
 const dyadic_rational_ops_t dyadic_rational_ops = {
     dyadic_rational_construct,

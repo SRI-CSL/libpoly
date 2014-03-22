@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "number/integer.h"
-#include "number/rational.h"
-#include "interval/interval.h"
+#include "integer.h"
+#include "rational.h"
+#include "interval.h"
 
 // Defined independently
 typedef struct algebraic_number_struct algebraic_number_t;

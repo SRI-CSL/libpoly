@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "number/integer.h"
-#include "variable/variable.h"
+#include "number/integer_internal.h"
+
+#include "variable.h"
 
 #include <stdio.h>
 

@@ -5,15 +5,14 @@
  *      Author: dejan
  */
 
-#include "number/algebraic_number.h"
+#include "algebraic_number.h"
+#include "polynomial_context.h"
 
 #include "number/integer_internal.h"
 #include "interval/interval_internal.h"
 #include "polynomial/coefficient.h"
-#include "polynomial/polynomial_context.h"
 
 #include "utils/debug_trace_internal.h"
-
 
 #include <assert.h>
 

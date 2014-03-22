@@ -9,8 +9,8 @@
 
 #include <stdio.h>
 
-#include "upolynomial/upolynomial.h"
-#include "number/dyadic_rational.h"
+#include "upolynomial.h"
+#include "dyadic_rational.h"
 
 /**
  * Algebraic number represented as the only root of the polynomial f in the

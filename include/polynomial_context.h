@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "variable/variable.h"
-#include "number/integer.h"
-#include "variable/variable_order.h"
+#include "variable.h"
+#include "integer.h"
+#include "variable_order.h"
 
 /**
  * Information providing semantic context for available operations on

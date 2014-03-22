@@ -5,8 +5,9 @@
  *Author: dejan
  */
 
-#include "variable/variable.h"
-#include "utils/debug_trace.h"
+#include <variable.h>
+
+#include "utils/debug_trace_internal.h"
 
 #include <assert.h>
 #include <string.h>

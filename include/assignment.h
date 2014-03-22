@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "variable/variable.h"
-#include "number/rational.h"
-#include "number/dyadic_rational.h"
-#include "number/algebraic_number.h"
+#include "variable.h"
+#include "rational.h"
+#include "dyadic_rational.h"
+#include "algebraic_number.h"
 
 #include <stdio.h>
 

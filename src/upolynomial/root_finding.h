@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include "upolynomial/upolynomial.h"
 #include "upolynomial/upolynomial_internal.h"
 #include "upolynomial/upolynomial_dense.h"
 
-#include "number/dyadic_rational.h"
-#include "number/algebraic_number.h"
+#include "number/dyadic_rational_internal.h"
+#include "algebraic_number.h"
 
-#include "interval/interval.h"
+#include "interval/interval_internal.h"
 
 /**
  * Compute the Sturm sequence of f. A Sturm sequence is a sequence

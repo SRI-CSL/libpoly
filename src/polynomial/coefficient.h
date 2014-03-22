@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include "number/integer.h"
-#include "variable/variable.h"
-#include "utils/assignment.h"
+#include "variable.h"
+#include "assignment.h"
+
+#include "number/integer_internal.h"
 
 /** Type of the coefficients */
 typedef enum {

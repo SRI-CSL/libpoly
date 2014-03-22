@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "number/integer.h"
+#include "upolynomial.h"
 
 /**
  * A monomial is a coefficient and the degree.

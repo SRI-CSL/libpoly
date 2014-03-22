@@ -5,8 +5,7 @@
  *      Author: dejan
  */
 
-#include "integer.h"
-#include "integer_internal.h"
+#include "number/integer_internal.h"
 
 static
 int_ring integer_ring_create(const integer_t* M, int is_prime) {

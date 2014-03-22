@@ -5,8 +5,8 @@
  *      Author: dejan
  */
 
+#include "polynomial_internal.h"
 #include "polynomial/monomial.h"
-#include "polynomial/polynomial.h"
 #include "polynomial/coefficient.h"
 
 #include "number/integer_internal.h"
