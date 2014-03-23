@@ -299,9 +299,11 @@ static void Q_construct(integer_t* Q, size_t size, const upolynomial_t* u) {
 
 static void Q_column_multiply(int_ring K, integer_t* Q, size_t size, int j, const integer_t* m) {
 
-  TRACE("nullspace", "Multiplying column %d of Q with %C\n", j, m);
-  TRACE("nullspace", "Q = \n");
-  TRACE_CMD("nullspace", integer_ops.print_matrix(Q, size, size, trace_out));
+  if (debug_trace_ops.is_enabled("nullspace")) {
+    tracef("Multiplying column %d of Q with ", j); integer_print(m, trace_out); tracef("\n");
+    tracef("Q = \n");
+    integer_ops.print_matrix(Q, size, size, trace_out);
+  }
 
   integer_t tmp;
   integer_ops.construct_from_int(K, &tmp, 0);
@@ -334,9 +336,10 @@ static void Q_column_add(int_ring K, integer_t* Q, size_t size, int i, const int
   integer_ops.construct_from_int(K, &mul, 0);
   integer_ops.construct_from_int(K, &add, 0);
 
-  TRACE("nullspace", "Adding [%d]*%C of Q to %i\n", j, m, i);
-  TRACE("nullspace", "Q = \n");
-  TRACE_CMD("nullspace", integer_ops.print_matrix(Q, size, size, trace_out));
+  if (debug_trace_ops.is_enabled("nullspace")) {
+    tracef("Adding [%d]*", j); integer_print(m, trace_out); tracef(" of Q to %i\n", i);
+    tracef("Q = \n"); integer_ops.print_matrix(Q, size, size, trace_out);
+  }
 
   int k;
   for (k = 0; k < size; ++ k) {
@@ -349,8 +352,9 @@ static void Q_column_add(int_ring K, integer_t* Q, size_t size, int i, const int
   integer_ops.destruct(&mul);
   integer_ops.destruct(&m_copy);
 
-  TRACE("nullspace", "Q = \n");
-  TRACE_CMD("nullspace", integer_ops.print_matrix(Q, size, size, trace_out));
+  if (debug_trace_ops.is_enabled("nullspace")) {
+    tracef("Q = \n"); integer_ops.print_matrix(Q, size, size, trace_out);
+  }
 }
 
 static void Q_null_space(int_ring K, integer_t* Q, size_t size, integer_t** v, size_t* v_size) {
@@ -922,11 +926,9 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   if (debug_trace_ops.is_enabled("hensel")) {
     tracef("hensel_lift_quadratic(%P, ", F);
     upolynomial_factors_ops.print(A, trace_out);
-    tracef(", ");
-    upolynomial_factors_ops.print(U, trace_out);
-    tracef(")\n");
-    tracef("q = %C\n", q);
-    tracef("q^2 = %C\n", &qq);
+    tracef(", "); upolynomial_factors_ops.print(U, trace_out); tracef(")\n");
+    tracef("q   = "); integer_print(q, trace_out); tracef("\n");
+    tracef("q^2 = "); integer_print(&qq, trace_out); tracef("\n");
   }
 
   /**
@@ -1289,7 +1291,10 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
   integer_ops.construct_from_int(Z, &coefficient_bound, 0);
   upolynomial_factor_bound_landau_mignotte(f, upolynomial_ops.degree(f)/2, &coefficient_bound);
   integer_ops.mul_int(Z, &coefficient_bound, &coefficient_bound, 2);
-  TRACE("factorization", "coefficient_bound = %C\n", &coefficient_bound)
+
+  if (debug_trace_ops.is_enabled("factorization")) {
+    tracef("coefficient_bound = "); integer_print(&coefficient_bound, trace_out); tracef("\n");
+  }
 
   // The prime factorization
   upolynomial_factors_t* factors_p_best = 0;
@@ -1303,7 +1308,9 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
     integer_t prime;
     integer_ops.construct_from_int(Z, &prime, primes[prime_i]);
 
-    TRACE("factorization", "prime = %C\n", &prime)
+    if (debug_trace_ops.is_enabled("factorization")) {
+      tracef("prime = "); integer_print(&prime, trace_out); tracef("\n");
+    }
 
     // We need a prime that keeps the degree of f, and maintains being square-free
     if (!integer_ops.divides(Z, &prime, upolynomial_ops.lead_coeff(f))) {

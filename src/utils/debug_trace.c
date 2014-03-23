@@ -32,6 +32,7 @@ static int trace_is_enabled(const char* tag) {
   return 0;
 }
 
+static
 void trace_disable(const char* tag) {
 #ifndef NDEBUG
   int i = trace_is_enabled(tag) - 1;
