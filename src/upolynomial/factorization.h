@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-#include "upolynomial.h"
+#include "upolynomial/upolynomial.h"
 
 /**
  * Factors the given polynomial into square-free factors. Polynomial f should be

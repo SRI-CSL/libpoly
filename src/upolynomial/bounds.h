@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <integer.h>
-#include <upolynomial.h>
+#include "number/integer.h"
+#include "upolynomial/upolynomial.h"
 
 /**
  * Upper bound on the modulus of the roots of f.

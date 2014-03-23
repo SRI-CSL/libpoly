@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "upolynomial.h"
+#include "upolynomial/upolynomial.h"
 
 /**
  * Compute the GCD using Euclid's algorithm. Degree of A should be >= than the
