@@ -460,14 +460,23 @@ static
 upolynomial_t* upolynomial_multiply_c(const upolynomial_t* p, const integer_t* c) {
   assert(p);
 
-  TRACE("arithmetic", "upolynomial_multiply_c(%P, %C)\n", p, c);
+  if (debug_trace_ops.is_enabled("arithmetic")) {
+    tracef("upolynomial_multiply_c(");
+    upolynomial_print(p, trace_out); tracef(", ");
+    integer_print(c, trace_out); tracef(")\n");
+  }
 
   umonomial_t m;
   umonomial_construct(p->K, &m, 0, c);
   upolynomial_t* result = upolynomial_multiply_simple(&m, p);
   umonomial_destruct(&m);
 
-  TRACE("arithmetic", "upolynomial_multiply_c(%P, %C) = %P\n", p, c, result);
+  if (debug_trace_ops.is_enabled("arithmetic")) {
+    tracef("upolynomial_multiply_c(");
+    upolynomial_print(p, trace_out); tracef(", ");
+    integer_print(c, trace_out); tracef(") = ");
+    upolynomial_print(result, trace_out); tracef("\n");
+  }
 
   return result;
 }
@@ -669,7 +678,11 @@ upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t
 static
 upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* c) {
 
-  TRACE("arithmetic", "upolynomial_div_exact(%P, %C)\n", p, c);
+  if (debug_trace_ops.is_enabled("arithmetic")) {
+    tracef("upolynomial_div_exact(");
+    upolynomial_print(p, trace_out); tracef(", ");
+    integer_print(c, trace_out); tracef(")\n");
+  }
 
   int_ring K = p->K;
 
@@ -686,7 +699,12 @@ upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* 
     integer_ops.div_exact(K, &result->monomials[i].coefficient, &p->monomials[i].coefficient, c);
   }
 
-  TRACE("arithmetic", "upolynomial_div_exact(%P, %C) = %P\n", p, c, result);
+  if (debug_trace_ops.is_enabled("arithmetic")) {
+    tracef("upolynomial_div_exact(");
+    upolynomial_print(p, trace_out); tracef(", ");
+    integer_print(c, trace_out); tracef(") = ");
+    upolynomial_print(result, trace_out); tracef("\n");
+  }
 
   return result;
 }
