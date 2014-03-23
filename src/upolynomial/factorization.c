@@ -63,7 +63,9 @@ STAT_DECLARE(int, upolynomial, factor_berlekamp_square_free);
  */
 upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
 
-  TRACE("factorization", "upolynomial_factor_square_free(%P)\n", f)
+  if (debug_trace_ops.is_enabled("factorization")) {
+    tracef("upolynomial_factor_square_free(%P)\n", f);
+  }
   STAT(upolynomial, factor_square_free) ++;
 
   assert(!f->K || !f->K->is_prime || upolynomial_ops.is_monic(f));
@@ -97,31 +99,43 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
     int k = 1;
     // P = GCD(f, f')
     upolynomial_t* P = upolynomial_ops.gcd(f, d_f);
-    TRACE("factorization", "P = %P\n", P)
+    if (debug_trace_ops.is_enabled("factorization")) {
+      tracef("P = %P\n", P);
+    }
     // L = f/P
     upolynomial_t* L = upolynomial_ops.div_exact(f, P);
-    TRACE("factorization", "L = %P\n", L)
+    if (debug_trace_ops.is_enabled("factorization")) {
+      tracef("L = %P\n", L);
+    }
 
     while (upolynomial_ops.degree(L) > 0) {
       // R = gcd(P, L)
       upolynomial_t* R = upolynomial_ops.gcd(P, L);
-      TRACE("factorization", "R = %P\n", R)
+      if (debug_trace_ops.is_enabled("factorization")) {
+        tracef("R = %P\n", R);
+      }
       // O = L / R (it can be constant if there is no factor of power k)
       if (upolynomial_ops.cmp(L, R)) {
         upolynomial_t* O = upolynomial_ops.div_exact(L, R);
-        TRACE("factorization", "O = %P\n", O)
+        if (debug_trace_ops.is_enabled("factorization")) {
+          tracef("O = %P\n", O);
+        }
         // Record the output
         upolynomial_factors_ops.add(factors, O, k);
       }
       // P = P / R
       upolynomial_t* tmp = P;
       P = upolynomial_ops.div_exact(P, R);
-      TRACE("factorization", "P = %P\n", P)
+      if (debug_trace_ops.is_enabled("factorization")) {
+        tracef("P = %P\n", P);
+      }
       upolynomial_ops.destruct(tmp);
       // L = R
       upolynomial_ops.destruct(L);
       L = R;
-      TRACE("factorization", "L = %P\n", L)
+      if (debug_trace_ops.is_enabled("factorization")) {
+        tracef("L = %P\n", L);
+      }
       // Next degree
       k = k + 1;
     }
@@ -146,9 +160,8 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
   upolynomial_ops.destruct(d_f);
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    TRACE("factorization", "upolynomial_factor_square_free(%P) = ", f)
-    upolynomial_factors_ops.print(factors, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor_square_free(%P) = ", f);
+    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   return factors;
@@ -177,7 +190,9 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
  */
 upolynomial_factors_t* upolynomial_factor_distinct_degree(const upolynomial_t* f) {
 
-  TRACE("factorization", "upolynomial_factor_distinct_degree(%P)\n", f)
+  if (debug_trace_ops.is_enabled("factorization")) {
+    tracef("upolynomial_factor_distinct_degree(%P)\n", f);
+  }
   STAT(upolynomial, factor_distinct_degree) ++;
 
   int_ring K = f->K;
@@ -256,9 +271,8 @@ upolynomial_factors_t* upolynomial_factor_distinct_degree(const upolynomial_t* f
   upolynomial_ops.destruct(tmp);
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    TRACE("factorization", "upolynomial_factor_distinct_degree(%P) = ", f);
-    upolynomial_factors_ops.print(factors, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor_distinct_degree(%P) = ", f);
+    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   return factors;
@@ -490,7 +504,9 @@ static void Q_destruct(integer_t* Q, size_t size) {
  */
 upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomial_t* f) {
 
-  TRACE("berlekamp", "upolynomial_factor_berlekamp_square_free(%P)\n", f);
+  if (debug_trace_ops.is_enabled("berlekamp")) {
+    tracef("upolynomial_factor_berlekamp_square_free(%P)\n", f);
+  }
   STAT(upolynomial, factor_berlekamp_square_free) ++;
 
   upolynomial_factors_t* factors = upolynomial_factors_ops.construct();
@@ -602,9 +618,8 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
   }
 
   if (debug_trace_ops.is_enabled("berlekamp")) {
-    TRACE("berlekamp", "upolynomial_factor_berlekamp_square_free(%P) = ", f);
-    upolynomial_factors_ops.print(factors, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor_berlekamp_square_free(%P) = ", f);
+    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   // Return the result
@@ -620,7 +635,9 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
  */
 upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
 
-  TRACE("berlekamp", "upolynomial_factor_Zp(%P)\n", f);
+  if (debug_trace_ops.is_enabled("berlekamp")) {
+    tracef("upolynomial_factor_Zp(%P)\n", f);
+  }
 
   int_ring K = f->K;
 
@@ -706,9 +723,8 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
   upolynomial_ops.destruct(to_factor);
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    TRACE("berlekamp", "upolynomial_factor_Zp(%P) = ", f)
-    upolynomial_factors_ops.print(result, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor_Zp(%P) = ", f);
+    upolynomial_factors_ops.print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -775,12 +791,18 @@ void hensel_lift_initialize(const upolynomial_factors_t* A, upolynomial_factors_
     upolynomial_t* Vi = 0;
 
     // Solve D = Vi*Ai + U_i*Qi+1
-    TRACE("hensel", "A_i = %P\n", A->factors[i]);
-    TRACE("hensel", "Q_i+1 = %P\n", Q[i+1]);
-    TRACE("hensel", "D  = %P\n", D);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("A_i = %P\n", A->factors[i]);
+      tracef("Q_i+1 = %P\n", Q[i + 1]);
+      tracef("D  = %P\n", D);
+    }
+
     upolynomial_ops.solve_bezout(A->factors[i], Q[i+1], D, &Vi, &Ui);
-    TRACE("hensel", "V_i = %P\n", Vi);
-    TRACE("hensel", "U_i = %P\n", Ui);
+
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("V_i = %P\n", Vi);
+      tracef("U_i = %P\n", Ui);
+    }
 
     // Remember the solution
     upolynomial_factors_ops.add(U, Ui, 1);
@@ -969,28 +991,55 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     upolynomial_ops.destruct(tmp1);
     upolynomial_ops.destruct(tmp2);
   }
-  TRACE("hensel", "prod_Ak = %P\n", prod_Ak);
+
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("prod_Ak = %P\n", prod_Ak);
+  }
+
   upolynomial_t* F_sub_prod_Ak = upolynomial_ops.sub(F, prod_Ak);
-  TRACE("hensel", "F_sub_prod_Ak = %P\n", F_sub_prod_Ak);
+
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("F_sub_prod_Ak = %P\n", F_sub_prod_Ak);
+  }
+
   upolynomial_t* D = upolynomial_ops.div_exact_c(F_sub_prod_Ak, q);
-  TRACE("hensel", "D = %P\n", D);
+
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("D = %P\n", D);
+  }
+
   upolynomial_t* D_q = upolynomial_ops.construct_copy_K(Zq, D);
-  TRACE("hensel", "D_q = %P\n", D_q);
+
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("D_q = %P\n", D_q);
+  }
 
   for (k = 0; k < A->size; ++ k) {
 
     upolynomial_t* D_mult_Uk_q = upolynomial_ops.multiply(D_q, U->factors[k]);
-    TRACE("hensel", "D_mult_Uk_q = %P\n", D_mult_Uk_q);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("D_mult_Uk_q = %P\n", D_mult_Uk_q);
+    }
     upolynomial_t* Sk_q = upolynomial_ops.rem_exact(D_mult_Uk_q, A->factors[k]);
-    TRACE("hensel", "Sk_q = %P\n", Sk_q);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Sk_q = %P\n", Sk_q);
+    }
     upolynomial_t* Sk_qq = upolynomial_ops.construct_copy_K(Zqq, Sk_q);
-    TRACE("hensel", "Sk_qq = %P\n", Sk_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Sk_qq = %P\n", Sk_qq);
+    }
     upolynomial_t* Ak_qq = upolynomial_ops.construct_copy_K(Zqq, A->factors[k]);
-    TRACE("hensel", "Ak_qq = %P\n", Ak_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Ak_qq = %P\n", Ak_qq);
+    }
     upolynomial_t* Sk_times_q_qq = upolynomial_ops.multiply_c(Sk_qq, q);
-    TRACE("hensel", "Sk_times_q_qq = %P\n", Sk_times_q_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Sk_times_q_qq = %P\n", Sk_times_q_qq);
+    }
     upolynomial_t* Bk_qq = upolynomial_ops.add(Ak_qq, Sk_times_q_qq);
-    TRACE("hensel", "Bk_qq = %P\n", Bk_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Bk_qq = %P\n", Bk_qq);
+    }
 
     upolynomial_factors_ops.add(B, Bk_qq, 1);
 
@@ -1030,7 +1079,9 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   upolynomial_t* P[A->size];
   hensel_lift_compute_products(B, P);
   upolynomial_t* E = upolynomial_ops.construct_power(Z, 0, 1);
-  TRACE("hensel", "E = %P\n", E);
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("E = %P\n", E);
+  }
   for (k = 0; k < A->size; ++ k) {
     upolynomial_t* Uk = upolynomial_ops.construct_copy_K(Z, U->factors[k]);
     upolynomial_t* mul = upolynomial_ops.multiply(Uk, P[k]);
@@ -1039,29 +1090,47 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     upolynomial_ops.destruct(mul);
     upolynomial_ops.destruct(E);
     E = sub;
-    TRACE("hensel", "E = %P\n", E);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("E = %P\n", E);
+    }
   }
   upolynomial_t* tmp = E;
   E = upolynomial_ops.div_exact_c(E, q);
-  TRACE("hensel", "E = %P\n", E);
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("E = %P\n", E);
+  }
   upolynomial_ops.destruct(tmp);
   upolynomial_t* E_q = upolynomial_ops.construct_copy_K(Zq, E);
-  TRACE("hensel", "E_q = %P\n", E_q);
+  if (debug_trace_ops.is_enabled("hensel")) {
+    tracef("E_q = %P\n", E_q);
+  }
 
   for (k = 0; k < A->size; ++ k) {
 
     upolynomial_t* E_times_Uk_q = upolynomial_ops.multiply(E_q, U->factors[k]);
-    TRACE("hensel", "E_times_Uk_q = %P\n", E_times_Uk_q);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("E_times_Uk_q = %P\n", E_times_Uk_q);
+    }
     upolynomial_t* Tk_q = upolynomial_ops.rem_exact(E_times_Uk_q, A->factors[k]);
-    TRACE("hensel", "Tk_q = %P\n", Tk_q);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Tk_q = %P\n", Tk_q);
+    }
     upolynomial_t* Tk_qq = upolynomial_ops.construct_copy_K(Zqq, Tk_q);
-    TRACE("hensel", "Tk_qq = %P\n", Tk_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Tk_qq = %P\n", Tk_qq);
+    }
     upolynomial_t* Tk_times_q_qq = upolynomial_ops.multiply_c(Tk_qq, q);
-    TRACE("hensel", "Tk_times_q_qq = %P\n", Tk_times_q_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Tk_times_q_qq = %P\n", Tk_times_q_qq);
+    }
     upolynomial_t* Uk_qq = upolynomial_ops.construct_copy_K(Zqq, U->factors[k]);
-    TRACE("hensel", "Uk_qq = %P\n", Uk_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Uk_qq = %P\n", Uk_qq);
+    }
     upolynomial_t* Vk_qq = upolynomial_ops.add(Uk_qq, Tk_times_q_qq);
-    TRACE("hensel", "Vk_qq = %P\n", Vk_qq);
+    if (debug_trace_ops.is_enabled("hensel")) {
+      tracef("Vk_qq = %P\n", Vk_qq);
+    }
 
     upolynomial_factors_ops.add(V, Vk_qq, 1);
 
@@ -1231,7 +1300,9 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
           upolynomial_ops.destruct(tmp);
         }
         upolynomial_ops.set_ring(candidate, Z);
-        TRACE("factorization", "candidate = %P\n", candidate);
+        if (debug_trace_ops.is_enabled("factorization")) {
+          tracef("candidate = %P\n", candidate);
+        }
 
         // Check divisibility
         if (upolynomial_ops.divides(candidate, to_factor)) {
@@ -1278,7 +1349,9 @@ static size_t primes_count = sizeof(primes)/sizeof(long);
  */
 upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) {
 
-  TRACE("factorization", "upolynomial_factor_Z_square_free(%P)\n", f)
+  if (debug_trace_ops.is_enabled("factorization")) {
+    tracef("upolynomial_factor_Z_square_free(%P)\n", f);
+  }
 
   assert(f->K == Z);
   assert(upolynomial_ops.degree(f) > 1);
@@ -1320,7 +1393,9 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
 
       // compute GCD of (f, f') in Z_p (to check for square-free
       upolynomial_t* f_p = upolynomial_ops.construct_copy_K(K_p, f);
-      TRACE("factorization", "f_p = %P\n", f_p)
+      if (debug_trace_ops.is_enabled("factorization")) {
+        tracef("f_p = %P\n", f_p);
+      }
       upolynomial_t* f_d_p = upolynomial_ops.derivative(f_p);
       upolynomial_t* gcd_p = upolynomial_ops.gcd(f_p, f_d_p);
 
@@ -1391,9 +1466,8 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
   }
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    TRACE("factorization", "upolynomial_factor_Z_square_free(%P) = ", f)
-    upolynomial_factors_ops.print(factors, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor_Z_square_free(%P) = ", f);
+    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   // Free the temps
@@ -1406,7 +1480,9 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
 
 upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
 
-  TRACE("factorization", "upolynomial_factor_Z(%P)\n", f)
+  if (debug_trace_ops.is_enabled("factorization")) {
+    tracef("upolynomial_factor_Z(%P)\n", f);
+  }
 
   assert(f->K == Z);
 
@@ -1452,9 +1528,8 @@ upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
   }
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    TRACE("factorization", "upolynomial_factor_Z(%P) = ", f)
-    upolynomial_factors_ops.print(factors, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor_Z(%P) = ", f);
+    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   // Done
