@@ -516,11 +516,15 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
         // red: a*x^k, q: b*x^d, so we multiply red with lcm/a and subtract
         // lcm/b multiple of q
         integer_ops.lcm_Z(&lcm, red->coefficients + k, q->coefficients + q_deg);
-        TRACE("division", "lcm = %C\n", &lcm);
         integer_ops.div_exact(Z, &red_mult, &lcm, red->coefficients + k);
-        TRACE("division", "red_mult = %C\n", &red_mult);
         integer_ops.div_exact(Z, &m.coefficient, &lcm, q->coefficients + q_deg);
-        TRACE("division", "m.c = %C\n", &m.coefficient);
+
+        if (debug_trace_ops.is_enabled("division")) {
+          tracef("lcm = "); integer_print(&lcm, trace_out); tracef("\n");
+          tracef("red_mult = "); integer_print(&red_mult, trace_out); tracef("\n");
+          tracef("m.c = "); integer_print(&m.coefficient, trace_out); tracef("\n");
+        }
+
         integer_ops.mul(Z, a, a, &red_mult);
         upolynomial_dense_ops.mult_c(red, Z, &red_mult);
       }
