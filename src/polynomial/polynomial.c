@@ -163,17 +163,22 @@ int polynomial_sgn(const polynomial_t* A, const assignment_t* m) {
 
 int polynomial_cmp(const polynomial_t* A1, const polynomial_t* A2) {
 
-  TRACE("polynomial", "polynomial_cmp(%P, %P)\n", A1, A2);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_cmp(%P, %P)\n", A1, A2);
+  }
 
   if (!polynomial_context_ops.equal(A1->ctx, A2->ctx)) {
     // random order for different contexts
     return A1 - A2;
   }
+
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
   int cmp = coefficient_ops.cmp(A1->ctx, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_cmp(%P, %P) => %d\n", A1, A2, cmp);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_cmp(%P, %P) => %d\n", A1, A2, cmp);
+  }
 
   return cmp;
 }
@@ -226,14 +231,15 @@ int polynomial_same_var_univariate(const polynomial_t* A1, const polynomial_t* A
 
 void polynomial_add(polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2) {
 
-  TRACE("polynomial", "polynomial_add(%P, %P, %P)\n", S, A1, A2);
-
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_add(%P, %P, %P)\n", S, A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -246,18 +252,22 @@ void polynomial_add(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
 
   coefficient_ops.add(S->ctx, &S->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_add() => %P\n", S);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_add() => %P\n", S);
+  }
 }
 
 void polynomial_sub(polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2) {
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
-  TRACE("polynomial", "polynomial_sub(%P, %P, %P)\n", S, A1, A2);
 
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_sub(%P, %P, %P)\n", S, A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -270,7 +280,9 @@ void polynomial_sub(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
 
   coefficient_ops.sub(S->ctx, &S->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_sub() => %P\n", S);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_sub() => %P\n", S);
+  }
 }
 
 void polynomial_neg(polynomial_t* N, const polynomial_t* A) {
@@ -288,14 +300,15 @@ void polynomial_neg(polynomial_t* N, const polynomial_t* A) {
 
 void polynomial_mul(polynomial_t* P, const polynomial_t* A1, const polynomial_t* A2) {
 
-  TRACE("polynomial", "polynomial_mul(%P, %P, %P)\n", P, A1, A2);
-
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_mul(%P, %P, %P)\n", P, A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -308,7 +321,9 @@ void polynomial_mul(polynomial_t* P, const polynomial_t* A1, const polynomial_t*
 
   coefficient_ops.mul(P->ctx, &P->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_mul() => %P\n", P);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_mul() => %P\n", P);
+  }
 }
 
 void polynomial_shl(polynomial_t* S, const polynomial_t* A, unsigned n) {
@@ -327,10 +342,11 @@ void polynomial_shl(polynomial_t* S, const polynomial_t* A, unsigned n) {
 
 void polynomial_pow(polynomial_t* P, const polynomial_t* A, unsigned n) {
 
-  TRACE("polynomial", "polynomial_pow(%P, %P)\n", P, A);
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    tracef("polynomial_pow(%P, %P)\n", P, A);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
 
@@ -344,7 +360,9 @@ void polynomial_pow(polynomial_t* P, const polynomial_t* A, unsigned n) {
 
   coefficient_ops.pow(P->ctx, &P->data, &A->data, n);
 
-  TRACE("polynomial", "polynomial_pow() => %P\n", P);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_pow() => %P\n", P);
+  }
 }
 
 void polynomial_add_mul(polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2) {
@@ -385,14 +403,15 @@ void polynomial_sub_mul(polynomial_t* S, const polynomial_t* A1, const polynomia
 
 void polynomial_div(polynomial_t* D, const polynomial_t* A1, const polynomial_t* A2) {
 
-  TRACE("polynomial", "polynomial_div(%P, %P, %P)\n", D, A1, A2);
-
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_div(%P, %P, %P)\n", D, A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -405,19 +424,22 @@ void polynomial_div(polynomial_t* D, const polynomial_t* A1, const polynomial_t*
 
   coefficient_ops.div(D->ctx, &D->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_div() => %P\n", D);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_div() => %P\n", D);
+  }
 }
 
 void polynomial_rem(polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2) {
 
-  TRACE("polynomial", "polynomial_rem(%P, %P, %P)\n", R, A1, A2);
-
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_rem(%P, %P, %P)\n", R, A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -430,19 +452,22 @@ void polynomial_rem(polynomial_t* R, const polynomial_t* A1, const polynomial_t*
 
   coefficient_ops.rem(R->ctx, &R->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_rem() => %P\n", R);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_rem() => %P\n", R);
+  }
 }
 
 void polynomial_divrem(polynomial_t* D, polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2) {
 
-  TRACE("polynomial", "polynomial_divrem(%P, %P, %P, %P)\n", D, R, A1, A2);
-
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_divrem(%P, %P, %P, %P)\n", D, R, A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -456,15 +481,18 @@ void polynomial_divrem(polynomial_t* D, polynomial_t* R, const polynomial_t* A1,
 
   coefficient_ops.divrem(D->ctx, &R->data, &R->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_rem() => (%P, %P)\n", D, R);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_rem() => (%P, %P)\n", D, R);
+  }
 }
 
 void polynomial_derivative(polynomial_t* A_d, const polynomial_t* A) {
 
-  TRACE("polynomial", "polynomial_derivative(%P, %P)\n", A_d, A);
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    tracef("polynomial_derivative(%P, %P)\n", A_d, A);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
 
@@ -482,18 +510,22 @@ void polynomial_derivative(polynomial_t* A_d, const polynomial_t* A) {
 
   coefficient_ops.derivative(A_d->ctx, &A_d->data, &A->data);
 
-  TRACE("polynomial", "polynomial_derivative() => %P\n", A_d);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_derivative() => %P\n", A_d);
+  }
 }
 
 void polynomial_gcd(polynomial_t* gcd, const polynomial_t* A1, const polynomial_t* A2) {
-  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
-
-  TRACE("polynomial", "polynomial_gcd(%P, %P)\n", A1, A2);
 
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db, trace_out);
+    tracef("polynomial_gcd(%P, %P)\n", A1, A2);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -506,7 +538,9 @@ void polynomial_gcd(polynomial_t* gcd, const polynomial_t* A1, const polynomial_
 
   coefficient_ops.gcd(gcd->ctx, &gcd->data, &A1->data, &A2->data);
 
-  TRACE("polynomial", "polynomial_gcd() => %P\n", gcd);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_gcd() => %P\n", gcd);
+  }
 }
 
 void polynomial_lcm(polynomial_t* lcm, const polynomial_t* A1, const polynomial_t* A2) {
@@ -526,18 +560,19 @@ void polynomial_lcm(polynomial_t* lcm, const polynomial_t* A1, const polynomial_
 
 void polynomial_reduce(
     const polynomial_t* A, const polynomial_t* B,
-    polynomial_t* P, polynomial_t* Q, polynomial_t* R) {
-
-  TRACE("polynomial", "polynomial_reduce(%P, %P)\n", A, B);
-
+    polynomial_t* P, polynomial_t* Q, polynomial_t* R)
+{
   const polynomial_context_t* ctx = A->ctx;
 
-  assert(polynomial_context_ops.equal(B->ctx, ctx));
-
   if (debug_trace_ops.is_enabled("polynomial")) {
-    variable_order_simple_ops.print((variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    tracef("polynomial_reduce(%P, %P)\n", A, B);
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db,
+        trace_out);
     tracef("\n");
   }
+
+  assert(polynomial_context_ops.equal(B->ctx, ctx));
 
   polynomial_external_clean(A);
   polynomial_external_clean(B);
@@ -548,15 +583,19 @@ void polynomial_reduce(
 
   coefficient_ops.reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, 1);
 
-  TRACE("polynomial", "polynomial_derivative() =>\n");
-  TRACE("polynomial", "\t P = %P\n", P);
-  TRACE("polynomial", "\t Q = %P\n", Q);
-  TRACE("polynomial", "\t R = %P\n", R);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_derivative() =>\n");
+    tracef("\t P = %P\n", P);
+    tracef("\t Q = %P\n", Q);
+    tracef("\t R = %P\n", R);
+  }
 }
 
 void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_t* B) {
 
-  TRACE("polynomial", "polynomial_psc(%P, %P)\n", A, B);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_psc(%P, %P)\n", A, B);
+  }
 
   assert(A->data.type == COEFFICIENT_POLYNOMIAL);
   assert(B->data.type == COEFFICIENT_POLYNOMIAL);
@@ -612,7 +651,9 @@ void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_
 
 void polynomial_resultant(polynomial_t* res, const polynomial_t* A, const polynomial_t* B) {
 
-  TRACE("polynomial", "polynomial_resultant(%P, %P)\n", A, B);
+  if (debug_trace_ops.is_enabled("polynomial")) {
+    tracef("polynomial_resultant(%P, %P)\n", A, B);
+  }
 
   assert(A->data.type == COEFFICIENT_POLYNOMIAL);
   assert(B->data.type == COEFFICIENT_POLYNOMIAL);
