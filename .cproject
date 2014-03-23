@@ -7,8 +7,10 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/polylib"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/poly"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libpoly"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/polylib/Debug"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/poly/Debug"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libpoly/debug-dynamic"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="polylib" srcPrefixMapping="" srcRootPath=""/>
 						<entry flags="RESOLVED" kind="libraryFile" name="poly" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
@@ -65,6 +67,19 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.204268791.1404292263" name="/" resourcePath="python">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.1862512529" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.743461928" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1741933036"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.1921782793" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.559986724"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1933473611" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug.623136106"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.111860038" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug.387263172"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.978083930" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.284481211"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.1143498982" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug.348091402"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="python" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -75,8 +90,10 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/polylib"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/poly"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libpoly"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/polylib/Release"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/poly/Release"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libpoly/release-dynamic"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="polylib" srcPrefixMapping="" srcRootPath=""/>
 						<entry flags="RESOLVED" kind="libraryFile" name="poly" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
@@ -136,6 +153,19 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1993201860.1635634501" name="/" resourcePath="python">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1574524570" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1383673438" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.982204129"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.687255391" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.1081387868"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.release.1256573741" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.release.1047661514"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.release.875890409" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.release.1755152936"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.release.701339164" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.release.799378350"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.so.release.804683464" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.release.1104784508"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="python" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
