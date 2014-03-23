@@ -112,10 +112,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.misc.pic.302829374" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" value="true" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.warnings.extrawarn.2072902639" name="Extra warnings (-Wextra)" superClass="gnu.c.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.warnings.extrawarn.2072902639" name="Extra warnings (-Wextra)" superClass="gnu.c.compiler.option.warnings.extrawarn" value="false" valueType="boolean"/>
 								<option id="gnu.c.compiler.option.warnings.toerrors.1967920712" name="Warnings as errors (-Werror)" superClass="gnu.c.compiler.option.warnings.toerrors" value="true" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.warnings.wconversion.1995240391" name="Implicit conversion warnings (-Wconversion)" superClass="gnu.c.compiler.option.warnings.wconversion" value="true" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.warnings.pedantic.909953607" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.warnings.wconversion.1995240391" name="Implicit conversion warnings (-Wconversion)" superClass="gnu.c.compiler.option.warnings.wconversion" value="false" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.warnings.pedantic.909953607" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2056722449" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.release.1755152936" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.release">
@@ -158,10 +158,10 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/polylib"/>
 		</configuration>
-		<configuration configurationName="debug-dynamic">
+		<configuration configurationName="Debug (dynamic)">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
-		<configuration configurationName="Debug (dynamic)">
+		<configuration configurationName="debug-dynamic">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
 		<configuration configurationName="Multiple configurations">
@@ -170,6 +170,7 @@
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/polylib"/>
 		</configuration>
+		<configuration configurationName="release-dynamic"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

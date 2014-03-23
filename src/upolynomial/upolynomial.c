@@ -325,15 +325,15 @@ upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q) {
 
   // Ensure capacity
   upolynomial_dense_t tmp;
-  upolynomial_dense_ops.construct(&tmp, degree + 1);
+  upolynomial_dense_construct(&tmp, degree + 1);
 
   // Add the buffers
-  upolynomial_dense_ops.add_mult_p_int(&tmp, p, 1);
-  upolynomial_dense_ops.add_mult_p_int(&tmp, q, 1);
+  upolynomial_dense_add_mult_p_int(&tmp, p, 1);
+  upolynomial_dense_add_mult_p_int(&tmp, q, 1);
 
   // Construct the result
-  upolynomial_t* result = upolynomial_dense_ops.to_upolynomial(&tmp, K);
-  upolynomial_dense_ops.destruct(&tmp);
+  upolynomial_t* result = upolynomial_dense_to_upolynomial(&tmp, K);
+  upolynomial_dense_destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
     tracef("upolynomial_add("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
@@ -362,15 +362,15 @@ upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q) {
 
   // Ensure capacity
   upolynomial_dense_t tmp;
-  upolynomial_dense_ops.construct(&tmp, degree + 1);
+  upolynomial_dense_construct(&tmp, degree + 1);
 
   // Add the buffers
-  upolynomial_dense_ops.add_mult_p_int(&tmp, p, 1);
-  upolynomial_dense_ops.add_mult_p_int(&tmp, q, -1);
+  upolynomial_dense_add_mult_p_int(&tmp, p, 1);
+  upolynomial_dense_add_mult_p_int(&tmp, q, -1);
 
   // Construct the result
-  upolynomial_t* result = upolynomial_dense_ops.to_upolynomial(&tmp, K);
-  upolynomial_dense_ops.destruct(&tmp);
+  upolynomial_t* result = upolynomial_dense_to_upolynomial(&tmp, K);
+  upolynomial_dense_destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
     tracef("upolynomial_sub("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
@@ -429,16 +429,16 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
 
   // Ensure capacity
   upolynomial_dense_t tmp;
-  upolynomial_dense_ops.construct(&tmp, degree + 1);
+  upolynomial_dense_construct(&tmp, degree + 1);
 
   unsigned i;
   for (i = 0; i < p->size; ++ i) {
-    upolynomial_dense_ops.add_mult_p_mon(&tmp, q, &p->monomials[i]);
+    upolynomial_dense_add_mult_p_mon(&tmp, q, &p->monomials[i]);
   }
 
   // Construct the result
-  upolynomial_t* result = upolynomial_dense_ops.to_upolynomial(&tmp, p->K);
-  upolynomial_dense_ops.destruct(&tmp);
+  upolynomial_t* result = upolynomial_dense_to_upolynomial(&tmp, p->K);
+  upolynomial_dense_destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
     tracef("upolynomial_multiply("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
@@ -518,7 +518,7 @@ upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
 
   // Ensure capacity
   upolynomial_dense_t tmp;
-  upolynomial_dense_ops.construct(&tmp, degree + 1);
+  upolynomial_dense_construct(&tmp, degree + 1);
   unsigned i;
   for (i = 0; i < p->size; ++ i) {
     size_t degree_i = p->monomials[i].degree;
@@ -529,8 +529,8 @@ upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
   tmp.size = degree + 1;
 
   // Construct the result
-  upolynomial_t* result = upolynomial_dense_ops.to_upolynomial(&tmp, p->K);
-  upolynomial_dense_ops.destruct(&tmp);
+  upolynomial_t* result = upolynomial_dense_to_upolynomial(&tmp, p->K);
+  upolynomial_dense_destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
     tracef("upolynomial_derivative("); upolynomial_print(p, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
@@ -557,8 +557,8 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
   int p_deg = upolynomial_degree(p);
   int q_deg = upolynomial_degree(q);
 
-  upolynomial_dense_ops.construct_p(rem, p_deg + 1, p);
-  upolynomial_dense_ops.construct(div, p_deg - q_deg + 1);
+  upolynomial_dense_construct_p(rem, p_deg + 1, p);
+  upolynomial_dense_construct(div, p_deg - q_deg + 1);
 
   // monomial we use to multiply with
   umonomial_t m;
@@ -579,9 +579,9 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
 
       if (debug_trace_ops.is_enabled("division")) {
         tracef("dividing with "); upolynomial_print(q, trace_out); tracef(" at degree %d\n", k);
-        tracef("rem = "); upolynomial_dense_ops.print(rem, trace_out);
+        tracef("rem = "); upolynomial_dense_print(rem, trace_out);
         tracef("div = "); tracef("\n");
-        upolynomial_dense_ops.print(div, trace_out); tracef("\n");
+        upolynomial_dense_print(div, trace_out); tracef("\n");
       }
 
       assert(!exact || integer_divides(K, upolynomial_lead_coeff(q), rem->coefficients + k));
@@ -596,12 +596,12 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
       } else {
         // rem: a*x^k, q: b*x^d, so we multiply rem with b and subtract a*q
         integer_assign(Z, &m.coefficient, rem->coefficients + k);
-        upolynomial_dense_ops.mult_c(rem, K, upolynomial_lead_coeff(q));
+        upolynomial_dense_mult_c(rem, K, upolynomial_lead_coeff(q));
       }
 
       // Do the subtraction
       if (integer_sgn(K, &m.coefficient)) {
-        upolynomial_dense_ops.sub_mult_p_mon(rem, q, &m);
+        upolynomial_dense_sub_mult_p_mon(rem, q, &m);
       }
 
       // Put the monomial into the division
@@ -612,7 +612,7 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
         integer_pow(K, &adjust, upolynomial_lead_coeff(q), m.degree);
         integer_mul(K, &div->coefficients[m.degree], &m.coefficient, &adjust);
       }
-      upolynomial_dense_ops.touch(div, K, m.degree);
+      upolynomial_dense_touch(div, K, m.degree);
     }
   }
 
@@ -661,9 +661,9 @@ upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
-    result = upolynomial_dense_ops.to_upolynomial(&div_buffer, K);
-    upolynomial_dense_ops.destruct(&div_buffer);
-    upolynomial_dense_ops.destruct(&rem_buffer);
+    result = upolynomial_dense_to_upolynomial(&div_buffer, K);
+    upolynomial_dense_destruct(&div_buffer);
+    upolynomial_dense_destruct(&rem_buffer);
   } else {
     // 0 polynomial
     result = upolynomial_construct_power(p->K, 0, 0);
@@ -727,9 +727,9 @@ upolynomial_t* upolynomial_rem_exact(const upolynomial_t* p, const upolynomial_t
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
-    result = upolynomial_dense_ops.to_upolynomial(&rem_buffer, K);
-    upolynomial_dense_ops.destruct(&rem_buffer);
-    upolynomial_dense_ops.destruct(&div_buffer);
+    result = upolynomial_dense_to_upolynomial(&rem_buffer, K);
+    upolynomial_dense_destruct(&rem_buffer);
+    upolynomial_dense_destruct(&div_buffer);
   } else {
     // rem = p
     result = upolynomial_construct_copy(p);
@@ -760,10 +760,10 @@ void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q,
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
-    *div= upolynomial_dense_ops.to_upolynomial(&div_buffer, K);
-    *rem = upolynomial_dense_ops.to_upolynomial(&rem_buffer, K);
-    upolynomial_dense_ops.destruct(&div_buffer);
-    upolynomial_dense_ops.destruct(&rem_buffer);
+    *div= upolynomial_dense_to_upolynomial(&div_buffer, K);
+    *rem = upolynomial_dense_to_upolynomial(&rem_buffer, K);
+    upolynomial_dense_destruct(&div_buffer);
+    upolynomial_dense_destruct(&rem_buffer);
   } else {
     // 0 polynomial
     *div = upolynomial_construct_power(p->K, 0, 0);
@@ -797,11 +797,11 @@ void upolynomial_div_pseudo(upolynomial_t** div, upolynomial_t** rem, const upol
 
   upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** pseudo */ 0);
 
-  *div = upolynomial_dense_ops.to_upolynomial(&div_buffer, K);
-  *rem = upolynomial_dense_ops.to_upolynomial(&rem_buffer, K);
+  *div = upolynomial_dense_to_upolynomial(&div_buffer, K);
+  *rem = upolynomial_dense_to_upolynomial(&rem_buffer, K);
 
-  upolynomial_dense_ops.destruct(&div_buffer);
-  upolynomial_dense_ops.destruct(&rem_buffer);
+  upolynomial_dense_destruct(&div_buffer);
+  upolynomial_dense_destruct(&rem_buffer);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
     tracef("upolynomial_div_pseudo("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = ("); upolynomial_print(*div, trace_out); tracef(", "); upolynomial_print(*rem, trace_out); tracef(")\n");
@@ -946,17 +946,17 @@ void upolynomial_evaluate_at_integer(const upolynomial_t* p, const integer_t* x,
 void upolynomial_evaluate_at_rational(const upolynomial_t* p, const rational_t* x, rational_t* value) {
   assert(p->K == Z);
   upolynomial_dense_t p_d;
-  upolynomial_dense_ops.construct_p(&p_d, upolynomial_ops.degree(p) + 1, p);
-  upolynomial_dense_ops.evaluate_at_rational(&p_d, x, value);
-  upolynomial_dense_ops.destruct(&p_d);
+  upolynomial_dense_construct_p(&p_d, upolynomial_ops.degree(p) + 1, p);
+  upolynomial_dense_evaluate_at_rational(&p_d, x, value);
+  upolynomial_dense_destruct(&p_d);
 }
 
 void upolynomial_evaluate_at_dyadic_rational(const upolynomial_t* p, const dyadic_rational_t* x, dyadic_rational_t* value) {
   assert(p->K == Z);
   upolynomial_dense_t p_d;
-  upolynomial_dense_ops.construct_p(&p_d, upolynomial_ops.degree(p) + 1, p);
-  upolynomial_dense_ops.evaluate_at_dyadic_rational(&p_d, x, value);
-  upolynomial_dense_ops.destruct(&p_d);
+  upolynomial_dense_construct_p(&p_d, upolynomial_ops.degree(p) + 1, p);
+  upolynomial_dense_evaluate_at_dyadic_rational(&p_d, x, value);
+  upolynomial_dense_destruct(&p_d);
 }
 
 int upolynomial_sgn_at_integer(const upolynomial_t* p, const integer_t* x) {
@@ -1130,8 +1130,8 @@ void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S
 
   int i;
   for (i = 0; i < *size; ++ i) {
-    (*S)[i] = upolynomial_dense_ops.to_upolynomial(S_dense + i, Z);
-    upolynomial_dense_ops.destruct(S_dense + i);
+    (*S)[i] = upolynomial_dense_to_upolynomial(S_dense + i, Z);
+    upolynomial_dense_destruct(S_dense + i);
   }
 
   free(S_dense);

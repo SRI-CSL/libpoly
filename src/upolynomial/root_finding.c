@@ -32,23 +32,23 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
   size_t f_deg = upolynomial_ops.degree(f);
 
   // f[0] = pp(f)
-  upolynomial_dense_ops.construct_p(&S[0], f_deg + 1, f);
-  upolynomial_dense_ops.mk_primitive_Z(&S[0], 1);
+  upolynomial_dense_construct_p(&S[0], f_deg + 1, f);
+  upolynomial_dense_mk_primitive_Z(&S[0], 1);
 
   if (debug_trace_ops.is_enabled("roots")) {
     tracef("S[0] = ");
-    upolynomial_dense_ops.print(&S[0], trace_out);
+    upolynomial_dense_print(&S[0], trace_out);
     tracef("\n");
   }
 
   // f[1] = f'
-  upolynomial_dense_ops.construct(&S[1], f_deg + 1);
-  upolynomial_dense_ops.derivative(Z, &S[0], &S[1]);
-  upolynomial_dense_ops.mk_primitive_Z(&S[1], 1);
+  upolynomial_dense_construct(&S[1], f_deg + 1);
+  upolynomial_dense_derivative(Z, &S[0], &S[1]);
+  upolynomial_dense_mk_primitive_Z(&S[1], 1);
 
   if (debug_trace_ops.is_enabled("roots")) {
     tracef("S[1] = ");
-    upolynomial_dense_ops.print(&S[1], trace_out);
+    upolynomial_dense_print(&S[1], trace_out);
     tracef("\n");
   }
 
@@ -56,19 +56,19 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
   int i = 1;
   while (S[i].size > 1) {
     i ++;
-    upolynomial_dense_ops.construct(&S[i], f_deg + 1);
+    upolynomial_dense_construct(&S[i], f_deg + 1);
     // Compute a*S[i-2] = div*S[i-1] + b*S[i]
-    upolynomial_dense_ops.reduce_Z(&S[i-2], &S[i-1], &a, &S[i]);
-    upolynomial_dense_ops.mk_primitive_Z(&S[i], 0);
+    upolynomial_dense_reduce_Z(&S[i-2], &S[i-1], &a, &S[i]);
+    upolynomial_dense_mk_primitive_Z(&S[i], 0);
 
     // If the coefficient of the reduction is not negative, we have to flip the
     // sign to get a Sturm sequence
     if (integer_sgn(Z, &a) > 0) {
-      upolynomial_dense_ops.negate(&S[i], Z);
+      upolynomial_dense_negate(&S[i], Z);
     }
 
     if (debug_trace_ops.is_enabled("roots")) {
-      tracef("S[%d] = ", i); upolynomial_dense_ops.print(&S[i], trace_out); tracef("\n");
+      tracef("S[%d] = ", i); upolynomial_dense_print(&S[i], trace_out); tracef("\n");
     }
   }
 
@@ -90,9 +90,9 @@ int sturm_seqence_count_sign_changes(
   int i, sgn_a, sgn_a_previous = 0, sgn_a_changes_count = 0;
   for (i = 0; i < sturm_sequence_size && sgn_a_changes_count < max_changes; ++ i) {
     // Get the sign of S[i] at a
-    sgn_a = (a == INF_N) ? upolynomial_dense_ops.sgn_at_minus_inf(&sturm_sequence[i])
-          : (a == INF_P) ? upolynomial_dense_ops.sgn_at_plus_inf(&sturm_sequence[i])
-          : upolynomial_dense_ops.sgn_at_rational(&sturm_sequence[i], a);
+    sgn_a = (a == INF_N) ? upolynomial_dense_sgn_at_minus_inf(&sturm_sequence[i])
+          : (a == INF_P) ? upolynomial_dense_sgn_at_plus_inf(&sturm_sequence[i])
+          : upolynomial_dense_sgn_at_rational(&sturm_sequence[i], a);
     // Compare with the previous non-zero sign
     if (sgn_a_previous == 0) {
       sgn_a_previous = sgn_a;
@@ -116,9 +116,9 @@ int sturm_seqence_count_sign_changes_dyadic(
   int i, sgn_a, sgn_a_previous = 0, sgn_a_changes_count = 0;
   for (i = 0; i < sturm_sequence_size && sgn_a_changes_count < max_changes; ++ i) {
     // Get the sign of S[i] at a
-    sgn_a = (a == INF_N) ? upolynomial_dense_ops.sgn_at_minus_inf(&sturm_sequence[i])
-          : (a == INF_P) ? upolynomial_dense_ops.sgn_at_plus_inf(&sturm_sequence[i])
-          : upolynomial_dense_ops.sgn_at_dyadic_rational(&sturm_sequence[i], a);
+    sgn_a = (a == INF_N) ? upolynomial_dense_sgn_at_minus_inf(&sturm_sequence[i])
+          : (a == INF_P) ? upolynomial_dense_sgn_at_plus_inf(&sturm_sequence[i])
+          : upolynomial_dense_sgn_at_dyadic_rational(&sturm_sequence[i], a);
     // Compare with the previous non-zero sign
     if (sgn_a_previous == 0) {
       sgn_a_previous = sgn_a;
@@ -147,10 +147,10 @@ int sturm_seqence_count_roots(
   int root_count = a_sgn_changes - b_sgn_changes;
   // Adjust for the possible zeros at a dn b
   if (interval) {
-    if (interval->b_open && upolynomial_dense_ops.sgn_at_rational(&sturm_sequence[0], &interval->b) == 0) {
+    if (interval->b_open && upolynomial_dense_sgn_at_rational(&sturm_sequence[0], &interval->b) == 0) {
       root_count --;
     }
-    if (!interval->a_open && upolynomial_dense_ops.sgn_at_rational(&sturm_sequence[0], &interval->a) != 0) {
+    if (!interval->a_open && upolynomial_dense_sgn_at_rational(&sturm_sequence[0], &interval->a) != 0) {
       root_count ++;
     }
   }
@@ -175,10 +175,10 @@ int sturm_seqence_count_roots_dyadic(
   int root_count = a_sgn_changes - b_sgn_changes;
   // Adjust for the possible zeros at a dn b
   if (interval) {
-    if (interval->b_open && upolynomial_dense_ops.sgn_at_dyadic_rational(&sturm_sequence[0], &interval->b) == 0) {
+    if (interval->b_open && upolynomial_dense_sgn_at_dyadic_rational(&sturm_sequence[0], &interval->b) == 0) {
       root_count --;
     }
-    if (!interval->a_open && upolynomial_dense_ops.sgn_at_dyadic_rational(&sturm_sequence[0], &interval->a) != 0) {
+    if (!interval->a_open && upolynomial_dense_sgn_at_dyadic_rational(&sturm_sequence[0], &interval->a) != 0) {
       root_count ++;
     }
   }
@@ -229,7 +229,7 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
     // Destroy the temporaries
     int i;
     for (i = 0; i < sturm_sequence_size; ++i) {
-      upolynomial_dense_ops.destruct(sturm_sequence + i);
+      upolynomial_dense_destruct(sturm_sequence + i);
     }
     free(sturm_sequence);
   }
@@ -257,7 +257,7 @@ void sturm_seqence_isolate_roots(
 
     if (debug_trace_ops.is_enabled("roots")) {
       tracef("sturm_seqence_isolate_roots(");
-      upolynomial_dense_ops.print(S, trace_out);
+      upolynomial_dense_print(S, trace_out);
       tracef(", ");
       dyadic_interval_print(&I, trace_out);
       tracef(")\n");
@@ -272,16 +272,16 @@ void sturm_seqence_isolate_roots(
     // For one root, check if we hit the root exactly
     if (total_roots == 1) {
       // Isolated one check if it's in b
-      if (upolynomial_dense_ops.sgn_at_dyadic_rational(&S[0], &I.b) == 0) {
+      if (upolynomial_dense_sgn_at_dyadic_rational(&S[0], &I.b) == 0) {
         // Copy out the interval [a, b]
         algebraic_number_ops.construct_from_dyadic_rational(&roots[*roots_size], &I.b);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
-      } else if (upolynomial_dense_ops.sgn_at_dyadic_rational(&S[0], &I.a) != 0) {
+      } else if (upolynomial_dense_sgn_at_dyadic_rational(&S[0], &I.a) != 0) {
         // Copy out the open interval (a, b)
         I.b_open = 1;
-        upolynomial_t* f = upolynomial_dense_ops.to_upolynomial(&S[0], Z);
+        upolynomial_t* f = upolynomial_dense_to_upolynomial(&S[0], Z);
         algebraic_number_ops.construct(&roots[*roots_size], f, &I);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
@@ -390,7 +390,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
     dyadic_interval_destruct(&interval_all);
     int i;
     for (i = 0; i < sturm_sequence_size; ++i) {
-      upolynomial_dense_ops.destruct(sturm_sequence + i);
+      upolynomial_dense_destruct(sturm_sequence + i);
     }
     free(sturm_sequence);
   }

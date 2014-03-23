@@ -89,23 +89,23 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
   // Buffers to keep A, B, and remainders
   upolynomial_dense_t r_0;
   upolynomial_dense_t r_1;
-  upolynomial_dense_ops.construct_p(&r_0, deg_A + 1, A);
-  upolynomial_dense_ops.construct_p(&r_1, deg_A + 1, B);
+  upolynomial_dense_construct_p(&r_0, deg_A + 1, A);
+  upolynomial_dense_construct_p(&r_1, deg_A + 1, B);
 
   // Buffers to keep div and rem
   upolynomial_dense_t r_2;
   upolynomial_dense_t q;
-  upolynomial_dense_ops.construct(&r_2, deg_A + 1); // Some extra for reuse
-  upolynomial_dense_ops.construct(&q, deg_A + 1);
+  upolynomial_dense_construct(&r_2, deg_A + 1); // Some extra for reuse
+  upolynomial_dense_construct(&q, deg_A + 1);
 
   // Buffers for the extended gcd computation
   upolynomial_dense_t s_0, s_1;
   upolynomial_dense_t t_0, t_1;
   if (extended_gcd) {
-    upolynomial_dense_ops.construct(&s_0, deg_A + 1);
-    upolynomial_dense_ops.construct(&s_1, deg_A + 1);
-    upolynomial_dense_ops.construct(&t_0, deg_A + 1);
-    upolynomial_dense_ops.construct(&t_1, deg_A + 1);
+    upolynomial_dense_construct(&s_0, deg_A + 1);
+    upolynomial_dense_construct(&s_1, deg_A + 1);
+    upolynomial_dense_construct(&t_0, deg_A + 1);
+    upolynomial_dense_construct(&t_1, deg_A + 1);
     // s_0, t_1 = 1
     integer_assign_int(Z, s_0.coefficients, 1);
     integer_assign_int(Z, t_1.coefficients, 1);
@@ -113,47 +113,47 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
 
   do {
     // One step of division
-    upolynomial_dense_ops.div_general(K, 1 /* exact */, &r_0, &r_1, &q, &r_2);
+    upolynomial_dense_div_general(K, 1 /* exact */, &r_0, &r_1, &q, &r_2);
 
     if (debug_trace_ops.is_enabled("gcd")) {
       tracef("r_0 = ");
-      upolynomial_dense_ops.print(&r_0, trace_out);
+      upolynomial_dense_print(&r_0, trace_out);
       tracef("\nr_1 = ");
-      upolynomial_dense_ops.print(&r_1, trace_out);
+      upolynomial_dense_print(&r_1, trace_out);
       tracef("\nq = ");
-      upolynomial_dense_ops.print(&q, trace_out);
+      upolynomial_dense_print(&q, trace_out);
       tracef("\nr_2 = ");
-      upolynomial_dense_ops.print(&r_2, trace_out);
+      upolynomial_dense_print(&r_2, trace_out);
       if (extended_gcd) {
         tracef("\ns_0 = ");
-        upolynomial_dense_ops.print(&s_0, trace_out);
+        upolynomial_dense_print(&s_0, trace_out);
         tracef("\ns_1 = ");
-        upolynomial_dense_ops.print(&s_1, trace_out);
+        upolynomial_dense_print(&s_1, trace_out);
         tracef("\nt_0 = ");
-        upolynomial_dense_ops.print(&t_0, trace_out);
+        upolynomial_dense_print(&t_0, trace_out);
         tracef("\nt_1 = ");
-        upolynomial_dense_ops.print(&t_1, trace_out);
+        upolynomial_dense_print(&t_1, trace_out);
       }
       tracef("\n");
     }
 
     // Check we are done
-    if (upolynomial_dense_ops.is_zero(&r_2))  {
+    if (upolynomial_dense_is_zero(&r_2))  {
       // We're in a field, make it monic
       integer_t lc;
       integer_construct_copy(K, &lc, r_1.coefficients + r_1.size - 1);
       if (integer_cmp_int(Z, &lc, 1)) {
-        upolynomial_dense_ops.div_c(&r_1, K, &lc);
+        upolynomial_dense_div_c(&r_1, K, &lc);
         if (extended_gcd) {
-          upolynomial_dense_ops.div_c(&s_1, K, &lc);
-          upolynomial_dense_ops.div_c(&t_1, K, &lc);
+          upolynomial_dense_div_c(&s_1, K, &lc);
+          upolynomial_dense_div_c(&t_1, K, &lc);
         }
       }
       integer_destruct(&lc);
-      D = upolynomial_dense_ops.to_upolynomial(&r_1, K);
+      D = upolynomial_dense_to_upolynomial(&r_1, K);
       if (extended_gcd) {
-        *U = upolynomial_dense_ops.to_upolynomial(&s_1, K);
-        *V = upolynomial_dense_ops.to_upolynomial(&t_1, K);
+        *U = upolynomial_dense_to_upolynomial(&s_1, K);
+        *V = upolynomial_dense_to_upolynomial(&t_1, K);
       }
     } else {
 
@@ -161,16 +161,16 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
       if (extended_gcd) {
         // s2 = s0 - q*s1
         // (s0, s1) = (s1, s2)
-        upolynomial_dense_ops.sub_mult(&s_0, K, &q, &s_1);
-        upolynomial_dense_ops.swap(&s_0, &s_1);;
+        upolynomial_dense_sub_mult(&s_0, K, &q, &s_1);
+        upolynomial_dense_swap(&s_0, &s_1);;
         // t2 = t0 - q*t2
-        upolynomial_dense_ops.sub_mult(&t_0, K, &q, &t_1);
-        upolynomial_dense_ops.swap(&t_0, &t_1);
+        upolynomial_dense_sub_mult(&t_0, K, &q, &t_1);
+        upolynomial_dense_swap(&t_0, &t_1);
       }
 
       // (r0, r1) = (r1, r2)
-      upolynomial_dense_ops.swap(&r_0, &r_1);
-      upolynomial_dense_ops.swap(&r_1, &r_2);
+      upolynomial_dense_swap(&r_0, &r_1);
+      upolynomial_dense_swap(&r_1, &r_2);
 
 
     }
@@ -178,16 +178,16 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
   } while (D == 0);
 
   if (extended_gcd) {
-    upolynomial_dense_ops.destruct(&s_0);
-    upolynomial_dense_ops.destruct(&s_1);
-    upolynomial_dense_ops.destruct(&t_0);
-    upolynomial_dense_ops.destruct(&t_1);
+    upolynomial_dense_destruct(&s_0);
+    upolynomial_dense_destruct(&s_1);
+    upolynomial_dense_destruct(&t_0);
+    upolynomial_dense_destruct(&t_1);
   }
 
-  upolynomial_dense_ops.destruct(&q);
-  upolynomial_dense_ops.destruct(&r_2);
-  upolynomial_dense_ops.destruct(&r_0);
-  upolynomial_dense_ops.destruct(&r_1);
+  upolynomial_dense_destruct(&q);
+  upolynomial_dense_destruct(&r_2);
+  upolynomial_dense_destruct(&r_0);
+  upolynomial_dense_destruct(&r_1);
 
   if (debug_trace_ops.is_enabled("gcd")) {
     tracef("upolynomial_gcd_euclid("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(") = "); upolynomial_print(D, trace_out); tracef("\n");
@@ -220,8 +220,8 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
   // Dense representations of the remainders to keep p and q
   upolynomial_dense_t r_0;
   upolynomial_dense_t r_1;
-  upolynomial_dense_ops.construct_p(&r_0, deg_A + 1, A);
-  upolynomial_dense_ops.construct_p(&r_1, deg_A + 1, B);
+  upolynomial_dense_construct_p(&r_0, deg_A + 1, A);
+  upolynomial_dense_construct_p(&r_1, deg_A + 1, B);
 
   // Contents of a, b
   integer_t A_cont, B_cont;
@@ -242,15 +242,15 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
   integer_gcd_Z(&d, &A_cont, &B_cont);
   if (integer_cmp_int(Z, &d, 1)) {
     // GCD != 1
-    upolynomial_dense_ops.div_c(&r_0, K, &A_cont);
-    upolynomial_dense_ops.div_c(&r_1, K, &B_cont);
+    upolynomial_dense_div_c(&r_0, K, &A_cont);
+    upolynomial_dense_div_c(&r_1, K, &B_cont);
   }
 
   // Buffers to keep div and rem
   upolynomial_dense_t r_2;
   upolynomial_dense_t q;
-  upolynomial_dense_ops.construct(&r_2, deg_A + 1); // Some extra for reuse
-  upolynomial_dense_ops.construct(&q, deg_A + 1);
+  upolynomial_dense_construct(&r_2, deg_A + 1); // Some extra for reuse
+  upolynomial_dense_construct(&q, deg_A + 1);
 
   // Adjustment coefficients
   integer_t g, h;
@@ -267,17 +267,17 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
     int delta = r_0.size - r_1.size;
 
     // One step of division
-    upolynomial_dense_ops.div_general(K, 0, &r_0, &r_1, &q, &r_2);
+    upolynomial_dense_div_general(K, 0, &r_0, &r_1, &q, &r_2);
 
     if (debug_trace_ops.is_enabled("gcd")) {
       tracef("r_0 = ");
-      upolynomial_dense_ops.print(&r_0, trace_out);
+      upolynomial_dense_print(&r_0, trace_out);
       tracef("\nr_q = ");
-      upolynomial_dense_ops.print(&r_1, trace_out);
+      upolynomial_dense_print(&r_1, trace_out);
       tracef("\nq = ");
-      upolynomial_dense_ops.print(&q, trace_out);
+      upolynomial_dense_print(&q, trace_out);
       tracef("\nr_w = ");
-      upolynomial_dense_ops.print(&r_2, trace_out);
+      upolynomial_dense_print(&r_2, trace_out);
       tracef("\n");
     }
 
@@ -286,21 +286,21 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
       if (integer_sgn(Z, r_2.coefficients)) {
         // rem != 0, GCD(p, q) is 1 => total gcd is d
         integer_assign(K, r_2.coefficients, &d);
-        D = upolynomial_dense_ops.to_upolynomial(&r_2, K);
+        D = upolynomial_dense_to_upolynomial(&r_2, K);
       } else {
         // rem == 0
-        upolynomial_dense_ops.mk_primitive_Z(&r_1, 1);
-        upolynomial_dense_ops.mult_c(&r_1, K, &d);
-        D = upolynomial_dense_ops.to_upolynomial(&r_1, K);
+        upolynomial_dense_mk_primitive_Z(&r_1, 1);
+        upolynomial_dense_mult_c(&r_1, K, &d);
+        D = upolynomial_dense_to_upolynomial(&r_1, K);
       }
     } else {
       // p = q
-      upolynomial_dense_ops.swap(&r_0, &r_1);
+      upolynomial_dense_swap(&r_0, &r_1);
       // q = rem/(g*(h^delta)
       integer_pow(K, &tmp1, &h, delta);
       integer_mul(K, &tmp2, &tmp1, &g);
-      upolynomial_dense_ops.swap(&r_1, &r_2);
-      upolynomial_dense_ops.div_c(&r_1, K, &tmp2);
+      upolynomial_dense_swap(&r_1, &r_2);
+      upolynomial_dense_div_c(&r_1, K, &tmp2);
       // g = lc(p)
       integer_assign(K, &g, r_0.coefficients + r_0.size - 1);
       // h = h^(1-delta)*g^delta = g^delta/(h^(delta-1))
@@ -319,10 +319,10 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
   integer_destruct(&A_cont);
   integer_destruct(&B_cont);
 
-  upolynomial_dense_ops.destruct(&q);
-  upolynomial_dense_ops.destruct(&r_2);
-  upolynomial_dense_ops.destruct(&r_0);
-  upolynomial_dense_ops.destruct(&r_1);
+  upolynomial_dense_destruct(&q);
+  upolynomial_dense_destruct(&r_2);
+  upolynomial_dense_destruct(&r_0);
+  upolynomial_dense_destruct(&r_1);
 
   if (debug_trace_ops.is_enabled("gcd")) {
     tracef("upolynomial_gcd_subresultant("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(") = "); upolynomial_print(D, trace_out); tracef("\n");
@@ -370,7 +370,7 @@ static upolynomial_t* reconstruct_polynomial(size_t max_size, integer_t* p_value
 
   // computation here
   upolynomial_dense_t p_d;
-  upolynomial_dense_ops.construct(&p_d, max_size);
+  upolynomial_dense_construct(&p_d, max_size);
 
   integer_t div;
   integer_t rem;
@@ -397,19 +397,19 @@ static upolynomial_t* reconstruct_polynomial(size_t max_size, integer_t* p_value
 
     d ++;
   }
-  upolynomial_dense_ops.touch(&p_d, Z, d - 1);
+  upolynomial_dense_touch(&p_d, Z, d - 1);
 
   // We only care about primitive GCDs in the reconstruction
-  upolynomial_dense_ops.mk_primitive_Z(&p_d, 1);
+  upolynomial_dense_mk_primitive_Z(&p_d, 1);
 
   // Now, multiply with cont
-  upolynomial_dense_ops.mult_c(&p_d, Z, cont);
+  upolynomial_dense_mult_c(&p_d, Z, cont);
 
   // Get the sparse representation
-  upolynomial_t* p = upolynomial_dense_ops.to_upolynomial(&p_d, Z);
+  upolynomial_t* p = upolynomial_dense_to_upolynomial(&p_d, Z);
 
   // Free temporaries
-  upolynomial_dense_ops.destruct(&p_d);
+  upolynomial_dense_destruct(&p_d);
   integer_destruct(&div);
   integer_destruct(&rem);
   integer_destruct(&P);

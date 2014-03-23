@@ -21,17 +21,17 @@ void trace_enable(const char* tag) {
 #endif
 }
 
-int trace_is_enabled(const char* tag) {
 #ifndef NDEBUG
+int trace_is_enabled(const char* tag) {
   unsigned i;
   for (i = 0; i < tags_to_trace_size; ++ i) {
     if (strcmp(tag, tags_to_trace[i]) == 0) {
       return i+1;
     }
   }
-#endif
   return 0;
 }
+#endif
 
 static
 void trace_disable(const char* tag) {

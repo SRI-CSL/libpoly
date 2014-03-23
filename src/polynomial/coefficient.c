@@ -2441,8 +2441,7 @@ void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, 
   assert(A->type == COEFFICIENT_POLYNOMIAL);
   assert(B->type == COEFFICIENT_POLYNOMIAL);
 
-  variable_t x = VAR(A);
-  assert(VAR(B) == x);
+  assert(VAR(B) == VAR(A));
 
   size_t A_deg = coefficient_degree(A);
   size_t B_deg = coefficient_degree(B);
