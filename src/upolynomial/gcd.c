@@ -224,8 +224,10 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
   upolynomial_ops.content_Z(A, &A_cont);
   upolynomial_ops.content_Z(B, &B_cont);
 
-  TRACE("gcd", "cont(p) = %C\n", &A_cont);
-  TRACE("gcd", "cont(q) = %C\n", &B_cont);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("cont(p) = "); integer_print(&A_cont, trace_out); tracef("\n");
+    tracef("cont(q) = "); integer_print(&B_cont, trace_out); tracef("\n");
+  }
 
   // d = gcd(content(p), content(q)))
   integer_t d;
@@ -341,7 +343,10 @@ static void evaluate_polynomial(const upolynomial_t* A, const integer_t* A_conte
       integer_ops.mul_pow2(Z, &add, &coeff, A->monomials[k].degree * pow);
     }
     integer_ops.add(Z, out, out, &add);
-    TRACE("gcd", "out = %C\n", out);
+
+    if (debug_trace_ops.is_enabled("gcd")) {
+      tracef("out = "); integer_print(out, trace_out); tracef("\n");
+    }
   }
 
   integer_ops.destruct(&coeff);
@@ -461,14 +466,19 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
   upolynomial_ops.content_Z(A, &A_cont);
   upolynomial_ops.content_Z(B, &B_cont);
 
-  TRACE("gcd", "cont(p) = %C\n", &A_cont);
-  TRACE("gcd", "cont(q) = %C\n", &B_cont);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("cont(p) = "); integer_print(&A_cont, trace_out); tracef("\n");
+    tracef("cont(q) = "); integer_print(&B_cont, trace_out); tracef("\n");
+  }
 
   // d = gcd(content(A), content(B)))
   integer_t d;
   integer_ops.construct_from_int(Z, &d, 1);
   integer_ops.gcd_Z(&d, &A_cont, &B_cont);
-  TRACE("gcd", "d = %C\n", &d);
+
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("d = "); integer_print(&d, trace_out); tracef("\n");
+  }
 
   // The number we use for valuation 2^n
   int n = bound_valuation(A, B, &A_cont, &B_cont);
@@ -484,7 +494,10 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
     evaluate_polynomial(A, &A_cont, n, &A_v);
     evaluate_polynomial(B, &B_cont, n, &B_v);
 
-    TRACE("gcd", "value of A/cont = %C\n", &A_v); TRACE("gcd", "value of B/cont = %C\n", &B_v);
+    if (debug_trace_ops.is_enabled("gcd")) {
+        tracef("value of A/cont = "); integer_print(&A_v, trace_out); tracef("\n");
+        tracef("value of B/cont = "); integer_print(&B_v, trace_out); tracef("\n");
+    }
 
     // Get the gcd of the values and reconstruct the possible gcd
     integer_ops.gcd_Z(&D_v, &A_v, &B_v);
