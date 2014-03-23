@@ -197,7 +197,9 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
   assert(f->K == Z);
 
   if (debug_trace_ops.is_enabled("roots")) {
-    tracef("upolynomial_root_count_sturm(%P, ", f); interval_ops.print(interval, trace_out); tracef("\n");
+    tracef("upolynomial_root_count_sturm(");
+    upolynomial_print(f, trace_out); tracef(", ");
+    interval_print(interval, trace_out); tracef("\n");
   }
 
   int total_count = 0;
@@ -249,7 +251,7 @@ void sturm_seqence_isolate_roots(
     int a_sgn_changes, int b_sgn_changes)
 {
   dyadic_interval_t I;
-  dyadic_interval_ops.construct_copy(&I, interval);
+  dyadic_interval_construct_copy(&I, interval);
 
   for (;;) {
 
@@ -257,7 +259,7 @@ void sturm_seqence_isolate_roots(
       tracef("sturm_seqence_isolate_roots(");
       upolynomial_dense_ops.print(S, trace_out);
       tracef(", ");
-      dyadic_interval_ops.print(&I, trace_out);
+      dyadic_interval_print(&I, trace_out);
       tracef(")\n");
       tracef("a_sgn_changes = %d\n", a_sgn_changes);
       tracef("b_sgn_changes = %d\n", b_sgn_changes);
@@ -273,7 +275,7 @@ void sturm_seqence_isolate_roots(
       if (upolynomial_dense_ops.sgn_at_dyadic_rational(&S[0], &I.b) == 0) {
         // Copy out the interval [a, b]
         algebraic_number_ops.construct_from_dyadic_rational(&roots[*roots_size], &I.b);
-        dyadic_interval_ops.destruct(&I);
+        dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
       } else if (upolynomial_dense_ops.sgn_at_dyadic_rational(&S[0], &I.a) != 0) {
@@ -281,7 +283,7 @@ void sturm_seqence_isolate_roots(
         I.b_open = 1;
         upolynomial_t* f = upolynomial_dense_ops.to_upolynomial(&S[0], Z);
         algebraic_number_ops.construct(&roots[*roots_size], f, &I);
-        dyadic_interval_ops.destruct(&I);
+        dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
       }
@@ -290,7 +292,7 @@ void sturm_seqence_isolate_roots(
     // Continue with the splits (a, m], (m, b]
     dyadic_interval_t I_left;
     dyadic_interval_t I_right;
-    dyadic_interval_ops.construct_from_split(&I_left, &I_right, &I, 0, 1);
+    dyadic_interval_construct_from_split(&I_left, &I_right, &I, 0, 1);
 
     // Number of sign changes in the mid-point
     int m_sgn_changes = sturm_seqence_count_sign_changes_dyadic(S, S_size, &I_left.b, a_sgn_changes);
@@ -298,10 +300,10 @@ void sturm_seqence_isolate_roots(
     // No need for recursion if one of the intervals keeps all the roots
     if (a_sgn_changes == m_sgn_changes) {
       // All the roots are in the right interval
-      dyadic_interval_ops.swap(&I, &I_right);
+      dyadic_interval_swap(&I, &I_right);
     } else if (b_sgn_changes == m_sgn_changes) {
       // All the roots are in the left interval
-      dyadic_interval_ops.swap(&I, &I_left);
+      dyadic_interval_swap(&I, &I_left);
     } else {
       // Recurse
       // Isolate in the right interval
@@ -309,16 +311,16 @@ void sturm_seqence_isolate_roots(
       // Isolate in the left interval
       sturm_seqence_isolate_roots(S, S_size, roots, roots_size, &I_right, m_sgn_changes, b_sgn_changes);
       // Remove the temporaries
-      dyadic_interval_ops.destruct(&I);
-      dyadic_interval_ops.destruct(&I_left);
-      dyadic_interval_ops.destruct(&I_right);
+      dyadic_interval_destruct(&I);
+      dyadic_interval_destruct(&I_left);
+      dyadic_interval_destruct(&I_right);
       // Done
       return;
     }
 
     // Remove the temporaries
-    dyadic_interval_ops.destruct(&I_left);
-    dyadic_interval_ops.destruct(&I_right);
+    dyadic_interval_destruct(&I_left);
+    dyadic_interval_destruct(&I_right);
   }
 }
 
@@ -329,7 +331,9 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
 
   assert(f->K == Z);
 
-  TRACE("roots", "upolynomial_root_isolate_sturm(%P)\n", f);
+  if (debug_trace_ops.is_enabled("roots")) {
+    tracef("upolynomial_root_isolate_sturm("); upolynomial_print(f, trace_out); tracef(")\n");
+  }
 
   *roots_size = 0;
 
@@ -357,13 +361,13 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
     int total_count = sturm_seqence_count_roots_dyadic(sturm_sequence, sturm_sequence_size, 0);
     // Now grow the interval (-1, 1] until it captures all the roots
     dyadic_interval_t interval_all;
-    dyadic_interval_ops.construct_from_int(&interval_all, -1, 1, 1, 1);
+    dyadic_interval_construct_from_int(&interval_all, -1, 1, 1, 1);
     int a_sgn_changes, b_sgn_changes;
     for (;;) {
 
       if (debug_trace_ops.is_enabled("roots")) {
         tracef("interval_all: ");
-        dyadic_interval_ops.print(&interval_all, trace_out);
+        dyadic_interval_print(&interval_all, trace_out);
         tracef("\n");
       }
 
@@ -374,7 +378,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
         break;
       }
       // Get the total number of roots
-      dyadic_interval_ops.scale(&interval_all, 1);
+      dyadic_interval_scale(&interval_all, 1);
     }
 
     // Isolate the roots
@@ -383,7 +387,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
     }
 
     // Destroy the temporaries
-    dyadic_interval_ops.destruct(&interval_all);
+    dyadic_interval_destruct(&interval_all);
     int i;
     for (i = 0; i < sturm_sequence_size; ++i) {
       upolynomial_dense_ops.destruct(sturm_sequence + i);
@@ -391,7 +395,11 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
     free(sturm_sequence);
   }
 
-  TRACE("roots", "upolynomial_root_isolate_sturm(%P) = %d \n", f, *roots_size);
+  if (debug_trace_ops.is_enabled("roots")) {
+    tracef("upolynomial_root_isolate_sturm(");
+    upolynomial_print(f, trace_out);
+    tracef(" = %d \n", *roots_size);
+  }
 
   // Sort the roots
   qsort(roots, *roots_size, sizeof(algebraic_number_t), algebraic_number_ops.cmp_void);
