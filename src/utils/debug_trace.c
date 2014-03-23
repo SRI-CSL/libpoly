@@ -14,13 +14,14 @@
 char* tags_to_trace[1000];
 size_t tags_to_trace_size = 0;
 
+static
 void trace_enable(const char* tag) {
 #ifndef NDEBUG
   tags_to_trace[tags_to_trace_size++] = strdup(tag);
 #endif
 }
 
-static int trace_is_enabled(const char* tag) {
+int trace_is_enabled(const char* tag) {
 #ifndef NDEBUG
   unsigned i;
   for (i = 0; i < tags_to_trace_size; ++ i) {
@@ -36,8 +37,10 @@ static
 void trace_disable(const char* tag) {
 #ifndef NDEBUG
   int i = trace_is_enabled(tag) - 1;
-  free(tags_to_trace[i]);
-  tags_to_trace[i] = tags_to_trace[--tags_to_trace_size];
+  if (i >= 0) {
+    free(tags_to_trace[i]);
+    tags_to_trace[i] = tags_to_trace[--tags_to_trace_size];
+  }
 #endif
 }
 

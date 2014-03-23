@@ -23,19 +23,22 @@ extern FILE* trace_out;
 
 #ifndef NDEBUG
 
+int trace_is_enabled(const char* tag);
+
 #define TRACE(tag, ...) { \
-  if (debug_trace_ops.is_enabled(tag)) { \
+  if (trace_is_enabled(tag)) { \
     tracef(__VA_ARGS__); \
   } \
 }
 
 #define TRACE_CMD(tag, cmd) { \
-  if (debug_trace_ops.is_enabled(tag)) { \
+  if (trace_is_enabled(tag)) { \
     cmd; \
   } \
 } \
 
 #else
+#define trace_is_enabled(tag) 0
 #define TRACE(tag, fmt, ...)
 #define TRACE_CMD(tag, cmd)
 #endif
