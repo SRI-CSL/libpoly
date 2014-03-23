@@ -9,6 +9,7 @@
 
 #include <interval.h>
 
+#include "number/integer.h"
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
 
@@ -103,7 +104,7 @@ void interval_construct_from_integer(interval_t* I,
     const integer_t* a, int a_open,
     const integer_t* b, int b_open)
 {
-  int cmp = integer_ops.cmp(Z, a, b);
+  int cmp = integer_cmp(Z, a, b);
   assert(cmp <= 0);
   rational_construct_from_integer(&I->a, a);
   if (cmp != 0) {
@@ -429,7 +430,7 @@ void dyadic_interval_construct_from_integer(dyadic_interval_t* I,
     const integer_t* a, int a_open,
     const integer_t* b, int b_open)
 {
-  int cmp = integer_ops.cmp(Z, a, b);
+  int cmp = integer_cmp(Z, a, b);
   assert(cmp <= 0);
   dyadic_rational_construct_from_integer(&I->a, a);
   if (cmp != 0) {

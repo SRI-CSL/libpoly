@@ -82,7 +82,7 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
     // f' is zero for a non-zero polynomial => f has to be of the form
     // f = \sum a_k x^(p*d_k) = f_p(x^p) where f_p = \sum a_k x^d_k
     // we factor f_p and then return f_p(x^p)=(f_p)^p
-    int p = integer_ops.to_int(&f->K->M);
+    int p = integer_to_int(&f->K->M);
     upolynomial_t* f_p = upolynomial_ops.div_degrees(f, p);
     factors = upolynomial_factor_square_free(f_p);
     int i;
@@ -142,7 +142,7 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
 
     // If P has content, it is a power of p
     if (upolynomial_ops.degree(P) > 0) {
-      int p = integer_ops.to_int(&f->K->M);
+      int p = integer_to_int(&f->K->M);
       upolynomial_t* P_p = upolynomial_ops.div_degrees(P, p);
       upolynomial_factors_t* sub_factors = upolynomial_factor_square_free(P_p);
       int i;
@@ -200,7 +200,7 @@ upolynomial_factors_t* upolynomial_factor_distinct_degree(const upolynomial_t* f
   assert(upolynomial_ops.is_monic(f));
 
   // The prime
-  int p = integer_ops.to_int(&K->M);
+  int p = integer_to_int(&K->M);
   assert(p < 100);
 
   upolynomial_factors_t* factors = upolynomial_factors_ops.construct();
@@ -282,12 +282,12 @@ upolynomial_factors_t* upolynomial_factor_distinct_degree(const upolynomial_t* f
 static void Q_construct(integer_t* Q, size_t size, const upolynomial_t* u) {
 
   int_ring K = upolynomial_ops.ring(u);
-  size_t p = (size_t) integer_ops.to_int(&K->M);
+  size_t p = (size_t) integer_to_int(&K->M);
 
   size_t k;
 
   for (k = 0; k < size*size; ++ k) {
-    integer_ops.construct_from_int(Z, Q + k, 0);
+    integer_construct_from_int(Z, Q + k, 0);
   }
 
   // Q
@@ -302,13 +302,13 @@ static void Q_construct(integer_t* Q, size_t size, const upolynomial_t* u) {
 
   // Q - I
   integer_t tmp, one;
-  integer_ops.construct_from_int(K, &tmp, 0);
-  integer_ops.construct_from_int(K, &one, 1);
+  integer_construct_from_int(K, &tmp, 0);
+  integer_construct_from_int(K, &one, 1);
   for(k = 0; k < size; ++ k) {
-    integer_ops.sub(K, &tmp, Q + k*size + k, &one);
-    integer_ops.swap(K, &tmp, Q + k*size + k);
+    integer_sub(K, &tmp, Q + k*size + k, &one);
+    integer_swap(K, &tmp, Q + k*size + k);
   }
-  integer_ops.destruct(&tmp); integer_ops.destruct(&one);
+  integer_destruct(&tmp); integer_destruct(&one);
 }
 
 static void Q_column_multiply(int_ring K, integer_t* Q, size_t size, int j, const integer_t* m) {
@@ -316,22 +316,22 @@ static void Q_column_multiply(int_ring K, integer_t* Q, size_t size, int j, cons
   if (debug_trace_ops.is_enabled("nullspace")) {
     tracef("Multiplying column %d of Q with ", j); integer_print(m, trace_out); tracef("\n");
     tracef("Q = \n");
-    integer_ops.print_matrix(Q, size, size, trace_out);
+    integer_print_matrix(Q, size, size, trace_out);
   }
 
   integer_t tmp;
-  integer_ops.construct_from_int(K, &tmp, 0);
+  integer_construct_from_int(K, &tmp, 0);
 
   int k;
   for (k = 0; k < size; ++ k) {
-    integer_ops.mul(K, &tmp, Q + k*size + j, m);
-    integer_ops.swap(K, &tmp, Q + k*size + j);
+    integer_mul(K, &tmp, Q + k*size + j, m);
+    integer_swap(K, &tmp, Q + k*size + j);
   }
 
-  integer_ops.destruct(&tmp);
+  integer_destruct(&tmp);
 
   TRACE("nullspace", "Q = \n");
-  TRACE_CMD("nullspace", integer_ops.print_matrix(Q, size, size, trace_out));
+  TRACE_CMD("nullspace", integer_print_matrix(Q, size, size, trace_out));
 }
 
 // add column j into i multiplied by m
@@ -340,34 +340,34 @@ static void Q_column_add(int_ring K, integer_t* Q, size_t size, int i, const int
   assert(i != j);
 
   // Nothing to multiply with
-  if (integer_ops.sgn(K, m) == 0) {
+  if (integer_sgn(K, m) == 0) {
     return;
   }
 
   integer_t m_copy, mul, add;
 
-  integer_ops.construct_copy(Z, &m_copy, m);
-  integer_ops.construct_from_int(K, &mul, 0);
-  integer_ops.construct_from_int(K, &add, 0);
+  integer_construct_copy(Z, &m_copy, m);
+  integer_construct_from_int(K, &mul, 0);
+  integer_construct_from_int(K, &add, 0);
 
   if (debug_trace_ops.is_enabled("nullspace")) {
     tracef("Adding [%d]*", j); integer_print(m, trace_out); tracef(" of Q to %i\n", i);
-    tracef("Q = \n"); integer_ops.print_matrix(Q, size, size, trace_out);
+    tracef("Q = \n"); integer_print_matrix(Q, size, size, trace_out);
   }
 
   int k;
   for (k = 0; k < size; ++ k) {
-    integer_ops.mul(K, &mul, Q + k*size + j, &m_copy);
-    integer_ops.add(K, &add, Q + k*size + i, &mul);
-    integer_ops.swap(K, &add, Q + k*size + i);
+    integer_mul(K, &mul, Q + k*size + j, &m_copy);
+    integer_add(K, &add, Q + k*size + i, &mul);
+    integer_swap(K, &add, Q + k*size + i);
   }
 
-  integer_ops.destruct(&add);
-  integer_ops.destruct(&mul);
-  integer_ops.destruct(&m_copy);
+  integer_destruct(&add);
+  integer_destruct(&mul);
+  integer_destruct(&m_copy);
 
   if (debug_trace_ops.is_enabled("nullspace")) {
-    tracef("Q = \n"); integer_ops.print_matrix(Q, size, size, trace_out);
+    tracef("Q = \n"); integer_print_matrix(Q, size, size, trace_out);
   }
 }
 
@@ -388,16 +388,16 @@ static void Q_null_space(int_ring K, integer_t* Q, size_t size, integer_t** v, s
   // "triangular"
   int pivot_found;
   integer_t tmp1, tmp2;
-  integer_ops.construct_from_int(K, &tmp1, 0);
-  integer_ops.construct_from_int(K, &tmp2, 0);
+  integer_construct_from_int(K, &tmp1, 0);
+  integer_construct_from_int(K, &tmp2, 0);
   for (k = 0; k < size; ++ k) {
     pivot_found = 0;
     for (j = 0; j < size; ++ j) {
       const integer_t* a_kj = Q + k*size + j;
-      if (c[j] == -1 && integer_ops.sgn(K, a_kj)) {
+      if (c[j] == -1 && integer_sgn(K, a_kj)) {
         // Multiply column j with the inverse to get -1
-        integer_ops.inv(K, &tmp1, a_kj);
-        integer_ops.neg(K, &tmp2, &tmp1);
+        integer_inv(K, &tmp1, a_kj);
+        integer_neg(K, &tmp2, &tmp1);
         Q_column_multiply(K, Q, size, j, &tmp2);
         c[j] = k;
         // Eliminate the row
@@ -419,29 +419,29 @@ static void Q_null_space(int_ring K, integer_t* Q, size_t size, integer_t** v, s
       v[*v_size] = current;
       for (j = 0; j < size; ++ j) {
         if (j == k) {
-          integer_ops.construct_from_int(Z, current + j, 1);
+          integer_construct_from_int(Z, current + j, 1);
         } else {
-          integer_ops.construct_from_int(Z, current + j, 0);
+          integer_construct_from_int(Z, current + j, 0);
         }
       }
       for (j = 0; j < size; ++ j) {
         if (c[j] != -1) {
-          integer_ops.assign(Z, current + c[j], Q + k*size + j);
+          integer_assign(Z, current + c[j], Q + k*size + j);
         }
       }
       (*v_size) ++;
     }
   }
 
-  integer_ops.destruct(&tmp1);
-  integer_ops.destruct(&tmp2);
+  integer_destruct(&tmp1);
+  integer_destruct(&tmp2);
 
 }
 
 static void Q_destruct(integer_t* Q, size_t size) {
   int i;
   for (i = 0; i < size*size; ++ i) {
-    integer_ops.destruct(Q + i);
+    integer_destruct(Q + i);
   }
 }
 
@@ -521,15 +521,15 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
   } else {
 
     // The prime (should be small)
-    assert(integer_ops.cmp_int(Z, &K->M, 100) < 0);
-    int p = integer_ops.to_int(&K->M);
+    assert(integer_cmp_int(Z, &K->M, 100) < 0);
+    int p = integer_to_int(&K->M);
 
     // Construct the Q matrix
     integer_t Q[deg_f * deg_f];
     Q_construct(Q, deg_f, f);
 
     TRACE("nullspace", "Q = \n");
-    TRACE_CMD("berlekamp", integer_ops.print_matrix(Q, deg_f, deg_f, trace_out));
+    TRACE_CMD("berlekamp", integer_print_matrix(Q, deg_f, deg_f, trace_out));
 
     // Compute the null space of Q
     integer_t* v[deg_f]; // Vectors v_i
@@ -540,7 +540,7 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
       int i;
       for (i = 0; i < v_size; ++i) {
         tracef("v[%d] = \n", i);
-        integer_ops.print_matrix(v[i], 1, deg_f, trace_out);
+        integer_print_matrix(v[i], 1, deg_f, trace_out);
       }
     }
 
@@ -559,7 +559,7 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
       int s;
       for (s = 0; s < p; ++ s) {
         v_poly[s] = upolynomial_ops.construct(K, deg_f - 1, v[i]);
-        integer_ops.dec(K, &v[i][0]);
+        integer_dec(K, &v[i][0]);
       }
 
       int factor_i, factor_i_end;
@@ -604,12 +604,12 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
     int j;
     for (i = 0; i < v_size; ++i) {
       for (j = 0; j < deg_f; ++j) {
-        integer_ops.destruct(v[i] + j);
+        integer_destruct(v[i] + j);
       }
       free(v[i]);
     }
 
-    TRACE("berlekamp", "Q = \n"); TRACE_CMD("berlekamp", integer_ops.print_matrix(Q, deg_f, deg_f, trace_out));
+    TRACE("berlekamp", "Q = \n"); TRACE_CMD("berlekamp", integer_print_matrix(Q, deg_f, deg_f, trace_out));
 
     assert(v_size == factors->size);
 
@@ -651,7 +651,7 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
   if (upolynomial_ops.is_monic(f)) {
     to_factor = upolynomial_ops.construct_copy(f);
   } else {
-    integer_ops.assign(Z, &result->constant, upolynomial_ops.lead_coeff(f));
+    integer_assign(Z, &result->constant, upolynomial_ops.lead_coeff(f));
     to_factor = upolynomial_ops.div_exact_c(f, &result->constant);
   }
 
@@ -667,19 +667,19 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
     size_t f_i_multiplicity = sq_free_factors->multiplicities[i];
 
     // Extract linear factors
-    int x_int, p = integer_ops.to_int(&K->M);
+    int x_int, p = integer_to_int(&K->M);
     upolynomial_t* linear_factors_product = 0;
     for (x_int = 0; x_int < p; ++ x_int) {
       // Values
       integer_t value, x;
-      integer_ops.construct_from_int(K, &value, 0);
-      integer_ops.construct_from_int(K, &x, x_int);
+      integer_construct_from_int(K, &value, 0);
+      integer_construct_from_int(K, &x, x_int);
 
       // Evaluate the polynomial
       upolynomial_ops.evaluate_at_integer(f_i, &x, &value);
 
       // If zero we have a factor
-      if (integer_ops.sgn(Z, &value) == 0) {
+      if (integer_sgn(Z, &value) == 0) {
         int coeff[2] = { 0, 1 };
         coeff[0] = -x_int;
         upolynomial_t* linear_factor = upolynomial_ops.construct_from_int(K, 1, coeff);
@@ -693,8 +693,8 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
         }
       }
 
-      integer_ops.destruct(&x);
-      integer_ops.destruct(&value);
+      integer_destruct(&x);
+      integer_destruct(&value);
     }
 
     // Remove any linear factors
@@ -941,8 +941,8 @@ void hensel_lift_quadratic(const upolynomial_t* F,
 
   // The lifted ring
   integer_t qq;
-  integer_ops.construct_from_int(Z, &qq, 0);
-  integer_ops.pow(Z, &qq, q, 2);
+  integer_construct_from_int(Z, &qq, 0);
+  integer_pow(Z, &qq, q, 2);
   int_ring Zqq = int_ring_ops.create(&qq, 0);
 
   if (debug_trace_ops.is_enabled("hensel")) {
@@ -1149,7 +1149,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   }
 
   // Remove the temporaries
-  integer_ops.destruct(&qq);
+  integer_destruct(&qq);
   int_ring_ops.detach(Zqq);
   for (k = 0; k < A->size; ++ k) {
     upolynomial_ops.destruct(P[k]);
@@ -1361,9 +1361,9 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
 
   // Get the bound on coefficients sufficient when lifting to Z
   integer_t coefficient_bound;
-  integer_ops.construct_from_int(Z, &coefficient_bound, 0);
+  integer_construct_from_int(Z, &coefficient_bound, 0);
   upolynomial_factor_bound_landau_mignotte(f, upolynomial_ops.degree(f)/2, &coefficient_bound);
-  integer_ops.mul_int(Z, &coefficient_bound, &coefficient_bound, 2);
+  integer_mul_int(Z, &coefficient_bound, &coefficient_bound, 2);
 
   if (debug_trace_ops.is_enabled("factorization")) {
     tracef("coefficient_bound = "); integer_print(&coefficient_bound, trace_out); tracef("\n");
@@ -1379,14 +1379,14 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
 
     // The prime we'll try
     integer_t prime;
-    integer_ops.construct_from_int(Z, &prime, primes[prime_i]);
+    integer_construct_from_int(Z, &prime, primes[prime_i]);
 
     if (debug_trace_ops.is_enabled("factorization")) {
       tracef("prime = "); integer_print(&prime, trace_out); tracef("\n");
     }
 
     // We need a prime that keeps the degree of f, and maintains being square-free
-    if (!integer_ops.divides(Z, &prime, upolynomial_ops.lead_coeff(f))) {
+    if (!integer_divides(Z, &prime, upolynomial_ops.lead_coeff(f))) {
 
       // The ring to use
       int_ring K_p = int_ring_ops.create(&prime, 1);
@@ -1429,7 +1429,7 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
       int_ring_ops.detach(K_p);
     }
 
-    integer_ops.destruct(&prime);
+    integer_destruct(&prime);
   }
 
   assert(factors_p_best);
@@ -1442,7 +1442,7 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
     upolynomial_factors_t* U_q = upolynomial_factors_ops.construct();
 
     // Lift the factorization until enough to reconstruct in Z
-    while (integer_ops.cmp(Z, &upolynomial_factors_ops.ring(factors_p_best)->M,
+    while (integer_cmp(Z, &upolynomial_factors_ops.ring(factors_p_best)->M,
         &coefficient_bound) < 0) {
       // Do the lift
       hensel_lift_quadratic(f, factors_p_best, U_p, factors_q, U_q);
@@ -1472,7 +1472,7 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
 
   // Free the temps
   upolynomial_factors_ops.destruct(factors_p_best, 1);
-  integer_ops.destruct(&coefficient_bound);
+  integer_destruct(&coefficient_bound);
 
   // Done
   return factors;
@@ -1497,7 +1497,7 @@ upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
 
   // Get a square-free decomposition of f
   upolynomial_factors_t* sq_free_factors = upolynomial_factor_square_free(f_pp);
-  assert(integer_ops.cmp_int(Z, &sq_free_factors->constant, 1) == 0);
+  assert(integer_cmp_int(Z, &sq_free_factors->constant, 1) == 0);
 
   // Factor individuals
   int sq_free_factor_i;

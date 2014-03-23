@@ -92,6 +92,8 @@ int integer_print(const integer_t* c, FILE* out) {
   return mpz_out_str(out, 10, c);
 }
 
+int integer_print_matrix(const integer_t* c, size_t m, size_t n, FILE* out);
+
 static inline
 int integer_bits(const integer_t* c) {
   return mpz_sizeinbase(c, 2);
@@ -168,7 +170,7 @@ int integer_divides(int_ring K, const integer_t* a, const integer_t* b) {
   assert(integer_in_ring(K, a) && integer_in_ring(K, b));
   if (K) {
     // In a prime ring, it's always divisible
-    if (K->is_prime) return integer_ops.sgn(Z, a);
+    if (K->is_prime) return integer_sgn(Z, a);
     // Otherwise compute the gcd
     integer_t gcd;
     mpz_init(&gcd);

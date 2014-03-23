@@ -7,6 +7,18 @@
 
 #include "number/integer.h"
 
+int integer_print_matrix(const integer_t* c, size_t m, size_t n, FILE* out) {
+  int i, j;
+  int len = 0;
+  for (i = 0; i < m; ++ i) {
+    for (j = 0; j < n; ++ j) {
+      len += gmp_fprintf(out, "%4Zd", c + i*m + j);
+    }
+    len += fprintf(out, "\n");
+  }
+  return len;
+}
+
 static
 int_ring integer_ring_create(const integer_t* M, int is_prime) {
 
@@ -81,7 +93,7 @@ int integer_ring_print(int_ring K, FILE* out) {
   len += fprintf(out, "Z");
   if (K) {
     len += fprintf(out, " mod ");
-    len += integer_ops.print(&K->M, out);
+    len += integer_print(&K->M, out);
   }
   return len;
 }
@@ -113,18 +125,6 @@ void integer_construct_from_string(int_ring K, integer_t* c, const char* x, int 
   integer_ring_normalize(K, c);
 }
 
-static
-int integer_print_matrix(const integer_t* c, size_t m, size_t n, FILE* out) {
-  int i, j;
-  int len = 0;
-  for (i = 0; i < m; ++ i) {
-    for (j = 0; j < n; ++ j) {
-      len += gmp_fprintf(out, "%4Zd", c + i*m + j);
-    }
-    len += fprintf(out, "\n");
-  }
-  return len;
-}
 
 static
 char* integer_to_string(const integer_t* c) {

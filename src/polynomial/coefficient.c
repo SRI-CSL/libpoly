@@ -1770,7 +1770,7 @@ void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coe
         coefficient_destruct(cont);
         coefficient_construct_copy(ctx, cont, C);
       } else {
-        integer_ops.assign(ctx->K, &cont->value.num, &C->value.num);
+        integer_assign(ctx->K, &cont->value.num, &C->value.num);
       }
     }
     if (pp) {
@@ -1778,7 +1778,7 @@ void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coe
         coefficient_destruct(pp);
         coefficient_construct_from_int(ctx, pp, 1);
       } else {
-        integer_ops.assign_int(ctx->K, &pp->value.num, 1);
+        integer_assign_int(ctx->K, &pp->value.num, 1);
       }
     }
     break;
@@ -2234,7 +2234,7 @@ void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const 
       coefficient_destruct(lcm);
       coefficient_construct(ctx, lcm);
     }
-    integer_ops.lcm_Z(&lcm->value.num, &C1->value.num, &C2->value.num);
+    integer_lcm_Z(&lcm->value.num, &C1->value.num, &C2->value.num);
   } else {
     // LCM(C1, C2) = C1*C2/GCD(C1, C2)
     coefficient_t gcd;

@@ -26,7 +26,7 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
   }
 
   integer_t a;
-  integer_ops.construct_from_int(Z, &a, 0);
+  integer_construct_from_int(Z, &a, 0);
 
   // Min size for the polynomials
   size_t f_deg = upolynomial_ops.degree(f);
@@ -63,7 +63,7 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
 
     // If the coefficient of the reduction is not negative, we have to flip the
     // sign to get a Sturm sequence
-    if (integer_ops.sgn(Z, &a) > 0) {
+    if (integer_sgn(Z, &a) > 0) {
       upolynomial_dense_ops.negate(&S[i], Z);
     }
 
@@ -73,7 +73,7 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
   }
 
   // Remove the temp
-  integer_ops.destruct(&a);
+  integer_destruct(&a);
 
   // Size
   *size = i + 1;

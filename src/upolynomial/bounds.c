@@ -29,38 +29,38 @@ void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B) {
 
   integer_t M_p; // Positive
   integer_t M_n; // Negative
-  integer_ops.construct_from_int(Z, &M_p, 0);
-  integer_ops.construct_from_int(Z, &M_n, 0);
+  integer_construct_from_int(Z, &M_p, 0);
+  integer_construct_from_int(Z, &M_n, 0);
 
   int k;
   int d = f->size - 1;
   for (k = 0; k < d; ++ k) {
     if (f->monomials[k].degree > 0) {
-      if (integer_ops.cmp(Z, &f->monomials[k].coefficient, &M_p) > 0) {
-        integer_ops.assign(Z, &M_p, &f->monomials[k].coefficient);
-        integer_ops.neg(Z, &M_n, &f->monomials[k].coefficient);
-      } else if (integer_ops.cmp(Z, &f->monomials[k].coefficient, &M_n) < 0) {
-        integer_ops.assign(Z, &M_n, &f->monomials[k].coefficient);
-        integer_ops.neg(Z, &M_p, &f->monomials[k].coefficient);
+      if (integer_cmp(Z, &f->monomials[k].coefficient, &M_p) > 0) {
+        integer_assign(Z, &M_p, &f->monomials[k].coefficient);
+        integer_neg(Z, &M_n, &f->monomials[k].coefficient);
+      } else if (integer_cmp(Z, &f->monomials[k].coefficient, &M_n) < 0) {
+        integer_assign(Z, &M_n, &f->monomials[k].coefficient);
+        integer_neg(Z, &M_p, &f->monomials[k].coefficient);
       }
     }
   }
 
-  integer_ops.construct_from_int(Z, B, 0);
-  if (integer_ops.sgn(Z, &f->monomials[d].coefficient) > 0) {
-    integer_ops.div_Z(B, &M_p, &f->monomials[d].coefficient);
+  integer_construct_from_int(Z, B, 0);
+  if (integer_sgn(Z, &f->monomials[d].coefficient) > 0) {
+    integer_div_Z(B, &M_p, &f->monomials[d].coefficient);
   } else {
     integer_t neg;
-    integer_ops.construct_from_int(Z, &neg, 0);
-    integer_ops.neg(Z, &neg, &f->monomials[d].coefficient);
-    integer_ops.div_Z(B, &M_p, &f->monomials[d].coefficient);
-    integer_ops.destruct(&neg);
+    integer_construct_from_int(Z, &neg, 0);
+    integer_neg(Z, &neg, &f->monomials[d].coefficient);
+    integer_div_Z(B, &M_p, &f->monomials[d].coefficient);
+    integer_destruct(&neg);
   }
 
-  integer_ops.inc(Z, B);
+  integer_inc(Z, B);
 
-  integer_ops.destruct(&M_p);
-  integer_ops.destruct(&M_n);
+  integer_destruct(&M_p);
+  integer_destruct(&M_n);
 }
 
 /**
@@ -115,38 +115,38 @@ void upolynomial_factor_bound_landau_mignotte(const upolynomial_t* f, size_t n, 
   integer_t tmp;
   integer_t norm;
   integer_t ak_sq;
-  integer_ops.construct_from_int(Z, &tmp, 0);
-  integer_ops.construct_from_int(Z, &norm, 0);
-  integer_ops.construct_from_int(Z, &ak_sq, 0);
+  integer_construct_from_int(Z, &tmp, 0);
+  integer_construct_from_int(Z, &norm, 0);
+  integer_construct_from_int(Z, &ak_sq, 0);
 
   int k;
 
   // Sum of squares
   for(k = 0; k < f->size; ++ k) {
     const integer_t* ak = &f->monomials[k].coefficient;
-    integer_ops.mul(Z, &ak_sq, ak, ak);
-    integer_ops.add(Z, &tmp, &norm, &ak_sq);
-    integer_ops.swap(Z, &tmp, &norm);
+    integer_mul(Z, &ak_sq, ak, ak);
+    integer_add(Z, &tmp, &norm, &ak_sq);
+    integer_swap(Z, &tmp, &norm);
   }
 
   // Square root
-  integer_ops.sqrt_Z(&tmp, &norm);
-  integer_ops.swap(Z, &tmp, &norm);
-  integer_ops.inc(Z, &norm);
+  integer_sqrt_Z(&tmp, &norm);
+  integer_swap(Z, &tmp, &norm);
+  integer_inc(Z, &norm);
 
   // Power of two
   integer_t two;
   integer_t power;
-  integer_ops.construct_from_int(Z, &two, 2);
-  integer_ops.construct_from_int(Z, &power, 0);
-  integer_ops.pow(Z, &power, &two, n);
+  integer_construct_from_int(Z, &two, 2);
+  integer_construct_from_int(Z, &power, 0);
+  integer_pow(Z, &power, &two, n);
 
   // Result
-  integer_ops.mul(Z, B, &power, &norm);
+  integer_mul(Z, B, &power, &norm);
 
-  integer_ops.destruct(&tmp);
-  integer_ops.destruct(&norm);
-  integer_ops.destruct(&ak_sq);
-  integer_ops.destruct(&two);
-  integer_ops.destruct(&power);
+  integer_destruct(&tmp);
+  integer_destruct(&norm);
+  integer_destruct(&ak_sq);
+  integer_destruct(&two);
+  integer_destruct(&power);
 }

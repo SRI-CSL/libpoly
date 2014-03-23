@@ -107,8 +107,8 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
     upolynomial_dense_ops.construct(&t_0, deg_A + 1);
     upolynomial_dense_ops.construct(&t_1, deg_A + 1);
     // s_0, t_1 = 1
-    integer_ops.assign_int(Z, s_0.coefficients, 1);
-    integer_ops.assign_int(Z, t_1.coefficients, 1);
+    integer_assign_int(Z, s_0.coefficients, 1);
+    integer_assign_int(Z, t_1.coefficients, 1);
   }
 
   do {
@@ -141,15 +141,15 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
     if (upolynomial_dense_ops.is_zero(&r_2))  {
       // We're in a field, make it monic
       integer_t lc;
-      integer_ops.construct_copy(K, &lc, r_1.coefficients + r_1.size - 1);
-      if (integer_ops.cmp_int(Z, &lc, 1)) {
+      integer_construct_copy(K, &lc, r_1.coefficients + r_1.size - 1);
+      if (integer_cmp_int(Z, &lc, 1)) {
         upolynomial_dense_ops.div_c(&r_1, K, &lc);
         if (extended_gcd) {
           upolynomial_dense_ops.div_c(&s_1, K, &lc);
           upolynomial_dense_ops.div_c(&t_1, K, &lc);
         }
       }
-      integer_ops.destruct(&lc);
+      integer_destruct(&lc);
       D = upolynomial_dense_ops.to_upolynomial(&r_1, K);
       if (extended_gcd) {
         *U = upolynomial_dense_ops.to_upolynomial(&s_1, K);
@@ -225,8 +225,8 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
 
   // Contents of a, b
   integer_t A_cont, B_cont;
-  integer_ops.construct_from_int(K, &A_cont, 0);
-  integer_ops.construct_from_int(K, &B_cont, 0);
+  integer_construct_from_int(K, &A_cont, 0);
+  integer_construct_from_int(K, &B_cont, 0);
   upolynomial_ops.content_Z(A, &A_cont);
   upolynomial_ops.content_Z(B, &B_cont);
 
@@ -237,10 +237,10 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
 
   // d = gcd(content(p), content(q)))
   integer_t d;
-  integer_ops.construct_from_int(K, &d, 1);
+  integer_construct_from_int(K, &d, 1);
 
-  integer_ops.gcd_Z(&d, &A_cont, &B_cont);
-  if (integer_ops.cmp_int(Z, &d, 1)) {
+  integer_gcd_Z(&d, &A_cont, &B_cont);
+  if (integer_cmp_int(Z, &d, 1)) {
     // GCD != 1
     upolynomial_dense_ops.div_c(&r_0, K, &A_cont);
     upolynomial_dense_ops.div_c(&r_1, K, &B_cont);
@@ -254,13 +254,13 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
 
   // Adjustment coefficients
   integer_t g, h;
-  integer_ops.construct_from_int(Z, &g, 1);
-  integer_ops.construct_from_int(Z, &h, 1);
+  integer_construct_from_int(Z, &g, 1);
+  integer_construct_from_int(Z, &h, 1);
 
   // Temps for computation
   integer_t tmp1, tmp2;
-  integer_ops.construct_from_int(K, &tmp1, 0);
-  integer_ops.construct_from_int(K, &tmp2, 0);
+  integer_construct_from_int(K, &tmp1, 0);
+  integer_construct_from_int(K, &tmp2, 0);
 
   do {
     // \delta = deg(p) - deg(q)
@@ -283,9 +283,9 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
 
     // Check if the remainder is of degree 0
     if (r_2.size == 1)  {
-      if (integer_ops.sgn(Z, r_2.coefficients)) {
+      if (integer_sgn(Z, r_2.coefficients)) {
         // rem != 0, GCD(p, q) is 1 => total gcd is d
-        integer_ops.assign(K, r_2.coefficients, &d);
+        integer_assign(K, r_2.coefficients, &d);
         D = upolynomial_dense_ops.to_upolynomial(&r_2, K);
       } else {
         // rem == 0
@@ -297,27 +297,27 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
       // p = q
       upolynomial_dense_ops.swap(&r_0, &r_1);
       // q = rem/(g*(h^delta)
-      integer_ops.pow(K, &tmp1, &h, delta);
-      integer_ops.mul(K, &tmp2, &tmp1, &g);
+      integer_pow(K, &tmp1, &h, delta);
+      integer_mul(K, &tmp2, &tmp1, &g);
       upolynomial_dense_ops.swap(&r_1, &r_2);
       upolynomial_dense_ops.div_c(&r_1, K, &tmp2);
       // g = lc(p)
-      integer_ops.assign(K, &g, r_0.coefficients + r_0.size - 1);
+      integer_assign(K, &g, r_0.coefficients + r_0.size - 1);
       // h = h^(1-delta)*g^delta = g^delta/(h^(delta-1))
-      integer_ops.pow(K, &tmp1, &g, delta);
-      integer_ops.pow(K, &tmp2, &h, delta - 1);
-      integer_ops.div_exact(K, &h, &tmp1, &tmp2);
+      integer_pow(K, &tmp1, &g, delta);
+      integer_pow(K, &tmp2, &h, delta - 1);
+      integer_div_exact(K, &h, &tmp1, &tmp2);
     }
   } while (D == 0);
 
-  integer_ops.destruct(&tmp1);
-  integer_ops.destruct(&tmp2);
-  integer_ops.destruct(&g);
-  integer_ops.destruct(&h);
+  integer_destruct(&tmp1);
+  integer_destruct(&tmp2);
+  integer_destruct(&g);
+  integer_destruct(&h);
 
-  integer_ops.destruct(&d);
-  integer_ops.destruct(&A_cont);
-  integer_ops.destruct(&B_cont);
+  integer_destruct(&d);
+  integer_destruct(&A_cont);
+  integer_destruct(&B_cont);
 
   upolynomial_dense_ops.destruct(&q);
   upolynomial_dense_ops.destruct(&r_2);
@@ -335,30 +335,30 @@ static void evaluate_polynomial(const upolynomial_t* A, const integer_t* A_conte
 
   assert(pow > 0);
 
-  integer_ops.assign_int(Z, out, 0);
+  integer_assign_int(Z, out, 0);
 
   integer_t add;
   integer_t coeff;
-  integer_ops.construct_from_int(Z, &add, 0);
-  integer_ops.construct_from_int(Z, &coeff, 0);
+  integer_construct_from_int(Z, &add, 0);
+  integer_construct_from_int(Z, &coeff, 0);
 
   int k;
   for (k = 0; k < A->size; ++ k) {
-    integer_ops.div_exact(Z, &coeff, &A->monomials[k].coefficient, A_content);
+    integer_div_exact(Z, &coeff, &A->monomials[k].coefficient, A_content);
     if (A->monomials[k].degree == 0) {
-      integer_ops.assign(Z, &add, &coeff);
+      integer_assign(Z, &add, &coeff);
     } else {
-      integer_ops.mul_pow2(Z, &add, &coeff, A->monomials[k].degree * pow);
+      integer_mul_pow2(Z, &add, &coeff, A->monomials[k].degree * pow);
     }
-    integer_ops.add(Z, out, out, &add);
+    integer_add(Z, out, out, &add);
 
     if (debug_trace_ops.is_enabled("gcd")) {
       tracef("out = "); integer_print(out, trace_out); tracef("\n");
     }
   }
 
-  integer_ops.destruct(&coeff);
-  integer_ops.destruct(&add);
+  integer_destruct(&coeff);
+  integer_destruct(&add);
 }
 
 /**
@@ -374,26 +374,26 @@ static upolynomial_t* reconstruct_polynomial(size_t max_size, integer_t* p_value
 
   integer_t div;
   integer_t rem;
-  integer_ops.construct_from_int(Z, &div, 0);
-  integer_ops.construct_from_int(Z, &rem, 0);
+  integer_construct_from_int(Z, &div, 0);
+  integer_construct_from_int(Z, &rem, 0);
 
   integer_t P;
-  integer_ops.construct_from_int(Z, &P, 2);
-  integer_ops.pow(Z, &P, &P, pow);
+  integer_construct_from_int(Z, &P, 2);
+  integer_pow(Z, &P, &P, pow);
 
   // Basically compute digits modulo x_value
   int d = 0;
-  while (integer_ops.sgn(Z, p_value)) {
-    integer_ops.div_rem_pow2_Z(&div, &rem, p_value, pow);
+  while (integer_sgn(Z, p_value)) {
+    integer_div_rem_pow2_Z(&div, &rem, p_value, pow);
 
-    if (integer_ops.bits(&rem) + 1 >= pow) {
+    if (integer_bits(&rem) + 1 >= pow) {
       // If biger than 2^n/2 then take subtract 2^n-1
-      integer_ops.sub(Z, &rem, &rem, &P);
-      integer_ops.inc(Z, &div);
+      integer_sub(Z, &rem, &rem, &P);
+      integer_inc(Z, &div);
     }
 
-    integer_ops.swap(Z, &rem, p_d.coefficients + d);
-    integer_ops.swap(Z, &div, p_value);
+    integer_swap(Z, &rem, p_d.coefficients + d);
+    integer_swap(Z, &div, p_value);
 
     d ++;
   }
@@ -410,9 +410,9 @@ static upolynomial_t* reconstruct_polynomial(size_t max_size, integer_t* p_value
 
   // Free temporaries
   upolynomial_dense_ops.destruct(&p_d);
-  integer_ops.destruct(&div);
-  integer_ops.destruct(&rem);
-  integer_ops.destruct(&P);
+  integer_destruct(&div);
+  integer_destruct(&rem);
+  integer_destruct(&P);
 
   return p;
 }
@@ -426,25 +426,25 @@ int bound_valuation(const upolynomial_t* A, const upolynomial_t* B, const intege
   int k;
 
   integer_t tmp;
-  integer_ops.construct_from_int(Z, &tmp, 0);
+  integer_construct_from_int(Z, &tmp, 0);
 
   for (k = 0; k < A->size; ++ k) {
-    integer_ops.div_Z(&tmp, &A->monomials[k].coefficient, A_cont);
-    int bits = integer_ops.bits(&tmp);
+    integer_div_Z(&tmp, &A->monomials[k].coefficient, A_cont);
+    int bits = integer_bits(&tmp);
     if (bits > A_max) {
       A_max = bits;
     }
   }
 
   for (k = 0; k < B->size; ++ k) {
-    integer_ops.div_Z(&tmp, &B->monomials[k].coefficient, B_cont);
-    int bits = integer_ops.bits(&tmp);
+    integer_div_Z(&tmp, &B->monomials[k].coefficient, B_cont);
+    int bits = integer_bits(&tmp);
     if (bits > B_max) {
       B_max = bits;
     }
   }
 
-  integer_ops.destruct(&tmp);
+  integer_destruct(&tmp);
 
   int bits_min = A_max > B_max ? B_max : A_max;
 
@@ -471,8 +471,8 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
 
   // content(A), content(B)
   integer_t A_cont, B_cont;
-  integer_ops.construct_from_int(Z, &A_cont, 0);
-  integer_ops.construct_from_int(Z, &B_cont, 0);
+  integer_construct_from_int(Z, &A_cont, 0);
+  integer_construct_from_int(Z, &B_cont, 0);
   upolynomial_ops.content_Z(A, &A_cont);
   upolynomial_ops.content_Z(B, &B_cont);
 
@@ -483,8 +483,8 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
 
   // d = gcd(content(A), content(B)))
   integer_t d;
-  integer_ops.construct_from_int(Z, &d, 1);
-  integer_ops.gcd_Z(&d, &A_cont, &B_cont);
+  integer_construct_from_int(Z, &d, 1);
+  integer_gcd_Z(&d, &A_cont, &B_cont);
 
   if (debug_trace_ops.is_enabled("gcd")) {
     tracef("d = "); integer_print(&d, trace_out); tracef("\n");
@@ -494,9 +494,9 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
   int n = bound_valuation(A, B, &A_cont, &B_cont);
 
   integer_t A_v, B_v, D_v;
-  integer_ops.construct_from_int(Z, &A_v, 0);
-  integer_ops.construct_from_int(Z, &B_v, 0);
-  integer_ops.construct_from_int(Z, &D_v, 0);
+  integer_construct_from_int(Z, &A_v, 0);
+  integer_construct_from_int(Z, &B_v, 0);
+  integer_construct_from_int(Z, &D_v, 0);
 
   while (D == 0 && (attempts --)) {
 
@@ -510,7 +510,7 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
     }
 
     // Get the gcd of the values and reconstruct the possible gcd
-    integer_ops.gcd_Z(&D_v, &A_v, &B_v);
+    integer_gcd_Z(&D_v, &A_v, &B_v);
     // This also changes the value D_v
     D = reconstruct_polynomial(upolynomial_ops.degree(A) + 1, &D_v, n, &d);
 
@@ -535,12 +535,12 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
     }
   }
 
-  integer_ops.destruct(&A_cont);
-  integer_ops.destruct(&B_cont);
-  integer_ops.destruct(&d);
-  integer_ops.destruct(&A_v);
-  integer_ops.destruct(&B_v);
-  integer_ops.destruct(&D_v);
+  integer_destruct(&A_cont);
+  integer_destruct(&B_cont);
+  integer_destruct(&d);
+  integer_destruct(&A_v);
+  integer_destruct(&B_v);
+  integer_destruct(&D_v);
 
   return D;
 }
