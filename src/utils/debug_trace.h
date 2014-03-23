@@ -13,7 +13,13 @@
 extern FILE* trace_out;
 
 /** Print to the debug trace printf style */
-void tracef(const char* format, ...);
+#define tracef(...) { \
+  if (trace_out) { \
+    fprintf(trace_out, __VA_ARGS__); \
+  } else { \
+    fprintf(stderr, __VA_ARGS__); \
+  } \
+}
 
 #ifndef NDEBUG
 

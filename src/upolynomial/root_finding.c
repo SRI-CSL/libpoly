@@ -398,7 +398,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
   if (debug_trace_ops.is_enabled("roots")) {
     tracef("upolynomial_root_isolate_sturm(");
     upolynomial_print(f, trace_out);
-    tracef(" = %d \n", *roots_size);
+    tracef(" = %zu \n", *roots_size);
   }
 
   // Sort the roots

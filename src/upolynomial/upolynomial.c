@@ -312,7 +312,7 @@ upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q) {
   assert(p->K == q->K);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_add(%P, %P)\n", p, q);
+    tracef("upolynomial_add("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   int_ring K = p->K;
@@ -336,7 +336,7 @@ upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q) {
   upolynomial_dense_ops.destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_add(%P, %P) = %P\n", p, q, result);
+    tracef("upolynomial_add("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -349,7 +349,7 @@ upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q) {
   assert(p->K == q->K);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_sub(%P, %P)\n", p, q);
+    tracef("upolynomial_sub("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   int_ring K = p->K;
@@ -373,7 +373,7 @@ upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q) {
   upolynomial_dense_ops.destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_sub(%P, %P) = %P\n", p, q, result);
+    tracef("upolynomial_sub("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -402,7 +402,7 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
   assert(p->K == q->K);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_multiply(%P, %P)\n", p, q);
+    tracef("upolynomial_multiply("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   // Take p to be the smaller size
@@ -419,7 +419,7 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
   if (p->K == Z && p->size == 1) {
     upolynomial_t* result = upolynomial_multiply_simple(p->monomials, q);
     if (debug_trace_ops.is_enabled("arithmetic")) {
-      tracef("upolynomial_multiply(%P, %P) = %P\n", p, q, result);
+      tracef("upolynomial_multiply("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
     }
     return result;
   }
@@ -441,7 +441,7 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
   upolynomial_dense_ops.destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_multiply(%P, %P) = %P\n", p, q, result);
+    tracef("upolynomial_multiply("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -474,7 +474,7 @@ upolynomial_t* upolynomial_multiply_c(const upolynomial_t* p, const integer_t* c
 upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_pow(%P, %ld)\n", p, pow);
+    tracef("upolynomial_pow("); upolynomial_print(p, trace_out); tracef(", %ld)\n", pow);
   }
 
   assert(p);
@@ -500,7 +500,7 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-  tracef("upolynomial_pow(%P, %ld) = %P\n", p, pow, result);
+  tracef("upolynomial_pow("); upolynomial_print(p, trace_out); tracef(", %ld) = ", pow); upolynomial_print(result, trace_out); tracef("\n");
 }
 
   return result;
@@ -509,7 +509,7 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
 upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_derivative(%P)\n", p);
+    tracef("upolynomial_derivative("); upolynomial_print(p, trace_out); tracef(")\n");
   }
 
   // Max degree of the derivative
@@ -533,7 +533,7 @@ upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
   upolynomial_dense_ops.destruct(&tmp);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_derivative(%P) = %P\n", p, result);
+    tracef("upolynomial_derivative("); upolynomial_print(p, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -544,7 +544,7 @@ upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
 void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upolynomial_dense_t* div, upolynomial_dense_t* rem, int exact) {
 
   if (debug_trace_ops.is_enabled("division")) {
-    tracef("upolynomial_div_general(%P, %P)\n", p, q);
+    tracef("upolynomial_div_general("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(p);
@@ -578,12 +578,10 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
     if (k >= q_deg) {
 
       if (debug_trace_ops.is_enabled("division")) {
-        tracef("dividing with %P at degree %d\n", q, k);
-        tracef("rem = ");
-        upolynomial_dense_ops.print(rem, trace_out);
-        tracef("\ndiv = ");
-        upolynomial_dense_ops.print(div, trace_out);
-        tracef("\n");
+        tracef("dividing with "); upolynomial_print(q, trace_out); tracef(" at degree %d\n", k);
+        tracef("rem = "); upolynomial_dense_ops.print(rem, trace_out);
+        tracef("div = "); tracef("\n");
+        upolynomial_dense_ops.print(div, trace_out); tracef("\n");
       }
 
       assert(!exact || integer_divides(K, upolynomial_lead_coeff(q), rem->coefficients + k));
@@ -626,7 +624,7 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
 upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_degrees(%P, %zd)\n", p, a);
+    tracef("upolynomial_div_degrees("); upolynomial_print(p, trace_out); tracef(", %zd)\n", a);
   }
 
   assert(a > 1);
@@ -639,7 +637,7 @@ upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a) {
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_degrees(%P, %zd) = %P\n", p, a, result);
+    tracef("upolynomial_div_degrees("); upolynomial_print(p, trace_out); tracef(", %zd) = ", a); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -648,7 +646,7 @@ upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a) {
 upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t* q) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_exact(%P, %P)\n", p, q);
+    tracef("upolynomial_div_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(p);
@@ -672,7 +670,7 @@ upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_exact(%P, %P) = %P\n", p, q, result);
+    tracef("upolynomial_div_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -719,7 +717,7 @@ upolynomial_t* upolynomial_rem_exact(const upolynomial_t* p, const upolynomial_t
   assert(!upolynomial_is_zero(q));
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_rem_exact(%P, %P)\n", p, q);
+    tracef("upolynomial_rem_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   upolynomial_t* result = 0;
@@ -738,7 +736,7 @@ upolynomial_t* upolynomial_rem_exact(const upolynomial_t* p, const upolynomial_t
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_rem_exact(%P, %P) = %P\n", p, q, result);
+    tracef("upolynomial_rem_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(result, trace_out); tracef("\n");
   }
 
   return result;
@@ -748,7 +746,7 @@ void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q,
     upolynomial_t** div, upolynomial_t** rem) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_rem_exact(%P, %P)\n", p, q);
+    tracef("upolynomial_div_rem_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(p);
@@ -774,7 +772,7 @@ void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q,
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_exact(%P, %P) = (%P, %P)\n", p, q, div, rem);
+    tracef("upolynomial_div_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = ("); upolynomial_print(*div, trace_out); tracef(", "); upolynomial_print(*rem, trace_out); tracef(")\n");
   }
 }
 
@@ -782,7 +780,7 @@ void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q,
 void upolynomial_div_pseudo(upolynomial_t** div, upolynomial_t** rem, const upolynomial_t* p, const upolynomial_t* q) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_pseudo(%P, %P)\n", p, q);
+    tracef("upolynomial_div_pseudo("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(!*div);
@@ -806,14 +804,14 @@ void upolynomial_div_pseudo(upolynomial_t** div, upolynomial_t** rem, const upol
   upolynomial_dense_ops.destruct(&rem_buffer);
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_pseudo(%P, %P) = (%P, %P)\n", p, q, *div, *rem);
+    tracef("upolynomial_div_pseudo("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = ("); upolynomial_print(*div, trace_out); tracef(", "); upolynomial_print(*rem, trace_out); tracef(")\n");
   }
 }
 
 int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_exact(%P, %P)\n", p, q);
+    tracef("upolynomial_div_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(p->K == q->K);
@@ -847,7 +845,7 @@ int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q) {
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
-    tracef("upolynomial_div_exact(%P, %P) = %d\n", p, q, result);
+    tracef("upolynomial_div_exact("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = %d\n", result);
   }
 
   return result;
@@ -991,7 +989,7 @@ int upolynomial_sgn_at_dyadic_rational(const upolynomial_t* p, const dyadic_rati
 upolynomial_t* upolynomial_gcd(const upolynomial_t* p, const upolynomial_t* q) {
 
   if (debug_trace_ops.is_enabled("gcd")) {
-    tracef("upolynomial_gcd(%P, %P)\n", p, q);
+    tracef("upolynomial_gcd("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(p->K == Z || p->K->is_prime); // Otherwise make sure you understand what's happening
@@ -1016,7 +1014,7 @@ upolynomial_t* upolynomial_gcd(const upolynomial_t* p, const upolynomial_t* q) {
   }
 
   if (debug_trace_ops.is_enabled("gcd")) {
-    tracef("upolynomial_gcd(%P, %P) = %P\n", p, q, gcd);
+    tracef("upolynomial_gcd("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(gcd, trace_out); tracef("\n");
   }
 
   return gcd;
@@ -1025,7 +1023,7 @@ upolynomial_t* upolynomial_gcd(const upolynomial_t* p, const upolynomial_t* q) {
 upolynomial_t* upolynomial_extended_gcd(const upolynomial_t* p, const upolynomial_t* q, upolynomial_t** u, upolynomial_t** v) {
 
   if (debug_trace_ops.is_enabled("gcd")) {
-    tracef("upolynomial_gcd(%P, %P)\n", p, q);
+    tracef("upolynomial_gcd("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(")\n");
   }
 
   assert(p->K && p->K->is_prime);
@@ -1041,7 +1039,7 @@ upolynomial_t* upolynomial_extended_gcd(const upolynomial_t* p, const upolynomia
   }
 
   if (debug_trace_ops.is_enabled("gcd")) {
-    tracef("upolynomial_gcd(%P, %P) = %P\n", p, q, gcd);
+    tracef("upolynomial_gcd("); upolynomial_print(p, trace_out); tracef(", "); upolynomial_print(q, trace_out); tracef(") = "); upolynomial_print(gcd, trace_out); tracef("\n");
   }
 
   return gcd;
@@ -1076,7 +1074,7 @@ void upolynomial_solve_bezout(const upolynomial_t* p, const upolynomial_t* q, co
 upolynomial_factors_t* upolynomial_factor(const upolynomial_t* p) {
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    tracef("upolynomial_factor(%P)\n", p);
+    tracef("upolynomial_factor("); upolynomial_print(p, trace_out); tracef(")\n");
   }
 
   upolynomial_factors_t* factors = 0;
@@ -1089,9 +1087,8 @@ upolynomial_factors_t* upolynomial_factor(const upolynomial_t* p) {
   }
 
   if (debug_trace_ops.is_enabled("factorization")) {
-    tracef("upolynomial_factor(%P) = ", p);
-    upolynomial_factors_ops.print(factors, trace_out);
-    tracef("\n");
+    tracef("upolynomial_factor("); upolynomial_print(p, trace_out); tracef(") = ");
+    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   return factors;
@@ -1099,28 +1096,28 @@ upolynomial_factors_t* upolynomial_factor(const upolynomial_t* p) {
 
 int upolynomial_roots_count(const upolynomial_t* p, const interval_t* ab) {
   if (debug_trace_ops.is_enabled("roots")) {
-    tracef("upolynomial_real_roots_count(%P)\n", p);
+    tracef("upolynomial_real_roots_count("); upolynomial_print(p, trace_out); tracef(")\n");
   }
   int roots = upolynomial_roots_count_sturm(p, ab);
   if (debug_trace_ops.is_enabled("roots")) {
-    tracef("upolynomial_real_roots_count(%P) => %d\n", p, roots);
+    tracef("upolynomial_real_roots_count("); upolynomial_print(p, trace_out); tracef(") => %d\n", roots);
   }
   return roots;
 }
 
 void upolynomial_roots_isolate(const upolynomial_t* p, algebraic_number_t* roots, size_t* roots_size) {
   if (debug_trace_ops.is_enabled("roots")) {
-    tracef("upolynomial_roots_isolate(%P)\n", p);
+    tracef("upolynomial_roots_isolate("); upolynomial_print(p, trace_out); tracef(")\n");
   }
   upolynomial_roots_isolate_sturm(p, roots, roots_size);
   if (debug_trace_ops.is_enabled("roots")) {
-    tracef("upolynomial_real_roots_count(%P) => %d\n", p, *roots_size);
+    tracef("upolynomial_real_roots_count("); upolynomial_print(p, trace_out); tracef(") => %zu\n", *roots_size);
   }
 }
 
 void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S, size_t* size) {
   if (debug_trace_ops.is_enabled("roots")) {
-    tracef("upolynomial_roots_sturm_sequence(%P)\n", f);
+    tracef("upolynomial_roots_sturm_sequence("); upolynomial_print(f, trace_out); tracef(")\n");
   }
   assert(f->K == Z);
 

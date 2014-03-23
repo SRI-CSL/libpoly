@@ -47,14 +47,6 @@ void trace_set_output(FILE* file) {
   trace_out = file;
 }
 
-void tracef(const char* format, ...) {
-  if (trace_out == 0) trace_out = stderr;
-  va_list argptr;
-  va_start(argptr, format);
-  vfprintf(trace_out, format, argptr);
-  va_end(argptr);
-}
-
 const debug_trace_ops_t debug_trace_ops = {
     trace_enable,
     trace_disable,
