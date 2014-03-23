@@ -21,7 +21,9 @@
 
 void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dense_t* S, size_t* size) {
 
-  TRACE("roots", "upolynomial_compute_sturm_sequence(%P)\n", f);
+  if (debug_trace_ops.is_enabled("roots")) {
+    tracef("upolynomial_compute_sturm_sequence("); upolynomial_print(f, trace_out); tracef("\n");
+  }
 
   integer_t a;
   integer_ops.construct_from_int(Z, &a, 0);

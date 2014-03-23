@@ -18,7 +18,6 @@
 #include <assert.h>
 #include <string.h>
 
-static
 size_t upolynomial_degree(const upolynomial_t* p) {
   assert(p);
   assert(p->size > 0);
@@ -26,7 +25,6 @@ size_t upolynomial_degree(const upolynomial_t* p) {
 }
 
 // Construct the polynomial, but don't construct monomials
-static
 upolynomial_t* upolynomial_construct_empty(int_ring K, size_t size) {
   size_t malloc_size = sizeof(upolynomial_t) + size*sizeof(umonomial_t);
   upolynomial_t* new_p = (upolynomial_t*) malloc(malloc_size);
@@ -36,7 +34,6 @@ upolynomial_t* upolynomial_construct_empty(int_ring K, size_t size) {
   return new_p;
 }
 
-static
 upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t* coefficients) {
 
   // Compute the needed size
@@ -44,7 +41,7 @@ upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t*
   unsigned size = 0;
 
   for (i = 0; i <= degree; ++ i) {
-    if (integer_ops.sgn(K, coefficients + i)) {
+    if (integer_sgn(K, coefficients + i)) {
       size ++;
     }
   }
@@ -59,15 +56,15 @@ upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t*
   // Copy the coefficients
   size = 0;
   integer_t tmp;
-  integer_ops.construct_from_int(Z, &tmp, 0);
+  integer_construct_from_int(Z, &tmp, 0);
   for (i = 0; i <= degree; ++ i) {
-    integer_ops.assign(K, &tmp, coefficients + i);
-    if (integer_ops.sgn(Z, &tmp)) {
+    integer_assign(K, &tmp, coefficients + i);
+    if (integer_sgn(Z, &tmp)) {
       umonomial_construct(K, &new_p->monomials[size], i, &tmp);
       size ++;
     }
   }
-  integer_ops.destruct(&tmp);
+  integer_destruct(&tmp);
 
   // If no one constructed, make 0
   if (size == 0) {
@@ -79,64 +76,59 @@ upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t*
   return new_p;
 }
 
-static
 void upolynomial_destruct(upolynomial_t* p) {
   assert(p);
   int i = 0;
   for (i = 0; i < p->size; ++ i) {
-    integer_ops.destruct(&p->monomials[i].coefficient);
+    integer_destruct(&p->monomials[i].coefficient);
   }
   int_ring_ops.detach((int_ring_t*)p->K);
   free(p);
 }
 
-static
 upolynomial_t* upolynomial_construct_power(int_ring K, size_t degree, long c) {
   upolynomial_t* result = upolynomial_construct_empty(K, 1);
-  integer_ops.construct_from_int(K, &result->monomials[0].coefficient, c);
+  integer_construct_from_int(K, &result->monomials[0].coefficient, c);
   result->monomials[0].degree = degree;
   return result;
 }
 
-static
 upolynomial_t* upolynomial_construct_from_int(int_ring K, size_t degree, const int* coefficients) {
 
   unsigned i;
   integer_t real_coefficients[degree+1];
 
   for (i = 0; i <= degree; ++ i) {
-    integer_ops.construct_from_int(K, &real_coefficients[i], coefficients[i]);
+    integer_construct_from_int(K, &real_coefficients[i], coefficients[i]);
   }
 
   upolynomial_t* result = upolynomial_construct(K, degree, real_coefficients);
 
   for (i = 0; i <= degree; ++ i) {
-    integer_ops.destruct(&real_coefficients[i]);
+    integer_destruct(&real_coefficients[i]);
   }
 
   return result;
 }
 
-static
 upolynomial_t* upolynomial_construct_from_long(int_ring K, size_t degree, const long* coefficients) {
 
   unsigned i;
   integer_t real_coefficients[degree+1];
 
   for (i = 0; i <= degree; ++ i) {
-    integer_ops.construct_from_int(K, &real_coefficients[i], coefficients[i]);
+    integer_construct_from_int(K, &real_coefficients[i], coefficients[i]);
   }
 
   upolynomial_t* result = upolynomial_construct(K, degree, real_coefficients);
 
   for (i = 0; i <= degree; ++ i) {
-    integer_ops.destruct(&real_coefficients[i]);
+    integer_destruct(&real_coefficients[i]);
   }
 
   return result;
 }
 
-static
 upolynomial_t* upolynomial_construct_copy(const upolynomial_t* p) {
   assert(p);
   // Allocate the memory
@@ -150,14 +142,13 @@ upolynomial_t* upolynomial_construct_copy(const upolynomial_t* p) {
   return new_p;
 }
 
-static
 upolynomial_t* upolynomial_construct_copy_K(int_ring K, const upolynomial_t* p) {
 
   assert(p);
   assert(K != p->K);
 
   // If in Z, same, or bigger, it's just a regular copy (while swapping the rings).
-  if (K == Z || (p->K != Z && integer_ops.cmp(Z, &K->M, &p->K->M) >= 0)) {
+  if (K == Z || (p->K != Z && integer_cmp(Z, &K->M, &p->K->M) >= 0)) {
     upolynomial_t* copy = upolynomial_construct_copy(p);
     int_ring_ops.detach(copy->K);
     copy->K = K;
@@ -171,7 +162,7 @@ upolynomial_t* upolynomial_construct_copy_K(int_ring K, const upolynomial_t* p) 
   size_t degree = 0;
 
   for (i = 0; i < p->size; ++ i) {
-    if (integer_ops.sgn(K, &p->monomials[i].coefficient)) {
+    if (integer_sgn(K, &p->monomials[i].coefficient)) {
       size ++;
       degree = p->monomials[i].degree;
     }
@@ -187,7 +178,7 @@ upolynomial_t* upolynomial_construct_copy_K(int_ring K, const upolynomial_t* p) 
 
   // Copy the coefficients
   if (degree == 0) {
-    if (integer_ops.sgn(K, &p->monomials[0].coefficient)) {
+    if (integer_sgn(K, &p->monomials[0].coefficient)) {
       umonomial_construct_copy(K, &new_p->monomials[0], &p->monomials[0]);
     } else {
       umonomial_construct_from_int(K, &new_p->monomials[0], 0, 0);
@@ -195,37 +186,34 @@ upolynomial_t* upolynomial_construct_copy_K(int_ring K, const upolynomial_t* p) 
   } else {
     size = 0;
     integer_t tmp;
-    integer_ops.construct_from_int(Z, &tmp, 0);
+    integer_construct_from_int(Z, &tmp, 0);
     for (i = 0; i < p->size; ++ i) {
-      integer_ops.assign(K, &tmp, &p->monomials[i].coefficient);
-      if (integer_ops.sgn(Z, &tmp)) {
+      integer_assign(K, &tmp, &p->monomials[i].coefficient);
+      if (integer_sgn(Z, &tmp)) {
         umonomial_construct(Z, &new_p->monomials[size], p->monomials[i].degree, &tmp);
         size ++;
       }
     }
-    integer_ops.destruct(&tmp);
+    integer_destruct(&tmp);
   }
 
   // Return the new polynomial
   return new_p;
 }
 
-static
 void upolynomial_unpack(const upolynomial_t* p, integer_t* out) {
   assert(p);
   unsigned i; // i big step, j small step
   for (i = 0; i < p->size; ++ i) {
-    integer_ops.assign(Z, &out[p->monomials[i].degree], &p->monomials[i].coefficient);
+    integer_assign(Z, &out[p->monomials[i].degree], &p->monomials[i].coefficient);
   }
 }
 
-static
 int_ring upolynomial_ring(const upolynomial_t* p) {
   assert(p);
   return p->K;
 }
 
-static
 void upolynomial_set_ring(upolynomial_t* p, int_ring K) {
   assert(p);
   int_ring_ops.detach(p->K);
@@ -233,14 +221,12 @@ void upolynomial_set_ring(upolynomial_t* p, int_ring K) {
   int_ring_ops.attach(p->K);
 }
 
-static
 const integer_t* upolynomial_lead_coeff(const upolynomial_t* p) {
   assert(p);
   assert(p->size > 0);
   return &p->monomials[p->size-1].coefficient;
 }
 
-static
 int upolynomial_print(const upolynomial_t* p, FILE* out) {
   assert(p);
   int len = 0;
@@ -257,7 +243,6 @@ int upolynomial_print(const upolynomial_t* p, FILE* out) {
   return len;
 }
 
-static
 char* upolynomial_to_string(const upolynomial_t* p) {
   char* str = 0;
   size_t size = 0;
@@ -267,7 +252,6 @@ char* upolynomial_to_string(const upolynomial_t* p) {
   return str;
 }
 
-static
 int upolynomial_cmp(const upolynomial_t* p, const upolynomial_t* q) {
   assert(p);
   assert(q);
@@ -291,7 +275,7 @@ int upolynomial_cmp(const upolynomial_t* p, const upolynomial_t* q) {
     if (q_deg > p_deg) return -1;
 
     // Degrees equal, compare coefficients
-    cmp = integer_ops.cmp(Z, &p->monomials[p_i].coefficient, &q->monomials[q_i].coefficient);
+    cmp = integer_cmp(Z, &p->monomials[p_i].coefficient, &q->monomials[q_i].coefficient);
     if (cmp) {
       return cmp;
     }
@@ -305,26 +289,22 @@ int upolynomial_cmp(const upolynomial_t* p, const upolynomial_t* q) {
   else return -1;
 }
 
-static
 int upolynomial_is_zero(const upolynomial_t* p) {
   if (p->size > 1) return 0;
   if (p->monomials[0].degree > 0) return 0;
-  return integer_ops.sgn(Z, &p->monomials[0].coefficient) == 0;
+  return integer_sgn(Z, &p->monomials[0].coefficient) == 0;
 }
 
-static
 int upolynomial_is_one(const upolynomial_t* p) {
   if (p->size > 1) return 0;
   if (p->monomials[0].degree > 0) return 0;
-  return integer_ops.cmp_int(Z, &p->monomials[0].coefficient, 1) == 0;
+  return integer_cmp_int(Z, &p->monomials[0].coefficient, 1) == 0;
 }
 
-static
 int upolynomial_is_monic(const upolynomial_t* p) {
-  return integer_ops.cmp_int(Z, upolynomial_lead_coeff(p), 1) == 0;
+  return integer_cmp_int(Z, upolynomial_lead_coeff(p), 1) == 0;
 }
 
-static
 upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q) {
 
   assert(p);
@@ -358,7 +338,6 @@ upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q) {
   return result;
 }
 
-static
 upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q) {
 
   assert(p);
@@ -392,7 +371,6 @@ upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q) {
   return result;
 }
 
-static
 upolynomial_t* upolynomial_multiply_simple(const umonomial_t* m, const upolynomial_t* q) {
 
   assert(m);
@@ -402,14 +380,13 @@ upolynomial_t* upolynomial_multiply_simple(const umonomial_t* m, const upolynomi
 
   int i;
   for (i = 0; i < result->size; ++ i) {
-    integer_ops.mul(q->K, &result->monomials[i].coefficient, &m->coefficient, &q->monomials[i].coefficient);
+    integer_mul(q->K, &result->monomials[i].coefficient, &m->coefficient, &q->monomials[i].coefficient);
     result->monomials[i].degree += m->degree;
   }
 
   return result;
 }
 
-static
 upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t* q) {
 
   assert(p);
@@ -456,7 +433,6 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
   return result;
 }
 
-static
 upolynomial_t* upolynomial_multiply_c(const upolynomial_t* p, const integer_t* c) {
   assert(p);
 
@@ -481,7 +457,6 @@ upolynomial_t* upolynomial_multiply_c(const upolynomial_t* p, const integer_t* c
   return result;
 }
 
-static
 upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
 
   TRACE("arithmetic", "upolynomial_pow(%P, %ld)\n", p, pow);
@@ -494,8 +469,8 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
   // Anything of size 1
   if (p->size == 1) {
     result = upolynomial_construct_empty(p->K, 1);
-    integer_ops.construct_from_int(Z, &result->monomials[0].coefficient, 0);
-    integer_ops.pow(p->K, &result->monomials[0].coefficient, &p->monomials[0].coefficient, pow);
+    integer_construct_from_int(Z, &result->monomials[0].coefficient, 0);
+    integer_pow(p->K, &result->monomials[0].coefficient, &p->monomials[0].coefficient, pow);
     result->monomials[0].degree = p->monomials[0].degree * pow;
   } else {
     // TODO: optimize
@@ -513,7 +488,6 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
   return result;
 }
 
-static
 upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
 
   TRACE("arithmetic", "upolynomial_derivative(%P)\n", p);
@@ -529,7 +503,7 @@ upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
   for (i = 0; i < p->size; ++ i) {
     size_t degree_i = p->monomials[i].degree;
     if (degree_i > 0) {
-      integer_ops.mul_int(p->K, &tmp.coefficients[degree_i-1], &p->monomials[i].coefficient, degree_i);
+      integer_mul_int(p->K, &tmp.coefficients[degree_i-1], &p->monomials[i].coefficient, degree_i);
     }
   }
   tmp.size = degree + 1;
@@ -545,7 +519,6 @@ upolynomial_t* upolynomial_derivative(const upolynomial_t* p) {
 
 // Performs general division loop, result is returned in the buffers
 // Buffers should be passed in unconstructed
-static
 void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upolynomial_dense_t* div, upolynomial_dense_t* rem, int exact) {
 
   TRACE("division", "upolynomial_div_general(%P, %P)\n", p, q);
@@ -569,12 +542,12 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
 
   // adjustment for the powers of div
   integer_t adjust;
-  integer_ops.construct_from_int(Z, &adjust, 0);
+  integer_construct_from_int(Z, &adjust, 0);
 
   int k;
   for (k = p_deg; k >= q_deg; -- k) {
     // next coefficient to eliminate
-    while (exact && k >= q_deg && integer_ops.sgn(Z, rem->coefficients + k) == 0) {
+    while (exact && k >= q_deg && integer_sgn(Z, rem->coefficients + k) == 0) {
       k --;
     }
     // if found, eliminate it
@@ -589,7 +562,7 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
         tracef("\n");
       }
 
-      assert(!exact || integer_ops.divides(K, upolynomial_lead_coeff(q), rem->coefficients + k));
+      assert(!exact || integer_divides(K, upolynomial_lead_coeff(q), rem->coefficients + k));
 
       // Eliminate the coefficient using q*m
       m.degree = k - q_deg;
@@ -597,36 +570,35 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
       // Get the quotient coefficient
       if (exact) {
         // get the quotient
-        integer_ops.div_exact(K, &m.coefficient, rem->coefficients + k, upolynomial_lead_coeff(q));
+        integer_div_exact(K, &m.coefficient, rem->coefficients + k, upolynomial_lead_coeff(q));
       } else {
         // rem: a*x^k, q: b*x^d, so we multiply rem with b and subtract a*q
-        integer_ops.assign(Z, &m.coefficient, rem->coefficients + k);
+        integer_assign(Z, &m.coefficient, rem->coefficients + k);
         upolynomial_dense_ops.mult_c(rem, K, upolynomial_lead_coeff(q));
       }
 
       // Do the subtraction
-      if (integer_ops.sgn(K, &m.coefficient)) {
+      if (integer_sgn(K, &m.coefficient)) {
         upolynomial_dense_ops.sub_mult_p_mon(rem, q, &m);
       }
 
       // Put the monomial into the division
-      if (exact || !integer_ops.sgn(Z, &m.coefficient)) {
-        integer_ops.swap(K, &div->coefficients[m.degree], &m.coefficient);
+      if (exact || !integer_sgn(Z, &m.coefficient)) {
+        integer_swap(K, &div->coefficients[m.degree], &m.coefficient);
       } else {
         // Adjust the monomial with to be lc(q)^(k-deg_q)
-        integer_ops.pow(K, &adjust, upolynomial_lead_coeff(q), m.degree);
-        integer_ops.mul(K, &div->coefficients[m.degree], &m.coefficient, &adjust);
+        integer_pow(K, &adjust, upolynomial_lead_coeff(q), m.degree);
+        integer_mul(K, &div->coefficients[m.degree], &m.coefficient, &adjust);
       }
       upolynomial_dense_ops.touch(div, K, m.degree);
     }
   }
 
   // destruct temps
-  integer_ops.destruct(&adjust);
+  integer_destruct(&adjust);
   umonomial_destruct(&m);
 }
 
-static
 upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a) {
 
   TRACE("arithmetic", "upolynomial_div_degrees(%P, %zd)\n", p, a);
@@ -645,7 +617,6 @@ upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a) {
   return result;
 }
 
-static
 upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t* q) {
 
   TRACE("arithmetic", "upolynomial_div_exact(%P, %P)\n", p, q);
@@ -675,7 +646,6 @@ upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t
   return result;
 }
 
-static
 upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* c) {
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
@@ -687,16 +657,16 @@ upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* 
   int_ring K = p->K;
 
   assert(p);
-  assert(integer_ops.cmp_int(K, c, 0));
+  assert(integer_cmp_int(K, c, 0));
 
   upolynomial_t* result = upolynomial_construct_empty(K, p->size);
 
   int i;
   for (i = 0; i < p->size; ++ i) {
     result->monomials[i].degree = p->monomials[i].degree;
-    integer_ops.construct_from_int(K, &result->monomials[i].coefficient, 0);
-    assert(integer_ops.divides(K, c, &p->monomials[i].coefficient));
-    integer_ops.div_exact(K, &result->monomials[i].coefficient, &p->monomials[i].coefficient, c);
+    integer_construct_from_int(K, &result->monomials[i].coefficient, 0);
+    assert(integer_divides(K, c, &p->monomials[i].coefficient));
+    integer_div_exact(K, &result->monomials[i].coefficient, &p->monomials[i].coefficient, c);
   }
 
   if (debug_trace_ops.is_enabled("arithmetic")) {
@@ -709,8 +679,6 @@ upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* 
   return result;
 }
 
-
-static
 upolynomial_t* upolynomial_rem_exact(const upolynomial_t* p, const upolynomial_t* q) {
 
   assert(p);
@@ -740,7 +708,6 @@ upolynomial_t* upolynomial_rem_exact(const upolynomial_t* p, const upolynomial_t
   return result;
 }
 
-static
 void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q,
     upolynomial_t** div, upolynomial_t** rem) {
 
@@ -772,7 +739,6 @@ void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q,
 }
 
 
-static
 void upolynomial_div_pseudo(upolynomial_t** div, upolynomial_t** rem, const upolynomial_t* p, const upolynomial_t* q) {
 
   TRACE("arithmetic", "upolynomial_div_pseudo(%P, %P)\n", p, q);
@@ -800,7 +766,6 @@ void upolynomial_div_pseudo(upolynomial_t** div, upolynomial_t** rem, const upol
   TRACE("arithmetic", "upolynomial_div_pseudo(%P, %P) = (%P, %P)\n", p, q, *div, *rem);
 }
 
-static
 int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q) {
 
   TRACE("arithmetic", "upolynomial_div_exact(%P, %P)\n", p, q);
@@ -816,7 +781,7 @@ int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q) {
     result = 0;
   } else {
     // Check that the least coefficient divides
-    if (!integer_ops.divides(K, &p->monomials[0].coefficient, &q->monomials[0].coefficient)) {
+    if (!integer_divides(K, &p->monomials[0].coefficient, &q->monomials[0].coefficient)) {
       result = 0;
     } else {
       // Let's just divide
@@ -842,7 +807,6 @@ int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q) {
 
 
 
-static
 void upolynomial_content_Z(const upolynomial_t* p, integer_t* content) {
 
   assert(p);
@@ -850,66 +814,63 @@ void upolynomial_content_Z(const upolynomial_t* p, integer_t* content) {
 
   unsigned i;
   integer_t tmp;
-  integer_ops.construct_from_int(Z, &tmp, 0);
+  integer_construct_from_int(Z, &tmp, 0);
 
   // GCD start
-  integer_ops.assign(Z, content, &p->monomials[0].coefficient);
-  if (integer_ops.sgn(Z, content) < 0) {
-    integer_ops.neg(Z, &tmp, content);
-    integer_ops.swap(Z, &tmp, content);
+  integer_assign(Z, content, &p->monomials[0].coefficient);
+  if (integer_sgn(Z, content) < 0) {
+    integer_neg(Z, &tmp, content);
+    integer_swap(Z, &tmp, content);
   }
   // GCD rest
   for (i = 1; i < p->size; ++ i) {
-    integer_ops.gcd_Z(&tmp, content, &p->monomials[i].coefficient);
-    integer_ops.swap(Z, &tmp, content);
+    integer_gcd_Z(&tmp, content, &p->monomials[i].coefficient);
+    integer_swap(Z, &tmp, content);
   }
 
-  assert(integer_ops.sgn(Z, content) > 0);
+  assert(integer_sgn(Z, content) > 0);
 
   const integer_t* lc = upolynomial_lead_coeff(p);
-  int sgn = integer_ops.sgn(Z, lc);
+  int sgn = integer_sgn(Z, lc);
   if (sgn < 0) {
     // Content is the same sign as lc
-    integer_ops.neg(Z, &tmp, content);
-    integer_ops.swap(Z, &tmp, content);
+    integer_neg(Z, &tmp, content);
+    integer_swap(Z, &tmp, content);
   }
 
-  integer_ops.destruct(&tmp);
+  integer_destruct(&tmp);
 }
 
-static
 int upolynomial_is_primitive(const upolynomial_t* p) {
   assert(p->K == Z);
   integer_t content;
-  integer_ops.construct_from_int(Z, &content, 0);
+  integer_construct_from_int(Z, &content, 0);
   upolynomial_content_Z(p, &content);
-  int is_primitive = integer_ops.cmp_int(Z, &content, 1) == 0 && integer_ops.sgn(Z, upolynomial_lead_coeff(p)) > 0;
-  integer_ops.destruct(&content);
+  int is_primitive = integer_cmp_int(Z, &content, 1) == 0 && integer_sgn(Z, upolynomial_lead_coeff(p)) > 0;
+  integer_destruct(&content);
   return is_primitive;
 }
 
-static
 void upolynomial_make_primitive_Z(upolynomial_t* p) {
   assert(p->K == Z);
 
   integer_t gcd;
-  integer_ops.construct_from_int(Z, &gcd, 0);
+  integer_construct_from_int(Z, &gcd, 0);
   upolynomial_content_Z(p, &gcd);
 
   integer_t tmp;
-  integer_ops.construct_from_int(Z, &tmp, 0);
+  integer_construct_from_int(Z, &tmp, 0);
   unsigned i;
   for (i = 0; i < p->size; ++ i) {
-    assert(integer_ops.divides(Z, &gcd, &p->monomials[i].coefficient));
-    integer_ops.div_exact(Z, &tmp, &p->monomials[i].coefficient, &gcd);
-    integer_ops.swap(Z, &tmp, &p->monomials[i].coefficient);
+    assert(integer_divides(Z, &gcd, &p->monomials[i].coefficient));
+    integer_div_exact(Z, &tmp, &p->monomials[i].coefficient, &gcd);
+    integer_swap(Z, &tmp, &p->monomials[i].coefficient);
   }
 
-  integer_ops.destruct(&gcd);
-  integer_ops.destruct(&tmp);
+  integer_destruct(&gcd);
+  integer_destruct(&tmp);
 }
 
-static
 upolynomial_t* upolynomial_primitive_part_Z(const upolynomial_t* p) {
   assert(p);
   assert(p->K == Z);
@@ -920,24 +881,22 @@ upolynomial_t* upolynomial_primitive_part_Z(const upolynomial_t* p) {
   return result;
 }
 
-static
 void upolynomial_evaluate_at_integer(const upolynomial_t* p, const integer_t* x, integer_t* value) {
   int_ring K = p->K;
   integer_t power;
-  integer_ops.construct_from_int(Z, &power, 0);
+  integer_construct_from_int(Z, &power, 0);
 
   // Compute
-  integer_ops.assign_int(Z, value, 0);
+  integer_assign_int(Z, value, 0);
   int i;
   for (i = 0; i < p->size; ++ i) {
-    integer_ops.pow(K, &power, x, p->monomials[i].degree);
-    integer_ops.add_mul(K, value, &p->monomials[i].coefficient, &power);
+    integer_pow(K, &power, x, p->monomials[i].degree);
+    integer_add_mul(K, value, &p->monomials[i].coefficient, &power);
   }
 
-  integer_ops.destruct(&power);
+  integer_destruct(&power);
 }
 
-static
 void upolynomial_evaluate_at_rational(const upolynomial_t* p, const rational_t* x, rational_t* value) {
   assert(p->K == Z);
   upolynomial_dense_t p_d;
@@ -946,7 +905,6 @@ void upolynomial_evaluate_at_rational(const upolynomial_t* p, const rational_t* 
   upolynomial_dense_ops.destruct(&p_d);
 }
 
-static
 void upolynomial_evaluate_at_dyadic_rational(const upolynomial_t* p, const dyadic_rational_t* x, dyadic_rational_t* value) {
   assert(p->K == Z);
   upolynomial_dense_t p_d;
@@ -957,10 +915,10 @@ void upolynomial_evaluate_at_dyadic_rational(const upolynomial_t* p, const dyadi
 
 int upolynomial_sgn_at_integer(const upolynomial_t* p, const integer_t* x) {
   integer_t value;
-  integer_ops.construct_from_int(p->K, &value, 0);
+  integer_construct_from_int(p->K, &value, 0);
   upolynomial_evaluate_at_integer(p, x, &value);
-  int sgn = integer_ops.sgn(p->K, &value);
-  integer_ops.destruct(&value);
+  int sgn = integer_sgn(p->K, &value);
+  integer_destruct(&value);
   return sgn;
 }
 
@@ -982,7 +940,6 @@ int upolynomial_sgn_at_dyadic_rational(const upolynomial_t* p, const dyadic_rati
   return sgn;
 }
 
-static
 upolynomial_t* upolynomial_gcd(const upolynomial_t* p, const upolynomial_t* q) {
 
   TRACE("gcd", "upolynomial_gcd(%P, %P)\n", p, q);
@@ -1060,7 +1017,6 @@ void upolynomial_solve_bezout(const upolynomial_t* p, const upolynomial_t* q, co
   upolynomial_destruct(m);
 }
 
-static
 upolynomial_factors_t* upolynomial_factor(const upolynomial_t* p) {
 
   TRACE("factorization", "upolynomial_factor(%P)\n", p);
@@ -1168,10 +1124,9 @@ const upolynomial_ops_struct upolynomial_ops = {
     upolynomial_roots_isolate
 };
 
-static
 upolynomial_factors_t* factors_construct(void) {
   upolynomial_factors_t* f = malloc(sizeof(upolynomial_factors_t));
-  integer_ops.construct_from_int(Z, &f->constant, 1);
+  integer_construct_from_int(Z, &f->constant, 1);
   f->size = 0;
   f->capacity = 10;
   f->factors = calloc(f->capacity, sizeof(upolynomial_t*));
@@ -1181,7 +1136,6 @@ upolynomial_factors_t* factors_construct(void) {
 
 #define SWAP(type, x, y) { type tmp; tmp = x; x = y; y = tmp; }
 
-static
 void factors_swap(upolynomial_factors_t* f1, upolynomial_factors_t* f2) {
   SWAP(size_t, f1->size, f2->size);
   SWAP(size_t, f1->capacity, f2->capacity);
@@ -1189,10 +1143,9 @@ void factors_swap(upolynomial_factors_t* f1, upolynomial_factors_t* f2) {
   SWAP(size_t*, f1->multiplicities, f2->multiplicities);
 }
 
-static
 void factors_clear(upolynomial_factors_t* f) {
   int i;
-  integer_ops.assign_int(Z, &f->constant, 1);
+  integer_assign_int(Z, &f->constant, 1);
   for (i = 0; i < f->size; ++i) {
     if (f->factors[i]) {
       upolynomial_ops.destruct(f->factors[i]);
@@ -1201,12 +1154,11 @@ void factors_clear(upolynomial_factors_t* f) {
   f->size = 0;
 }
 
-static
 void factors_destruct(upolynomial_factors_t* f, int destruct_factors) {
   if (destruct_factors) {
     factors_clear(f);
   }
-  integer_ops.destruct(&f->constant);
+  integer_destruct(&f->constant);
   free(f->factors);
   free(f->multiplicities);
   free(f);
@@ -1225,7 +1177,6 @@ const integer_t* factors_get_constant(const upolynomial_factors_t* f) {
   return &f->constant;
 }
 
-static
 void factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d) {
   // assert(upolynomial_degree(p) > 0); (we reuse this as general sets)
 
@@ -1241,18 +1192,17 @@ void factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d) {
 
 int factors_print(const upolynomial_factors_t* f, FILE* out) {
   int len = 0;
-  len += integer_ops.print(&f->constant, out);
+  len += integer_print(&f->constant, out);
   int i;
   for (i = 0; i < f->size; ++ i) {
     len += fprintf(out, " * ");
     len += fprintf(out, "[");
-    len += upolynomial_ops.print(f->factors[i], out);
+    len += upolynomial_print(f->factors[i], out);
     len += fprintf(out, "]^%zu", f->multiplicities[i]);
   }
   return len;
 }
 
-static
 int_ring factors_ring(const upolynomial_factors_t* f) {
   if (f->size == 0) {
     return Z;
@@ -1261,11 +1211,10 @@ int_ring factors_ring(const upolynomial_factors_t* f) {
   }
 }
 
-static
 void factors_set_ring(upolynomial_factors_t* f, int_ring K) {
   int i;
   for (i = 0; i < f->size; ++ i) {
-    upolynomial_ops.set_ring(f->factors[i], K);
+    upolynomial_set_ring(f->factors[i], K);
   }
 }
 
