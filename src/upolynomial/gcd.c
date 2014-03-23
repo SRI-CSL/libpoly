@@ -63,7 +63,9 @@ STAT_DECLARE(int, upolynomial, gcd_heuristic_success);
  */
 upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_t* B, upolynomial_t** U, upolynomial_t** V)
 {
-  TRACE("gcd", "upolynomial_gcd_euclid(%P, %P)\n", A, B);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("upolynomial_gcd_euclid(%P, %P)\n", A, B);
+  }
 
   assert(!upolynomial_ops.is_zero(B));
 
@@ -187,14 +189,18 @@ upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_
   upolynomial_dense_ops.destruct(&r_0);
   upolynomial_dense_ops.destruct(&r_1);
 
-  TRACE("gcd", "upolynomial_gcd_euclid(%P, %P) = %P\n", A, B, D);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("upolynomial_gcd_euclid(%P, %P) = %P\n", A, B, D);
+  }
 
   return D;
 }
 
 upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolynomial_t* B) {
 
-  TRACE("gcd", "upolynomial_gcd_subresultant(%P, %P)\n", A, B);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("upolynomial_gcd_subresultant(%P, %P)\n", A, B);
+  }
   STAT(upolynomial, gcd_subresultant) ++;
 
   assert(!upolynomial_ops.is_zero(B));
@@ -318,7 +324,9 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
   upolynomial_dense_ops.destruct(&r_0);
   upolynomial_dense_ops.destruct(&r_1);
 
-  TRACE("gcd", "upolynomial_gcd_subresultant(%P, %P) = %P\n", A, B, D);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("upolynomial_gcd_subresultant(%P, %P) = %P\n", A, B, D);
+  }
 
   return D;
 }
@@ -450,7 +458,9 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
     return upolynomial_gcd_heuristic(B, A, attempts);
   }
 
-  TRACE("gcd", "upolynomial_gcd_heuristic(%P, %P)\n", A, B);
+  if (debug_trace_ops.is_enabled("gcd")) {
+    tracef("upolynomial_gcd_heuristic(%P, %P)\n", A, B);
+  }
   STAT(upolynomial, gcd_heuristic) ++;
 
   upolynomial_t* D = 0;
@@ -516,9 +526,13 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
 
   if (D) {
     STAT(upolynomial, gcd_heuristic_success)++;
-    TRACE("gcd", "upolynomial_gcd_heuristic(%P, %P) = %P\n", A, B, D);
+    if (debug_trace_ops.is_enabled("gcd")) {
+      tracef("upolynomial_gcd_heuristic(%P, %P) = %P\n", A, B, D);
+    }
   } else {
-    TRACE("gcd", "upolynomial_gcd_heuristic(%P, %P) failed", A, B, D);
+    if (debug_trace_ops.is_enabled("gcd")) {
+      tracef("upolynomial_gcd_heuristic(%P, %P) failed", A, B, D);
+    }
   }
 
   integer_ops.destruct(&A_cont);
