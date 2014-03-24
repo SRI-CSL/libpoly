@@ -10,6 +10,8 @@ ENDIF()
 # Configure the library source
 add_subdirectory(src)
 
-# Conficure the python bindings
+# Configure the python bindings
 add_subdirectory(python)
 
+# Configure the tests
+add_subdirectory(test)
