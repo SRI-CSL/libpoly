@@ -13,7 +13,8 @@
 #include <malloc.h>
 #include <assert.h>
 
-inline void upolynomial_dense_normalize(upolynomial_dense_t* p_d, int_ring K) {
+static inline
+void upolynomial_dense_normalize(upolynomial_dense_t* p_d, int_ring K) {
   int d = p_d->size - 1;
   while (d > 0 && integer_sgn(Z, p_d->coefficients + d) == 0) {
     d --;
