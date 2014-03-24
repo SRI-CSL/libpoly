@@ -46,6 +46,11 @@ void trace_disable(const char* tag) {
 
 FILE* trace_out = 0;
 
+__attribute__ (( __constructor__ (101) ))
+void trace_out_set(void) {
+  trace_out = stderr;
+}
+
 void trace_set_output(FILE* file) {
   trace_out = file;
 }

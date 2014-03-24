@@ -66,9 +66,9 @@ print a_double
 
 polypy_test.start("Arithmetic")
 
-polypy.trace_enable("coefficient")
-polypy.trace_enable("coefficient::resultant")
-polypy.trace_enable("algebraic_number")
+# polypy.trace_enable("coefficient")
+# polypy.trace_enable("coefficient::resultant")
+# polypy.trace_enable("algebraic_number")
 
 x = polypy.x
 

@@ -9,17 +9,11 @@
 
 #include <debug_trace.h>
 
-/** Where the output goes */
+/** Where the output goes (defaults to */
 extern FILE* trace_out;
 
 /** Print to the debug trace printf style */
-#define tracef(...) { \
-  if (trace_out) { \
-    fprintf(trace_out, __VA_ARGS__); \
-  } else { \
-    fprintf(stderr, __VA_ARGS__); \
-  } \
-}
+#define tracef(...) fprintf(trace_out, __VA_ARGS__);
 
 #ifndef NDEBUG
 
