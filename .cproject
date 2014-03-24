@@ -2,7 +2,7 @@
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.config.gnu.so.debug.204268791">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.so.debug.204268791" moduleId="org.eclipse.cdt.core.settings" name="debug-dynamic">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.so.debug.204268791" moduleId="org.eclipse.cdt.core.settings" name="DEBUG">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/polylib"/>
@@ -25,11 +25,11 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="poly" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="Dynamic library in debug mode" id="cdt.managedbuild.config.gnu.so.debug.204268791" name="debug-dynamic" parent="cdt.managedbuild.config.gnu.so.debug">
+				<configuration artifactExtension="so" artifactName="poly" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="Dynamic library in debug mode" id="cdt.managedbuild.config.gnu.so.debug.204268791" name="DEBUG" parent="cdt.managedbuild.config.gnu.so.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.204268791." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.1796577130" name="Linux GCC" nonInternalBuilderId="cdt.managedbuild.target.gnu.builder.so.debug" superClass="cdt.managedbuild.toolchain.gnu.so.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.debug.1172630420" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
-							<builder buildPath="${workspace_loc:/libpoly}/debug-dynamic" id="cdt.managedbuild.target.gnu.builder.so.debug.164388302" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.so.debug"/>
+							<builder buildPath="${workspace_loc:/libpoly/build}" id="cdt.managedbuild.target.gnu.builder.so.debug.164388302" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.so.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1741933036" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.559986724" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug">
 								<option id="gnu.cpp.compiler.so.debug.option.optimization.level.1870312428" name="Optimization Level" superClass="gnu.cpp.compiler.so.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -67,25 +67,15 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.204268791.1404292263" name="/" resourcePath="python">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.1862512529" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.743461928" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1741933036"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.1921782793" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.559986724"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1933473611" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug.623136106"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.111860038" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug.387263172"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.978083930" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.284481211"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.1143498982" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug.348091402"/>
-						</toolChain>
-					</folderInfo>
 					<sourceEntries>
-						<entry excluding="python" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.so.release.1993201860">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.so.release.1993201860" moduleId="org.eclipse.cdt.core.settings" name="release-dynamic">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.so.release.1993201860" moduleId="org.eclipse.cdt.core.settings" name="RELEASE">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/polylib"/>
@@ -108,11 +98,11 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="poly" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="Dynamic library in release mode" id="cdt.managedbuild.config.gnu.so.release.1993201860" name="release-dynamic" parent="cdt.managedbuild.config.gnu.so.release">
+				<configuration artifactExtension="so" artifactName="poly" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="Dynamic library in release mode" id="cdt.managedbuild.config.gnu.so.release.1993201860" name="RELEASE" parent="cdt.managedbuild.config.gnu.so.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1993201860." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1550572688" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.release.1715025668" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.release"/>
-							<builder buildPath="${workspace_loc:/polylib}/Release" id="cdt.managedbuild.target.gnu.builder.so.release.121031924" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.so.release"/>
+							<builder buildPath="${workspace_loc:/libpoly/build}" id="cdt.managedbuild.target.gnu.builder.so.release.121031924" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.so.release"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.982204129" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.1081387868" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.release">
 								<option id="gnu.cpp.compiler.so.release.option.optimization.level.473969067" name="Optimization Level" superClass="gnu.cpp.compiler.so.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
@@ -153,18 +143,8 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1993201860.1635634501" name="/" resourcePath="python">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1574524570" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1383673438" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.982204129"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.687255391" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.1081387868"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.release.1256573741" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.release.1047661514"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.release.875890409" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.release.1755152936"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.release.701339164" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.release.799378350"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.so.release.804683464" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.release.1104784508"/>
-						</toolChain>
-					</folderInfo>
 					<sourceEntries>
-						<entry excluding="python" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -23,4 +23,19 @@ set(poly_SOURCES
     utils/statistics.c
 )
 
-add_library(poly ${poly_SOURCES})
+# Find the GMP number library
+find_path(GMP_INCLUDE_DIR gmp.h)
+find_library(GMP_LIBRARY gmp)
+if (GMP_INCLUDE_DIR AND GMP_LIBRARY)
+    message(STATUS "GMP headers: "${GMP_INCLUDE_DIR})
+    message(STATUS "GMP library: "${GMP_LIBRARY})
+else()
+    MESSAGE(FATAL_ERROR "Could not the GMP number library (sudo apt-get install libgmp-dev)")
+endif()
+
+include_directories(${GMP_INCLUDE_DIR})
+include_directories(${libpoly_SOURCE_DIR}/include)
+include_directories(${libpoly_SOURCE_DIR}/src)
+
+add_library(poly SHARED ${poly_SOURCES})
+target_link_libraries(poly ${GMP_LIBRARY})

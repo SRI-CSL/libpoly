@@ -10,7 +10,7 @@
 #include <Python.h>
 
 #include "utils.h"
-#include "univariate_polynomial.h"
+#include "upolynomial.h"
 
 /** Definition of the python UPolynomial object */
 typedef struct {
