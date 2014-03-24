@@ -177,7 +177,7 @@ void upolynomial_dense_touch(upolynomial_dense_t* p_d, int_ring K, size_t degree
   }
 }
 
-void upolynomial_dense_mk_primitive_z(upolynomial_dense_t* p_d, int positive) {
+void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive) {
 
   int degree = p_d->size > 0 ? p_d->size - 1 : 0;
   int lc_sgn = integer_sgn(Z, p_d->coefficients + degree);
