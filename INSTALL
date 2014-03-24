@@ -1,0 +1,9 @@
+In the build directory perform 
+
+cmake .. -DCMAKE_BUILD_TYPE=$type
+
+where $type is either Debug or Release.
+
+A simple make will do after that.
+
+To run some test, do a make check.
