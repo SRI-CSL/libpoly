@@ -14,7 +14,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static
 void monomial_construct(const polynomial_context_t* ctx, monomial_t* m) {
   integer_construct_from_int(ctx->K, &m->a, 0);
   m->n = 0;
@@ -22,13 +21,11 @@ void monomial_construct(const polynomial_context_t* ctx, monomial_t* m) {
   m->p = 0;
 }
 
-static
 void monomial_clear(const polynomial_context_t* ctx, monomial_t* m) {
   integer_assign_int(ctx->K, &m->a, 0);
   m->n = 0;
 }
 
-static
 void monomial_construct_copy(const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort) {
   integer_construct_copy(ctx->K, &m->a, &from->a);
   m->n = from->n;
@@ -53,7 +50,6 @@ void monomial_construct_copy(const polynomial_context_t* ctx, monomial_t* m, con
   }
 }
 
-static
 void monomial_destruct(monomial_t* m) {
   integer_destruct(&m->a);
   if (m->p) {
@@ -64,7 +60,6 @@ void monomial_destruct(monomial_t* m) {
   }
 }
 
-static
 void monomial_assign(const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort) {
   if (m != from) {
     monomial_destruct(m);
@@ -72,7 +67,6 @@ void monomial_assign(const polynomial_context_t* ctx, monomial_t* m, const monom
   }
 }
 
-static
 void monomial_push(monomial_t* m, variable_t x, unsigned d) {
   if (m->n == m->capacity) {
     m->capacity += 5;
@@ -84,13 +78,11 @@ void monomial_push(monomial_t* m, variable_t x, unsigned d) {
   ++ (m->n);
 }
 
-static
 void monomial_pop(monomial_t* m) {
   assert(m->n > 0);
   -- m->n;
 }
 
-static
 int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* out) {
   int ret = 0;
   ret += integer_print(&m->a, out);
@@ -140,16 +132,3 @@ void monomial_gcd(const polynomial_context_t* ctx, monomial_t* gcd, const monomi
   SWAP(result, *gcd);
   monomial_destruct(&result);
 }
-
-const monomial_ops_t monomial_ops = {
-    monomial_construct,
-    monomial_construct_copy,
-    monomial_destruct,
-    monomial_clear,
-    monomial_assign,
-    monomial_print,
-    monomial_push,
-    monomial_pop,
-    monomial_gcd,
-};
-

@@ -35,27 +35,30 @@ typedef struct {
   power_t* p;
 } monomial_t;
 
-typedef struct {
-  /** Construct an empty monomial */
-  void (*construct) (const polynomial_context_t* ctx, monomial_t* m);
-  /** Construct an ordered copy of the monomial */
-  void (*construct_copy) (const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort);
-  /** Destruct the monomial */
-  void (*destruct) (monomial_t* m);
-  /** Clear the monomial to 0 */
-  void (*clear) (const polynomial_context_t* ctx, monomial_t* m);
-  /** Assign another monomial */
-  void (*assign) (const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort);
-  /** Print the monomial */
-  int (*print) (const polynomial_context_t* ctx, const monomial_t* m, FILE* out);
-  /** Add a variable power to the end of the monomial */
-  void (*push) (monomial_t* m, variable_t x, unsigned d);
-  /** Remove a variable powerfrom the end of the monomial */
-  void (*pop) (monomial_t* m);
-  /** Get the gcd of two monomials */
-  void (*gcd) (const polynomial_context_t* ctx, monomial_t* gcd, const monomial_t* m1, const monomial_t* m2);
+/** Construct an empty monomial */
+void monomial_construct(const polynomial_context_t* ctx, monomial_t* m);
 
-} monomial_ops_t;
+/** Construct an ordered copy of the monomial */
+void monomial_construct_copy(const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort);
 
-/** Implementation of the monomial operations */
-extern const monomial_ops_t monomial_ops;
+/** Destruct the monomial */
+void monomial_destruct(monomial_t* m);
+
+/** Clear the monomial to 0 */
+void monomial_clear(const polynomial_context_t* ctx, monomial_t* m);
+
+/** Assign another monomial */
+void monomial_assign(const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort);
+
+/** Print the monomial */
+int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* out);
+
+/** Add a variable power to the end of the monomial */
+void monomial_push(monomial_t* m, variable_t x, unsigned d);
+
+/** Remove a variable powerfrom the end of the monomial */
+void monomial_pop(monomial_t* m);
+
+/** Get the gcd of two monomials */
+void monomial_gcd(const polynomial_context_t* ctx, monomial_t* gcd, const monomial_t* m1, const monomial_t* m2);
+

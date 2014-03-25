@@ -623,7 +623,7 @@ void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* 
   if (trace_is_enabled("coefficient::order")) {
     tracef("order = "); variable_order_simple_ops.print((variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
-    tracef("m = "); monomial_ops.print(ctx, m, trace_out); tracef("\n");
+    tracef("m = "); monomial_print(ctx, m, trace_out); tracef("\n");
   }
 
   size_t d;
@@ -640,9 +640,9 @@ void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* 
     // Power of x
     for (d = 1; d < SIZE(C); ++ d) {
       if (!coefficient_is_zero(ctx, COEFF(C, d))) {
-        monomial_ops.push(m, VAR(C), d);
+        monomial_push(m, VAR(C), d);
         coefficient_traverse(ctx, COEFF(C, d), f, m, data);
-        monomial_ops.pop(m);
+        monomial_pop(m);
       }
     }
     break;
@@ -659,7 +659,7 @@ void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, vo
 
   if (trace_is_enabled("coefficient::order")) {
     tracef("coefficient_add_monomial():\n");
-    tracef("m = "); monomial_ops.print(ctx, m, trace_out); tracef("\n");
+    tracef("m = "); monomial_print(ctx, m, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
@@ -697,9 +697,9 @@ void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, vo
 
 void coefficient_order_and_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void) {
   monomial_t m_ordered;
-  monomial_ops.construct_copy(ctx, &m_ordered, m, /** sort */ 1);
+  monomial_construct_copy(ctx, &m_ordered, m, /** sort */ 1);
   coefficient_add_monomial(ctx, &m_ordered, C_void);
-  monomial_ops.destruct(&m_ordered);
+  monomial_destruct(&m_ordered);
 }
 
 STAT_DECLARE(int, coefficient, order)
@@ -723,13 +723,13 @@ void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C) {
   coefficient_construct(ctx, &result);
   // The monomials build in the original order
   monomial_t m_tmp;
-  monomial_ops.construct(ctx, &m_tmp);
+  monomial_construct(ctx, &m_tmp);
   // For each monomial of C, add it to the result
   coefficient_traverse(ctx, C, coefficient_order_and_add_monomial, &m_tmp, &result);
   // Keep the result
   coefficient_swap(C, &result);
   // Destroy temps
-  monomial_ops.destruct(&m_tmp);
+  monomial_destruct(&m_tmp);
   coefficient_destruct(&result);
 
   assert(coefficient_is_normalized(ctx, C));
@@ -1795,9 +1795,9 @@ void coefficient_pp(const polynomial_context_t* ctx, coefficient_t* pp, const co
 void monomial_gcd_visit(const polynomial_context_t* ctx, monomial_t* m, void* data) {
   monomial_t* gcd = (monomial_t*) data;
   if (integer_is_zero(ctx->K, &gcd->a)) {
-    monomial_ops.assign(ctx, gcd, m, 0);
+    monomial_assign(ctx, gcd, m, 0);
   } else {
-    monomial_ops.gcd(ctx, gcd, gcd, m);
+    monomial_gcd(ctx, gcd, gcd, m);
   }
 }
 
@@ -1919,24 +1919,24 @@ void coefficient_gcd_monomial_extract(const polynomial_context_t* ctx, coefficie
   assert(P != Q);
 
   monomial_t m_P_gcd, m_Q_gcd, m_tmp;
-  monomial_ops.construct(ctx, &m_P_gcd);
-  monomial_ops.construct(ctx, &m_Q_gcd);
-  monomial_ops.construct(ctx, &m_tmp);
+  monomial_construct(ctx, &m_P_gcd);
+  monomial_construct(ctx, &m_Q_gcd);
+  monomial_construct(ctx, &m_tmp);
 
   // Compute the gcd
   coefficient_traverse(ctx, P, monomial_gcd_visit, &m_tmp, &m_P_gcd);
-  monomial_ops.clear(ctx, &m_tmp);
+  monomial_clear(ctx, &m_tmp);
   coefficient_traverse(ctx, Q, monomial_gcd_visit, &m_tmp, &m_Q_gcd);
 
   if (trace_is_enabled("coefficient")) {
-    tracef("P_gcd = "); monomial_ops.print(ctx, &m_P_gcd, trace_out); tracef("\n");
-    tracef("Q_gcd = "); monomial_ops.print(ctx, &m_Q_gcd, trace_out); tracef("\n");
+    tracef("P_gcd = "); monomial_print(ctx, &m_P_gcd, trace_out); tracef("\n");
+    tracef("Q_gcd = "); monomial_print(ctx, &m_Q_gcd, trace_out); tracef("\n");
   }
 
   // Final gcd
   monomial_t m_gcd;
-  monomial_ops.construct(ctx, &m_gcd);
-  monomial_ops.gcd(ctx, &m_gcd, &m_P_gcd, &m_Q_gcd);
+  monomial_construct(ctx, &m_gcd);
+  monomial_gcd(ctx, &m_gcd, &m_P_gcd, &m_Q_gcd);
 
   // Construct the result
   coefficient_t result;
@@ -1958,10 +1958,10 @@ void coefficient_gcd_monomial_extract(const polynomial_context_t* ctx, coefficie
   coefficient_swap(&result, gcd);
   coefficient_destruct(&result);
 
-  monomial_ops.destruct(&m_gcd);
-  monomial_ops.destruct(&m_tmp);
-  monomial_ops.destruct(&m_Q_gcd);
-  monomial_ops.destruct(&m_P_gcd);
+  monomial_destruct(&m_gcd);
+  monomial_destruct(&m_tmp);
+  monomial_destruct(&m_Q_gcd);
+  monomial_destruct(&m_P_gcd);
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_gcd_monomial_extract() =>"); coefficient_print(ctx, gcd, trace_out); tracef("\n");
