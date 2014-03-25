@@ -34,10 +34,10 @@ void upolynomial_dense_construct(upolynomial_dense_t* p_d, size_t capacity) {
 }
 
 void upolynomial_dense_construct_p(upolynomial_dense_t* p_d, size_t capacity, const upolynomial_t* p) {
-  assert(capacity > upolynomial_ops.degree(p));
+  assert(capacity > upolynomial_degree(p));
   upolynomial_dense_construct(p_d, capacity);
-  upolynomial_ops.unpack(p, p_d->coefficients);
-  p_d->size = upolynomial_ops.degree(p) + 1;
+  upolynomial_unpack(p, p_d->coefficients);
+  p_d->size = upolynomial_degree(p) + 1;
 }
 
 void upolynomial_dense_destruct(upolynomial_dense_t* p_d) {
@@ -151,7 +151,7 @@ void upolynomial_dense_clear(upolynomial_dense_t* p_d) {
 
 upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, int_ring K) {
   assert(p_d->size > 0);
-  upolynomial_t* result = upolynomial_ops.construct(K, p_d->size - 1, p_d->coefficients);
+  upolynomial_t* result = upolynomial_construct(K, p_d->size - 1, p_d->coefficients);
   return result;
 }
 
@@ -252,7 +252,7 @@ void upolynomial_dense_div_c(upolynomial_dense_t* p_d, int_ring K, const integer
 
 void upolynomial_dense_add_mult_p_c(upolynomial_dense_t* p_d, const upolynomial_t* p, const integer_t* c) {
   assert(integer_sgn(p->K, c));
-  size_t needed_degree = upolynomial_ops.degree(p);
+  size_t needed_degree = upolynomial_degree(p);
   assert(p_d->capacity > needed_degree);
   // Add
   size_t i;
@@ -268,7 +268,7 @@ void upolynomial_dense_add_mult_p_c(upolynomial_dense_t* p_d, const upolynomial_
 
 void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const upolynomial_t* p, int c) {
   assert(c);
-  size_t needed_degree = upolynomial_ops.degree(p);
+  size_t needed_degree = upolynomial_degree(p);
   assert(p_d->capacity > needed_degree);
   // Add
   size_t i;
@@ -284,7 +284,7 @@ void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const upolynomia
 
 void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const upolynomial_t* p, const umonomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
-  size_t needed_degree = upolynomial_ops.degree(p) + m->degree;
+  size_t needed_degree = upolynomial_degree(p) + m->degree;
   assert(p_d->capacity > needed_degree);
   size_t i;
   for (i = 0; i < p->size; ++ i) {
@@ -299,7 +299,7 @@ void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const upolynomia
 
 void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const upolynomial_t* p, const umonomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
-  size_t needed_degree = upolynomial_ops.degree(p) + m->degree;
+  size_t needed_degree = upolynomial_degree(p) + m->degree;
   size_t i;
   for (i = 0; i < p->size; ++ i) {
     size_t degree = p->monomials[i].degree + m->degree;
@@ -369,7 +369,7 @@ void upolynomial_dense_negate(upolynomial_dense_t* p_d, int_ring K) {
 
 void upolynomial_dense_div_general(int_ring K, int exact, const upolynomial_dense_t* p, const upolynomial_dense_t* q, upolynomial_dense_t* div, upolynomial_dense_t* rem) {
 
-  if (debug_trace_ops.is_enabled("division")) {
+  if (trace_is_enabled("division")) {
     tracef("upolynomial_div_general(");
     int_ring_ops.print(K, trace_out);
     tracef(", ");
@@ -408,7 +408,7 @@ void upolynomial_dense_div_general(int_ring K, int exact, const upolynomial_dens
     // if found, eliminate it
     if (k >= (int) q_deg) {
 
-      if (debug_trace_ops.is_enabled("division")) {
+      if (trace_is_enabled("division")) {
         tracef("q = ");
         upolynomial_dense_print(q, trace_out);
         tracef("\nrem = ");
@@ -464,7 +464,7 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
   integer_construct_from_int(Z, &lcm, 0);
   integer_construct_from_int(Z, &red_mult, 0);
 
-  if (debug_trace_ops.is_enabled("division")) {
+  if (trace_is_enabled("division")) {
     tracef("upolynomial_dense_reduce_Z(");
     upolynomial_dense_print(p, trace_out);
     tracef(", ");
@@ -499,7 +499,7 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
     // if found, eliminate it
     if (k >= (int) q_deg) {
 
-      if (debug_trace_ops.is_enabled("division")) {
+      if (trace_is_enabled("division")) {
         tracef("q = ");
         upolynomial_dense_print(q, trace_out);
         tracef("\nred = ");
@@ -520,7 +520,7 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
         integer_div_exact(Z, &red_mult, &lcm, red->coefficients + k);
         integer_div_exact(Z, &m.coefficient, &lcm, q->coefficients + q_deg);
 
-        if (debug_trace_ops.is_enabled("division")) {
+        if (trace_is_enabled("division")) {
           tracef("lcm = "); integer_print(&lcm, trace_out); tracef("\n");
           tracef("red_mult = "); integer_print(&red_mult, trace_out); tracef("\n");
           tracef("m.c = "); integer_print(&m.coefficient, trace_out); tracef("\n");
@@ -533,7 +533,7 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
       // Do the subtraction
       upolynomial_dense_sub_mult_mon(red, Z, q, &m);
 
-      if (debug_trace_ops.is_enabled("division")) {
+      if (trace_is_enabled("division")) {
         tracef("red' = ");
         upolynomial_dense_print(red, trace_out);
       }

@@ -110,7 +110,7 @@ void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B) {
 void upolynomial_factor_bound_landau_mignotte(const upolynomial_t* f, size_t n, integer_t* B) {
 
   assert(f->K == Z);
-  assert(upolynomial_ops.degree(f) >= n);
+  assert(upolynomial_degree(f) >= n);
 
   integer_t tmp;
   integer_t norm;
