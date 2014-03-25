@@ -147,7 +147,7 @@ void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
   size_t C_u_deg = upolynomial_ops.degree(C_u);
   integer_t* coeff = malloc(sizeof(integer_t)*(C_u_deg + 1));
 
-  int i;
+  size_t i;
   for (i = 0; i <= C_u_deg; ++ i) {
     integer_construct_from_int(ctx->K, coeff + i, 0);
   }
@@ -545,18 +545,6 @@ int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C
   return coefficient_cmp_general(ctx, C1, C2, 0);
 }
 
-STAT_DECLARE(int, coefficient, divides)
-
-static
-int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
-  TRACE("coefficient", "coefficient_divides()\n");
-  STAT(coefficient, divides) ++;
-
-  int divides = 0;
-
-  return divides;
-}
-
 static
 char* power_symbol = 0;
 
@@ -807,7 +795,7 @@ void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const co
       // Two polynomials over the same top variable
       size_t max_size = MAX(SIZE(C1), SIZE(C2));
       coefficient_construct_rec(ctx, &result, VAR(C1), max_size);
-      int i;
+      size_t i;
       for (i = 0; i < max_size; ++ i) {
         if (i < SIZE(C1)) {
           if (i < SIZE(C2)) {
@@ -923,7 +911,7 @@ void coefficient_sub(const polynomial_context_t* ctx, coefficient_t* S, const co
       assert(VAR(C1) == VAR(C2));
       size_t max_size = MAX(SIZE(C1), SIZE(C2));
       coefficient_construct_rec(ctx, &result, VAR(C1), max_size);
-      int i;
+      size_t i;
       for (i = 0; i < max_size; ++ i) {
         if (i < SIZE(C1)) {
           if (i < SIZE(C2)) {
@@ -1142,7 +1130,7 @@ void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const co
     coefficient_t result;
     coefficient_construct_rec(ctx, &result, VAR(C), SIZE(C) - n);
     int i;
-    for (i = 0; i < SIZE(C) - n; ++ i) {
+    for (i = 0; i < (int) SIZE(C) - (int) n; ++ i) {
       coefficient_assign(ctx, COEFF(&result, i), COEFF(C, i + n));
     }
     coefficient_swap(&result, S);
@@ -1751,6 +1739,23 @@ void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coeff
   assert(coefficient_is_normalized(ctx, R));
 }
 
+STAT_DECLARE(int, coefficient, divides)
+
+static
+int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
+  TRACE("coefficient", "coefficient_divides()\n");
+  STAT(coefficient, divides) ++;
+
+  coefficient_t R;
+  coefficient_construct(ctx, &R);
+  coefficient_prem(ctx, &R, C2, C1);
+  int divides = coefficient_is_zero(ctx, &R);
+  coefficient_destruct(&R);
+
+  return divides;
+}
+
+
 STAT_DECLARE(int, coefficient, pp_cont)
 
 static
@@ -1853,12 +1858,12 @@ void monomial_gcd_visit(const polynomial_context_t* ctx, monomial_t* m, void* da
 }
 
 static
-int coefficient_is_univariate(const polynomial_context_t* ctx, const coefficient_t* C) {
+int coefficient_is_univariate(const coefficient_t* C) {
   int i;
   if (C->type == COEFFICIENT_NUMERIC) {
     return 1;
   } else {
-    for (i = 0; i < SIZE(C); ++i) {
+    for (i = 0; i < SIZE(C); ++ i) {
       if (COEFF(C, i)->type != COEFFICIENT_NUMERIC) {
         return 0;
       }
@@ -1942,7 +1947,7 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
   if (gcd->type == COEFFICIENT_NUMERIC) {
     integer_assign_int(ctx->K, &gcd->value.num, 1);
     return 1;
-  } else if (coefficient_is_univariate(ctx, C1) && coefficient_is_univariate(ctx, C2)) {
+  } else if (coefficient_is_univariate(C1) && coefficient_is_univariate(C2)) {
     return 1;
   } else {
     return 0;
@@ -2459,7 +2464,7 @@ void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, 
   // Compute the PSC
   size_t psc_size = B_deg + 1;
   coefficient_t* psc = malloc(sizeof(coefficient_t)*psc_size);
-  int i;
+  size_t i;
   for (i = 0; i < psc_size; ++ i) {
     coefficient_construct(ctx, psc + i);
   }
@@ -2548,7 +2553,7 @@ coefficient_ensure_capacity(const polynomial_context_t* ctx, coefficient_t* C, v
     } else if (capacity > C->value.rec.capacity) {
       // Already recursive polynomial, resize up
       C->value.rec.coefficients = realloc(C->value.rec.coefficients, capacity * sizeof(coefficient_t));
-      int i;
+      size_t i;
       for (i = C->value.rec.capacity; i < capacity; ++ i) {
         coefficient_construct(ctx, C->value.rec.coefficients + i);
       }

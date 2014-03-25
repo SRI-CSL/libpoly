@@ -140,7 +140,19 @@ void rational_mul_2exp(rational_t* mul, const rational_t* a, unsigned n) {
 
 static inline
 void rational_pow(rational_t* pow, const rational_t*a, unsigned n) {
-  assert(0);
+  rational_t result, tmp;
+  rational_construct_from_int(&result, 1, 1);
+  rational_construct_copy(&tmp, a);
+  while (n) {
+    if (n & 1) {
+      rational_mul(&result, &result, &tmp);
+    }
+    rational_mul(&tmp, &tmp, &tmp);
+    n >>= 1;
+  }
+  rational_swap(&result, pow);
+  rational_destruct(&tmp);
+  rational_destruct(&result);
 }
 
 static inline

@@ -622,7 +622,7 @@ void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_
   // Allocate the space for the result
   size_t size = B_deg + 1;
   coefficient_t* psc_coeff = malloc(sizeof(coefficient_t)*size);
-  int i;
+  size_t i;
   for (i = 0; i < size; ++ i) {
     coefficient_ops.construct(ctx, psc_coeff + i);
   }
@@ -643,7 +643,7 @@ void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_
 
   if (debug_trace_ops.is_enabled("polynomial")) {
     for (i = 0; i < size; ++ i) {
-      tracef("PSC[%d] = ", i); polynomial_print(psc[i], trace_out); tracef("\n");
+      tracef("PSC[%zu] = ", i); polynomial_print(psc[i], trace_out); tracef("\n");
     }
   }
 }
