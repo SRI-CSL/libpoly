@@ -90,37 +90,37 @@ const integer_t* upolynomial_dense_lead_coeff(const upolynomial_dense_t* p_d) {
 
 void upolynomial_dense_evaluate_at_rational(const upolynomial_dense_t* p_d, const rational_t* x, rational_t* value) {
   int i;
-  rational_ops.assign_int(value, 0, 1);
+  rational_assign_int(value, 0, 1);
   for (i = p_d->size - 1; i >= 0; -- i) {
-    rational_ops.mul(value, value, x);
-    rational_ops.add_integer(value, value, p_d->coefficients + i);
+    rational_mul(value, value, x);
+    rational_add_integer(value, value, p_d->coefficients + i);
   }
 }
 
 void upolynomial_dense_evaluate_at_dyadic_rational(const upolynomial_dense_t* p_d, const dyadic_rational_t* x, dyadic_rational_t* value) {
   int i;
-  dyadic_rational_ops.assign_int(value, 0, 0);
+  dyadic_rational_assign_int(value, 0, 0);
   for (i = p_d->size - 1; i >= 0; -- i) {
-    dyadic_rational_ops.mul(value, value, x);
-    dyadic_rational_ops.add_integer(value, value, p_d->coefficients + i);
+    dyadic_rational_mul(value, value, x);
+    dyadic_rational_add_integer(value, value, p_d->coefficients + i);
   }
 }
 
 int upolynomial_dense_sgn_at_rational(const upolynomial_dense_t* p_d, const rational_t* x) {
   rational_t value;
-  rational_ops.construct(&value);
+  rational_construct(&value);
   upolynomial_dense_evaluate_at_rational(p_d, x, &value);
-  int sgn = rational_ops.sgn(&value);
-  rational_ops.destruct(&value);
+  int sgn = rational_sgn(&value);
+  rational_destruct(&value);
   return sgn;
 }
 
 int upolynomial_dense_sgn_at_dyadic_rational(const upolynomial_dense_t* p_d, const dyadic_rational_t* x) {
   dyadic_rational_t value;
-  dyadic_rational_ops.construct(&value);
+  dyadic_rational_construct(&value);
   upolynomial_dense_evaluate_at_dyadic_rational(p_d, x, &value);
-  int sgn = dyadic_rational_ops.sgn(&value);
-  dyadic_rational_ops.destruct(&value);
+  int sgn = dyadic_rational_sgn(&value);
+  dyadic_rational_destruct(&value);
   return sgn;
 }
 

@@ -979,10 +979,10 @@ int upolynomial_sgn_at_rational(const upolynomial_t* p, const rational_t* x) {
 
 int upolynomial_sgn_at_dyadic_rational(const upolynomial_t* p, const dyadic_rational_t* x) {
   dyadic_rational_t value;
-  dyadic_rational_ops.construct(&value);
+  dyadic_rational_construct(&value);
   upolynomial_evaluate_at_dyadic_rational(p, x, &value);
-  int sgn = dyadic_rational_ops.sgn(&value);
-  dyadic_rational_ops.destruct(&value);
+  int sgn = dyadic_rational_sgn(&value);
+  dyadic_rational_destruct(&value);
   return sgn;
 }
 
@@ -1189,110 +1189,3 @@ const upolynomial_ops_struct upolynomial_ops = {
     upolynomial_roots_isolate
 };
 
-upolynomial_factors_t* factors_construct(void) {
-  upolynomial_factors_t* f = malloc(sizeof(upolynomial_factors_t));
-  integer_construct_from_int(Z, &f->constant, 1);
-  f->size = 0;
-  f->capacity = 10;
-  f->factors = calloc(f->capacity, sizeof(upolynomial_t*));
-  f->multiplicities = calloc(f->capacity, sizeof(size_t));
-  return f;
-}
-
-#define SWAP(type, x, y) { type tmp; tmp = x; x = y; y = tmp; }
-
-void factors_swap(upolynomial_factors_t* f1, upolynomial_factors_t* f2) {
-  SWAP(size_t, f1->size, f2->size);
-  SWAP(size_t, f1->capacity, f2->capacity);
-  SWAP(upolynomial_t**, f1->factors, f2->factors);
-  SWAP(size_t*, f1->multiplicities, f2->multiplicities);
-}
-
-void factors_clear(upolynomial_factors_t* f) {
-  size_t i;
-  integer_assign_int(Z, &f->constant, 1);
-  for (i = 0; i < f->size; ++i) {
-    if (f->factors[i]) {
-      upolynomial_destruct(f->factors[i]);
-    }
-  }
-  f->size = 0;
-}
-
-void factors_destruct(upolynomial_factors_t* f, int destruct_factors) {
-  if (destruct_factors) {
-    factors_clear(f);
-  }
-  integer_destruct(&f->constant);
-  free(f->factors);
-  free(f->multiplicities);
-  free(f);
-}
-
-size_t factors_size(const upolynomial_factors_t* f) {
-  return f->size;
-}
-
-upolynomial_t* factors_get_factor(upolynomial_factors_t* f, size_t i, size_t* d) {
-  *d = f->multiplicities[i];
-  return f->factors[i];
-}
-
-const integer_t* factors_get_constant(const upolynomial_factors_t* f) {
-  return &f->constant;
-}
-
-void factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d) {
-  // assert(upolynomial_degree(p) > 0); (we reuse this as general sets)
-
-  if (f->size == f->capacity) {
-    f->capacity *= 2;
-    f->factors = realloc(f->factors, f->capacity*sizeof(upolynomial_t*));
-    f->multiplicities = realloc(f->multiplicities, f->capacity*sizeof(size_t));
-  }
-  f->factors[f->size] = p;
-  f->multiplicities[f->size] = d;
-  f->size ++;
-}
-
-int factors_print(const upolynomial_factors_t* f, FILE* out) {
-  int len = 0;
-  len += integer_print(&f->constant, out);
-  size_t i;
-  for (i = 0; i < f->size; ++ i) {
-    len += fprintf(out, " * ");
-    len += fprintf(out, "[");
-    len += upolynomial_print(f->factors[i], out);
-    len += fprintf(out, "]^%zu", f->multiplicities[i]);
-  }
-  return len;
-}
-
-int_ring factors_ring(const upolynomial_factors_t* f) {
-  if (f->size == 0) {
-    return Z;
-  } else {
-    return f->factors[0]->K;
-  }
-}
-
-void factors_set_ring(upolynomial_factors_t* f, int_ring K) {
-  size_t i;
-  for (i = 0; i < f->size; ++ i) {
-    upolynomial_set_ring(f->factors[i], K);
-  }
-}
-
-const upolynomial_factors_ops_t upolynomial_factors_ops = {
-    factors_construct,
-    factors_destruct,
-    factors_clear,
-    factors_swap,
-    factors_size,
-    factors_get_factor,
-    factors_get_constant,
-    factors_add,
-    factors_print,
-    factors_ring,
-    factors_set_ring
-};

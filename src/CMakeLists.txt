@@ -7,6 +7,7 @@ set(poly_SOURCES
     upolynomial/factorization.c
     upolynomial/upolynomial.c
     upolynomial/gcd.c
+    upolynomial/factors.c
     upolynomial/upolynomial_dense.c
     upolynomial/root_finding.c
     upolynomial/upolynomial.c

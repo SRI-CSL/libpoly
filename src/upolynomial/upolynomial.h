@@ -23,19 +23,6 @@ struct upolynomial_struct {
   umonomial_t monomials[];
 };
 
-struct upolynomial_factors_struct {
-  /** Constant factor */
-  integer_t constant;
-  /** Number of actual factors */
-  size_t size;
-  /** Size of the factors array */
-  size_t capacity;
-  /** The irreducible factors */
-  upolynomial_t** factors;
-  /** The multiplicity of individual factors */
-  size_t* multiplicities;
-};
-
 size_t upolynomial_degree(const upolynomial_t* p);
 
 upolynomial_t* upolynomial_construct_empty(int_ring K, size_t size);
@@ -133,26 +120,4 @@ int upolynomial_roots_count(const upolynomial_t* p, const interval_t* ab);
 void upolynomial_roots_isolate(const upolynomial_t* p, algebraic_number_t* roots, size_t* roots_size);
 
 void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S, size_t* size);
-
-upolynomial_factors_t* factors_construct(void);
-
-void factors_swap(upolynomial_factors_t* f1, upolynomial_factors_t* f2);
-
-void factors_clear(upolynomial_factors_t* f);
-
-void factors_destruct(upolynomial_factors_t* f, int destruct_factors);
-
-size_t factors_size(const upolynomial_factors_t* f);
-
-upolynomial_t* factors_get_factor(upolynomial_factors_t* f, size_t i, size_t* d);
-
-const integer_t* factors_get_constant(const upolynomial_factors_t* f);
-
-void factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d);
-
-int factors_print(const upolynomial_factors_t* f, FILE* out);
-
-int_ring factors_ring(const upolynomial_factors_t* f);
-
-void factors_set_ring(upolynomial_factors_t* f, int_ring K);
 
