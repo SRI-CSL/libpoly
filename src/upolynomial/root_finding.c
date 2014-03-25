@@ -236,7 +236,7 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
   }
 
   // Destroy the factors
-  upolynomial_factors_ops.destruct(square_free_factors, 1);
+  upolynomial_factors_destruct(square_free_factors, 1);
 
   // Return the total number of roots
   return total_count;
@@ -275,7 +275,7 @@ void sturm_seqence_isolate_roots(
       // Isolated one check if it's in b
       if (upolynomial_dense_sgn_at_dyadic_rational(&S[0], &I.b) == 0) {
         // Copy out the interval [a, b]
-        algebraic_number_ops.construct_from_dyadic_rational(&roots[*roots_size], &I.b);
+        algebraic_number_construct_from_dyadic_rational(&roots[*roots_size], &I.b);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
@@ -283,7 +283,7 @@ void sturm_seqence_isolate_roots(
         // Copy out the open interval (a, b)
         I.b_open = 1;
         upolynomial_t* f = upolynomial_dense_to_upolynomial(&S[0], Z);
-        algebraic_number_ops.construct(&roots[*roots_size], f, &I);
+        algebraic_number_construct(&roots[*roots_size], f, &I);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
@@ -403,8 +403,8 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
   }
 
   // Sort the roots
-  qsort(roots, *roots_size, sizeof(algebraic_number_t), algebraic_number_ops.cmp_void);
+  qsort(roots, *roots_size, sizeof(algebraic_number_t), algebraic_number_cmp_void);
 
   // Destroy the factors
-  upolynomial_factors_ops.destruct(square_free_factors, 1);
+  upolynomial_factors_destruct(square_free_factors, 1);
 }

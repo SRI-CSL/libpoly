@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "algebraic_number.h"
+#include "number/algebraic_number.h"
 #include "polynomial_context.h"
 
 #include "number/integer.h"
@@ -109,7 +109,7 @@ int algebraic_number_refine_const(const algebraic_number_t* a_const) {
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("algebraic_number_refine(");
-    algebraic_number_ops.print(a_const, trace_out);
+    algebraic_number_print(a_const, trace_out);
     tracef(")\n");
   }
 
@@ -147,14 +147,13 @@ int algebraic_number_refine_const(const algebraic_number_t* a_const) {
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("algebraic_number_refine() => ");
-    algebraic_number_ops.print(a_const, trace_out);
+    algebraic_number_print(a_const, trace_out);
     tracef(", d = %d\n", result);
   }
 
   return result;
 }
 
-static inline
 void algebraic_number_refine(algebraic_number_t* a) {
   if (a->f) {
     algebraic_number_refine_const(a);
@@ -168,9 +167,9 @@ int algebraic_number_cmp(const algebraic_number_t* a1, const algebraic_number_t*
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("algebraic_number_cmp(");
-    algebraic_number_ops.print(a1, trace_out);
+    algebraic_number_print(a1, trace_out);
     tracef(", ");
-    algebraic_number_ops.print(a2, trace_out);
+    algebraic_number_print(a2, trace_out);
     tracef(")\n");
   }
 
@@ -195,9 +194,9 @@ int algebraic_number_cmp(const algebraic_number_t* a1, const algebraic_number_t*
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("algebraic_number_cmp(");
-    algebraic_number_ops.print(a1, trace_out);
+    algebraic_number_print(a1, trace_out);
     tracef(", ");
-    algebraic_number_ops.print(a2, trace_out);
+    algebraic_number_print(a2, trace_out);
     tracef(")\n");
   }
 
@@ -258,9 +257,9 @@ int algebraic_number_cmp(const algebraic_number_t* a1, const algebraic_number_t*
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("algebraic_number_cmp(");
-    algebraic_number_ops.print(a1, trace_out);
+    algebraic_number_print(a1, trace_out);
     tracef(", ");
-    algebraic_number_ops.print(a2, trace_out);
+    algebraic_number_print(a2, trace_out);
     tracef(") => %d\n", result);
   }
 
@@ -303,7 +302,7 @@ double algebraic_number_to_double(const algebraic_number_t* a_const) {
 
   // We do the necessary refinement on a copy
   algebraic_number_t a;
-  algebraic_number_ops.construct_copy(&a, a_const);
+  algebraic_number_construct_copy(&a, a_const);
 
   // Refine the number until we get the desired precision
   dyadic_rational_t interval_size;
@@ -320,7 +319,7 @@ double algebraic_number_to_double(const algebraic_number_t* a_const) {
   double result = dyadic_rational_ops.to_double(&a.I.a);
 
   dyadic_rational_ops.destruct(&interval_size);
-  algebraic_number_ops.destruct(&a);
+  algebraic_number_destruct(&a);
 
   return result;
 }

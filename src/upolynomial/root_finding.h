@@ -11,7 +11,7 @@
 #include "upolynomial/upolynomial_dense.h"
 
 #include "number/dyadic_rational.h"
-#include "algebraic_number.h"
+#include "number/algebraic_number.h"
 
 #include "interval/interval.h"
 
