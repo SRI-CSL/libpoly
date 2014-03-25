@@ -48,7 +48,6 @@ coefficient_is_normalized(const polynomial_context_t* ctx, coefficient_t* C);
 
 STAT_DECLARE(int, coefficient, construct)
 
-static inline
 void coefficient_construct(const polynomial_context_t* ctx, coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_construct()\n");
   STAT(coefficient, construct) ++;
@@ -59,7 +58,6 @@ void coefficient_construct(const polynomial_context_t* ctx, coefficient_t* C) {
 
 STAT_DECLARE(int, coefficient, construct_from_int)
 
-static inline
 void coefficient_construct_from_int(const polynomial_context_t* ctx, coefficient_t* C, long C_int) {
   TRACE("coefficient::internal", "coefficient_construct_from_int()\n");
   STAT(coefficient, construct_from_int) ++;
@@ -70,7 +68,6 @@ void coefficient_construct_from_int(const polynomial_context_t* ctx, coefficient
 
 STAT_DECLARE(int, coefficient, construct_from_integer)
 
-static inline
 void coefficient_construct_from_integer(const polynomial_context_t* ctx, coefficient_t* C, const integer_t* C_integer) {
   TRACE("coefficient::internal", "coefficient_construct_from_integer()\n");
   STAT(coefficient, construct_from_integer) ++;
@@ -81,7 +78,6 @@ void coefficient_construct_from_integer(const polynomial_context_t* ctx, coeffic
 
 STAT_DECLARE(int, coefficient, construct_rec)
 
-static
 void coefficient_construct_rec(const polynomial_context_t* ctx, coefficient_t* C, variable_t x, size_t capacity) {
   TRACE("coefficient::internal", "coefficient_construct_rec()\n");
   STAT(coefficient, construct_rec) ++;
@@ -96,7 +92,6 @@ void coefficient_construct_rec(const polynomial_context_t* ctx, coefficient_t* C
 
 STAT_DECLARE(int, coefficient, construct_simple)
 
-static
 void coefficient_construct_simple(const polynomial_context_t* ctx, coefficient_t* C, const integer_t* a, variable_t x, unsigned n) {
   TRACE("coefficient::internal", "coefficient_construct_simple()\n");
   STAT(coefficient, construct_simple) ++;
@@ -112,7 +107,6 @@ void coefficient_construct_simple(const polynomial_context_t* ctx, coefficient_t
 
 STAT_DECLARE(int, coefficient, construct_copy)
 
-static
 void coefficient_construct_copy(const polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
   TRACE("coefficient::internal", "coefficient_construct_copy()\n");
   STAT(coefficient, construct_copy) ++;
@@ -138,7 +132,6 @@ void coefficient_construct_copy(const polynomial_context_t* ctx, coefficient_t* 
 
 STAT_DECLARE(int, coefficient, construct_from_univariate)
 
-static inline
 void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
     coefficient_t* C, const upolynomial_t* C_u, variable_t x) {
 
@@ -171,7 +164,6 @@ void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
   assert(coefficient_is_normalized(ctx, C));
 }
 
-static
 void coefficient_destruct(coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_destruct()\n");
 
@@ -190,7 +182,6 @@ void coefficient_destruct(coefficient_t* C) {
 
 STAT_DECLARE(int, coefficient, swap)
 
-static inline
 void coefficient_swap(coefficient_t* C1, coefficient_t* C2) {
   TRACE("coefficient::internal", "coefficient_swap()\n");
   STAT(coefficient, swap) ++;
@@ -201,7 +192,6 @@ void coefficient_swap(coefficient_t* C1, coefficient_t* C2) {
 
 STAT_DECLARE(int, coefficient, assign)
 
-static
 void coefficient_assign(const polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
   TRACE("coefficient::internal", "coefficient_assign()\n");
   STAT(coefficient, assign) ++;
@@ -230,7 +220,6 @@ void coefficient_assign(const polynomial_context_t* ctx, coefficient_t* C, const
 
 STAT_DECLARE(int, coefficient, assign_int)
 
-static
 void coefficient_assign_int(const polynomial_context_t* ctx, coefficient_t* C, long x) {
   TRACE("coefficient::internal", "coefficient_assign_int()\n");
   STAT(coefficient, assign) ++;
@@ -276,12 +265,10 @@ const coefficient_t* coefficient_lc(const coefficient_t* C) {
   return 0;
 }
 
-static inline
 int coefficient_is_constant(const coefficient_t* C) {
   return C->type == COEFFICIENT_NUMERIC;
 }
 
-static inline
 size_t coefficient_degree(const coefficient_t* C) {
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -295,7 +282,6 @@ size_t coefficient_degree(const coefficient_t* C) {
   return 0;
 }
 
-static inline
 size_t coefficient_degree_safe(const polynomial_context_t* ctx, const coefficient_t* C, variable_t x) {
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -314,13 +300,11 @@ size_t coefficient_degree_safe(const polynomial_context_t* ctx, const coefficien
   return 0;
 }
 
-static inline
 variable_t coefficient_top_variable(const coefficient_t* C) {
   assert(C->type == COEFFICIENT_POLYNOMIAL);
   return VAR(C);
 }
 
-static
 const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t d) {
 
   assert(d <= coefficient_degree(C));
@@ -340,7 +324,6 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
 
 STAT_DECLARE(int, coefficient, is_zero)
 
-static inline
 int coefficient_is_zero(const polynomial_context_t* ctx, const coefficient_t* C) {
   STAT(coefficient, is_zero) ++;
   return C->type == COEFFICIENT_NUMERIC && integer_is_zero(ctx->K, &C->value.num);
@@ -348,7 +331,6 @@ int coefficient_is_zero(const polynomial_context_t* ctx, const coefficient_t* C)
 
 STAT_DECLARE(int, coefficient, is_one)
 
-static inline
 int coefficient_is_one(const polynomial_context_t* ctx, const coefficient_t* C) {
   STAT(coefficient, is_one) ++;
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, 1) == 0;
@@ -443,7 +425,6 @@ int coefficient_lc_sgn(const polynomial_context_t* ctx, const coefficient_t* C) 
 
 STAT_DECLARE(int, coefficient, in_order)
 
-static
 int coefficient_in_order(const polynomial_context_t* ctx, const coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_in_order()\n");
   STAT(coefficient, in_order) ++;
@@ -475,7 +456,6 @@ int coefficient_in_order(const polynomial_context_t* ctx, const coefficient_t* C
 }
 
 
-static
 int coefficient_cmp_general(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, int compare_values) {
   int cmp;
 
@@ -529,7 +509,6 @@ int coefficient_cmp_general(const polynomial_context_t* ctx, const coefficient_t
 
 STAT_DECLARE(int, coefficient, cmp)
 
-static inline
 int coefficient_cmp(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_cmp()\n");
   STAT(coefficient, cmp) ++;
@@ -539,7 +518,6 @@ int coefficient_cmp(const polynomial_context_t* ctx, const coefficient_t* C1, co
 
 STAT_DECLARE(int, coefficient, cmp_type)
 
-static inline
 int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::internal", "coefficient_cmp_type()\n");
   STAT(coefficient, cmp_type) ++;
@@ -547,11 +525,9 @@ int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C
   return coefficient_cmp_general(ctx, C1, C2, 0);
 }
 
-static
 char* power_symbol = 0;
 
 /** Set the power symbol for print-outs */
-static
 void coefficient_set_power_symbol(const char* pow) {
   if (power_symbol) {
     free(power_symbol);
@@ -563,13 +539,11 @@ void coefficient_set_power_symbol(const char* pow) {
   }
 }
 
-static
 const char* coefficient_get_power_symbol(void) {
   if (power_symbol) return power_symbol;
   else return "^";
 }
 
-static
 int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, FILE* out) {
   int i, k = 0, ret = 0;
   switch (C->type) {
@@ -632,7 +606,6 @@ int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, F
   return ret;
 }
 
-static
 char* coefficient_to_string(const polynomial_context_t* ctx, const coefficient_t* C) {
   char* str = 0;
   size_t size = 0;
@@ -645,12 +618,11 @@ char* coefficient_to_string(const polynomial_context_t* ctx, const coefficient_t
 /** Function type called on coefficient traversal */
 typedef void (*traverse_f) (const polynomial_context_t* ctx, monomial_t* p, void* data);
 
-static
 void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data) {
 
   if (trace_is_enabled("coefficient::order")) {
     tracef("order = "); variable_order_simple_ops.print((variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
     tracef("m = "); monomial_ops.print(ctx, m, trace_out); tracef("\n");
   }
 
@@ -681,7 +653,6 @@ void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* 
  * Method called to add a monomial to C. The monomial should be ordered in the
  * same order as C, top variable at the m[0].
  */
-static
 void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void) {
 
   coefficient_t* C = (coefficient_t*) C_void;
@@ -689,7 +660,7 @@ void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, vo
   if (trace_is_enabled("coefficient::order")) {
     tracef("coefficient_add_monomial():\n");
     tracef("m = "); monomial_ops.print(ctx, m, trace_out); tracef("\n");
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
   if (m->n == 0) {
@@ -724,7 +695,6 @@ void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, vo
   assert(coefficient_is_normalized(ctx, C));
 }
 
-static
 void coefficient_order_and_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void) {
   monomial_t m_ordered;
   monomial_ops.construct_copy(ctx, &m_ordered, m, /** sort */ 1);
@@ -734,7 +704,6 @@ void coefficient_order_and_add_monomial(const polynomial_context_t* ctx, monomia
 
 STAT_DECLARE(int, coefficient, order)
 
-static
 void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C) {
   TRACE("coefficient", "coefficient_order()\n");
   STAT(coefficient, order) ++;
@@ -746,7 +715,7 @@ void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C) {
 
   if (trace_is_enabled("coefficient::order")) {
     tracef("order = "); variable_order_simple_ops.print((variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
   // The coefficient we are building
@@ -770,15 +739,14 @@ STAT_DECLARE(int, coefficient, add)
 
 #define MAX(x, y) (x >= y ? x : y)
 
-static
 void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_add()\n");
   STAT(coefficient, add) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("S = "); coefficient_ops.print(ctx, S, trace_out); tracef("\n");
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("S = "); coefficient_print(ctx, S, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   coefficient_t result;
@@ -835,7 +803,7 @@ void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const co
   }
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("add = "); coefficient_ops.print(ctx, S, trace_out); tracef("\n");
+    tracef("add = "); coefficient_print(ctx, S, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, S));
@@ -843,7 +811,6 @@ void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, neg)
 
-static
 void coefficient_neg(const polynomial_context_t* ctx, coefficient_t* N, const coefficient_t* C) {
   TRACE("coefficient::arith", "coefficient_neg()\n");
   STAT(coefficient, neg) ++;
@@ -886,15 +853,14 @@ void coefficient_neg(const polynomial_context_t* ctx, coefficient_t* N, const co
 
 STAT_DECLARE(int, coefficient, sub)
 
-static
 void coefficient_sub(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_sub()\n");
   STAT(coefficient, sub) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("S = "); coefficient_ops.print(ctx, S, trace_out); tracef("\n");
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("S = "); coefficient_print(ctx, S, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   coefficient_t result;
@@ -951,20 +917,18 @@ void coefficient_sub(const polynomial_context_t* ctx, coefficient_t* S, const co
 }
 
 
-static
 void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 STAT_DECLARE(int, coefficient, mul)
 
-static
 void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_mul()\n");
   STAT(coefficient, mul) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   size_t i, j;
@@ -1023,7 +987,7 @@ void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const co
   }
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("mul = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
+    tracef("mul = "); coefficient_print(ctx, P, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, P));
@@ -1031,14 +995,13 @@ void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const co
 
 STAT_DECLARE(int, coefficient, mul_int)
 
-static
 void coefficient_mul_int(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a) {
   TRACE("coefficient::arith", "coefficient_mul_int()\n");
   STAT(coefficient, mul_int) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
     tracef("n  = %ld", a);
   }
 
@@ -1072,13 +1035,12 @@ void coefficient_mul_int(const polynomial_context_t* ctx, coefficient_t* P, cons
 
 STAT_DECLARE(int, coefficient, shl)
 
-static
 void coefficient_shl(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, variable_t x, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shl()\n");
   STAT(coefficient, shl) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
     tracef("x = %s\n", variable_db_ops.get_name(ctx->var_db, x));
     tracef("n  = %u\n", n);
   }
@@ -1096,7 +1058,7 @@ void coefficient_shl(const polynomial_context_t* ctx, coefficient_t* S, const co
   }
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("coefficient_shl() =>"); coefficient_ops.print(ctx, S, trace_out); tracef("\n");
+    tracef("coefficient_shl() =>"); coefficient_print(ctx, S, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, S));
@@ -1104,13 +1066,12 @@ void coefficient_shl(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, shr)
 
-static
 void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shr()\n");
   STAT(coefficient, shl) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
     tracef("n  = %u\n", n);
   }
 
@@ -1140,7 +1101,7 @@ void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const co
   }
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("coefficient_shr() =>"); coefficient_ops.print(ctx, S, trace_out); tracef("\n");
+    tracef("coefficient_shr() =>"); coefficient_print(ctx, S, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, S));
@@ -1148,14 +1109,13 @@ void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, pow)
 
-static
 void coefficient_pow(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n) {
   TRACE("coefficient", "coefficient_pow()\n");
   STAT(coefficient, pow) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
   if (n == 0) {
@@ -1206,15 +1166,14 @@ void coefficient_pow(const polynomial_context_t* ctx, coefficient_t* P, const co
 
 STAT_DECLARE(int, coefficient, add_mul)
 
-static
 void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_add_mul()\n");
   STAT(coefficient, add_mul) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
-    tracef("S = "); coefficient_ops.print(ctx, S, trace_out); tracef("\n");
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("S = "); coefficient_print(ctx, S, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   if (C1->type == COEFFICIENT_NUMERIC && C2->type == COEFFICIENT_NUMERIC && S->type == COEFFICIENT_NUMERIC) {
@@ -1232,7 +1191,6 @@ void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, cons
 
 STAT_DECLARE(int, coefficient, sub_mul)
 
-static
 void coefficient_sub_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_sub_mul()\n");
   STAT(coefficient, sub_mul) ++;
@@ -1282,22 +1240,16 @@ void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d,
 /// Forward declarations of division/reduction/gcd stuff
 ///
 
-static
 void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
 
-static
 void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C);
 
-static
 void coefficient_pp(const polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C);
 
-static
 void coefficient_cont(const polynomial_context_t* ctx, coefficient_t* cont, const coefficient_t* C);
 
-static
 void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2);
 
-static
 void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2);
 
 //
@@ -1306,7 +1258,6 @@ void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const 
 
 STAT_DECLARE(int, coefficient, reduce)
 
-static
 void coefficient_reduce(
     const polynomial_context_t* ctx,
     const coefficient_t* A, const coefficient_t* B,
@@ -1317,8 +1268,8 @@ void coefficient_reduce(
   STAT(coefficient, reduce) ++;
 
   if (trace_is_enabled("coefficient::reduce")) {
-    tracef("A = "); coefficient_ops.print(ctx, A, trace_out); tracef("\n");
-    tracef("B = "); coefficient_ops.print(ctx, B, trace_out); tracef("\n");
+    tracef("A = "); coefficient_print(ctx, A, trace_out); tracef("\n");
+    tracef("B = "); coefficient_print(ctx, B, trace_out); tracef("\n");
   }
 
   assert(A->type == COEFFICIENT_POLYNOMIAL);
@@ -1529,14 +1480,13 @@ void coefficient_reduce(
 
 STAT_DECLARE(int, coefficient, div)
 
-static
 void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_div()\n");
   STAT(coefficient, div) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(!coefficient_is_zero(ctx, C2));
@@ -1575,7 +1525,7 @@ void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const co
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_div() => "); coefficient_ops.print(ctx, D, trace_out); tracef("\n");
+    tracef("coefficient_div() => "); coefficient_print(ctx, D, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, D));
@@ -1583,14 +1533,13 @@ void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const co
 
 STAT_DECLARE(int, coefficient, rem)
 
-static
 void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_rem()\n");
   STAT(coefficient, rem) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(!coefficient_is_zero(ctx, C2));
@@ -1611,7 +1560,7 @@ void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const co
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_rem() => "); coefficient_ops.print(ctx, R, trace_out); tracef("\n");
+    tracef("coefficient_rem() => "); coefficient_print(ctx, R, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, R));
@@ -1619,14 +1568,13 @@ void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const co
 
 STAT_DECLARE(int, coefficient, sprem)
 
-static
 void coefficient_sprem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_sprem()\n");
   STAT(coefficient, sprem) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(!coefficient_is_zero(ctx, C2));
@@ -1647,7 +1595,7 @@ void coefficient_sprem(const polynomial_context_t* ctx, coefficient_t* R, const 
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_sprem() => "); coefficient_ops.print(ctx, R, trace_out); tracef("\n");
+    tracef("coefficient_sprem() => "); coefficient_print(ctx, R, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, R));
@@ -1655,14 +1603,13 @@ void coefficient_sprem(const polynomial_context_t* ctx, coefficient_t* R, const 
 
 STAT_DECLARE(int, coefficient, prem)
 
-static
 void coefficient_prem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_prem()\n");
   STAT(coefficient, rem) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(!coefficient_is_zero(ctx, C2));
@@ -1683,7 +1630,7 @@ void coefficient_prem(const polynomial_context_t* ctx, coefficient_t* R, const c
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_prem() => "); coefficient_ops.print(ctx, R, trace_out); tracef("\n");
+    tracef("coefficient_prem() => "); coefficient_print(ctx, R, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, R));
@@ -1692,14 +1639,13 @@ void coefficient_prem(const polynomial_context_t* ctx, coefficient_t* R, const c
 
 STAT_DECLARE(int, coefficient, divrem)
 
-static
 void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_divrem()\n");
   STAT(coefficient, divrem) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(!coefficient_is_zero(ctx, C2));
@@ -1734,8 +1680,8 @@ void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coeff
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_divrem() => \n");
-    tracef("D = "); coefficient_ops.print(ctx, D, trace_out); tracef("\n");
-    tracef("D = "); coefficient_ops.print(ctx, R, trace_out); tracef("\n");
+    tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
+    tracef("D = "); coefficient_print(ctx, R, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, R));
@@ -1743,7 +1689,6 @@ void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coeff
 
 STAT_DECLARE(int, coefficient, divides)
 
-static
 int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_divides()\n");
   STAT(coefficient, divides) ++;
@@ -1760,14 +1705,13 @@ int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1
 
 STAT_DECLARE(int, coefficient, pp_cont)
 
-static
 void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C) {
 
   TRACE("coefficient", "coefficient_pp_cont()\n");
   STAT(coefficient, pp_cont) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C = "); coefficient_ops.print(ctx, C, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
   assert(ctx->K == Z);
@@ -1834,17 +1778,15 @@ void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coe
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_pp_cont() => ");
-    if (pp) { tracef("pp = "); coefficient_ops.print(ctx, pp, trace_out); tracef("\n"); }
-    if (cont) { tracef("cont = "); coefficient_ops.print(ctx, cont, trace_out); tracef("\n"); }
+    if (pp) { tracef("pp = "); coefficient_print(ctx, pp, trace_out); tracef("\n"); }
+    if (cont) { tracef("cont = "); coefficient_print(ctx, cont, trace_out); tracef("\n"); }
   }
 }
 
-static
 void coefficient_cont(const polynomial_context_t* ctx, coefficient_t* cont, const coefficient_t* C) {
   coefficient_pp_cont(ctx, 0, cont, C);
 }
 
-static
 void coefficient_pp(const polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C) {
   coefficient_pp_cont(ctx, pp, 0, C);
 }
@@ -1859,7 +1801,6 @@ void monomial_gcd_visit(const polynomial_context_t* ctx, monomial_t* m, void* da
   }
 }
 
-static
 int coefficient_is_univariate(const coefficient_t* C) {
   size_t i;
   if (C->type == COEFFICIENT_NUMERIC) {
@@ -1874,7 +1815,6 @@ int coefficient_is_univariate(const coefficient_t* C) {
   }
 }
 
-static
 const integer_t* coefficient_get_constant(const coefficient_t* C) {
   while (C->type == COEFFICIENT_POLYNOMIAL) {
     C = COEFF(C, 0);
@@ -1882,8 +1822,7 @@ const integer_t* coefficient_get_constant(const coefficient_t* C) {
   return &C->value.num;
 }
 
-static
-upolynomial_t* coefficient_to_simple_univariate(const polynomial_context_t* ctx, const coefficient_t* C) {
+upolynomial_t* coefficient_to_univariate(const polynomial_context_t* ctx, const coefficient_t* C) {
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
   integer_t* coeff = malloc(sizeof(integer_t)*SIZE(C));
@@ -1908,7 +1847,6 @@ upolynomial_t* coefficient_to_simple_univariate(const polynomial_context_t* ctx,
  * univariate gcd of these. If the coefficients were univariate already, or
  * the result is a constant (i.e. gcd = 1), the result is precise.
  */
-static
 int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
     coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2) {
 
@@ -1917,8 +1855,8 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_gcd_pp_univariate()\n");
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   int C1_vanishes = integer_is_zero(ctx->K, coefficient_get_constant(coefficient_lc(C1)));
@@ -1932,8 +1870,8 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
   variable_t x = VAR(C1);
   assert(x == VAR(C2));
 
-  upolynomial_t* C1_u = coefficient_to_simple_univariate(ctx, C1);
-  upolynomial_t* C2_u = coefficient_to_simple_univariate(ctx, C2);
+  upolynomial_t* C1_u = coefficient_to_univariate(ctx, C1);
+  upolynomial_t* C2_u = coefficient_to_univariate(ctx, C2);
   upolynomial_t* gcd_u = upolynomial_gcd(C1_u, C2_u);
   coefficient_construct_from_univariate(ctx, gcd, gcd_u, x);
 
@@ -1943,7 +1881,7 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_gcd_pp_univariate() => ");
-    tracef("gcd = "); coefficient_ops.print(ctx, gcd, trace_out); tracef("\n");
+    tracef("gcd = "); coefficient_print(ctx, gcd, trace_out); tracef("\n");
   }
 
   if (gcd->type == COEFFICIENT_NUMERIC) {
@@ -1969,14 +1907,13 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
  *  P = 2*x^2 + 1
  *  Q = 2*y*x^3
  */
-static
 void coefficient_gcd_monomial_extract(const polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_monomial_extract()\n");
 
   if (trace_is_enabled("coefficient")) {
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("Q = "); coefficient_ops.print(ctx, Q, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
 
   assert(P != Q);
@@ -2027,9 +1964,9 @@ void coefficient_gcd_monomial_extract(const polynomial_context_t* ctx, coefficie
   monomial_ops.destruct(&m_P_gcd);
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_gcd_monomial_extract() =>"); coefficient_ops.print(ctx, gcd, trace_out); tracef("\n");
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("Q = "); coefficient_ops.print(ctx, Q, trace_out); tracef("\n");
+    tracef("coefficient_gcd_monomial_extract() =>"); coefficient_print(ctx, gcd, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
 }
 
@@ -2039,15 +1976,14 @@ STAT_DECLARE(int, coefficient, gcd_pp)
  * Compute the gcd of two primitive polynomials P and Q. The polynomials P and
  * Q will be used and changed in the computation.
  */
-static
 void coefficient_gcd_pp(const polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_pp()\n");
   STAT(coefficient, gcd_pp) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("Q = "); coefficient_ops.print(ctx, Q, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
 
   // Try to comute the univariate GCD first
@@ -2103,20 +2039,19 @@ void coefficient_gcd_pp(const polynomial_context_t* ctx, coefficient_t* gcd, coe
   coefficient_destruct(&gcd_u);
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_gcd_pp() => "); coefficient_ops.print(ctx, gcd, trace_out); tracef("\n");
+    tracef("coefficient_gcd_pp() => "); coefficient_print(ctx, gcd, trace_out); tracef("\n");
   }
 }
 
 STAT_DECLARE(int, coefficient, gcd)
 
-static
 void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_gcd()\n");
   STAT(coefficient, gcd) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(ctx->K == Z);
@@ -2207,13 +2142,13 @@ void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const 
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_gcd() => "); coefficient_ops.print(ctx, gcd, trace_out); tracef("\n");
+    tracef("coefficient_gcd() => "); coefficient_print(ctx, gcd, trace_out); tracef("\n");
   }
 
   if (trace_is_enabled("coefficient::gcd::sage")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
-    tracef("gcd = "); coefficient_ops.print(ctx, gcd, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
+    tracef("gcd = "); coefficient_print(ctx, gcd, trace_out); tracef("\n");
     tracef("gcd_sage = C1.gcd(C2)\n");
     tracef("if (gcd != gcd_sage):\n");
     tracef("\tprint 'C1 =', C1\n");
@@ -2225,14 +2160,13 @@ void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const 
 
 STAT_DECLARE(int, coefficient, lcm)
 
-static
 void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_lcm()\n");
   STAT(coefficient, lcm) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("C1 = "); coefficient_ops.print(ctx, C1, trace_out); tracef("\n");
-    tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(ctx->K == Z);
@@ -2267,7 +2201,7 @@ void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const 
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_lcm() => "); coefficient_ops.print(ctx, lcm, trace_out); tracef("\n");
+    tracef("coefficient_lcm() => "); coefficient_print(ctx, lcm, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, lcm));
@@ -2286,8 +2220,8 @@ void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* S, const co
   STAT(coefficient, psc) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("P = "); coefficient_ops.print(ctx, P, trace_out); tracef("\n");
-    tracef("Q = "); coefficient_ops.print(ctx, Q, trace_out); tracef("\n");
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
 
   assert(P->type == COEFFICIENT_POLYNOMIAL);
@@ -2443,8 +2377,8 @@ void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, 
   STAT(coefficient, resultant) ++;
 
   if (trace_is_enabled("coefficient")) {
-    tracef("A = "); coefficient_ops.print(ctx, A, trace_out); tracef("\n");
-    tracef("B = "); coefficient_ops.print(ctx, B, trace_out); tracef("\n");
+    tracef("A = "); coefficient_print(ctx, A, trace_out); tracef("\n");
+    tracef("B = "); coefficient_print(ctx, B, trace_out); tracef("\n");
   }
 
   assert(A->type == COEFFICIENT_POLYNOMIAL);
@@ -2566,60 +2500,3 @@ coefficient_ensure_capacity(const polynomial_context_t* ctx, coefficient_t* C, v
   }
 }
 
-
-
-const coefficient_ops_t coefficient_ops = {
-    coefficient_construct,
-    coefficient_construct_from_int,
-    coefficient_construct_from_integer,
-    coefficient_construct_from_univariate,
-    coefficient_construct_simple,
-    coefficient_construct_copy,
-    coefficient_destruct,
-    coefficient_swap,
-    coefficient_assign,
-    coefficient_assign_int,
-    coefficient_to_simple_univariate,
-    coefficient_is_constant,
-    coefficient_degree,
-    coefficient_top_variable,
-    coefficient_get_coefficient,
-    coefficient_lc,
-    coefficient_is_zero,
-    coefficient_is_one,
-    coefficient_sgn,
-    coefficient_value_approx,
-    coefficient_lc_sgn,
-    coefficient_in_order,
-    coefficient_cmp,
-    coefficient_cmp_type,
-    coefficient_divides,
-    coefficient_print,
-    coefficient_to_string,
-    coefficient_order,
-    coefficient_add,
-    coefficient_sub,
-    coefficient_neg,
-    coefficient_mul,
-    coefficient_mul_int,
-    coefficient_shl,
-    coefficient_shr,
-    coefficient_pow,
-    coefficient_add_mul,
-    coefficient_sub_mul,
-    coefficient_reduce,
-    coefficient_div,
-    coefficient_rem,
-    coefficient_prem,
-    coefficient_sprem,
-    coefficient_divrem,
-    coefficient_derivative,
-    coefficient_gcd,
-    coefficient_pp,
-    coefficient_cont,
-    coefficient_pp_cont,
-    coefficient_lcm,
-    coefficient_resultant,
-    coefficient_psc,
-    coefficient_set_power_symbol
-};

@@ -15,9 +15,9 @@
 #define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 
 void polynomial_external_clean(const polynomial_t* A_const) {
-  if (A_const->flags.external && !coefficient_ops.in_order(A_const->ctx, &A_const->data)) {
+  if (A_const->flags.external && !coefficient_in_order(A_const->ctx, &A_const->data)) {
     polynomial_t* A = (polynomial_t*) A_const;
-    coefficient_ops.order(A->ctx, &A->data);
+    coefficient_order(A->ctx, &A->data);
     A->flags.primitive = 0;
   }
 }
@@ -41,7 +41,7 @@ void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx, int 
   A->flags.primitive = 1;
   A->flags.univariate = 1;
   polynomial_set_context(A, ctx);
-  coefficient_ops.construct(ctx, &A->data);
+  coefficient_construct(ctx, &A->data);
 }
 
 void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_context_t* ctx,
@@ -52,7 +52,7 @@ void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_con
   A->flags.univariate = 0;
   A->flags.external = external;
   polynomial_set_context(A, ctx);
-  coefficient_ops.construct_copy(A->ctx, &A->data, from);
+  coefficient_construct_copy(A->ctx, &A->data, from);
 }
 
 void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from, int external) {
@@ -60,7 +60,7 @@ void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from, int ex
   A->flags = from->flags;
   A->flags.external = external;
   polynomial_set_context(A, from->ctx);
-  coefficient_ops.construct_copy(A->ctx, &A->data, &from->data);
+  coefficient_construct_copy(A->ctx, &A->data, &from->data);
 }
 
 /** Construct a simple polynomial c*x^n */
@@ -74,11 +74,11 @@ void polynomial_construct_simple(
   A->flags.primitive = 0;
   A->flags.univariate = 1;
   polynomial_set_context(A, ctx);
-  coefficient_ops.construct_simple(ctx, &A->data, c, x, n);
+  coefficient_construct_simple(ctx, &A->data, c, x, n);
 }
 
 void polynomial_destruct(polynomial_t* A) {
-  coefficient_ops.destruct(&A->data);
+  coefficient_destruct(&A->data);
   if (A->flags.external) {
     polynomial_context_ops.detach((polynomial_context_t*)A->ctx);
   }
@@ -113,7 +113,7 @@ void polynomial_assign(polynomial_t* A, const polynomial_t* from) {
       A->flags = from->flags;
       A->flags.external = 0;
     }
-    coefficient_ops.assign(A->ctx, &A->data, &from->data);
+    coefficient_assign(A->ctx, &A->data, &from->data);
   }
 }
 
@@ -123,12 +123,12 @@ const polynomial_context_t* polynomial_context(const polynomial_t* A) {
 
 variable_t polynomial_top_variable(const polynomial_t* A) {
   polynomial_external_clean(A);
-  return coefficient_ops.top_variable(&A->data);
+  return coefficient_top_variable(&A->data);
 }
 
 size_t polynomial_degree(const polynomial_t* A) {
   polynomial_external_clean(A);
-  return coefficient_ops.degree(&A->data);
+  return coefficient_degree(&A->data);
 }
 
 void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t k) {
@@ -140,7 +140,7 @@ void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t
     polynomial_swap(C_p, &result);
     polynomial_destruct(&result);
   } else {
-    const coefficient_t* C = coefficient_ops.get_coefficient(&A->data, k);
+    const coefficient_t* C = coefficient_get_coefficient(&A->data, k);
     polynomial_t result;
     polynomial_construct_from_coefficient(&result, A->ctx, C, 0);
     polynomial_swap(C_p, &result);
@@ -149,15 +149,15 @@ void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t
 }
 
 int polynomial_is_constant(const polynomial_t* A) {
-  return coefficient_ops.is_constant(&A->data);
+  return coefficient_is_constant(&A->data);
 }
 
 int polynomial_is_zero(const polynomial_t* A) {
-  return coefficient_ops.is_zero(A->ctx, &A->data);
+  return coefficient_is_zero(A->ctx, &A->data);
 }
 
 int polynomial_sgn(const polynomial_t* A, const assignment_t* m) {
-  return coefficient_ops.sgn(A->ctx, &A->data, m);
+  return coefficient_sgn(A->ctx, &A->data, m);
 }
 
 int polynomial_cmp(const polynomial_t* A1, const polynomial_t* A2) {
@@ -173,7 +173,7 @@ int polynomial_cmp(const polynomial_t* A1, const polynomial_t* A2) {
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-  int cmp = coefficient_ops.cmp(A1->ctx, &A1->data, &A2->data);
+  int cmp = coefficient_cmp(A1->ctx, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_cmp("); polynomial_print(A1, trace_out); tracef(", "); polynomial_print(A2, trace_out); tracef(") => %d\n", cmp);
@@ -188,7 +188,7 @@ int polynomial_cmp_type(const polynomial_t* A1, const polynomial_t* A2) {
   assert(polynomial_context_ops.equal(A2->ctx, ctx));
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-  return coefficient_ops.cmp_type(ctx, &A1->data, &A2->data);
+  return coefficient_cmp_type(ctx, &A1->data, &A2->data);
 }
 
 int polynomial_divides(const polynomial_t* A1, const polynomial_t* A2) {
@@ -197,17 +197,17 @@ int polynomial_divides(const polynomial_t* A1, const polynomial_t* A2) {
   }
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-  return coefficient_ops.divides(A1->ctx, &A1->data, &A2->data);
+  return coefficient_divides(A1->ctx, &A1->data, &A2->data);
 }
 
 int polynomial_print(const polynomial_t* A, FILE* out) {
   polynomial_external_clean(A);
-  return coefficient_ops.print(A->ctx, &A->data, out);
+  return coefficient_print(A->ctx, &A->data, out);
 }
 
 char* polynomial_to_string(const polynomial_t* A) {
   polynomial_external_clean(A);
-  return coefficient_ops.to_string(A->ctx, &A->data);
+  return coefficient_to_string(A->ctx, &A->data);
 }
 
 inline
@@ -249,7 +249,7 @@ void polynomial_add(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
 
   polynomial_set_context(S, A1->ctx);
 
-  coefficient_ops.add(S->ctx, &S->data, &A1->data, &A2->data);
+  coefficient_add(S->ctx, &S->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_add() => "); polynomial_print(S, trace_out); tracef("\n");
@@ -277,7 +277,7 @@ void polynomial_sub(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
 
   polynomial_set_context(S, A1->ctx);
 
-  coefficient_ops.sub(S->ctx, &S->data, &A1->data, &A2->data);
+  coefficient_sub(S->ctx, &S->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_sub() => "); polynomial_print(S, trace_out); tracef("\n");
@@ -294,7 +294,7 @@ void polynomial_neg(polynomial_t* N, const polynomial_t* A) {
 
   polynomial_set_context(N, N->ctx);
 
-  coefficient_ops.neg(N->ctx, &N->data, &A->data);
+  coefficient_neg(N->ctx, &N->data, &A->data);
 }
 
 void polynomial_mul(polynomial_t* P, const polynomial_t* A1, const polynomial_t* A2) {
@@ -318,7 +318,7 @@ void polynomial_mul(polynomial_t* P, const polynomial_t* A1, const polynomial_t*
 
   polynomial_set_context(P, A1->ctx);
 
-  coefficient_ops.mul(P->ctx, &P->data, &A1->data, &A2->data);
+  coefficient_mul(P->ctx, &P->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_mul() => "); polynomial_print(P, trace_out); tracef("\n");
@@ -336,7 +336,7 @@ void polynomial_shl(polynomial_t* S, const polynomial_t* A, unsigned n) {
   polynomial_set_context(S, A->ctx);
 
   assert(A->data.type == COEFFICIENT_POLYNOMIAL);
-  coefficient_ops.shl(S->ctx, &S->data, &A->data, VAR(&A->data), n);
+  coefficient_shl(S->ctx, &S->data, &A->data, VAR(&A->data), n);
 }
 
 void polynomial_pow(polynomial_t* P, const polynomial_t* A, unsigned n) {
@@ -357,7 +357,7 @@ void polynomial_pow(polynomial_t* P, const polynomial_t* A, unsigned n) {
 
   polynomial_set_context(P, A->ctx);
 
-  coefficient_ops.pow(P->ctx, &P->data, &A->data, n);
+  coefficient_pow(P->ctx, &P->data, &A->data, n);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_pow() => "); polynomial_print(P, trace_out); tracef("\n");
@@ -379,7 +379,7 @@ void polynomial_add_mul(polynomial_t* S, const polynomial_t* A1, const polynomia
   S->flags.primitive = 0;
   S->flags.univariate = polynomial_same_var_univariate(A1, A2) && polynomial_same_var_univariate(S, A1);
 
-  coefficient_ops.add_mul(ctx, &S->data, &A1->data, &A2->data);
+  coefficient_add_mul(ctx, &S->data, &A1->data, &A2->data);
 }
 
 void polynomial_sub_mul(polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2) {
@@ -397,7 +397,7 @@ void polynomial_sub_mul(polynomial_t* S, const polynomial_t* A1, const polynomia
   S->flags.primitive = 0;
   S->flags.univariate = polynomial_same_var_univariate(A1, A2) && polynomial_same_var_univariate(S, A1);
 
-  coefficient_ops.sub_mul(ctx, &S->data, &A1->data, &A2->data);
+  coefficient_sub_mul(ctx, &S->data, &A1->data, &A2->data);
 }
 
 void polynomial_div(polynomial_t* D, const polynomial_t* A1, const polynomial_t* A2) {
@@ -421,7 +421,7 @@ void polynomial_div(polynomial_t* D, const polynomial_t* A1, const polynomial_t*
 
   polynomial_set_context(D, A1->ctx);
 
-  coefficient_ops.div(D->ctx, &D->data, &A1->data, &A2->data);
+  coefficient_div(D->ctx, &D->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_div() => "); polynomial_print(D, trace_out); tracef("\n");
@@ -449,7 +449,7 @@ void polynomial_rem(polynomial_t* R, const polynomial_t* A1, const polynomial_t*
 
   polynomial_set_context(R, A1->ctx);
 
-  coefficient_ops.rem(R->ctx, &R->data, &A1->data, &A2->data);
+  coefficient_rem(R->ctx, &R->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_rem() => "); polynomial_print(R, trace_out); tracef("\n");
@@ -478,7 +478,7 @@ void polynomial_divrem(polynomial_t* D, polynomial_t* R, const polynomial_t* A1,
   polynomial_set_context(D, A1->ctx);
   polynomial_set_context(R, A1->ctx);
 
-  coefficient_ops.divrem(D->ctx, &R->data, &R->data, &A1->data, &A2->data);
+  coefficient_divrem(D->ctx, &R->data, &R->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_rem() => ("); polynomial_print(D, trace_out); tracef(", "); polynomial_print(R, trace_out); tracef(")\n");
@@ -507,7 +507,7 @@ void polynomial_derivative(polynomial_t* A_d, const polynomial_t* A) {
 
   polynomial_set_context(A_d, A->ctx);
 
-  coefficient_ops.derivative(A_d->ctx, &A_d->data, &A->data);
+  coefficient_derivative(A_d->ctx, &A_d->data, &A->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_derivative() => "); polynomial_print(A_d, trace_out); tracef("\n");
@@ -535,7 +535,7 @@ void polynomial_gcd(polynomial_t* gcd, const polynomial_t* A1, const polynomial_
   gcd->flags.primitive = A1->flags.primitive && A2->flags.primitive;
   gcd->flags.univariate = polynomial_same_var_univariate(A1, A2);
 
-  coefficient_ops.gcd(gcd->ctx, &gcd->data, &A1->data, &A2->data);
+  coefficient_gcd(gcd->ctx, &gcd->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_gcd() => "); polynomial_print(gcd, trace_out); tracef("\n");
@@ -554,7 +554,7 @@ void polynomial_lcm(polynomial_t* lcm, const polynomial_t* A1, const polynomial_
   lcm->flags.primitive = A1->flags.primitive && A2->flags.primitive;
   lcm->flags.univariate = polynomial_same_var_univariate(A1, A2);
 
-  coefficient_ops.lcm(lcm->ctx, &lcm->data, &A1->data, &A2->data);
+  coefficient_lcm(lcm->ctx, &lcm->data, &A1->data, &A2->data);
 }
 
 void polynomial_reduce(
@@ -580,7 +580,7 @@ void polynomial_reduce(
   polynomial_set_context(Q, ctx);
   polynomial_set_context(R, ctx);
 
-  coefficient_ops.reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, 1);
+  coefficient_reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, 1);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_derivative() =>\n");
@@ -624,11 +624,11 @@ void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_
   coefficient_t* psc_coeff = malloc(sizeof(coefficient_t)*size);
   size_t i;
   for (i = 0; i < size; ++ i) {
-    coefficient_ops.construct(ctx, psc_coeff + i);
+    coefficient_construct(ctx, psc_coeff + i);
   }
 
   // Compute
-  coefficient_ops.psc(ctx, psc_coeff, &A->data, &B->data);
+  coefficient_psc(ctx, psc_coeff, &A->data, &B->data);
 
   // Construct the output (one less, we ignore the final 1)
   for (i = 0; i < size; ++ i) {
@@ -636,7 +636,7 @@ void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_
     polynomial_construct_from_coefficient(&tmp, ctx, psc_coeff + i, 0);
     polynomial_swap(&tmp, psc[i]);
     polynomial_destruct(&tmp);
-    coefficient_ops.destruct(&psc_coeff[i]);
+    coefficient_destruct(&psc_coeff[i]);
   }
 
   free(psc_coeff);
@@ -670,7 +670,7 @@ void polynomial_resultant(polynomial_t* res, const polynomial_t* A, const polyno
   polynomial_external_clean(B);
 
   // Compute
-  coefficient_ops.resultant(ctx, &res->data, &A->data, &B->data);
+  coefficient_resultant(ctx, &res->data, &A->data, &B->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_resultant("); polynomial_print(A, trace_out); tracef(", "); polynomial_print(B, trace_out); tracef(") => "); polynomial_print(res, trace_out); tracef("\n");
@@ -679,7 +679,7 @@ void polynomial_resultant(polynomial_t* res, const polynomial_t* A, const polyno
 
 /** Set the power symbol for printouts */
 void polynomial_set_power_symbol(const char* power) {
-  coefficient_ops.set_power_symbol(power);
+  coefficient_set_power_symbol(power);
 }
 
 

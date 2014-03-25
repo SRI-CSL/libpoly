@@ -404,11 +404,11 @@ void algebraic_number_op(
   }
 
   coefficient_t f_a;
-  coefficient_ops.construct_from_univariate(ctx, &f_a, a->f, var_x);
+  coefficient_construct_from_univariate(ctx, &f_a, a->f, var_x);
 
   coefficient_t f_b;
   if (b) {
-    coefficient_ops.construct_from_univariate(ctx, &f_b, b->f, var_y);
+    coefficient_construct_from_univariate(ctx, &f_b, b->f, var_y);
   }
 
   // Construct the op polynomial
@@ -416,23 +416,23 @@ void algebraic_number_op(
   construct_op(&f_r);
 
   if (trace_is_enabled("algebraic_number")) {
-    tracef("f_r = "); coefficient_ops.print(ctx, &f_r, trace_out); tracef("\n");
+    tracef("f_r = "); coefficient_print(ctx, &f_r, trace_out); tracef("\n");
   }
 
   // Compute the resultant
-  coefficient_ops.resultant(ctx, &f_r, &f_r, &f_a);
+  coefficient_resultant(ctx, &f_r, &f_r, &f_a);
   if (trace_is_enabled("algebraic_number")) {
-    tracef("f_r = "); coefficient_ops.print(ctx, &f_r, trace_out); tracef("\n");
+    tracef("f_r = "); coefficient_print(ctx, &f_r, trace_out); tracef("\n");
   }
   if (b) {
-    coefficient_ops.resultant(ctx, &f_r, &f_r, &f_b);
+    coefficient_resultant(ctx, &f_r, &f_r, &f_b);
     if (trace_is_enabled("algebraic_number")) {
-      tracef("f_r = "); coefficient_ops.print(ctx, &f_r, trace_out); tracef("\n");
+      tracef("f_r = "); coefficient_print(ctx, &f_r, trace_out); tracef("\n");
     }
   }
 
   // Resultant polynomial captures the result
-  upolynomial_t* f = coefficient_ops.to_univariate(ctx, &f_r);
+  upolynomial_t* f = coefficient_to_univariate(ctx, &f_r);
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("f = "); upolynomial_print(f, trace_out);
@@ -500,9 +500,9 @@ void algebraic_number_op(
   }
 
   // Remove temps
-  coefficient_ops.destruct(&f_a);
-  coefficient_ops.destruct(&f_b);
-  coefficient_ops.destruct(&f_r);
+  coefficient_destruct(&f_a);
+  coefficient_destruct(&f_b);
+  coefficient_destruct(&f_r);
   dyadic_interval_destruct(&I);
   free(f_roots);
 }
@@ -514,14 +514,14 @@ void algebraic_number_add_construct_op(coefficient_t* f_r) {
   integer_t one;
   integer_construct_from_int(Z, &one, 1);
   coefficient_t f_x, f_y;
-  coefficient_ops.construct_simple(ctx, f_r, &one, var_r, 1);
-  coefficient_ops.construct_simple(ctx, &f_x, &one, var_x, 1);
-  coefficient_ops.construct_simple(ctx, &f_y, &one, var_y, 1);
-  coefficient_ops.sub(ctx, f_r, f_r, &f_x);
-  coefficient_ops.sub(ctx, f_r, f_r, &f_y);
+  coefficient_construct_simple(ctx, f_r, &one, var_r, 1);
+  coefficient_construct_simple(ctx, &f_x, &one, var_x, 1);
+  coefficient_construct_simple(ctx, &f_y, &one, var_y, 1);
+  coefficient_sub(ctx, f_r, f_r, &f_x);
+  coefficient_sub(ctx, f_r, f_r, &f_y);
   integer_destruct(&one);
-  coefficient_ops.destruct(&f_x);
-  coefficient_ops.destruct(&f_y);
+  coefficient_destruct(&f_x);
+  coefficient_destruct(&f_y);
 }
 
 void algebraic_number_add(algebraic_number_t* sum, const algebraic_number_t* a, const algebraic_number_t* b) {
@@ -536,14 +536,14 @@ void algebraic_number_sub_construct_op(coefficient_t* f_r) {
   integer_t one;
   integer_construct_from_int(Z, &one, 1);
   coefficient_t f_x, f_y;
-  coefficient_ops.construct_simple(ctx, f_r, &one, var_r, 1);
-  coefficient_ops.construct_simple(ctx, &f_x, &one, var_x, 1);
-  coefficient_ops.construct_simple(ctx, &f_y, &one, var_y, 1);
-  coefficient_ops.sub(ctx, f_r, f_r, &f_x);
-  coefficient_ops.add(ctx, f_r, f_r, &f_y);
+  coefficient_construct_simple(ctx, f_r, &one, var_r, 1);
+  coefficient_construct_simple(ctx, &f_x, &one, var_x, 1);
+  coefficient_construct_simple(ctx, &f_y, &one, var_y, 1);
+  coefficient_sub(ctx, f_r, f_r, &f_x);
+  coefficient_add(ctx, f_r, f_r, &f_y);
   integer_destruct(&one);
-  coefficient_ops.destruct(&f_x);
-  coefficient_ops.destruct(&f_y);
+  coefficient_destruct(&f_x);
+  coefficient_destruct(&f_y);
 }
 
 void algebraic_number_sub(algebraic_number_t* sub, const algebraic_number_t* a, const algebraic_number_t* b) {
@@ -560,13 +560,13 @@ void algebraic_number_mul_construct_op(coefficient_t* f_r) {
   integer_t one;
   integer_construct_from_int(Z, &one, 1);
   coefficient_t f_x, f_y;
-  coefficient_ops.construct_simple(ctx, f_r, &one, var_r, 1);
-  coefficient_ops.construct_simple(ctx, &f_x, &one, var_x, 1);
-  coefficient_ops.construct_simple(ctx, &f_y, &one, var_y, 1);
-  coefficient_ops.sub_mul(ctx, f_r, &f_x, &f_y);
+  coefficient_construct_simple(ctx, f_r, &one, var_r, 1);
+  coefficient_construct_simple(ctx, &f_x, &one, var_x, 1);
+  coefficient_construct_simple(ctx, &f_y, &one, var_y, 1);
+  coefficient_sub_mul(ctx, f_r, &f_x, &f_y);
   integer_destruct(&one);
-  coefficient_ops.destruct(&f_x);
-  coefficient_ops.destruct(&f_y);
+  coefficient_destruct(&f_x);
+  coefficient_destruct(&f_y);
 }
 
 void algebraic_number_mul(algebraic_number_t* mul, const algebraic_number_t* a, const algebraic_number_t* b) {
