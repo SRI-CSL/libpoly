@@ -13,8 +13,6 @@
 #include "polynomial_context.h"
 #include "assignment.h"
 
-typedef struct polynomial_rec_struct polynomial_rec_t;
-
 /**
  * Polynomials incorporate the context and coefficient data. The also carry
  * flags so as not to re-do any computation.

@@ -29,7 +29,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.204268791." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.1796577130" name="Linux GCC" nonInternalBuilderId="cdt.managedbuild.target.gnu.builder.so.debug" superClass="cdt.managedbuild.toolchain.gnu.so.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.debug.1172630420" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
-							<builder buildPath="${workspace_loc:/libpoly/build}" id="cdt.managedbuild.target.gnu.builder.so.debug.164388302" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.so.debug"/>
+							<builder buildPath="${workspace_loc:/libpoly/build}" id="cdt.managedbuild.target.gnu.builder.so.debug.164388302" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.so.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1741933036" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.559986724" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug">
 								<option id="gnu.cpp.compiler.so.debug.option.optimization.level.1870312428" name="Optimization Level" superClass="gnu.cpp.compiler.so.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -102,7 +102,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1993201860." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1550572688" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.release.1715025668" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.release"/>
-							<builder buildPath="${workspace_loc:/libpoly/build}" id="cdt.managedbuild.target.gnu.builder.so.release.121031924" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.so.release"/>
+							<builder buildPath="${workspace_loc:/libpoly/build}" id="cdt.managedbuild.target.gnu.builder.so.release.121031924" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.target.gnu.builder.so.release"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.982204129" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.1081387868" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.release">
 								<option id="gnu.cpp.compiler.so.release.option.optimization.level.473969067" name="Optimization Level" superClass="gnu.cpp.compiler.so.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
@@ -168,10 +168,10 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/polylib"/>
 		</configuration>
-		<configuration configurationName="Debug (dynamic)">
+		<configuration configurationName="debug-dynamic">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
-		<configuration configurationName="debug-dynamic">
+		<configuration configurationName="Debug (dynamic)">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
 		<configuration configurationName="Multiple configurations">

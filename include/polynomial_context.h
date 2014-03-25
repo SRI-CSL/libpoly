@@ -15,7 +15,7 @@
  * Information providing semantic context for available operations on
  * polynomials.
  */
-typedef struct polynomial_context_struct {
+struct polynomial_context_struct {
   /** Reference count of this polynomial */
   size_t ref_count;
   /** The ring of base operations */
@@ -24,7 +24,9 @@ typedef struct polynomial_context_struct {
   variable_db_t* var_db;
   /** The order of variables */
   variable_order_t* var_order;
-} polynomial_context_t;
+};
+
+typedef struct polynomial_context_struct polynomial_context_t;
 
 /** Operations on the polynomial context */
 typedef struct {

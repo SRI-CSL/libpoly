@@ -12,9 +12,9 @@
 typedef struct variable_order_struct variable_order_t;
 typedef struct variable_order_ops_struct variable_order_ops_t;
 
-typedef struct variable_order_struct {
+struct variable_order_struct {
   variable_order_ops_t* ops;
-} variable_order_t;
+};
 
 /**
  * Variable order interface. The order should be total, but can change over
@@ -28,7 +28,7 @@ typedef struct variable_order_struct {
  * To do so we can keep the maximal time-stamp of all the variables. If the
  * timestamp of any of the variables
  */
-typedef struct variable_order_ops_struct {
+struct variable_order_ops_struct {
 
   /** Construct a new variable order */
   variable_order_t* (*new) (void);
@@ -42,26 +42,25 @@ typedef struct variable_order_ops_struct {
   /** Compare two variables */
   int (*cmp) (const variable_order_t* var_order, variable_t x, variable_t y);
 
-} variable_order_ops_t;
+};
 
 typedef struct variable_order_simple_struct variable_order_simple_t;
 typedef struct variable_order_simple_ops_struct variable_order_simple_ops_t;
-
 
 /**
  * A simple variable order that orders variable based on a given list, and
  * order the rest of the variables based on their variable id.
  */
-typedef struct variable_order_simple_struct {
+struct variable_order_simple_struct {
   /** The operations */
   variable_order_simple_ops_t* ops;
   /** Reference count */
   size_t ref_count;
   /** The actual order */
   variable_list_t list;
-} variable_order_simple_t;
+};
 
-typedef struct variable_order_simple_ops_struct {
+struct variable_order_simple_ops_struct {
 
   variable_order_ops_t variable_order_ops;
 
@@ -86,6 +85,6 @@ typedef struct variable_order_simple_ops_struct {
   /** Return a string representation of the order */
   char* (*to_string) (const variable_order_simple_t* var_order, const variable_db_t* var_db);
 
-} variable_order_simple_ops_t;
+};
 
 extern variable_order_simple_ops_t variable_order_simple_ops;

@@ -18,11 +18,13 @@
  * refinement of the interval when needed. If f is 0, then the interval is
  * a single point, and that is the value of the number.
  */
-typedef struct algebraic_number_struct {
+struct algebraic_number_struct {
   upolynomial_t* f;
   dyadic_interval_t I;
   int sgn_at_a, sgn_at_b;
-} algebraic_number_t;
+};
+
+typedef struct algebraic_number_struct algebraic_number_t;
 
 /** Operations on algebraic numbers */
 typedef struct {

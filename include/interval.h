@@ -14,7 +14,7 @@
  * An interval (a, b) with both points rationals. The side is open if
  * the _open is true.
  */
-typedef struct {
+typedef struct interval_struct {
   /** Is the end at the point a open */
   size_t a_open : 1;
   /** Is the end at the point b open */

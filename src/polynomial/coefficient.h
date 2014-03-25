@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <polynomial_context.h>
+
 #include "variable.h"
 #include "assignment.h"
 
@@ -20,11 +22,11 @@ typedef enum {
   COEFFICIENT_POLYNOMIAL
 } coefficient_type_t;
 
-typedef struct polynomial_rec_struct polnomial_rec_t;
+typedef struct polynomial_rec_struct polynomial_rec_t;
 typedef struct coefficient_struct coefficient_t;
 
 /** Recursive nodes in the tree representation of the polynomial */
-typedef struct polynomial_rec_struct {
+struct polynomial_rec_struct {
   /** The used size of the coefficient array */
   size_t size     : 16;
   /** Capacity of the coefficient array */
@@ -33,7 +35,7 @@ typedef struct polynomial_rec_struct {
   variable_t x    : 32;
   /** Coefficients */
   coefficient_t* coefficients;
-} polynomial_rec_t;
+};
 
 /**
  * Value of each coefficient is either a base value or a polynomial.
@@ -46,18 +48,15 @@ typedef union {
 /**
  * A coefficient is a tagged union of coefficient values.
  */
-typedef struct coefficient_struct {
+struct coefficient_struct {
   coefficient_type_t type;
   coefficient_union_t value;
-} coefficient_t;
+};
 
 #define SIZE(C) ((C)->value.rec.size)
 #define CAPACITY(C) ((C)->value.rec.capacity)
 #define COEFF(C, i) ((C)->value.rec.coefficients + (i))
 #define VAR(C) ((C)->value.rec.x)
-
-/** Context for the polynomial operations */
-typedef struct polynomial_context_struct polynomial_context_t;
 
 /**
  * Type of remaindering in the reduce method.

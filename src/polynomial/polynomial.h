@@ -46,14 +46,14 @@ typedef struct {
 
 } polynomial_flags_t;
 
-typedef struct polynomial_struct {
+struct polynomial_struct {
   /** The actual polynomial representation (so we can use it as a coefficient) */
   coefficient_t data;
   /** Flags as above */
   polynomial_flags_t flags;
   /** Context of the polynomial */
   const polynomial_context_t* ctx;
-} polynomial_t;
+};
 
 void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx, int external);
 

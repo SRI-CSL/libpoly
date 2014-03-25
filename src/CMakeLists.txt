@@ -18,6 +18,7 @@ set(poly_SOURCES
     variable/variable.c
     variable/variable_order.c
     interval/interval.c
+    interval/arithmetic.c
     utils/debug_trace.c
     utils/assignment.c
     utils/statistics.c

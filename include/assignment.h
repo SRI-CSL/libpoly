@@ -12,9 +12,9 @@
 #include "dyadic_rational.h"
 #include "algebraic_number.h"
 
-#include <stdio.h>
+#include "polynomial.h"
 
-typedef struct polynomial_struct polynomial_t;
+#include <stdio.h>
 
 /** Types of values for the assignment */
 typedef enum {

@@ -10,6 +10,7 @@
 
 #include "number/integer.h"
 #include "interval/interval.h"
+#include "interval/arithmetic.h"
 #include "polynomial/coefficient.h"
 
 #include "utils/debug_trace.h"
