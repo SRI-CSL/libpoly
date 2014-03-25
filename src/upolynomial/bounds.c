@@ -119,7 +119,7 @@ void upolynomial_factor_bound_landau_mignotte(const upolynomial_t* f, size_t n, 
   integer_construct_from_int(Z, &norm, 0);
   integer_construct_from_int(Z, &ak_sq, 0);
 
-  int k;
+  size_t k;
 
   // Sum of squares
   for(k = 0; k < f->size; ++ k) {

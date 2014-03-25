@@ -85,7 +85,7 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
     int p = integer_to_int(&f->K->M);
     upolynomial_t* f_p = upolynomial_ops.div_degrees(f, p);
     factors = upolynomial_factor_square_free(f_p);
-    int i;
+    size_t i;
     for (i = 0; i < factors->size; ++ i) {
       factors->multiplicities[i] *= p;
     }
@@ -145,7 +145,7 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
       int p = integer_to_int(&f->K->M);
       upolynomial_t* P_p = upolynomial_ops.div_degrees(P, p);
       upolynomial_factors_t* sub_factors = upolynomial_factor_square_free(P_p);
-      int i;
+      size_t i;
       for (i = 0; i < sub_factors->size; ++ i) {
         upolynomial_factors_ops.add(factors, sub_factors->factors[i], sub_factors->multiplicities[i] * p);
       }
@@ -206,7 +206,7 @@ upolynomial_factors_t* upolynomial_factor_distinct_degree(const upolynomial_t* f
   upolynomial_factors_t* factors = upolynomial_factors_ops.construct();
 
   // Enumerate with d
-  int d = 0;
+  size_t d = 0;
   // Keep x TODO: optimize when switch to dense representation
   upolynomial_t* x = upolynomial_ops.construct_power(K, 1, 1);
   // Keep x^p^d, start with x^p^0
@@ -322,7 +322,7 @@ static void Q_column_multiply(int_ring K, integer_t* Q, size_t size, int j, cons
   integer_t tmp;
   integer_construct_from_int(K, &tmp, 0);
 
-  int k;
+  size_t k;
   for (k = 0; k < size; ++ k) {
     integer_mul(K, &tmp, Q + k*size + j, m);
     integer_swap(K, &tmp, Q + k*size + j);
@@ -355,7 +355,7 @@ static void Q_column_add(int_ring K, integer_t* Q, size_t size, int i, const int
     tracef("Q = \n"); integer_print_matrix(Q, size, size, trace_out);
   }
 
-  int k;
+  size_t k;
   for (k = 0; k < size; ++ k) {
     integer_mul(K, &mul, Q + k*size + j, &m_copy);
     integer_add(K, &add, Q + k*size + i, &mul);
@@ -375,7 +375,7 @@ static void Q_null_space(int_ring K, integer_t* Q, size_t size, integer_t** v, s
 
   *v_size = 0;
 
-  int k, j, i;
+  size_t i, j, k;
 
   int c[size]; // per column: which row contains the non-eliminated
   for (k = 0; k < size; ++ k) { c[k] = -1; }
@@ -439,7 +439,7 @@ static void Q_null_space(int_ring K, integer_t* Q, size_t size, integer_t** v, s
 }
 
 static void Q_destruct(integer_t* Q, size_t size) {
-  int i;
+  size_t i;
   for (i = 0; i < size*size; ++ i) {
     integer_destruct(Q + i);
   }
@@ -537,9 +537,9 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
     Q_null_space(K, Q, deg_f, v, &v_size);
 
     if (debug_trace_ops.is_enabled("nullspace")) {
-      int i;
+      size_t i;
       for (i = 0; i < v_size; ++i) {
-        tracef("v[%d] = \n", i);
+        tracef("v[%zu] = \n", i);
         integer_print_matrix(v[i], 1, deg_f, trace_out);
       }
     }
@@ -548,7 +548,7 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
     upolynomial_factors_ops.add(factors, upolynomial_ops.construct_copy(f), 1);
 
     // Filter through the null-basis
-    int i;
+    size_t i;
     int done = 0;
     for (i = 1; !done && i < v_size; ++i) {
 
@@ -601,7 +601,7 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
     }
 
     // Deallocate the null vectors
-    int j;
+    size_t j;
     for (i = 0; i < v_size; ++i) {
       for (j = 0; j < deg_f; ++j) {
         integer_destruct(v[i] + j);
@@ -708,7 +708,7 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
       // Factor it
       upolynomial_factors_t* f_i_factors = upolynomial_factor_berlekamp_square_free(f_i);
       // Copy the factorization (all monic, no constant to worry about)
-      int k;
+      size_t k;
       for (k = 0; k < f_i_factors->size; ++k) {
         assert(f_i_factors->multiplicities[k] == 1);
         upolynomial_factors_ops.add(result, f_i_factors->factors[k], f_i_multiplicity);
@@ -929,7 +929,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     const upolynomial_factors_t* A, const upolynomial_factors_t* U,
     upolynomial_factors_t* B, upolynomial_factors_t* V)
 {
-  int k;
+  size_t k;
 
   assert(B->size == 0);
   assert(V->size == 0);
@@ -1178,7 +1178,7 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
   int i, k;
 
   // Maximal degree we want to consider
-  int max_degree = upolynomial_ops.degree(f)/2;
+  size_t max_degree = upolynomial_ops.degree(f)/2;
 
   const int size = factors_p->size;
 
@@ -1285,7 +1285,7 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
       }
 
       // Check the sum of degrees
-      int deg_sum = 0;
+      size_t deg_sum = 0;
       for (i = 0; i < sel_size; ++ i) {
         deg_sum += upolynomial_ops.degree(factors_p->factors[sel[i]]);
       }
@@ -1373,7 +1373,7 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
   upolynomial_factors_t* factors_p_best = 0;
 
   // Find a good prime modulus
-  int prime_i;
+  size_t prime_i;
   int candidates_to_check = 1;
   for (prime_i = 0; candidates_to_check && prime_i < primes_count; ++ prime_i) {
 
@@ -1500,7 +1500,7 @@ upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
   assert(integer_cmp_int(Z, &sq_free_factors->constant, 1) == 0);
 
   // Factor individuals
-  int sq_free_factor_i;
+  size_t sq_free_factor_i;
   for (sq_free_factor_i = 0; sq_free_factor_i < sq_free_factors->size; ++ sq_free_factor_i) {
     upolynomial_t* sq_free_factor = sq_free_factors->factors[sq_free_factor_i];
     size_t sq_free_factor_multiplicity = sq_free_factors->multiplicities[sq_free_factor_i];
@@ -1516,7 +1516,7 @@ upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
     upolynomial_factors_t* sq_free_factor_factors = upolynomial_factor_Z_square_free(sq_free_factor);
 
     // Add the factors
-    int current;
+    size_t current;
     for (current = 0; current < sq_free_factor_factors->size; ++ current) {
       upolynomial_t* factor = sq_free_factor_factors->factors[current];
       size_t factor_multiplicity = sq_free_factor_factors->multiplicities[current];

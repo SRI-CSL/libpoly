@@ -34,7 +34,7 @@ void monomial_construct_copy(const polynomial_context_t* ctx, monomial_t* m, con
   m->n = from->n;
   m->capacity = from->n;
   m->p = malloc(m->n*sizeof(power_t));
-  int i,j;
+  size_t i, j;
   // Copy
   for (i = 0; i < m->n; ++ i) {
     m->p[i] = from->p[i];
@@ -95,7 +95,7 @@ int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* o
   int ret = 0;
   ret += integer_print(&m->a, out);
   ret += fprintf(out, " * ");
-  int i = 0;
+  size_t i = 0;
   for (i = 0; i < m->n; ++ i) {
     if (i) {
       ret += fprintf(out, "*");
@@ -119,7 +119,7 @@ void monomial_gcd(const polynomial_context_t* ctx, monomial_t* gcd, const monomi
   integer_gcd_Z(&result.a, &m1->a, &m2->a);
 
   // GCD of the power
-  int m1_i = 0, m2_i = 0;
+  size_t m1_i = 0, m2_i = 0;
   while (m1_i < m1->n && m2_i < m2->n) {
     // Only keep powers that are equal
     // Variables in the monomial go top to bottom
