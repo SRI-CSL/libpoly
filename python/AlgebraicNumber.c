@@ -312,12 +312,39 @@ AlgebraicNumber_add(PyObject* self, PyObject* other) {
 
 static PyObject*
 AlgebraicNumber_neg(PyObject* self) {
-  return 0;
+  if (!PyAlgebraicNumber_CHECK(self)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  AlgebraicNumber* a1 = (AlgebraicNumber*) self;
+
+  algebraic_number_t neg;
+  algebraic_number_ops.construct_zero(&neg);
+  algebraic_number_ops.neg(&neg, &a1->a);
+  PyObject* result = PyAlgebraicNumber_create(&neg);
+  algebraic_number_ops.destruct(&neg);
+
+  return result;
 }
 
 static PyObject*
 AlgebraicNumber_sub(PyObject* self, PyObject* other) {
-  return 0;
+  if (!PyAlgebraicNumber_CHECK(self) || !PyAlgebraicNumber_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  AlgebraicNumber* a1 = (AlgebraicNumber*) self;
+  AlgebraicNumber* a2 = (AlgebraicNumber*) other;
+
+  algebraic_number_t sub;
+  algebraic_number_ops.construct_zero(&sub);
+  algebraic_number_ops.sub(&sub, &a1->a, &a2->a);
+  PyObject* result = PyAlgebraicNumber_create(&sub);
+  algebraic_number_ops.destruct(&sub);
+
+  return result;
 }
 
 static PyObject*
@@ -340,6 +367,20 @@ AlgebraicNumber_mul(PyObject* self, PyObject* other) {
 }
 
 static PyObject*
-AlgebraicNumber_pow(PyObject* self, PyObject* args) {
-  return 0;
+AlgebraicNumber_pow(PyObject* self, PyObject* other) {
+  if (!PyAlgebraicNumber_CHECK(self) || !PyInt_Check(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  AlgebraicNumber* a1 = (AlgebraicNumber*) self;
+  long n = PyInt_AsLong(other);
+
+  algebraic_number_t pow;
+  algebraic_number_ops.construct_zero(&pow);
+  algebraic_number_ops.pow(&pow, &a1->a, n);
+  PyObject* result = PyAlgebraicNumber_create(&pow);
+  algebraic_number_ops.destruct(&pow);
+
+  return result;
 }

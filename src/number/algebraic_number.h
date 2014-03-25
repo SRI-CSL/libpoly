@@ -27,6 +27,9 @@ void algebraic_number_construct_from_dyadic_rational(algebraic_number_t* a, cons
 /** Destruct the number */
 void algebraic_number_destruct(algebraic_number_t* a);
 
+/** Swap the two numbers */
+void algebraic_number_swap(algebraic_number_t* a, algebraic_number_t* b);
+
 /** Compare two algebraic numbers */
 int algebraic_number_cmp(const algebraic_number_t* a1, const algebraic_number_t* a2);
 
@@ -50,6 +53,9 @@ void algebraic_number_add(algebraic_number_t* sum, const algebraic_number_t* a, 
 
 /** Subtraction */
 void algebraic_number_sub(algebraic_number_t* sub, const algebraic_number_t* a, const algebraic_number_t* b);
+
+/** Negation */
+void algebraic_number_neg(algebraic_number_t* neg, const algebraic_number_t* a);
 
 /** Multiplication */
 void algebraic_number_mul(algebraic_number_t* mul, const algebraic_number_t* a, const algebraic_number_t* b);

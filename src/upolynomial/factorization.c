@@ -686,7 +686,7 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
         upolynomial_factors_add(result, linear_factor, f_i_multiplicity);
         if (linear_factors_product) {
           upolynomial_t* tmp = linear_factors_product;
-          linear_factors_product = upolynomial_multiply(linear_factors_product, linear_factor);
+          linear_factors_product = upolynomial_mul(linear_factors_product, linear_factor);
           upolynomial_destruct(tmp);
         } else {
           linear_factors_product = upolynomial_construct_copy(linear_factor);
@@ -780,7 +780,7 @@ void hensel_lift_initialize(const upolynomial_factors_t* A, upolynomial_factors_
   upolynomial_t* Q[r];
   Q[r-1] = upolynomial_construct_copy(A->factors[r-1]);
   for (i = r-2; i >= 0; -- i) {
-    Q[i] = upolynomial_multiply(Q[i+1], A->factors[i]);
+    Q[i] = upolynomial_mul(Q[i+1], A->factors[i]);
   }
 
   // The D we will be solving for
@@ -865,19 +865,19 @@ void hensel_lift_compute_products(const upolynomial_factors_t* A, upolynomial_t*
   upolynomial_t* P1_z[n];
   P1_z[0] = upolynomial_construct_power(Z, 0, 1);
   for(k = 1; k < n; ++ k) {
-    P1_z[k] = upolynomial_multiply(P1_z[k-1], A_z[k-1]);
+    P1_z[k] = upolynomial_mul(P1_z[k-1], A_z[k-1]);
   }
 
   // Compute P2[k] = A{k+1}*...*An
   upolynomial_t* P2_z[n];
   P2_z[n-1] = upolynomial_construct_power(Z, 0, 1);
   for(k = n-2; k >= 0; --k) {
-    P2_z[k] = upolynomial_multiply(P2_z[k+1], A_z[k+1]);
+    P2_z[k] = upolynomial_mul(P2_z[k+1], A_z[k+1]);
   }
 
   // Compute the P[k]
   for(k = 0; k < n; ++ k) {
-    P_z[k] = upolynomial_multiply(P1_z[k], P2_z[k]);
+    P_z[k] = upolynomial_mul(P1_z[k], P2_z[k]);
   }
 
   // Free the temps
@@ -987,7 +987,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   for (k = 1; k < A->size; ++ k) {
     upolynomial_t* tmp1 = upolynomial_construct_copy_K(Z, A->factors[k]);
     upolynomial_t* tmp2 = prod_Ak;
-    prod_Ak = upolynomial_multiply(tmp1, tmp2);
+    prod_Ak = upolynomial_mul(tmp1, tmp2);
     upolynomial_destruct(tmp1);
     upolynomial_destruct(tmp2);
   }
@@ -1016,7 +1016,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
 
   for (k = 0; k < A->size; ++ k) {
 
-    upolynomial_t* D_mult_Uk_q = upolynomial_multiply(D_q, U->factors[k]);
+    upolynomial_t* D_mult_Uk_q = upolynomial_mul(D_q, U->factors[k]);
     if (trace_is_enabled("hensel")) {
       tracef("D_mult_Uk_q = "); upolynomial_print(D_mult_Uk_q, trace_out); tracef("\n");
     }
@@ -1032,7 +1032,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     if (trace_is_enabled("hensel")) {
       tracef("Ak_qq = "); upolynomial_print(Ak_qq, trace_out); tracef("\n");
     }
-    upolynomial_t* Sk_times_q_qq = upolynomial_multiply_c(Sk_qq, q);
+    upolynomial_t* Sk_times_q_qq = upolynomial_mul_c(Sk_qq, q);
     if (trace_is_enabled("hensel")) {
       tracef("Sk_times_q_qq = "); upolynomial_print(Sk_times_q_qq, trace_out); tracef("\n");
     }
@@ -1084,7 +1084,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   }
   for (k = 0; k < A->size; ++ k) {
     upolynomial_t* Uk = upolynomial_construct_copy_K(Z, U->factors[k]);
-    upolynomial_t* mul = upolynomial_multiply(Uk, P[k]);
+    upolynomial_t* mul = upolynomial_mul(Uk, P[k]);
     upolynomial_t* sub = upolynomial_sub(E, mul);
     upolynomial_destruct(Uk);
     upolynomial_destruct(mul);
@@ -1107,7 +1107,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
 
   for (k = 0; k < A->size; ++ k) {
 
-    upolynomial_t* E_times_Uk_q = upolynomial_multiply(E_q, U->factors[k]);
+    upolynomial_t* E_times_Uk_q = upolynomial_mul(E_q, U->factors[k]);
     if (trace_is_enabled("hensel")) {
       tracef("E_times_Uk_q = "); upolynomial_print(E_times_Uk_q, trace_out); tracef("\n");
     }
@@ -1119,7 +1119,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     if (trace_is_enabled("hensel")) {
       tracef("Tk_qq = "); upolynomial_print(Tk_qq, trace_out); tracef("\n");
     }
-    upolynomial_t* Tk_times_q_qq = upolynomial_multiply_c(Tk_qq, q);
+    upolynomial_t* Tk_times_q_qq = upolynomial_mul_c(Tk_qq, q);
     if (trace_is_enabled("hensel")) {
       tracef("Tk_times_q_qq = "); upolynomial_print(Tk_times_q_qq, trace_out); tracef("\n");
     }
@@ -1296,7 +1296,7 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
         upolynomial_t* candidate = upolynomial_construct_copy(factors_p->factors[sel[0]]);
         for (i = 1; i < sel_size; ++ i) {
           upolynomial_t* tmp = candidate;
-          candidate = upolynomial_multiply(candidate, factors_p->factors[sel[i]]);
+          candidate = upolynomial_mul(candidate, factors_p->factors[sel[i]]);
           upolynomial_destruct(tmp);
         }
         upolynomial_set_ring(candidate, Z);

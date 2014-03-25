@@ -65,11 +65,9 @@ upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q);
 
 upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q);
 
-upolynomial_t* upolynomial_multiply_simple(const umonomial_t* m, const upolynomial_t* q);
+upolynomial_t* upolynomial_mul(const upolynomial_t* p, const upolynomial_t* q);
 
-upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t* q);
-
-upolynomial_t* upolynomial_multiply_c(const upolynomial_t* p, const integer_t* c);
+upolynomial_t* upolynomial_mul_c(const upolynomial_t* p, const integer_t* c);
 
 upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow);
 
@@ -120,4 +118,8 @@ int upolynomial_roots_count(const upolynomial_t* p, const interval_t* ab);
 void upolynomial_roots_isolate(const upolynomial_t* p, algebraic_number_t* roots, size_t* roots_size);
 
 void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S, size_t* size);
+
+/** Compute f(-x) */
+upolynomial_t* upolynomial_subst_x_neg(const upolynomial_t* f);
+
 

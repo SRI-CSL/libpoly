@@ -57,6 +57,12 @@ void algebraic_number_destruct(algebraic_number_t* a) {
   dyadic_interval_destruct(&a->I);
 }
 
+void algebraic_number_swap(algebraic_number_t* a, algebraic_number_t* b) {
+  algebraic_number_t tmp = *a;
+  *a = *b;
+  *b = tmp;
+}
+
 static inline
 void algebraic_number_reduce_polynomial(const algebraic_number_t* a, const upolynomial_t* f, int sgn_at_a, int sgn_at_b) {
   assert(a->f);
@@ -378,17 +384,18 @@ void filter_roots(algebraic_number_t* roots, size_t* roots_size, const dyadic_in
 }
 
 /** Function type called on coefficient traversal (such as r - (x + y)) */
-typedef void (*construct_op_polynomial_f) (coefficient_t* op);
+typedef void (*construct_op_polynomial_f) (coefficient_t* op, void* data);
 
 /** Function type called on interval operations (such as I = I1 + I2) */
-typedef void (*interval_op_f) (dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+typedef void (*interval_op_f) (dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2, void* data);
 
 /** Compute the operation */
 static
 void algebraic_number_op(
     algebraic_number_t* op, const algebraic_number_t* a, const algebraic_number_t* b,
     construct_op_polynomial_f construct_op,
-    interval_op_f interval_op)
+    interval_op_f interval_op,
+    void* data)
 {
   assert(a->f && (b == 0 || b->f));
 
@@ -412,7 +419,7 @@ void algebraic_number_op(
 
   // Construct the op polynomial
   coefficient_t f_r;
-  construct_op(&f_r);
+  construct_op(&f_r, data);
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("f_r = "); coefficient_print(ctx, &f_r, trace_out); tracef("\n");
@@ -452,9 +459,9 @@ void algebraic_number_op(
 
     // Add the two intervals
     if (b) {
-      interval_op(&I, &a->I, &b->I);
+      interval_op(&I, &a->I, &b->I, data);
     } else {
-      interval_op(&I, &a->I, 0);
+      interval_op(&I, &a->I, 0, data);
     }
 
     if (trace_is_enabled("algebraic_number")) {
@@ -506,7 +513,8 @@ void algebraic_number_op(
   free(f_roots);
 }
 
-void algebraic_number_add_construct_op(coefficient_t* f_r) {
+void algebraic_number_add_construct_op(coefficient_t* f_r, void* data) {
+  __unused(data);
   const polynomial_context_t* ctx = algebraic_pctx();
 
   // Construct the polynomial z - (x + y)
@@ -523,12 +531,18 @@ void algebraic_number_add_construct_op(coefficient_t* f_r) {
   coefficient_destruct(&f_y);
 }
 
-void algebraic_number_add(algebraic_number_t* sum, const algebraic_number_t* a, const algebraic_number_t* b) {
-  assert(a->f && b->f);
-  algebraic_number_op(sum, a, b, algebraic_number_add_construct_op, dyadic_interval_add);
+void algebraic_number_add_interval_op(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2, void* data) {
+  __unused(data);
+  dyadic_interval_add(I, I1, I2);
 }
 
-void algebraic_number_sub_construct_op(coefficient_t* f_r) {
+void algebraic_number_add(algebraic_number_t* sum, const algebraic_number_t* a, const algebraic_number_t* b) {
+  assert(a->f && b->f);
+  algebraic_number_op(sum, a, b, algebraic_number_add_construct_op, algebraic_number_add_interval_op, 0);
+}
+
+void algebraic_number_sub_construct_op(coefficient_t* f_r, void* data) {
+  __unused(data);
   const polynomial_context_t* ctx = algebraic_pctx();
 
   // Construct the polynomial z - (x - y)
@@ -545,14 +559,31 @@ void algebraic_number_sub_construct_op(coefficient_t* f_r) {
   coefficient_destruct(&f_y);
 }
 
-void algebraic_number_sub(algebraic_number_t* sub, const algebraic_number_t* a, const algebraic_number_t* b) {
-  (void) sub;
-  (void) a;
-  (void) b;
-  assert(0);
+void algebraic_number_sub_interval_op(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2, void* data) {
+  __unused(data);
+  dyadic_interval_sub(I, I1, I2);
 }
 
-void algebraic_number_mul_construct_op(coefficient_t* f_r) {
+void algebraic_number_sub(algebraic_number_t* sub, const algebraic_number_t* a, const algebraic_number_t* b) {
+  assert(a->f && b->f);
+  algebraic_number_op(sub, a, b, algebraic_number_sub_construct_op, algebraic_number_sub_interval_op, 0);
+}
+
+void algebraic_number_neg(algebraic_number_t* neg, const algebraic_number_t* a) {
+  assert(a->f);
+  upolynomial_t* f_neg_x = upolynomial_subst_x_neg(a->f);
+  dyadic_interval_t I_neg;
+  dyadic_interval_construct_copy(&I_neg, &a->I);
+  dyadic_interval_neg(&I_neg, &I_neg);
+
+  algebraic_number_t result;
+  algebraic_number_construct(&result, f_neg_x, &I_neg);
+  algebraic_number_swap(&result, neg);
+  algebraic_number_destruct(&result);
+}
+
+void algebraic_number_mul_construct_op(coefficient_t* f_r, void* data) {
+  __unused(data);
   const polynomial_context_t* ctx = algebraic_pctx();
 
   // Construct the polynomial z - (x*y)
@@ -568,17 +599,40 @@ void algebraic_number_mul_construct_op(coefficient_t* f_r) {
   coefficient_destruct(&f_y);
 }
 
+void algebraic_number_mul_interval_op(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2, void* data) {
+  __unused(data);
+  dyadic_interval_mul(I, I1, I2);
+}
+
 void algebraic_number_mul(algebraic_number_t* mul, const algebraic_number_t* a, const algebraic_number_t* b) {
   assert(a->f && b->f);
-  algebraic_number_op(mul, a, b, algebraic_number_mul_construct_op, dyadic_interval_mul);
+  algebraic_number_op(mul, a, b, algebraic_number_mul_construct_op, algebraic_number_mul_interval_op, 0);
+}
+
+void algebraic_number_pow_construct_op(coefficient_t* f_r, void* data) {
+  const polynomial_context_t* ctx = algebraic_pctx();
+
+  unsigned n = *((unsigned*) data);
+
+  // Construct the polynomial z - x**n
+  integer_t one;
+  integer_construct_from_int(Z, &one, 1);
+  coefficient_t f_x;
+  coefficient_construct_simple(ctx, f_r, &one, var_r, 1);
+  coefficient_construct_simple(ctx, &f_x, &one, var_x, n);
+  coefficient_sub(ctx, f_r, f_r, &f_x);
+  integer_destruct(&one);
+  coefficient_destruct(&f_x);
+}
+
+void algebraic_number_pow_interval_op(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2, void* data) {
+  assert(I2 == 0);
+  unsigned n = *((unsigned*) data);
+  dyadic_interval_pow(I, I1, n);
 }
 
 void algebraic_number_pow(algebraic_number_t* pow, const algebraic_number_t* a, unsigned n) {
-  (void) pow;
-  (void) a;
-  (void) n;
-  assert(0);
-
+  algebraic_number_op(pow, a, 0, algebraic_number_pow_construct_op, algebraic_number_pow_interval_op, &n);
 }
 
 const algebraic_number_ops_t algebraic_number_ops = {
@@ -595,6 +649,7 @@ const algebraic_number_ops_t algebraic_number_ops = {
     algebraic_number_refine,
     algebraic_number_add,
     algebraic_number_sub,
+    algebraic_number_neg,
     algebraic_number_mul,
     algebraic_number_pow
 };

@@ -395,7 +395,7 @@ upolynomial_t* upolynomial_multiply_simple(const umonomial_t* m, const upolynomi
   return result;
 }
 
-upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t* q) {
+upolynomial_t* upolynomial_mul(const upolynomial_t* p, const upolynomial_t* q) {
 
   assert(p);
   assert(q);
@@ -407,7 +407,7 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
 
   // Take p to be the smaller size
   if (p->size > q->size) {
-    return upolynomial_multiply(q, p);
+    return upolynomial_mul(q, p);
   }
 
   // If multiplying with zero
@@ -447,7 +447,7 @@ upolynomial_t* upolynomial_multiply(const upolynomial_t* p, const upolynomial_t*
   return result;
 }
 
-upolynomial_t* upolynomial_multiply_c(const upolynomial_t* p, const integer_t* c) {
+upolynomial_t* upolynomial_mul_c(const upolynomial_t* p, const integer_t* c) {
   assert(p);
 
   if (trace_is_enabled("arithmetic")) {
@@ -494,7 +494,7 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
     int i;
     for (i = 2; i <= pow; ++ i) {
       upolynomial_t* tmp = result;
-      result = upolynomial_multiply(result, p);
+      result = upolynomial_mul(result, p);
       upolynomial_destruct(tmp);
     }
   }
@@ -1056,9 +1056,9 @@ void upolynomial_solve_bezout(const upolynomial_t* p, const upolynomial_t* q, co
   // m = r/gcd
   upolynomial_t* m = upolynomial_div_exact(r, gcd);
   // u = u*m
-  upolynomial_t* u2 = upolynomial_multiply(u1, m);
+  upolynomial_t* u2 = upolynomial_mul(u1, m);
   // v = v*m
-  upolynomial_t* v2  = upolynomial_multiply(v1, m);
+  upolynomial_t* v2  = upolynomial_mul(v1, m);
   // Fix degrees
   *u = upolynomial_rem_exact(u2, q);
   *v = upolynomial_rem_exact(v2, p);
@@ -1137,6 +1137,20 @@ void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S
   free(S_dense);
 }
 
+upolynomial_t* upolynomial_subst_x_neg(const upolynomial_t* f) {
+
+  upolynomial_t* neg = upolynomial_construct_copy(f);
+  size_t i;
+  for (i = 0; i < neg->size; ++ i) {
+    // We negate odd degrees
+    if (neg->monomials[i].degree % 2) {
+      integer_neg(neg->K, &neg->monomials[i].coefficient, &neg->monomials[i].coefficient);
+    }
+  }
+
+  return neg;
+}
+
 const upolynomial_ops_struct upolynomial_ops = {
     upolynomial_construct,
     upolynomial_construct_power,
@@ -1165,8 +1179,8 @@ const upolynomial_ops_struct upolynomial_ops = {
     upolynomial_cmp,
     upolynomial_add,
     upolynomial_sub,
-    upolynomial_multiply,
-    upolynomial_multiply_c,
+    upolynomial_mul,
+    upolynomial_mul_c,
     upolynomial_pow,
     upolynomial_derivative,
     upolynomial_divides,
