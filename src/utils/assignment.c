@@ -102,7 +102,7 @@ void assignment_ensure_size(const assignment_t* m_const, size_t size) {
   assignment_t* m = (assignment_t*) m_const;
   if (size >= m->size) {
     m->values = realloc(m->values, sizeof(value_t)*size);
-    int i;
+    size_t i;
     for (i = m->size; i < size; ++ i) {
       value_construct(m->values + i, VALUE_NONE, 0);
     }
@@ -126,7 +126,7 @@ assignment_t* assignment_new(const variable_db_t* var_db) {
 
 void assignment_destruct(assignment_t* m) {
   if (m->values) {
-    int i;
+    size_t i;
     for (i = 0; i < m->size; ++ i) {
       value_ops.destruct(m->values + i);
     }

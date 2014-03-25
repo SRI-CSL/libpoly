@@ -77,7 +77,8 @@ void variable_order_simple_pop(variable_order_simple_t* var_order) {
 }
 
 int variable_order_simple_print(const variable_order_simple_t* var_order, const variable_db_t* var_db, FILE* out) {
-  int i, ret = 0;
+  size_t i;
+  int ret = 0;
   ret += fprintf(out, "[");
   for (i = 0; i < var_order->list.list_size; ++ i) {
     if (i) {

@@ -28,11 +28,11 @@ typedef struct coefficient_struct coefficient_t;
 /** Recursive nodes in the tree representation of the polynomial */
 struct polynomial_rec_struct {
   /** The used size of the coefficient array */
-  size_t size     : 16;
+  size_t size;
   /** Capacity of the coefficient array */
-  size_t capacity : 16;
+  size_t capacity;
   /** The main variable */
-  variable_t x    : 32;
+  variable_t x;
   /** Coefficients */
   coefficient_t* coefficients;
 };

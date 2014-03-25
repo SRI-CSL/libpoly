@@ -342,7 +342,7 @@ static void evaluate_polynomial(const upolynomial_t* A, const integer_t* A_conte
   integer_construct_from_int(Z, &add, 0);
   integer_construct_from_int(Z, &coeff, 0);
 
-  int k;
+  size_t k;
   for (k = 0; k < A->size; ++ k) {
     integer_div_exact(Z, &coeff, &A->monomials[k].coefficient, A_content);
     if (A->monomials[k].degree == 0) {
@@ -397,7 +397,7 @@ static upolynomial_t* reconstruct_polynomial(size_t max_size, integer_t* p_value
 
     d ++;
   }
-  upolynomial_dense_touch(&p_d, Z, d - 1);
+  upolynomial_dense_touch(&p_d, d - 1);
 
   // We only care about primitive GCDs in the reconstruction
   upolynomial_dense_mk_primitive_Z(&p_d, 1);
@@ -423,7 +423,7 @@ int bound_valuation(const upolynomial_t* A, const upolynomial_t* B, const intege
 
   int A_max = 0;
   int B_max = 0;
-  int k;
+  size_t k;
 
   integer_t tmp;
   integer_construct_from_int(Z, &tmp, 0);

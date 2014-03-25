@@ -78,7 +78,7 @@ upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t*
 
 void upolynomial_destruct(upolynomial_t* p) {
   assert(p);
-  int i = 0;
+  size_t i = 0;
   for (i = 0; i < p->size; ++ i) {
     integer_destruct(&p->monomials[i].coefficient);
   }
@@ -386,7 +386,7 @@ upolynomial_t* upolynomial_multiply_simple(const umonomial_t* m, const upolynomi
 
   upolynomial_t* result = upolynomial_construct_copy(q);
 
-  int i;
+  size_t i;
   for (i = 0; i < result->size; ++ i) {
     integer_mul(q->K, &result->monomials[i].coefficient, &m->coefficient, &q->monomials[i].coefficient);
     result->monomials[i].degree += m->degree;
@@ -612,7 +612,7 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
         integer_pow(K, &adjust, upolynomial_lead_coeff(q), m.degree);
         integer_mul(K, &div->coefficients[m.degree], &m.coefficient, &adjust);
       }
-      upolynomial_dense_touch(div, K, m.degree);
+      upolynomial_dense_touch(div, m.degree);
     }
   }
 
@@ -630,7 +630,7 @@ upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a) {
   assert(a > 1);
 
   upolynomial_t* result = upolynomial_construct_copy(p);
-  int i;
+  size_t i;
   for (i = 0; i < result->size; ++ i) {
     assert(result->monomials[i].degree % a == 0);
     result->monomials[i].degree /= a;
@@ -691,7 +691,7 @@ upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* 
 
   upolynomial_t* result = upolynomial_construct_empty(K, p->size);
 
-  int i;
+  size_t i;
   for (i = 0; i < p->size; ++ i) {
     result->monomials[i].degree = p->monomials[i].degree;
     integer_construct_from_int(K, &result->monomials[i].coefficient, 0);
@@ -934,7 +934,7 @@ void upolynomial_evaluate_at_integer(const upolynomial_t* p, const integer_t* x,
 
   // Compute
   integer_assign_int(Z, value, 0);
-  int i;
+  size_t i;
   for (i = 0; i < p->size; ++ i) {
     integer_pow(K, &power, x, p->monomials[i].degree);
     integer_add_mul(K, value, &p->monomials[i].coefficient, &power);
@@ -1128,7 +1128,7 @@ void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S
 
   (*S) = (upolynomial_t**) malloc((*size)*sizeof(upolynomial_t*));
 
-  int i;
+  size_t i;
   for (i = 0; i < *size; ++ i) {
     (*S)[i] = upolynomial_dense_to_upolynomial(S_dense + i, Z);
     upolynomial_dense_destruct(S_dense + i);
@@ -1209,7 +1209,7 @@ void factors_swap(upolynomial_factors_t* f1, upolynomial_factors_t* f2) {
 }
 
 void factors_clear(upolynomial_factors_t* f) {
-  int i;
+  size_t i;
   integer_assign_int(Z, &f->constant, 1);
   for (i = 0; i < f->size; ++i) {
     if (f->factors[i]) {
@@ -1258,7 +1258,7 @@ void factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d) {
 int factors_print(const upolynomial_factors_t* f, FILE* out) {
   int len = 0;
   len += integer_print(&f->constant, out);
-  int i;
+  size_t i;
   for (i = 0; i < f->size; ++ i) {
     len += fprintf(out, " * ");
     len += fprintf(out, "[");
@@ -1277,7 +1277,7 @@ int_ring factors_ring(const upolynomial_factors_t* f) {
 }
 
 void factors_set_ring(upolynomial_factors_t* f, int_ring K) {
-  int i;
+  size_t i;
   for (i = 0; i < f->size; ++ i) {
     upolynomial_set_ring(f->factors[i], K);
   }

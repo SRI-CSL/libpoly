@@ -360,7 +360,7 @@ const polynomial_context_t* algebraic_pctx(void) {
 }
 
 void filter_roots(algebraic_number_t* roots, size_t* roots_size, const dyadic_interval_t* I) {
-  int i, to_keep;
+  size_t i, to_keep;
   for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
     algebraic_number_t* root = roots + i;
     if (dyadic_interval_disjunct(&root->I, I)) {
@@ -463,9 +463,9 @@ void algebraic_number_op(
         tracef("b = "); algebraic_number_print(b, trace_out); tracef("\n");
       }
       tracef("I = "); dyadic_interval_print(&I, trace_out); tracef("\n");
-      int i;
+      size_t i;
       for (i = 0; i < f_roots_size; ++ i) {
-        tracef("f[%d] = ", i); algebraic_number_print(f_roots + i, trace_out); tracef("\n");
+        tracef("f[%zu] = ", i); algebraic_number_print(f_roots + i, trace_out); tracef("\n");
       }
     }
 
@@ -478,7 +478,7 @@ void algebraic_number_op(
       if (b) {
         algebraic_number_refine_const(b);
       }
-      int i;
+      size_t i;
       for (i = 0; i < f_roots_size; ++ i) {
         if ((f_roots + i)->f) {
           // not a point, refine it
@@ -546,8 +546,10 @@ void algebraic_number_sub_construct_op(coefficient_t* f_r) {
 }
 
 void algebraic_number_sub(algebraic_number_t* sub, const algebraic_number_t* a, const algebraic_number_t* b) {
-//  assert(a->f && b->f);
-//  algebraic_number_op(sub, a, b, algebraic_number_sub_construct_op, dyadic_interval_sub);
+  (void) sub;
+  (void) a;
+  (void) b;
+  assert(0);
 }
 
 void algebraic_number_mul_construct_op(coefficient_t* f_r) {
@@ -572,6 +574,10 @@ void algebraic_number_mul(algebraic_number_t* mul, const algebraic_number_t* a, 
 }
 
 void algebraic_number_pow(algebraic_number_t* pow, const algebraic_number_t* a, unsigned n) {
+  (void) pow;
+  (void) a;
+  (void) n;
+  assert(0);
 
 }
 

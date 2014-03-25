@@ -16,7 +16,7 @@
 static inline
 void upolynomial_dense_normalize(upolynomial_dense_t* p_d, int_ring K) {
   int d = p_d->size - 1;
-  while (d > 0 && integer_sgn(Z, p_d->coefficients + d) == 0) {
+  while (d > 0 && integer_sgn(K, p_d->coefficients + d) == 0) {
     d --;
   }
   p_d->size = d + 1;
@@ -27,7 +27,7 @@ void upolynomial_dense_construct(upolynomial_dense_t* p_d, size_t capacity) {
   p_d->capacity = capacity;
   p_d->size = 1;
   p_d->coefficients = malloc(capacity*sizeof(integer_t));
-  int i = 0;
+  size_t i = 0;
   for (i = 0; i < capacity; i ++) {
     integer_construct_from_int(Z, p_d->coefficients + i, 0);
   }
@@ -41,7 +41,7 @@ void upolynomial_dense_construct_p(upolynomial_dense_t* p_d, size_t capacity, co
 }
 
 void upolynomial_dense_destruct(upolynomial_dense_t* p_d) {
-  int i;
+  size_t i;
   for (i = 0; i < p_d->capacity; ++ i) {
     integer_destruct(p_d->coefficients + i);
   }
@@ -171,7 +171,7 @@ int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file) {
   return len;
 }
 
-void upolynomial_dense_touch(upolynomial_dense_t* p_d, int_ring K, size_t degree) {
+void upolynomial_dense_touch(upolynomial_dense_t* p_d, size_t degree) {
   if (degree >= p_d->size) {
     assert(degree < p_d->capacity);
     p_d->size = degree + 1;
@@ -210,7 +210,7 @@ void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive) {
 
   // Make it primitive
   if (integer_cmp_int(Z, &gcd, 1)) {
-    for (degree = 0; degree < p_d->size; ++ degree) {
+    for (degree = 0; degree <  (int) p_d->size; ++ degree) {
       if (integer_sgn(Z, p_d->coefficients + degree)) {
         integer_div_Z(&tmp, p_d->coefficients + degree, &gcd);
         integer_swap(Z, &tmp, p_d->coefficients + degree);
@@ -226,7 +226,7 @@ void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, int_ring K, const intege
   assert(integer_sgn(K, c));
   integer_t mult;
   integer_construct_from_int(Z, &mult, 0);
-  int i;
+  size_t i;
   for (i = 0; i < p_d->size; ++ i) {
     if (integer_sgn(Z, p_d->coefficients + i)) {
       integer_mul(K, &mult, p_d->coefficients + i, c);
@@ -240,7 +240,7 @@ void upolynomial_dense_div_c(upolynomial_dense_t* p_d, int_ring K, const integer
   assert(integer_sgn(K, c));
   integer_t div;
   integer_construct_from_int(Z, &div, 0);
-  int i;
+  size_t i;
   for (i = 0; i < p_d->size; ++ i) {
     if (integer_sgn(Z, p_d->coefficients + i)) {
       integer_div_exact(K, &div, p_d->coefficients + i, c);
@@ -255,7 +255,7 @@ void upolynomial_dense_add_mult_p_c(upolynomial_dense_t* p_d, const upolynomial_
   size_t needed_degree = upolynomial_ops.degree(p);
   assert(p_d->capacity > needed_degree);
   // Add
-  int i;
+  size_t i;
   for (i = 0; i < p->size; ++ i) {
     integer_add_mul(p->K, &p_d->coefficients[p->monomials[i].degree], &p->monomials[i].coefficient, c);
   }
@@ -271,7 +271,7 @@ void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const upolynomia
   size_t needed_degree = upolynomial_ops.degree(p);
   assert(p_d->capacity > needed_degree);
   // Add
-  int i;
+  size_t i;
   for (i = 0; i < p->size; ++ i) {
     integer_add_mul_int(p->K, &p_d->coefficients[p->monomials[i].degree], &p->monomials[i].coefficient, c);
   }
@@ -286,7 +286,7 @@ void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const upolynomia
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
   size_t needed_degree = upolynomial_ops.degree(p) + m->degree;
   assert(p_d->capacity > needed_degree);
-  int i;
+  size_t i;
   for (i = 0; i < p->size; ++ i) {
     size_t degree = p->monomials[i].degree + m->degree;
     integer_add_mul(p->K, &p_d->coefficients[degree], &p->monomials[i].coefficient, &m->coefficient);
@@ -300,7 +300,7 @@ void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const upolynomia
 void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const upolynomial_t* p, const umonomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
   size_t needed_degree = upolynomial_ops.degree(p) + m->degree;
-  int i;
+  size_t i;
   for (i = 0; i < p->size; ++ i) {
     size_t degree = p->monomials[i].degree + m->degree;
     assert(p_d->capacity > degree);
@@ -316,7 +316,7 @@ void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, int_ring K, const 
   assert(m->degree > 0 || integer_sgn(K, &m->coefficient));
 
   size_t needed_size = p->size + m->degree;
-  int d;
+  size_t d;
   for (d = 0; d < p->size; ++ d) {
     if (integer_sgn(Z, p->coefficients + d)) {
       size_t degree = d + m->degree;
@@ -338,12 +338,12 @@ void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, int_ring K, const upol
     return;
   }
 
-  int p_deg = p->size - 1;
-  int q_deg = q->size - 1;
+  size_t p_deg = p->size - 1;
+  size_t q_deg = q->size - 1;
 
   assert(p_d->capacity > p_deg + q_deg);
 
-  int i, j;
+  size_t i, j;
   for (i = 0; i <= p_deg; ++ i) {
     if (integer_sgn(Z, p->coefficients + i)) {
       for (j = 0; j <= q_deg; ++ j) {
@@ -361,7 +361,7 @@ void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, int_ring K, const upol
 }
 
 void upolynomial_dense_negate(upolynomial_dense_t* p_d, int_ring K) {
-  int i;
+  size_t i;
   for (i = 0; i < p_d->size; ++ i) {
     integer_neg(K, p_d->coefficients + i, p_d->coefficients + i);
   }
@@ -446,7 +446,7 @@ void upolynomial_dense_div_general(int_ring K, int exact, const upolynomial_dens
         integer_pow(K, &adjust, q->coefficients + q_deg, m.degree);
         integer_mul(K, &div->coefficients[m.degree], &m.coefficient, &adjust);
       }
-      upolynomial_dense_touch(div, K, m.degree);
+      upolynomial_dense_touch(div, m.degree);
     }
   }
 
@@ -558,7 +558,7 @@ void upolynomial_dense_derivative(int_ring K, const upolynomial_dense_t* p_d, up
         integer_mul_int(K, &p_d_prime->coefficients[i-1], &p_d->coefficients[i], i);
       }
     }
-    upolynomial_dense_touch(p_d_prime, K, deg-1);
+    upolynomial_dense_touch(p_d_prime, deg-1);
     upolynomial_dense_normalize(p_d_prime, K);
   }
 }

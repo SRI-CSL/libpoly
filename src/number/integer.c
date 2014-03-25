@@ -8,7 +8,7 @@
 #include "number/integer.h"
 
 int integer_print_matrix(const integer_t* c, size_t m, size_t n, FILE* out) {
-  int i, j;
+  size_t i, j;
   int len = 0;
   for (i = 0; i < m; ++ i) {
     for (j = 0; j < n; ++ j) {

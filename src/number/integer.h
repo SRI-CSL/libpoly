@@ -95,7 +95,7 @@ int integer_print(const integer_t* c, FILE* out) {
 int integer_print_matrix(const integer_t* c, size_t m, size_t n, FILE* out);
 
 static inline
-int integer_bits(const integer_t* c) {
+size_t integer_bits(const integer_t* c) {
   return mpz_sizeinbase(c, 2);
 }
 

@@ -49,7 +49,6 @@ AlgebraicNumber_mul(PyObject* self, PyObject* args);
 static PyObject*
 AlgebraicNumber_pow(PyObject* self, PyObject* args);
 
-
 PyMethodDef AlgebraicNumber_methods[] = {
     {"refine", (PyCFunction)AlgebraicNumber_refine, METH_NOARGS, "Refines the number to half the interval"},
     {"to_double", (PyCFunction)AlgebraicNumber_to_double, METH_NOARGS, "Returns the approximation of the algebraic number"},

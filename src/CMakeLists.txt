@@ -24,6 +24,9 @@ set(poly_SOURCES
     utils/statistics.c
 )
 
+# Add warnings as errors for good practice
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra -std=gnu99")
+
 # Find the GMP number library
 find_path(GMP_INCLUDE_DIR gmp.h)
 find_library(GMP_LIBRARY gmp)

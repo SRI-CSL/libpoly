@@ -35,14 +35,14 @@ void stats_construct(void) {
 
 __attribute__ (( __destructor__ (101) ))
 void stats_destruct(void) {
-  int i;
+  size_t i;
   for (i = 0;i < int_stats.count; ++ i) {
     free(int_stats.names[i]);
   }
 }
 
 static void stats_print(FILE* out) {
-  int i;
+  size_t i;
   for (i = 0; i < int_stats.count; ++ i) {
     fprintf(out, "%s = %d\n", int_stats.names[i], int_stats.values[i]);
   }

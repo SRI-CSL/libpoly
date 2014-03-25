@@ -119,7 +119,7 @@ int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file);
 /**
  * Call when modifying a coefficient, so as to keep internal consistency.
  */
-void upolynomial_dense_touch(upolynomial_dense_t* p_d, int_ring K, size_t degree);
+void upolynomial_dense_touch(upolynomial_dense_t* p_d, size_t degree);
 
 /**
  * Make the polynomial primitive (divide by gcd). If the positive flag is

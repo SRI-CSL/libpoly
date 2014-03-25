@@ -19,7 +19,7 @@ void variable_db_resize(variable_db_t* var_db, size_t capacity) {
   assert(capacity > var_db->capacity);
   var_db->variable_names = realloc(var_db->variable_names, capacity*sizeof(char*));
   var_db->capacity = capacity;
-  int i;
+  size_t i;
   for (i = var_db->size; i < capacity; ++ i) {
     var_db->variable_names[i] = 0;
   }
@@ -56,7 +56,7 @@ void variable_db_construct(variable_db_t* var_db) {
 
 void variable_db_destruct(variable_db_t* var_db) {
   assert(var_db);
-  int i;
+  size_t i;
   for (i = 0; i < var_db->size; ++ i) {
     if (var_db->variable_names[i]) {
       free(var_db->variable_names[i]);
@@ -88,10 +88,11 @@ variable_db_t* variable_db_new(void) {
 
 int variable_db_print(const variable_db_t* var_db, FILE* out) {
   assert(var_db);
-  int i, ret = 0;
+  int ret = 0;
+  size_t i;
   for (i = 0; i < var_db->size; ++ i) {
     if (var_db->variable_names[i]) {
-      fprintf(out, "[%d] = %s\n", i, var_db->variable_names[i]);
+      ret += fprintf(out, "[%zu] = %s\n", i, var_db->variable_names[i]);
     }
   }
   return ret;
@@ -127,7 +128,7 @@ static
 void variable_map_resize(variable_list_t* list, size_t capacity) {
   assert(capacity > list->var_to_index_map_capacity);
   list->var_to_index_map = (int*) realloc(list->var_to_index_map, capacity*sizeof(int));
-  int i;
+  size_t i;
   for (i = list->var_to_index_map_capacity; i < capacity; ++ i) {
     list->var_to_index_map[i] = -1;
   }
@@ -169,7 +170,7 @@ int variable_list_index(const variable_list_t* list, variable_t x) {
 
 static
 void variable_list_copy_into(const variable_list_t* list, variable_t* vars) {
-  int i;
+  size_t i;
   for (i = 0; i < list->list_size; ++ i) {
     vars[i] = list->list[i];
   }

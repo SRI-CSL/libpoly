@@ -114,7 +114,7 @@ typedef struct {
   /**
    * Returns the number of bits needed for this number.
    */
-  int (*bits) (const integer_t* c);
+  size_t (*bits) (const integer_t* c);
 
   /**
    * Prints the integer matrix (m)x(n) to the given stream.

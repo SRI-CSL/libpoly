@@ -115,7 +115,7 @@ void coefficient_construct_copy(const polynomial_context_t* ctx, coefficient_t* 
   TRACE("coefficient::internal", "coefficient_construct_copy()\n");
   STAT(coefficient, construct_copy) ++;
 
-  int i;
+  size_t i;
   switch(from->type) {
   case COEFFICIENT_NUMERIC:
     C->type = COEFFICIENT_NUMERIC;
@@ -173,7 +173,7 @@ static
 void coefficient_destruct(coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_destruct()\n");
 
-  int i;
+  size_t i;
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     integer_destruct(&C->value.num);
@@ -375,7 +375,7 @@ void coefficient_value_approx(const polynomial_context_t* ctx, const coefficient
     // we choose to do it b) way
 
     // Compute
-    int i;
+    size_t i;
     for (i = 0; i < SIZE(C); ++ i) {
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         coefficient_value_approx(ctx, COEFF(C, i), m, &tmp1);
@@ -446,7 +446,7 @@ int coefficient_in_order(const polynomial_context_t* ctx, const coefficient_t* C
   TRACE("coefficient::internal", "coefficient_in_order()\n");
   STAT(coefficient, in_order) ++;
 
-  int i;
+  size_t i;
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return 1;
@@ -652,7 +652,7 @@ void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* 
     tracef("m = "); monomial_ops.print(ctx, m, trace_out); tracef("\n");
   }
 
-  int d;
+  size_t d;
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     integer_assign(ctx->K, &m->a, &C->value.num);
@@ -846,7 +846,7 @@ void coefficient_neg(const polynomial_context_t* ctx, coefficient_t* N, const co
   TRACE("coefficient::arith", "coefficient_neg()\n");
   STAT(coefficient, neg) ++;
 
-  int i;
+  size_t i;
   coefficient_t result;
 
   switch (C->type) {
@@ -965,7 +965,7 @@ void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const co
     tracef("C2 = "); coefficient_ops.print(ctx, C2, trace_out); tracef("\n");
   }
 
-  int i, j;
+  size_t i, j;
   coefficient_t result;
 
   int type_cmp = coefficient_cmp_type(ctx, C1, C2);
@@ -1040,7 +1040,7 @@ void coefficient_mul_int(const polynomial_context_t* ctx, coefficient_t* P, cons
     tracef("n  = %ld", a);
   }
 
-  int i;
+  size_t i;
   coefficient_t result;
 
   if (C->type == COEFFICIENT_NUMERIC) {
@@ -1254,7 +1254,7 @@ void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d,
   TRACE("coefficient", "coefficient_derivative()\n");
   STAT(coefficient, derivative) ++;
 
-  int i;
+  size_t i;
   coefficient_t result;
 
   switch(C->type) {
@@ -1859,7 +1859,7 @@ void monomial_gcd_visit(const polynomial_context_t* ctx, monomial_t* m, void* da
 
 static
 int coefficient_is_univariate(const coefficient_t* C) {
-  int i;
+  size_t i;
   if (C->type == COEFFICIENT_NUMERIC) {
     return 1;
   } else {
@@ -1886,7 +1886,7 @@ upolynomial_t* coefficient_to_simple_univariate(const polynomial_context_t* ctx,
 
   integer_t* coeff = malloc(sizeof(integer_t)*SIZE(C));
 
-  int i;
+  size_t i;
   for (i = 0; i < SIZE(C); ++ i) {
     integer_construct_copy(ctx->K, coeff + i, coefficient_get_constant(COEFF(C, i)));
   }

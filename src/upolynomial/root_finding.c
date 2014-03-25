@@ -213,7 +213,7 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
   // Get the square-free factorization and then count roots for each factor.
   upolynomial_factors_t* square_free_factors = upolynomial_ops.factor_square_free(f);
 
-  int factor_i;
+  size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
     // The factor we are working with
     const upolynomial_t* factor = square_free_factors->factors[factor_i];
@@ -227,7 +227,7 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
     total_count += sturm_seqence_count_roots(sturm_sequence, sturm_sequence_size, interval);
 
     // Destroy the temporaries
-    int i;
+    size_t i;
     for (i = 0; i < sturm_sequence_size; ++i) {
       upolynomial_dense_destruct(sturm_sequence + i);
     }
@@ -346,7 +346,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
   // Get the square-free factorization and then count roots for each factor.
   upolynomial_factors_t* square_free_factors = upolynomial_ops.factor_square_free(f);
 
-  int factor_i;
+  size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
     // The factor we are working with
     const upolynomial_t* factor = square_free_factors->factors[factor_i];
@@ -388,7 +388,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
 
     // Destroy the temporaries
     dyadic_interval_destruct(&interval_all);
-    int i;
+    size_t i;
     for (i = 0; i < sturm_sequence_size; ++i) {
       upolynomial_dense_destruct(sturm_sequence + i);
     }
