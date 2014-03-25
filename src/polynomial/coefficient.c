@@ -1837,6 +1837,7 @@ upolynomial_t* coefficient_to_univariate(const polynomial_context_t* ctx, const 
   for (i = 0; i < SIZE(C); ++ i) {
     integer_destruct(coeff + i);
   }
+  free(coeff);
 
   return C_u;
 }
