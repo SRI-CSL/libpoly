@@ -104,6 +104,79 @@ void dyadic_interval_add(dyadic_interval_t* S, const dyadic_interval_t* I1, cons
   dyadic_interval_destruct(&result);
 }
 
+void interval_neg(interval_t* N, const interval_t* I) {
+  if (I->is_point) {
+    if (!N->is_point) {
+      rational_destruct(&N->b);
+    }
+    rational_neg(&N->a, &I->a);
+    N->b_open = N->a_open = 0;
+    N->is_point = 1;
+    return;
+  }
+
+  if (N->is_point) {
+    rational_construct(&N->b);
+    N->is_point = 0;
+  }
+
+  // -[a, b] = [-b, -a]
+  // (doing swap in case I and N are the same)
+  rational_neg(&N->a, &I->a);
+  rational_neg(&N->b, &I->b);
+  N->a_open = I->a_open;
+  N->b_open = I->b_open;
+
+  rational_swap(&N->a, &N->b);
+  size_t tmp = N->a_open;
+  N->a_open = N->b_open;
+  N->b_open = tmp;
+}
+
+void dyadic_interval_neg(dyadic_interval_t* N, const dyadic_interval_t* I) {
+  if (I->is_point) {
+    if (!N->is_point) {
+      dyadic_rational_destruct(&N->b);
+    }
+    dyadic_rational_neg(&N->a, &I->a);
+    N->b_open = N->a_open = 0;
+    N->is_point = 1;
+    return;
+  }
+
+  if (N->is_point) {
+    dyadic_rational_construct(&N->b);
+    N->is_point = 0;
+  }
+
+  // -[a, b] = [-b, -a]
+  // (doing swap in case I and N are the same)
+  dyadic_rational_neg(&N->a, &I->a);
+  dyadic_rational_neg(&N->b, &I->b);
+  N->a_open = I->a_open;
+  N->b_open = I->b_open;
+
+  dyadic_rational_swap(&N->a, &N->b);
+  size_t tmp = N->a_open;
+  N->a_open = N->b_open;
+  N->b_open = tmp;
+}
+
+void interval_sub(interval_t* S, const interval_t* I1, const interval_t* I2) {
+  interval_t neg;
+  interval_construct_copy(&neg, I2);
+  interval_neg(&neg, &neg);
+  interval_add(S, I1, &neg);
+  interval_destruct(&neg);
+}
+
+void dyadic_interval_sub(dyadic_interval_t* S, const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
+  dyadic_interval_t neg;
+  dyadic_interval_construct_copy(&neg, I2);
+  dyadic_interval_neg(&neg, &neg);
+  dyadic_interval_add(S, I1, &neg);
+  dyadic_interval_destruct(&neg);
+}
 
 void interval_mul(interval_t* P, const interval_t* I1, const interval_t* I2) {
   if (I1->is_point) {
@@ -368,6 +441,62 @@ void interval_pow(interval_t* P, const interval_t* I, unsigned n) {
       } else {
         // negative turns positive, so we flip
         rational_swap(&P->a, &P->b);
+        P->a_open = I->b_open;
+        P->b_open = I->a_open;
+      }
+    }
+  }
+}
+
+void dyadic_interval_pow(dyadic_interval_t* P, const dyadic_interval_t* I, unsigned n) {
+  if (n == 0) {
+    // I^0 = [1]
+    if (!P->is_point) {
+      P->is_point = 1;
+      dyadic_rational_destruct(&P->b);
+    }
+    dyadic_rational_assign_int(&P->a, 1, 1);
+    P->a_open = 0;
+    P->b_open = 0;
+  } else if (I->is_point) {
+    // Plain power
+    if (!P->is_point) {
+      dyadic_rational_destruct(&P->b);
+      P->is_point = 1;
+      P->a_open = P->b_open = 0;
+    }
+    dyadic_rational_pow(&P->a, &I->a, n);
+  } else {
+    if (P->is_point) {
+      P->is_point = 0;
+      dyadic_rational_construct(&P->b);
+    }
+    if (n % 2) {
+      // For odd powers we are monotonic, i.e. [a, b]^n = [a^n, b^n]
+      P->a_open = I->a_open;
+      P->b_open = I->b_open;
+      dyadic_rational_pow(&P->a, &I->a, n);
+      dyadic_rational_pow(&P->b, &I->b, n);
+    } else {
+      // Even powers depend on whether 0 is in the interval
+      int sgn = dyadic_interval_sgn(I);
+      dyadic_rational_pow(&P->a, &I->a, n);
+      dyadic_rational_pow(&P->b, &I->b, n);
+      if (sgn == 0) {
+        // P = [0, max(a, b)^n]
+        if (dyadic_interval_endpoint_lt(&P->b, I->b_open, &P->a, I->a_open)) {
+          dyadic_rational_swap(&P->b, &P->a);
+          P->b_open = I->a_open;
+        }
+        dyadic_rational_assign_int(&P->a, 0, 1);
+        P->a_open = 0;
+      } else if (sgn > 0) {
+        // P = I^n
+        P->a_open = I->a_open;
+        P->b_open = I->b_open;
+      } else {
+        // negative turns positive, so we flip
+        dyadic_rational_swap(&P->a, &P->b);
         P->a_open = I->b_open;
         P->b_open = I->a_open;
       }

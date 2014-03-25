@@ -158,6 +158,7 @@ void dyadic_interval_construct_from_int(dyadic_interval_t* I,
     I->b_open = b_open;
     I->is_point = 0;
   } else {
+    assert(!a_open && !b_open);
     I->is_point = 1;
     I->a_open = I->b_open = 0;
   }
@@ -195,6 +196,7 @@ void dyadic_interval_construct_from_integer(dyadic_interval_t* I,
     I->a_open = a_open;
     I->b_open = b_open;
   } else {
+    assert(!a_open && !b_open);
     I->is_point = 1;
     I->a_open = I->b_open = 0;
   }
@@ -323,6 +325,43 @@ int interval_sgn(const interval_t* I) {
   return 1;
 }
 
+int dyadic_interval_sgn(const dyadic_interval_t* I) {
+  int a_sgn = dyadic_rational_sgn(&I->a);
+  if (I->is_point) {
+    return a_sgn;
+  }
+  int b_sgn = dyadic_rational_sgn(&I->b);
+
+  if (a_sgn < 0 && b_sgn > 0) {
+    // Definitively contains 0
+    return 0;
+  }
+  if (a_sgn == 0) {
+    if (!I->a_open) {
+      // Left contains zero
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+  if (b_sgn == 0) {
+    if (!I->b_open) {
+      // Right contains zero
+      return 0;
+    } else {
+      return -1;
+    }
+  }
+
+  // Doesn't contain zero
+  if (a_sgn < 0) {
+    return -1;
+  }
+
+  assert(b_sgn > 0);
+  return 1;
+}
+
 void dyadic_interval_construct_from_split(dyadic_interval_t* I_left, dyadic_interval_t* I_right, const dyadic_interval_t* I, int left_open, int right_open) {
   assert(!I->is_point);
   dyadic_rational_t m;
@@ -379,22 +418,6 @@ void dyadic_interval_construct_intersection(dyadic_interval_t* I, const dyadic_i
     }
 
     dyadic_interval_construct(I, max_a, a_open, min_b, b_open);
-  }
-}
-
-int dyadic_interval_sgn(const dyadic_interval_t* I) {
-  int a_sgn = dyadic_rational_sgn(&I->a);
-  if (I->is_point) {
-    return a_sgn;
-  }
-  int b_sgn = dyadic_rational_sgn(&I->b);
-  if (a_sgn < 0 && b_sgn <= 0) {
-    return -1;
-  } else if (b_sgn > 0 && a_sgn >= 0) {
-    return 1;
-  } else {
-    // a_sgn <= 0, b_sgn >= 0, contains 0
-    return 0;
   }
 }
 
