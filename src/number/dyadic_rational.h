@@ -92,9 +92,9 @@ void dyadic_rational_destruct(dyadic_rational_t* q) {
 static inline
 int dyadic_rational_print(const dyadic_rational_t* dq, FILE* out) {
   rational_t q;
-  rational_ops.construct_from_dyadic(&q, dq);
-  int ret = rational_ops.print(&q, out);
-  rational_ops.destruct(&q);
+  rational_construct_from_dyadic(&q, dq);
+  int ret = rational_print(&q, out);
+  rational_destruct(&q);
   return ret;
 }
 
@@ -111,9 +111,9 @@ char* dyadic_rational_to_string(const dyadic_rational_t* q) {
 static inline
 double dyadic_rational_to_double(const dyadic_rational_t* dq) {
   rational_t q;
-  rational_ops.construct_from_dyadic(&q, dq);
-  double ret = rational_ops.to_double(&q);
-  rational_ops.destruct(&q);
+  rational_construct_from_dyadic(&q, dq);
+  double ret = rational_to_double(&q);
+  rational_destruct(&q);
   return ret;
 }
 

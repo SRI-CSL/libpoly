@@ -7,6 +7,8 @@
 
 #include "utils/assignment.h"
 
+#include "number/rational.h"
+#include "number/dyadic_rational.h"
 #include "number/algebraic_number.h"
 #include "interval/interval.h"
 #include "polynomial/polynomial.h"
@@ -22,10 +24,10 @@ void value_construct(value_t* v, value_type_t type, const void* data) {
   case VALUE_NONE:
     break;
   case VALUE_RATIONAL:
-    rational_ops.construct_copy(&v->value.q, data);
+    rational_construct_copy(&v->value.q, data);
     break;
   case VALUE_DYADIC_RATIONAL:
-    dyadic_rational_ops.construct_copy(&v->value.dy_q, data);
+    dyadic_rational_construct_copy(&v->value.dy_q, data);
     break;
   case VALUE_ALGEBRAIC:
     algebraic_number_construct_copy(&v->value.a, data);
@@ -55,10 +57,10 @@ void value_destruct(value_t* v) {
   case VALUE_NONE:
     break;
   case VALUE_RATIONAL:
-    rational_ops.destruct(&v->value.q);
+    rational_destruct(&v->value.q);
     break;
   case VALUE_DYADIC_RATIONAL:
-    dyadic_rational_ops.destruct(&v->value.dy_q);
+    dyadic_rational_destruct(&v->value.dy_q);
     break;
   case VALUE_ALGEBRAIC:
     algebraic_number_destruct(&v->value.a);
@@ -86,10 +88,10 @@ int value_print(const value_t* v, FILE* out) {
     ret += fprintf(out, "<null>");
     break;
   case VALUE_RATIONAL:
-    ret += rational_ops.print(&v->value.q, out);
+    ret += rational_print(&v->value.q, out);
     break;
   case VALUE_DYADIC_RATIONAL:
-    ret += dyadic_rational_ops.print(&v->value.dy_q, out);
+    ret += dyadic_rational_print(&v->value.dy_q, out);
     break;
   case VALUE_ALGEBRAIC:
     ret += algebraic_number_print(&v->value.a, out);

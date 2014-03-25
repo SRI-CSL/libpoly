@@ -970,10 +970,10 @@ int upolynomial_sgn_at_integer(const upolynomial_t* p, const integer_t* x) {
 
 int upolynomial_sgn_at_rational(const upolynomial_t* p, const rational_t* x) {
   rational_t value;
-  rational_ops.construct(&value);
+  rational_construct(&value);
   upolynomial_evaluate_at_rational(p, x, &value);
-  int sgn = rational_ops.sgn(&value);
-  rational_ops.destruct(&value);
+  int sgn = rational_sgn(&value);
+  rational_destruct(&value);
   return sgn;
 }
 

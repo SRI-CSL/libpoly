@@ -487,7 +487,7 @@ int interval_print(const interval_t* I, FILE* out) {
   if (I) {
     if (I->is_point) {
       ret += fprintf(out, "[");
-      ret += rational_ops.print(&I->a, out);
+      ret += rational_print(&I->a, out);
       ret += fprintf(out, "]");
     } else {
       if (I->a_open) {
@@ -495,9 +495,9 @@ int interval_print(const interval_t* I, FILE* out) {
       } else {
         ret += fprintf(out, "[");
       }
-      ret += rational_ops.print(&I->a, out);
+      ret += rational_print(&I->a, out);
       ret += fprintf(out, ", ");
-      ret += rational_ops.print(&I->b, out);
+      ret += rational_print(&I->b, out);
       if (I->b_open) {
         ret += fprintf(out, ")");
       } else {
@@ -515,7 +515,7 @@ int dyadic_interval_print(const dyadic_interval_t* I, FILE* out) {
   if (I) {
     if (I->is_point) {
       ret += fprintf(out, "[");
-      ret += dyadic_rational_ops.print(&I->a, out);
+      ret += dyadic_rational_print(&I->a, out);
       ret += fprintf(out, "]");
     } else {
       if (I->a_open) {
@@ -523,9 +523,9 @@ int dyadic_interval_print(const dyadic_interval_t* I, FILE* out) {
       } else {
         ret += fprintf(out, "[");
       }
-      ret += dyadic_rational_ops.print(&I->a, out);
+      ret += dyadic_rational_print(&I->a, out);
       ret += fprintf(out, ", ");
-      ret += dyadic_rational_ops.print(&I->b, out);
+      ret += dyadic_rational_print(&I->b, out);
       if (I->b_open) {
         ret += fprintf(out, ")");
       } else {
