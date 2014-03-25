@@ -572,7 +572,7 @@ void algebraic_number_sub(algebraic_number_t* sub, const algebraic_number_t* a, 
 void algebraic_number_neg(algebraic_number_t* neg, const algebraic_number_t* a) {
   assert(a->f);
   upolynomial_t* f_neg_x = upolynomial_subst_x_neg(a->f);
-  if (integer_sgn(Z, upolynomial_lead_coeff(a->f)) < 0) {
+  if (integer_sgn(Z, upolynomial_lead_coeff(f_neg_x)) < 0) {
     upolynomial_neg_in_place(f_neg_x);
   }
   dyadic_interval_t I_neg;

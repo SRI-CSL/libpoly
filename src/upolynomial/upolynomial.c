@@ -1140,10 +1140,7 @@ void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S
 void upolynomial_neg_in_place(upolynomial_t* p) {
   size_t i;
   for (i = 0; i < p->size; ++ i) {
-    // We negate odd degrees
-    if (p->monomials[i].degree % 2) {
-      integer_neg(p->K, &p->monomials[i].coefficient, &p->monomials[i].coefficient);
-    }
+    integer_neg(p->K, &p->monomials[i].coefficient, &p->monomials[i].coefficient);
   }
 }
 
