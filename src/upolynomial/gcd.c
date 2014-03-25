@@ -14,11 +14,11 @@
 
 #include <assert.h>
 
-STAT_DECLARE(int, upolynomial, gcd_euclid);
-STAT_DECLARE(int, upolynomial, gcd_euclid_extended);
-STAT_DECLARE(int, upolynomial, gcd_subresultant);
-STAT_DECLARE(int, upolynomial, gcd_heuristic);
-STAT_DECLARE(int, upolynomial, gcd_heuristic_success);
+STAT_DECLARE(int, upolynomial, gcd_euclid)
+STAT_DECLARE(int, upolynomial, gcd_euclid_extended)
+STAT_DECLARE(int, upolynomial, gcd_subresultant)
+STAT_DECLARE(int, upolynomial, gcd_heuristic)
+STAT_DECLARE(int, upolynomial, gcd_heuristic_success)
 
 /**
  * Computing using Euclid's algorithm.

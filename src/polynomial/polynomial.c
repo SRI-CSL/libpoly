@@ -22,7 +22,6 @@ void polynomial_external_clean(const polynomial_t* A_const) {
   }
 }
 
-inline
 void polynomial_set_context(polynomial_t* A, const polynomial_context_t* ctx) {
   if (A->ctx != ctx) {
     if (A->ctx && A->flags.external) {

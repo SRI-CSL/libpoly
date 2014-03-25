@@ -20,7 +20,7 @@ struct upolynomial_struct {
   /** The number of monomials */
   size_t size;
   /** The monomials */
-  umonomial_t monomials[0];
+  umonomial_t monomials[];
 };
 
 struct upolynomial_factors_struct {

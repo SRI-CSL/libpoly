@@ -16,9 +16,9 @@
 #include <malloc.h>
 
 
-STAT_DECLARE(int, upolynomial, factor_square_free);
-STAT_DECLARE(int, upolynomial, factor_distinct_degree);
-STAT_DECLARE(int, upolynomial, factor_berlekamp_square_free);
+STAT_DECLARE(int, upolynomial, factor_square_free)
+STAT_DECLARE(int, upolynomial, factor_distinct_degree)
+STAT_DECLARE(int, upolynomial, factor_berlekamp_square_free)
 
 /**
  * We are given a polynomial f and we will return it's square-free factorization

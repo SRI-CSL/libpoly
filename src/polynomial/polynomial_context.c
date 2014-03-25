@@ -18,6 +18,7 @@ void polynomial_context_construct(polynomial_context_t* ctx, int_ring_t* K, vari
   ctx->var_db = var_db;
   ctx->var_order = var_order;
 }
+
 void polynomial_context_attach(polynomial_context_t* ctx) {
   if (ctx->K) {
     int_ring_ops.attach(ctx->K);
