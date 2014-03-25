@@ -1137,6 +1137,16 @@ void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S
   free(S_dense);
 }
 
+void upolynomial_neg_in_place(upolynomial_t* p) {
+  size_t i;
+  for (i = 0; i < p->size; ++ i) {
+    // We negate odd degrees
+    if (p->monomials[i].degree % 2) {
+      integer_neg(p->K, &p->monomials[i].coefficient, &p->monomials[i].coefficient);
+    }
+  }
+}
+
 upolynomial_t* upolynomial_subst_x_neg(const upolynomial_t* f) {
 
   upolynomial_t* neg = upolynomial_construct_copy(f);
@@ -1148,6 +1158,12 @@ upolynomial_t* upolynomial_subst_x_neg(const upolynomial_t* f) {
     }
   }
 
+  return neg;
+}
+
+upolynomial_t* upolynomial_neg(const upolynomial_t* p) {
+  upolynomial_t* neg = upolynomial_construct_copy(p);
+  upolynomial_neg_in_place(neg);
   return neg;
 }
 

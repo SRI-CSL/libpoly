@@ -65,6 +65,10 @@ upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q);
 
 upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q);
 
+upolynomial_t* upolynomial_neg(const upolynomial_t* p);
+
+void upolynomial_neg_in_place(upolynomial_t* p);
+
 upolynomial_t* upolynomial_mul(const upolynomial_t* p, const upolynomial_t* q);
 
 upolynomial_t* upolynomial_mul_c(const upolynomial_t* p, const integer_t* c);

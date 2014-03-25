@@ -91,6 +91,12 @@ polypy_test.start("Arithmetic")
 
 x = polypy.x
 
+a = polypy.AlgebraicNumber(x**3 - 3, 0)
+a_neg = -a
+check_comparison(a_neg, a, "a", (a_neg < a), True)
+sum = a + a_neg
+check_comparison(sum, zero, "==", (sum == zero), True)
+
 a = polypy.AlgebraicNumber(x**2 - 2, 1)
 a2 = polypy.AlgebraicNumber(x**2 - 4, 1)
 
