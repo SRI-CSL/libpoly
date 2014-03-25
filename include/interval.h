@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "rational.h"
 #include "dyadic_rational.h"
 

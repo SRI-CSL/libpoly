@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "variable.h"
 #include "variable_order.h"
 #include "integer.h"
@@ -29,8 +31,6 @@
  * In any case, the polynomial context should not be changed externally during
  * any operations.
  */
-typedef struct polynomial_struct polynomial_t;
-
 typedef struct {
 
   /** Construct a zero polynomial (does not attach the context) */

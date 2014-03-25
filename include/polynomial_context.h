@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "variable.h"
 #include "integer.h"
 #include "variable_order.h"
@@ -25,8 +27,6 @@ struct polynomial_context_struct {
   /** The order of variables */
   variable_order_t* var_order;
 };
-
-typedef struct polynomial_context_struct polynomial_context_t;
 
 /** Operations on the polynomial context */
 typedef struct {

@@ -14,20 +14,16 @@
 /**
  * A polynomial is the ring, number of monomials and the monomials.
  */
-typedef struct upolynomial_struct {
-
+struct upolynomial_struct {
   /** The ring of coefficients */
   int_ring K;
   /** The number of monomials */
   size_t size;
   /** The monomials */
   umonomial_t monomials[0];
+};
 
-} upolynomial_t;
-
-
-typedef struct upolynomial_factors_struct {
-
+struct upolynomial_factors_struct {
   /** Constant factor */
   integer_t constant;
   /** Number of actual factors */
@@ -38,8 +34,7 @@ typedef struct upolynomial_factors_struct {
   upolynomial_t** factors;
   /** The multiplicity of individual factors */
   size_t* multiplicities;
-
-} upolynomial_factors_t;
+};
 
 size_t upolynomial_degree(const upolynomial_t* p);
 

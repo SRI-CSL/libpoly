@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "variable.h"
 
 typedef struct variable_order_struct variable_order_t;

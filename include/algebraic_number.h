@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include <stdio.h>
 
 #include "upolynomial.h"
@@ -23,8 +25,6 @@ struct algebraic_number_struct {
   dyadic_interval_t I;
   int sgn_at_a, sgn_at_b;
 };
-
-typedef struct algebraic_number_struct algebraic_number_t;
 
 /** Operations on algebraic numbers */
 typedef struct {

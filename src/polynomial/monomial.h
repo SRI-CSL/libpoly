@@ -21,9 +21,6 @@ typedef struct {
   unsigned d;
 } power_t;
 
-/** Context for the polynomial operations */
-typedef struct polynomial_context_struct polynomial_context_t;
-
 /**
  * A monomial of the form a*x_1^d_1*...*x_size*d_size.
  */

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include <stdio.h>
 
 /** Variables are just ids */

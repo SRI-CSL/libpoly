@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "variable.h"
 #include "rational.h"
 #include "dyadic_rational.h"
@@ -53,14 +55,14 @@ typedef struct {
 /** Implementation of the value operations */
 extern const value_ops_t value_ops;
 
-typedef struct {
+struct assignment_struct {
   /** Size of the map */
   size_t size;
   /** The values */
   value_t* values;
   /** The variable database */
   const variable_db_t* var_db;
-} assignment_t;
+};
 
 typedef struct {
 

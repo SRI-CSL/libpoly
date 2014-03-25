@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <gmp.h>

@@ -7,24 +7,11 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "integer.h"
 #include "rational.h"
 #include "interval.h"
-
-// Defined independently
-typedef struct algebraic_number_struct algebraic_number_t;
-
-/**
- * An univariate polynomial is an array of monomials, with the coefficients
- * ordered in increasing order.
- */
-typedef struct upolynomial_struct upolynomial_t;
-
-/**
- * Structure containing the factors of a polynomial. In general, a factorization
- * will be of the form p = C * f_1^d_1 * f_2^d_2 * ... * f_k^d_k.
- */
-typedef struct upolynomial_factors_struct upolynomial_factors_t;
 
 /** Interface of the polynomial operations */
 typedef struct {
