@@ -507,7 +507,9 @@ void algebraic_number_op(
 
   // Remove temps
   coefficient_destruct(&f_a);
-  coefficient_destruct(&f_b);
+  if (b) {
+    coefficient_destruct(&f_b);
+  }
   coefficient_destruct(&f_r);
   dyadic_interval_destruct(&I);
   free(f_roots);

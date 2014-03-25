@@ -103,6 +103,9 @@ a2 = polypy.AlgebraicNumber(x**2 - 4, 1)
 mul = a * a
 check_comparison(mul, a2, "==", (mul == a2), True)
 
+a_pow = a**2 
+check_comparison(a_pow, a2, "==", (a_pow == a2), True)
+
 b = polypy.AlgebraicNumber(x**2 - 3, 1)
 ab = polypy.AlgebraicNumber(x**2 - 6, 1)
 mul = a * b
