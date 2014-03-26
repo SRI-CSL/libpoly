@@ -197,7 +197,7 @@ void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive) {
   for (-- degree; degree >= 0; -- degree) {
     if (integer_sgn(Z, p_d->coefficients + degree)) {
       integer_gcd_Z(&tmp, &gcd, p_d->coefficients + degree);
-      integer_swap(Z, &tmp, &gcd);
+      integer_swap(&tmp, &gcd);
     }
   }
   assert(integer_sgn(Z, &gcd) > 0);
@@ -205,7 +205,7 @@ void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive) {
   // If the lc is negative, make gcd negative
   if (positive && lc_sgn < 0) {
     integer_neg(Z, &tmp, &gcd);
-    integer_swap(Z, &tmp, &gcd);
+    integer_swap(&tmp, &gcd);
   }
 
   // Make it primitive
@@ -213,7 +213,7 @@ void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive) {
     for (degree = 0; degree <  (int) p_d->size; ++ degree) {
       if (integer_sgn(Z, p_d->coefficients + degree)) {
         integer_div_Z(&tmp, p_d->coefficients + degree, &gcd);
-        integer_swap(Z, &tmp, p_d->coefficients + degree);
+        integer_swap(&tmp, p_d->coefficients + degree);
       }
     }
   }
@@ -230,7 +230,7 @@ void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, int_ring K, const intege
   for (i = 0; i < p_d->size; ++ i) {
     if (integer_sgn(Z, p_d->coefficients + i)) {
       integer_mul(K, &mult, p_d->coefficients + i, c);
-      integer_swap(K, &mult, p_d->coefficients + i);
+      integer_swap(&mult, p_d->coefficients + i);
     }
   }
   integer_destruct(&mult);
@@ -244,7 +244,7 @@ void upolynomial_dense_div_c(upolynomial_dense_t* p_d, int_ring K, const integer
   for (i = 0; i < p_d->size; ++ i) {
     if (integer_sgn(Z, p_d->coefficients + i)) {
       integer_div_exact(K, &div, p_d->coefficients + i, c);
-      integer_swap(K, &div, p_d->coefficients + i);
+      integer_swap(&div, p_d->coefficients + i);
     }
   }
   integer_destruct(&div);
@@ -440,7 +440,7 @@ void upolynomial_dense_div_general(int_ring K, int exact, const upolynomial_dens
 
       // Put the monomial into the division
       if (exact || !integer_sgn(Z, &m.coefficient)) {
-        integer_swap(K, &div->coefficients[m.degree], &m.coefficient);
+        integer_swap(&div->coefficients[m.degree], &m.coefficient);
       } else {
         // Adjust the monomial with to be lc(q)^(k-deg_q)
         integer_pow(K, &adjust, q->coefficients + q_deg, m.degree);

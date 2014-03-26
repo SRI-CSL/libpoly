@@ -173,10 +173,9 @@ typedef struct {
   int (*divides) (int_ring K, const integer_t* a, const integer_t* b);
 
   /**
-   * Swap two integers. The integers are assumed to already be in the
-   * given ring.
+   * Swap two integers.
    */
-  void (*swap) (int_ring K, integer_t* a, integer_t* b);
+  void (*swap) (integer_t* a, integer_t* b);
 
   /**
    * Compute a ++.

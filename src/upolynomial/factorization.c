@@ -306,7 +306,7 @@ static void Q_construct(integer_t* Q, size_t size, const upolynomial_t* u) {
   integer_construct_from_int(K, &one, 1);
   for(k = 0; k < size; ++ k) {
     integer_sub(K, &tmp, Q + k*size + k, &one);
-    integer_swap(K, &tmp, Q + k*size + k);
+    integer_swap(&tmp, Q + k*size + k);
   }
   integer_destruct(&tmp); integer_destruct(&one);
 }
@@ -325,7 +325,7 @@ static void Q_column_multiply(int_ring K, integer_t* Q, size_t size, int j, cons
   size_t k;
   for (k = 0; k < size; ++ k) {
     integer_mul(K, &tmp, Q + k*size + j, m);
-    integer_swap(K, &tmp, Q + k*size + j);
+    integer_swap(&tmp, Q + k*size + j);
   }
 
   integer_destruct(&tmp);
@@ -359,7 +359,7 @@ static void Q_column_add(int_ring K, integer_t* Q, size_t size, int i, const int
   for (k = 0; k < size; ++ k) {
     integer_mul(K, &mul, Q + k*size + j, &m_copy);
     integer_add(K, &add, Q + k*size + i, &mul);
-    integer_swap(K, &add, Q + k*size + i);
+    integer_swap(&add, Q + k*size + i);
   }
 
   integer_destruct(&add);

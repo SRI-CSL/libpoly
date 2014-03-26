@@ -126,12 +126,12 @@ void upolynomial_factor_bound_landau_mignotte(const upolynomial_t* f, size_t n, 
     const integer_t* ak = &f->monomials[k].coefficient;
     integer_mul(Z, &ak_sq, ak, ak);
     integer_add(Z, &tmp, &norm, &ak_sq);
-    integer_swap(Z, &tmp, &norm);
+    integer_swap(&tmp, &norm);
   }
 
   // Square root
   integer_sqrt_Z(&tmp, &norm);
-  integer_swap(Z, &tmp, &norm);
+  integer_swap(&tmp, &norm);
   integer_inc(Z, &norm);
 
   // Power of two

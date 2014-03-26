@@ -18,6 +18,8 @@ static
 void trace_enable(const char* tag) {
 #ifndef NDEBUG
   tags_to_trace[tags_to_trace_size++] = strdup(tag);
+#else
+  (void) tag;
 #endif
 }
 
@@ -41,6 +43,8 @@ void trace_disable(const char* tag) {
     free(tags_to_trace[i]);
     tags_to_trace[i] = tags_to_trace[--tags_to_trace_size];
   }
+#else
+  (void) tag;
 #endif
 }
 

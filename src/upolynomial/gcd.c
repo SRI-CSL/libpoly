@@ -392,8 +392,8 @@ static upolynomial_t* reconstruct_polynomial(size_t max_size, integer_t* p_value
       integer_inc(Z, &div);
     }
 
-    integer_swap(Z, &rem, p_d.coefficients + d);
-    integer_swap(Z, &div, p_value);
+    integer_swap(&rem, p_d.coefficients + d);
+    integer_swap(&div, p_value);
 
     d ++;
   }

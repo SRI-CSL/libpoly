@@ -35,6 +35,7 @@ int trace_is_enabled(const char* tag);
 
 static inline
 int trace_is_enabled(const char* tag) {
+  (void) tag;
   return 0;
 }
 

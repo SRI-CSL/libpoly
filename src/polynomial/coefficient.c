@@ -154,7 +154,7 @@ void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
 
   // Move over the coefficients
   for (i = 0; i <= C_u_deg; ++ i) {
-    integer_swap(ctx->K, &COEFF(C, i)->value.num, coeff + i);
+    integer_swap(&COEFF(C, i)->value.num, coeff + i);
     integer_destruct(coeff + i);
   }
 
@@ -235,6 +235,7 @@ void coefficient_assign_int(const polynomial_context_t* ctx, coefficient_t* C, l
 }
 
 const coefficient_t* coefficient_lc_safe(const polynomial_context_t* ctx, const coefficient_t* C, variable_t x) {
+  __unused(ctx);
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return C;
@@ -283,6 +284,7 @@ size_t coefficient_degree(const coefficient_t* C) {
 }
 
 size_t coefficient_degree_safe(const polynomial_context_t* ctx, const coefficient_t* C, variable_t x) {
+  __unused(ctx);
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return 0;

@@ -606,7 +606,7 @@ void upolynomial_div_general(const upolynomial_t* p, const upolynomial_t* q, upo
 
       // Put the monomial into the division
       if (exact || !integer_sgn(Z, &m.coefficient)) {
-        integer_swap(K, &div->coefficients[m.degree], &m.coefficient);
+        integer_swap(&div->coefficients[m.degree], &m.coefficient);
       } else {
         // Adjust the monomial with to be lc(q)^(k-deg_q)
         integer_pow(K, &adjust, upolynomial_lead_coeff(q), m.degree);
@@ -866,12 +866,12 @@ void upolynomial_content_Z(const upolynomial_t* p, integer_t* content) {
   integer_assign(Z, content, &p->monomials[0].coefficient);
   if (integer_sgn(Z, content) < 0) {
     integer_neg(Z, &tmp, content);
-    integer_swap(Z, &tmp, content);
+    integer_swap(&tmp, content);
   }
   // GCD rest
   for (i = 1; i < p->size; ++ i) {
     integer_gcd_Z(&tmp, content, &p->monomials[i].coefficient);
-    integer_swap(Z, &tmp, content);
+    integer_swap(&tmp, content);
   }
 
   assert(integer_sgn(Z, content) > 0);
@@ -881,7 +881,7 @@ void upolynomial_content_Z(const upolynomial_t* p, integer_t* content) {
   if (sgn < 0) {
     // Content is the same sign as lc
     integer_neg(Z, &tmp, content);
-    integer_swap(Z, &tmp, content);
+    integer_swap(&tmp, content);
   }
 
   integer_destruct(&tmp);
@@ -910,7 +910,7 @@ void upolynomial_make_primitive_Z(upolynomial_t* p) {
   for (i = 0; i < p->size; ++ i) {
     assert(integer_divides(Z, &gcd, &p->monomials[i].coefficient));
     integer_div_exact(Z, &tmp, &p->monomials[i].coefficient, &gcd);
-    integer_swap(Z, &tmp, &p->monomials[i].coefficient);
+    integer_swap(&tmp, &p->monomials[i].coefficient);
   }
 
   integer_destruct(&gcd);

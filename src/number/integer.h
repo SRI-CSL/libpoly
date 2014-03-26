@@ -184,8 +184,7 @@ int integer_divides(int_ring K, const integer_t* a, const integer_t* b) {
 }
 
 static inline
-void integer_swap(int_ring K, integer_t* a, integer_t* b) {
-  assert(integer_in_ring(K, a) && integer_in_ring(K, b));
+void integer_swap(integer_t* a, integer_t* b) {
   mpz_swap(a, b);
 }
 

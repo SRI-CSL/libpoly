@@ -65,6 +65,8 @@ void algebraic_number_swap(algebraic_number_t* a, algebraic_number_t* b) {
 
 static inline
 void algebraic_number_reduce_polynomial(const algebraic_number_t* a, const upolynomial_t* f, int sgn_at_a, int sgn_at_b) {
+  __unused(sgn_at_a);
+  __unused(sgn_at_b);
   assert(a->f);
   assert(a->sgn_at_a * a->sgn_at_b < 0);
   assert(sgn_at_a * sgn_at_b < 0);
@@ -632,6 +634,7 @@ void algebraic_number_pow_construct_op(coefficient_t* f_r, void* data) {
 
 void algebraic_number_pow_interval_op(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2, void* data) {
   assert(I2 == 0);
+  __unused(I2);
   unsigned n = *((unsigned*) data);
   dyadic_interval_pow(I, I1, n);
 }
