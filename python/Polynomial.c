@@ -234,6 +234,7 @@ PyObject*
 Polynomial_create(polynomial_t* p) {
   Polynomial *self;
   self = (Polynomial*)PolynomialType.tp_alloc(&PolynomialType, 0);
+  polynomial_ops.set_external(p);
   self->p = p;
   return (PyObject*) self;
 }
@@ -363,7 +364,7 @@ PyPolynomial_FromVariable(PyObject* variable, const polynomial_context_t* ctx) {
 
   // The x polynomial
   polynomial_t* p_x = polynomial_ops.alloc();
-  polynomial_ops.construct_simple(p_x, ctx, 0, &one, x, 1);
+  polynomial_ops.construct_simple(p_x, ctx, &one, x, 1);
 
   // Remove temps
   integer_ops.destruct(&one);
@@ -382,7 +383,7 @@ PyPolynomial_FromLong_or_Int(PyObject* number, const polynomial_context_t* ctx) 
 
   // The c polynomial
   polynomial_t* p_c = polynomial_ops.alloc();
-  polynomial_ops.construct_simple(p_c, ctx, 1, &c, 0, 0);
+  polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
 
   // Remove temps
   integer_ops.destruct(&c);
@@ -428,8 +429,7 @@ Polynomial_add(PyObject* self, PyObject* other) {
   }
 
   // Add the polynomials
-  polynomial_t* sum = polynomial_ops.alloc();
-  polynomial_ops.construct(sum, p1_ctx, 1);
+  polynomial_t* sum = polynomial_ops.new(p1_ctx);
   polynomial_ops.add(sum, p1->p, p2->p);
 
   if (dec_other) {
@@ -444,8 +444,7 @@ static PyObject*
 Polynomial_neg(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
   const polynomial_context_t* p_ctx = polynomial_ops.context(p->p);
-  polynomial_t* neg = polynomial_ops.alloc();
-  polynomial_ops.construct(neg, p_ctx, 1);
+  polynomial_t* neg = polynomial_ops.new(p_ctx);
   polynomial_ops.neg(neg, p->p);
   return Polynomial_create(neg);
 }
@@ -487,8 +486,7 @@ Polynomial_sub(PyObject* self, PyObject* other) {
   }
 
   // Subtract the polynomials
-  polynomial_t* sub = polynomial_ops.alloc();
-  polynomial_ops.construct(sub, p1_ctx, 1);
+  polynomial_t* sub = polynomial_ops.new(p1_ctx);
   polynomial_ops.sub(sub, p1->p, p2->p);
 
   if (dec_other) {
@@ -534,8 +532,7 @@ Polynomial_mul(PyObject* self, PyObject* other) {
   }
 
   // Multiply the polynomials
-  polynomial_t* mul = polynomial_ops.alloc();
-  polynomial_ops.construct(mul, p1_ctx, 1);
+  polynomial_t* mul = polynomial_ops.new(p1_ctx);
   polynomial_ops.mul(mul, p1->p, p2->p);
 
   if (dec_other) {
@@ -563,8 +560,7 @@ Polynomial_pow(PyObject* self, PyObject* other) {
   }
   const polynomial_context_t* p_ctx = polynomial_ops.context(p->p);
   // Compute
-  polynomial_t* pow = polynomial_ops.alloc();
-  polynomial_ops.construct(pow, p_ctx, 1);
+  polynomial_t* pow = polynomial_ops.new(p_ctx);
   polynomial_ops.pow(pow, p->p, n);
   // Return the result
   return Polynomial_create(pow);
@@ -607,8 +603,7 @@ Polynomial_div(PyObject* self, PyObject* other) {
   }
 
   // Multiply the polynomials
-  polynomial_t* div = polynomial_ops.alloc();
-  polynomial_ops.construct(div, p1_ctx, 1);
+  polynomial_t* div = polynomial_ops.new(p1_ctx);
   polynomial_ops.div(div, p1->p, p2->p);
 
   if (dec_other) {
@@ -655,8 +650,7 @@ Polynomial_rem(PyObject* self, PyObject* other) {
   }
 
   // Multiply the polynomials
-  polynomial_t* rem = polynomial_ops.alloc();
-  polynomial_ops.construct(rem, p1_ctx, 1);
+  polynomial_t* rem = polynomial_ops.new(p1_ctx);
   polynomial_ops.rem(rem, p1->p, p2->p);
 
   if (dec_other) {
@@ -704,9 +698,8 @@ Polynomial_divmod(PyObject* self, PyObject* other) {
   }
 
   // Multiply the polynomials
-  polynomial_t* div = polynomial_ops.alloc();
-  polynomial_t* rem = polynomial_ops.alloc();
-  polynomial_ops.construct(rem, p1_ctx, 1);
+  polynomial_t* rem = polynomial_ops.new(p1_ctx);
+  polynomial_t* div = polynomial_ops.new(p1_ctx);
   polynomial_ops.divrem(div, rem, p1->p, p2->p);
 
   if (dec_other) {
@@ -771,8 +764,7 @@ Polynomial_gcd(PyObject* self, PyObject* args) {
   }
 
   // Multiply the polynomials
-  polynomial_t* gcd = polynomial_ops.alloc();
-  polynomial_ops.construct(gcd, p1_ctx, 1);
+  polynomial_t* gcd = polynomial_ops.new(p1_ctx);
   polynomial_ops.gcd(gcd, p1->p, p2->p);
 
   if (dec_other) {
@@ -822,8 +814,7 @@ Polynomial_lcm(PyObject* self, PyObject* args) {
   }
 
   // Multiply the polynomials
-  polynomial_t* lcm = polynomial_ops.alloc();
-  polynomial_ops.construct(lcm, p1_ctx, 1);
+  polynomial_t* lcm = polynomial_ops.new(p1_ctx);
   polynomial_ops.lcm(lcm, p1->p, p2->p);
 
   if (dec_other) {
@@ -891,7 +882,7 @@ Polynomial_psc(PyObject* self, PyObject* args) {
   polynomial_t** psc = malloc(sizeof(polynomial_t*)*size);
   int i;
   for (i = 0; i < size; ++ i) {
-    psc[i] = polynomial_ops.new(p1_ctx, 1);
+    psc[i] = polynomial_ops.new(p1_ctx);
   }
 
   // Compute the psc
@@ -962,7 +953,7 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
   }
 
   // Allocate the resultant
-  polynomial_t* resultant = polynomial_ops.new(p1_ctx, 1);
+  polynomial_t* resultant = polynomial_ops.new(p1_ctx);
 
   // Compute the psc
   polynomial_ops.resultant(resultant, p1->p, p2->p);
@@ -1004,7 +995,7 @@ Polynomial_roots_isolate(PyObject* self) {
 static PyObject*
 Polynomial_derivative(PyObject* self) {
   polynomial_t* p = ((Polynomial*) self)->p;
-  polynomial_t* p_derivative = polynomial_ops.new(polynomial_ops.context(p), 1);
+  polynomial_t* p_derivative = polynomial_ops.new(polynomial_ops.context(p));
   polynomial_ops.derivative(p_derivative, p);
   return Polynomial_create(p_derivative);
 }
@@ -1033,7 +1024,7 @@ Polynomial_coefficients(PyObject* self) {
   // Copy the polynomials into a list
   PyObject* list = PyList_New(size);
   for (i = 0; i < size; ++i) {
-    polynomial_t* c_p = polynomial_ops.new(ctx, 1);
+    polynomial_t* c_p = polynomial_ops.new(ctx);
     polynomial_ops.get_coefficient(c_p, p, i);
     PyObject* c = Polynomial_create(c_p);
     PyList_SetItem(list, i, c);

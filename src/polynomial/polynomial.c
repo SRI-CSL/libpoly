@@ -6,6 +6,7 @@
  */
 
 #include "polynomial/polynomial.h"
+#include "polynomial/factorization.h"
 
 #include "utils/debug_trace.h"
 
@@ -34,9 +35,9 @@ void polynomial_set_context(polynomial_t* A, const polynomial_context_t* ctx) {
   }
 }
 
-void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx, int external) {
+void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx) {
   A->ctx = 0;
-  A->flags.external = external;
+  A->flags.external = 0;
   A->flags.prime = 1;
   A->flags.primitive = 1;
   A->flags.univariate = 1;
@@ -45,31 +46,31 @@ void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx, int 
 }
 
 void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_context_t* ctx,
-    const coefficient_t* from, int external) {
+    const coefficient_t* from) {
   A->ctx = 0;
   A->flags.prime = 0;
   A->flags.primitive = 0;
   A->flags.univariate = 0;
-  A->flags.external = external;
+  A->flags.external = 0;
   polynomial_set_context(A, ctx);
   coefficient_construct_copy(A->ctx, &A->data, from);
 }
 
-void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from, int external) {
+void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from) {
   A->ctx = 0;
   A->flags = from->flags;
-  A->flags.external = external;
+  A->flags.external = 0;
   polynomial_set_context(A, from->ctx);
   coefficient_construct_copy(A->ctx, &A->data, &from->data);
 }
 
 /** Construct a simple polynomial c*x^n */
 void polynomial_construct_simple(
-    polynomial_t* A, const polynomial_context_t* ctx, int external,
+    polynomial_t* A, const polynomial_context_t* ctx,
     const integer_t* c, variable_t x, unsigned n)
 {
   A->ctx = 0;
-  A->flags.external = external;
+  A->flags.external = 0;
   A->flags.prime = 0;
   A->flags.primitive = 0;
   A->flags.univariate = 1;
@@ -89,10 +90,17 @@ polynomial_t* polynomial_alloc(void) {
   return new;
 }
 
-polynomial_t* polynomial_new(const polynomial_context_t* ctx, int external) {
+polynomial_t* polynomial_new(const polynomial_context_t* ctx) {
   polynomial_t* new = polynomial_alloc();
-  polynomial_construct(new, ctx, external);
+  polynomial_construct(new, ctx);
   return new;
+}
+
+void polynomial_set_external(polynomial_t* A) {
+  if (!A->flags.external) {
+    A->flags.external = 1;
+    polynomial_context_ops.attach((polynomial_context_t*) A->ctx);
+  }
 }
 
 #define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
@@ -136,13 +144,13 @@ void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t
 
   if (k > polynomial_degree(A)) {
     polynomial_t result;
-    polynomial_construct(&result, A->ctx, 0);
+    polynomial_construct(&result, A->ctx);
     polynomial_swap(C_p, &result);
     polynomial_destruct(&result);
   } else {
     const coefficient_t* C = coefficient_get_coefficient(&A->data, k);
     polynomial_t result;
-    polynomial_construct_from_coefficient(&result, A->ctx, C, 0);
+    polynomial_construct_from_coefficient(&result, A->ctx, C);
     polynomial_swap(C_p, &result);
     polynomial_destruct(&result);
   }
@@ -633,7 +641,7 @@ void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_
   // Construct the output (one less, we ignore the final 1)
   for (i = 0; i < size; ++ i) {
     polynomial_t tmp;
-    polynomial_construct_from_coefficient(&tmp, ctx, psc_coeff + i, 0);
+    polynomial_construct_from_coefficient(&tmp, ctx, psc_coeff + i);
     polynomial_swap(&tmp, psc[i]);
     polynomial_destruct(&tmp);
     coefficient_destruct(&psc_coeff[i]);
@@ -677,6 +685,33 @@ void polynomial_resultant(polynomial_t* res, const polynomial_t* A, const polyno
   }
 }
 
+void polynomial_factor_square_free(const polynomial_t* A, polynomial_t*** factors, size_t** multiplicities, size_t* size) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_factor_square_free"); polynomial_print(A, trace_out); tracef(")\n");
+  }
+
+  assert(*factors == 0);
+  assert(*multiplicities == 0);
+  assert(*size == 0);
+
+  coefficient_factors_t coeff_factors;
+  coefficient_factors_construct(&coeff_factors);
+
+  *size = coeff_factors.size;
+  *factors = malloc(sizeof(polynomial_t*) * (*size));
+  *multiplicities = malloc(sizeof(size_t) * (*size));
+
+  size_t i;
+  for (i = 0; i < *size; ++ i) {
+    (*factors)[i] = malloc(sizeof(polynomial_t));
+    polynomial_construct_from_coefficient((*factors)[i], A->ctx, coeff_factors.factors + i);
+    (*multiplicities)[i] = coeff_factors.multiplicities[i];
+  }
+
+  coefficient_factors_destruct(&coeff_factors);
+}
+
 /** Set the power symbol for printouts */
 void polynomial_set_power_symbol(const char* power) {
   coefficient_set_power_symbol(power);
@@ -690,6 +725,7 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_destruct,
   polynomial_alloc,
   polynomial_new,
+  polynomial_set_external,
   polynomial_swap,
   polynomial_assign,
   polynomial_context,

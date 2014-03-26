@@ -214,7 +214,7 @@ polynomial_t* PyLong_Or_Int_to_polynomial(PyObject* number) {
   integer_t c;
   PyLong_or_Int_to_integer(number, 0, &c);
   polynomial_t* p_c = polynomial_ops.alloc();
-  polynomial_ops.construct_simple(p_c, ctx, 0, &c, 0, 0);
+  polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
   integer_ops.destruct(&c);
   return p_c;
 }
@@ -226,7 +226,7 @@ polynomial_t* Variable_to_polynomial(PyObject* var) {
   integer_t one;
   integer_ops.construct_from_int(Z, &one, 1);
   polynomial_t* p_x = polynomial_ops.alloc();
-  polynomial_ops.construct_simple(p_x, ctx, 0, &one, x->x, 1);
+  polynomial_ops.construct_simple(p_x, ctx, &one, x->x, 1);
   integer_ops.destruct(&one);
   return p_x;
 }
@@ -242,8 +242,7 @@ Variable_add_number(PyObject* self, PyObject* other) {
   polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_sum = polynomial_ops.alloc();
-  polynomial_ops.construct(p_sum, ctx, 1);
+  polynomial_t* p_sum = polynomial_ops.new(ctx);
   polynomial_ops.add(p_sum, p_x, p_c);
 
   // Remove temporaries
@@ -266,8 +265,7 @@ Variable_add_Variable(PyObject* self, PyObject* other) {
   polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_sum = polynomial_ops.alloc();
-  polynomial_ops.construct(p_sum, ctx, 1);
+  polynomial_t* p_sum = polynomial_ops.new(ctx);
   polynomial_ops.add(p_sum, p_x, p_y);
 
   // Remove temporaries
@@ -303,8 +301,7 @@ Variable_neg(PyObject* self) {
   polynomial_t* p_x = Variable_to_polynomial(self);
 
   // -x polynomial
-  polynomial_t* p_neg = polynomial_ops.alloc();
-  polynomial_ops.construct(p_neg, ctx, 1);
+  polynomial_t* p_neg = polynomial_ops.new(ctx);
   polynomial_ops.neg(p_neg, p_x);
 
   // Remove temporaries
@@ -325,8 +322,7 @@ Variable_sub_number(PyObject* self, PyObject* other) {
   polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_sub = polynomial_ops.alloc();
-  polynomial_ops.construct(p_sub, ctx, 1);
+  polynomial_t* p_sub = polynomial_ops.new(ctx);
   polynomial_ops.sub(p_sub, p_x, p_c);
 
   // Remove temporaries
@@ -349,8 +345,7 @@ Variable_sub_Variable(PyObject* self, PyObject* other) {
   polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x - y polynomial
-  polynomial_t* p_sub = polynomial_ops.alloc();
-  polynomial_ops.construct(p_sub, ctx, 1);
+  polynomial_t* p_sub = polynomial_ops.new(ctx);
   polynomial_ops.sub(p_sub, p_x, p_y);
 
   // Remove temporaries
@@ -390,8 +385,7 @@ Variable_mul_number(PyObject* self, PyObject* other) {
   polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_mul = polynomial_ops.alloc();
-  polynomial_ops.construct(p_mul, ctx, 1);
+  polynomial_t* p_mul = polynomial_ops.new(ctx);
   polynomial_ops.mul(p_mul, p_x, p_c);
 
   // Remove temporaries
@@ -414,8 +408,7 @@ Variable_mul_Variable(PyObject* self, PyObject* other) {
   polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_mul = polynomial_ops.alloc();
-  polynomial_ops.construct(p_mul, ctx, 1);
+  polynomial_t* p_mul = polynomial_ops.new(ctx);
   polynomial_ops.mul(p_mul, p_x, p_y);
 
   // Remove temporaries
@@ -459,7 +452,7 @@ Variable_pow(PyObject* self, PyObject* other) {
       integer_t one;
       integer_ops.construct_from_int(Z, &one, 1);
       polynomial_t* pow_x = polynomial_ops.alloc();
-      polynomial_ops.construct_simple(pow_x, ctx, 1, &one, var->x, n);
+      polynomial_ops.construct_simple(pow_x, ctx, &one, var->x, n);
       integer_ops.destruct(&one);
       return Polynomial_create(pow_x);
     }

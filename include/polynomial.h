@@ -34,13 +34,13 @@
 typedef struct {
 
   /** Construct a zero polynomial (does not attach the context) */
-  void (*construct) (polynomial_t* A, const polynomial_context_t* ctx, int external);
+  void (*construct) (polynomial_t* A, const polynomial_context_t* ctx);
 
   /** Construct a simple polynomial c*x^n */
-  void (*construct_simple) (polynomial_t* A, const polynomial_context_t* ctx, int external, const integer_t* c, variable_t x, unsigned n);
+  void (*construct_simple) (polynomial_t* A, const polynomial_context_t* ctx, const integer_t* c, variable_t x, unsigned n);
 
   /** Construct a copy of the given polynomial (does not attach the context). */
-  void (*construct_copy) (polynomial_t* A, const polynomial_t* from, int external);
+  void (*construct_copy) (polynomial_t* A, const polynomial_t* from);
 
   /** Destruct the polynomial. */
   void (*destruct) (polynomial_t* A);
@@ -49,7 +49,10 @@ typedef struct {
   polynomial_t* (*alloc) (void);
 
   /** Allocate and construct a new polynomial */
-  polynomial_t* (*new) (const polynomial_context_t* ctx, int external);
+  polynomial_t* (*new) (const polynomial_context_t* ctx);
+
+  /** Makr the polynomial as external */
+  void (*set_external) (polynomial_t* A);
 
   /** Swap two polynomials. */
   void (*swap) (polynomial_t* A1, polynomial_t* A2);

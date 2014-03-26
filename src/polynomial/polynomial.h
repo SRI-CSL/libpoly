@@ -55,19 +55,21 @@ struct polynomial_struct {
   const polynomial_context_t* ctx;
 };
 
-void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx, int external);
+void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx);
 
-void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_context_t* ctx, const coefficient_t* from, int external);
+void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_context_t* ctx, const coefficient_t* from);
 
-void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from, int external);
+void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from);
 
-void polynomial_construct_simple(polynomial_t* A, const polynomial_context_t* ctx, int external, const integer_t* c, variable_t x, unsigned n);
+void polynomial_construct_simple(polynomial_t* A, const polynomial_context_t* ctx, const integer_t* c, variable_t x, unsigned n);
 
 void polynomial_destruct(polynomial_t* A);
 
 polynomial_t* polynomial_alloc(void);
 
-polynomial_t* polynomial_new(const polynomial_context_t* ctx, int external);
+polynomial_t* polynomial_new(const polynomial_context_t* ctx);
+
+void polynomial_set_external(polynomial_t* A);
 
 void polynomial_swap(polynomial_t* A1, polynomial_t* A2);
 
@@ -132,3 +134,6 @@ void polynomial_resultant(polynomial_t* res, const polynomial_t* A, const polyno
 void polynomial_psc(polynomial_t** psc, const polynomial_t* A, const polynomial_t* B);
 
 void polynomial_reduce(const polynomial_t* A, const polynomial_t* B, polynomial_t* P, polynomial_t* Q, polynomial_t* R);
+
+void polynomial_factor_square_free(const polynomial_t* A, polynomial_t*** factors, size_t** multiplicities, size_t* size);
+
