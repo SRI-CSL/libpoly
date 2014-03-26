@@ -178,6 +178,13 @@ typedef struct {
    */
   void (*psc) (polynomial_t** psc, const polynomial_t* A1, const polynomial_t* A2);
 
+  /**
+   * Get the square-free factorization of the given polynomial. It will allocate
+   * the given arrays and return the polynomials and their multiplicities in
+   * them.
+   */
+  void (*factor_square_free) (const polynomial_t* A, polynomial_t*** factors, size_t** multiplicities, size_t* size);
+
   /** Set the power symbol for printouts */
   void (*set_power_symbol) (const char* power);
 

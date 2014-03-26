@@ -695,8 +695,18 @@ void polynomial_factor_square_free(const polynomial_t* A, polynomial_t*** factor
   assert(*multiplicities == 0);
   assert(*size == 0);
 
+  const polynomial_context_t* ctx = A->ctx;
+
+  if (trace_is_enabled("polynomial")) {
+    variable_order_simple_ops.print((variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    tracef("\n");
+  }
+
+  polynomial_external_clean(A);
   coefficient_factors_t coeff_factors;
   coefficient_factors_construct(&coeff_factors);
+
+  coefficient_factor_square_free(ctx, &A->data, &coeff_factors);
 
   *size = coeff_factors.size;
   *factors = malloc(sizeof(polynomial_t*) * (*size));
@@ -757,6 +767,7 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_lcm,
   polynomial_resultant,
   polynomial_psc,
+  polynomial_factor_square_free,
   polynomial_set_power_symbol
 };
 

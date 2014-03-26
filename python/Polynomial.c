@@ -977,9 +977,44 @@ Polynomial_factor(PyObject* self) {
   return 0;
 }
 
+// Creates a python list from the factors, taking over the polynomials
+PyObject* factors_to_PyList(polynomial_t** factors, size_t* multiplicities, size_t size) {
+  // Construct the result
+  PyObject* factors_list = PyList_New(size);
+
+  // Copy the constant
+    // Copy over the factors
+  int i;
+  for (i = 0; i < size; ++ i) {
+    PyObject* p_i = Polynomial_create(factors[i]);
+    Py_INCREF(p_i);
+    PyObject* d = PyInt_FromSize_t(multiplicities[i]);
+    PyObject* pair = PyTuple_New(2);
+    PyTuple_SetItem(pair, 0, p_i);
+    PyTuple_SetItem(pair, 1, d);
+    PyList_SetItem(factors_list, i, pair);
+  }
+
+  // Return the list
+  return factors_list;
+}
+
 static PyObject*
 Polynomial_factor_square_free(PyObject* self) {
-  return 0;
+  // Get arguments
+  Polynomial* p = (Polynomial*) self;
+  // Factor
+  polynomial_t** factors = 0;
+  size_t* multiplicities = 0;
+  size_t factors_size;
+  polynomial_ops.factor_square_free(p->p, &factors, &multiplicities, &factors_size);
+  // Create the list
+  PyObject* factors_list = factors_to_PyList(factors, multiplicities, factors_size);
+  // Get rid of the factors (not the polynomials)
+  free(factors);
+  free(multiplicities);
+  // Return the list
+  return factors_list;
 }
 
 static PyObject*
