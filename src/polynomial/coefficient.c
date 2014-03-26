@@ -1238,6 +1238,20 @@ void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d,
   assert(coefficient_is_normalized(ctx, C_d));
 }
 
+void coefficient_div_degrees(const polynomial_context_t* ctx, coefficient_t* C, size_t p) {
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    size_t i;
+    for (i = 1; i < SIZE(C); ++ i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        assert(i % p == 0);
+        assert(coefficient_is_zero(ctx, COEFF(C, i/ p)));
+        coefficient_swap(COEFF(C, i), COEFF(C, i / p));
+      }
+    }
+    coefficient_normalize(ctx, C);
+  }
+}
+
 ///
 /// Forward declarations of division/reduction/gcd stuff
 ///

@@ -218,6 +218,9 @@ void coefficient_reduce(const polynomial_context_t* ctx, const coefficient_t* A,
 /** Compute C1 = D*C2, in the given ring (assumes that C2 divides C1). */
 void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
 
+/** Divide the degrees of the main variable of coefficient with the given number */
+void coefficient_div_degrees(const polynomial_context_t* ctx, coefficient_t* C, size_t p);
+
 /** Compute R = D*C2 - C1, in the given ring (assumes division is exact). */
 void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 

@@ -2,6 +2,7 @@ set(poly_SOURCES
     polynomial/polynomial.c
     polynomial/polynomial_context.c
     polynomial/coefficient.c
+    polynomial/factorization.c
     polynomial/monomial.c
     upolynomial/bounds.c
     upolynomial/factorization.c
