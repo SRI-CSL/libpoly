@@ -20,8 +20,6 @@
  * the bound is
  *
  *  B = 1 + max(a_0, ..., a_{n-1})/|a_n|
- *
- *  TODO: B is not a coefficient, it's a number
  */
 void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B);
 

@@ -489,19 +489,30 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
     integer_pow(p->K, &result->monomials[0].coefficient, &p->monomials[0].coefficient, pow);
     result->monomials[0].degree = p->monomials[0].degree * pow;
   } else {
-    // TODO: optimize
-    result = upolynomial_construct_copy(p);
-    int i;
-    for (i = 2; i <= pow; ++ i) {
-      upolynomial_t* tmp = result;
-      result = upolynomial_mul(result, p);
-      upolynomial_destruct(tmp);
+    result = upolynomial_construct_power(p->K, 0, 1);
+    upolynomial_t* tmp = upolynomial_construct_copy(p);
+    upolynomial_t* prev;
+    while (pow) {
+      if (pow & 1) {
+        prev = result;
+        result = upolynomial_mul(result, tmp);
+        upolynomial_destruct(prev);
+      }
+      prev = tmp;
+      tmp = upolynomial_mul(tmp, tmp);
+      pow >>= 1;
+      upolynomial_destruct(prev);
     }
+    upolynomial_destruct(tmp);
   }
 
   if (trace_is_enabled("arithmetic")) {
-  tracef("upolynomial_pow("); upolynomial_print(p, trace_out); tracef(", %ld) = ", pow); upolynomial_print(result, trace_out); tracef("\n");
-}
+    tracef("upolynomial_pow(");
+    upolynomial_print(p, trace_out);
+    tracef(", %ld) = ", pow);
+    upolynomial_print(result, trace_out);
+    tracef("\n");
+  }
 
   return result;
 }
