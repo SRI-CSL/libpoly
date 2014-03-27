@@ -57,8 +57,8 @@ int coefficient_factors_print(const polynomial_context_t* ctx, const coefficient
       ret += fprintf(out, ", ");
     }
     ret += fprintf(out, "(");
-    coefficient_print(ctx, factors->factors + i, out);
-    ret += fprintf(out, ", %zu", factors->multiplicities[i]);
+    ret += coefficient_print(ctx, factors->factors + i, out);
+    ret += fprintf(out, ", %zu)", factors->multiplicities[i]);
   }
 
   fprintf(out, "]");
@@ -221,7 +221,7 @@ void coefficient_factor_square_free(const polynomial_context_t* ctx, const coeff
   STAT(coefficient, factor_square_free) ++;
 
   if (trace_is_enabled("factorization")) {
-    tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef("\n");
+    tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(")\n");
   }
 
   coefficient_t C_pp, C_cont;
@@ -247,6 +247,12 @@ void coefficient_factor_square_free(const polynomial_context_t* ctx, const coeff
 
   coefficient_destruct(&C_pp);
   coefficient_destruct(&C_cont);
+
+  if (trace_is_enabled("factorization")) {
+    tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(") =>");
+    coefficient_factors_print(ctx, factors, trace_out); tracef("\n");
+
+  }
 }
 
 

@@ -127,6 +127,7 @@ PyMethodDef Polynomial_methods[] = {
     {"derivative", (PyCFunction)Polynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
     {"psc", (PyCFunction)Polynomial_psc, METH_VARARGS, "Returns the principal subresultant coefficients of the current and given polynomial"},
+    {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {NULL}  /* Sentinel */
 };
 
@@ -1006,7 +1007,7 @@ Polynomial_factor_square_free(PyObject* self) {
   // Factor
   polynomial_t** factors = 0;
   size_t* multiplicities = 0;
-  size_t factors_size;
+  size_t factors_size = 0;
   polynomial_ops.factor_square_free(p->p, &factors, &multiplicities, &factors_size);
   // Create the list
   PyObject* factors_list = factors_to_PyList(factors, multiplicities, factors_size);

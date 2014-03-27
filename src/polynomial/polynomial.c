@@ -688,7 +688,7 @@ void polynomial_resultant(polynomial_t* res, const polynomial_t* A, const polyno
 void polynomial_factor_square_free(const polynomial_t* A, polynomial_t*** factors, size_t** multiplicities, size_t* size) {
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_factor_square_free"); polynomial_print(A, trace_out); tracef(")\n");
+    tracef("polynomial_factor_square_free("); polynomial_print(A, trace_out); tracef(")\n");
   }
 
   assert(*factors == 0);
@@ -708,9 +708,15 @@ void polynomial_factor_square_free(const polynomial_t* A, polynomial_t*** factor
 
   coefficient_factor_square_free(ctx, &A->data, &coeff_factors);
 
-  *size = coeff_factors.size;
-  *factors = malloc(sizeof(polynomial_t*) * (*size));
-  *multiplicities = malloc(sizeof(size_t) * (*size));
+  if (coeff_factors.size) {
+    *size = coeff_factors.size;
+    *factors = malloc(sizeof(polynomial_t*) * (*size));
+    *multiplicities = malloc(sizeof(size_t) * (*size));
+  } else {
+    *size = 0;
+    *factors = 0;
+    *multiplicities = 0;
+  }
 
   size_t i;
   for (i = 0; i < *size; ++ i) {
