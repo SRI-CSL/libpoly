@@ -237,12 +237,12 @@ void coefficient_factor_square_free(const polynomial_context_t* ctx, const coeff
       coefficient_factors_add(ctx, factors, &C_cont, 1);
     }
   } else {
-    coefficient_factor_square_free(ctx, &C_pp, factors);
+    coefficient_factor_square_free(ctx, &C_cont, factors);
   }
 
   // Factor the primitive part
   if (!coefficient_is_constant(&C_pp)) {
-    coefficient_factor_square_free_pp(ctx, C, factors);
+    coefficient_factor_square_free_pp(ctx, &C_pp, factors);
   }
 
   coefficient_destruct(&C_pp);
