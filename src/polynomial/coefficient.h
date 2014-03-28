@@ -8,10 +8,10 @@
 #pragma once
 
 #include <polynomial_context.h>
+#include <variable.h>
+#include <assignment.h>
 
-#include "variable.h"
-#include "assignment.h"
-
+#include "polynomial/monomial.h"
 #include "number/integer.h"
 
 /** Type of the coefficients */
@@ -102,11 +102,20 @@ void coefficient_assign(const polynomial_context_t* ctx, coefficient_t* C, const
 /** Assign the coefficient a give integer */
 void coefficient_assign_int(const polynomial_context_t* ctx, coefficient_t* C, long x);
 
+/** Check if the coefficient is univariate */
+int coefficient_is_univariate(const coefficient_t* C);
+
+/** Returns true if the coefficient conforms to internal representation (mainly debug purposes) */
+int coefficient_is_normalized(const polynomial_context_t* ctx, coefficient_t* C);
+
 /** Returns the univariate version of this coefficient (must be univariate) */
 upolynomial_t* coefficient_to_univariate(const polynomial_context_t* ctx, const coefficient_t* C);
 
 /** Returns true if the coefficient is a constant */
 int coefficient_is_constant(const coefficient_t* C);
+
+/** Returns the constant of the polynomial (the actual deep constant) */
+const integer_t* coefficient_get_constant(const coefficient_t* C);
 
 /** The degree of the coefficient */
 size_t coefficient_degree(const coefficient_t* C);
@@ -236,26 +245,6 @@ void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coeff
 /** Computes the derivative of the coefficient (in the main variable) */
 void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d, const coefficient_t* C);
 
-/** Compute the greatest common divisor gcd(C1, C2). */
-void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2);
-
-/**
- * Compute the primitive part pp(A(divide with content).
- */
-void coefficient_pp(const polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C);
-
-/**
- * Compute the content cont(A(gcd of coefficients). Content is computed so that
- * A/cont(A) has a positive leading coefficient.
- */
-void coefficient_cont(const polynomial_context_t* ctx, coefficient_t* cont, const coefficient_t* C);
-
-/** Comput pp and cont at the same time */
-void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C);
-
-/** Compute the least common multiple. */
-void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2);
-
 /**
  * Compute the resultant of C1 and C2 over their (common) top variable.
  */
@@ -270,3 +259,17 @@ void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* psc, const 
 /** Set the power symbol for print-outs */
 void coefficient_set_power_symbol(const char* pow);
 
+/** Function type called on coefficient traversal */
+typedef void (*traverse_f) (const polynomial_context_t* ctx, monomial_t* p, void* data);
+
+/**
+ * Run on the coefficient to traverse all monomials. The traverse_f function will be called on he monomial with
+ * the associated data.
+ */
+void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data);
+
+/**
+ * Method called to add a monomial to C. The monomial should be ordered in the
+ * same order as C, top variable at the m[0].
+ */
+void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void);

@@ -1,9 +1,10 @@
 set(poly_SOURCES 
+    polynomial/monomial.c
+    polynomial/coefficient.c
+    polynomial/gcd.c
+    polynomial/factorization.c
     polynomial/polynomial.c
     polynomial/polynomial_context.c
-    polynomial/coefficient.c
-    polynomial/factorization.c
-    polynomial/monomial.c
     upolynomial/bounds.c
     upolynomial/factorization.c
     upolynomial/upolynomial.c

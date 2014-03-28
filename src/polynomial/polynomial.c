@@ -6,6 +6,7 @@
  */
 
 #include "polynomial/polynomial.h"
+#include "polynomial/gcd.h"
 #include "polynomial/factorization.h"
 
 #include "utils/debug_trace.h"
