@@ -1,30 +1,29 @@
 set(poly_SOURCES 
+    utils/debug_trace.c
+    utils/assignment.c
+    utils/statistics.c
+    number/rational.c
+    number/algebraic_number.c
+    number/dyadic_rational.c
+    number/integer.c
+    interval/interval.c
+    interval/arithmetic.c
+    variable/variable.c
+    variable/variable_order.c
+    upolynomial/umonomial.c
+    upolynomial/upolynomial.c
+    upolynomial/upolynomial_dense.c
+    upolynomial/bounds.c
+    upolynomial/gcd.c
+    upolynomial/factors.c
+    upolynomial/factorization.c
+    upolynomial/root_finding.c
     polynomial/monomial.c
     polynomial/coefficient.c
     polynomial/gcd.c
     polynomial/factorization.c
     polynomial/polynomial.c
     polynomial/polynomial_context.c
-    upolynomial/bounds.c
-    upolynomial/factorization.c
-    upolynomial/upolynomial.c
-    upolynomial/gcd.c
-    upolynomial/factors.c
-    upolynomial/upolynomial_dense.c
-    upolynomial/root_finding.c
-    upolynomial/upolynomial.c
-    upolynomial/umonomial.c
-    number/rational.c
-    number/algebraic_number.c
-    number/dyadic_rational.c
-    number/integer.c
-    variable/variable.c
-    variable/variable_order.c
-    interval/interval.c
-    interval/arithmetic.c
-    utils/debug_trace.c
-    utils/assignment.c
-    utils/statistics.c
 )
 
 # Add warnings as errors for good practice
