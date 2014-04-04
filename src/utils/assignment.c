@@ -99,6 +99,7 @@ const value_t* assignment_get_value(const assignment_t* m, variable_t x) {
 }
 
 void assignment_get_value_approx(const assignment_t* m, variable_t x, interval_t* approx) {
+  assert(assignment_get_value(m, x)->type != VALUE_NONE);
   const value_t* x_value = assignment_get_value(m, x);
   value_approx(x_value, approx);
 }

@@ -132,6 +132,9 @@ const coefficient_t* coefficient_lc(const coefficient_t* C);
 /** Get the reductum of the coefficient */
 void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C);
 
+/** Get the model-based reductum of the coefficient */
+void coefficient_reductum_m(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const assignment_t* m);
+
 /** Returns true if the coefficient is 0 */
 int coefficient_is_zero(const polynomial_context_t* ctx, const coefficient_t* C);
 

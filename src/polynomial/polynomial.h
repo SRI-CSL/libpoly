@@ -50,6 +50,8 @@ void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t
 
 void polynomial_reductum(polynomial_t* R, const polynomial_t* A);
 
+void polynomial_reductum_m(polynomial_t* R, const polynomial_t* A, const assignment_t* m);
+
 int polynomial_is_constant(const polynomial_t* A);
 
 int polynomial_is_zero(const polynomial_t* A);

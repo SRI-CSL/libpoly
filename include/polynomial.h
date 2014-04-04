@@ -75,6 +75,9 @@ typedef struct {
   /** Get the reductum of the polynomial (the polynomial withough the leading coefficient) */
   void (*reductum) (polynomial_t* R, const polynomial_t* A);
 
+  /** Get the model-based reductum of the polynomial (the polynomial withough the leading coefficient) */
+  void (*reductum_m) (polynomial_t* R, const polynomial_t* A, const assignment_t* m);
+
   /** Returns true if the polynomial is a constant */
   int (*is_constant) (const polynomial_t* A);
 

@@ -292,6 +292,32 @@ void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, con
   coefficient_destruct(&result);
 }
 
+void coefficient_reductum_m(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const assignment_t* m) {
+
+  assert(C->type == COEFFICIENT_POLYNOMIAL);
+
+  // Locate the first non-zero ceofficient past the top one
+  int i = SIZE(C) - 2;
+  while (coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
+    -- i;
+  }
+
+  coefficient_t result;
+  coefficient_construct_rec(ctx, &result, VAR(C), i + 1);
+
+  // Copy the other coefficients
+  while (i >= 0) {
+    if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+      coefficient_assign(ctx, COEFF(&result, i), COEFF(C, i));
+    }
+    -- i;
+  }
+
+  coefficient_normalize(ctx, &result);
+  coefficient_swap(R, &result);
+  coefficient_destruct(&result);
+}
+
 int coefficient_is_constant(const coefficient_t* C) {
   return C->type == COEFFICIENT_NUMERIC;
 }

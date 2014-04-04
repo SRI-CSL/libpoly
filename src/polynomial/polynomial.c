@@ -146,6 +146,12 @@ void polynomial_reductum(polynomial_t* R, const polynomial_t* A) {
   coefficient_reductum(A->ctx, &R->data, &A->data);
 }
 
+void polynomial_reductum_m(polynomial_t* R, const polynomial_t* A, const assignment_t* m) {
+  polynomial_external_clean(A);
+  polynomial_set_context(R, A->ctx);
+  coefficient_reductum_m(A->ctx, &R->data, &A->data, m);
+}
+
 int polynomial_is_constant(const polynomial_t* A) {
   return coefficient_is_constant(&A->data);
 }
@@ -703,6 +709,7 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_top_variable,
   polynomial_get_coefficient,
   polynomial_reductum,
+  polynomial_reductum_m,
   polynomial_is_constant,
   polynomial_is_zero,
   polynomial_sgn,

@@ -44,7 +44,7 @@ static PyObject*
 Polynomial_coefficients(PyObject* self);
 
 static PyObject*
-Polynomial_reductum(PyObject* self);
+Polynomial_reductum(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_sgn(PyObject* self, PyObject* arguments);
@@ -124,7 +124,7 @@ Polynomial_psc(PyObject* self, PyObject* args);
 PyMethodDef Polynomial_methods[] = {
     {"degree", (PyCFunction)Polynomial_degree, METH_NOARGS, "Returns the degree of the polynomial in its top variable"},
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
-    {"reductum", (PyCFunction)Polynomial_reductum, METH_NOARGS, "Returns the reductum of the polynomial"},
+    {"reductum", (PyCFunction)Polynomial_reductum, METH_VARARGS, "Returns the reductum of the polynomial"},
     {"sgn", (PyCFunction)Polynomial_sgn, METH_VARARGS, "Returns the sign of the polynomials in the given model"},
     {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial"},
     {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial"},
@@ -1163,11 +1163,34 @@ Polynomial_coefficients(PyObject* self) {
 }
 
 static PyObject*
-Polynomial_reductum(PyObject* self) {
+Polynomial_reductum(PyObject* self, PyObject* args) {
   polynomial_t* p = ((Polynomial*) self)->p;
   const polynomial_context_t* ctx = polynomial_ops.context(p);
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) > 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  assignment_t* assignment = 0;
+
+  if (PyTuple_Size(args) == 1) {
+    PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+    if (!PyAssignment_CHECK(assignment_obj)) {
+      Py_INCREF(Py_NotImplemented);
+      return Py_NotImplemented;
+    } else {
+      assignment = ((Assignment*) assignment_obj)->assignment;
+    }
+  }
+
   polynomial_t* result = polynomial_ops.new(ctx);
-  polynomial_ops.reductum(result, p);
+  if (assignment) {
+    polynomial_ops.reductum_m(result, p, assignment);
+  } else {
+    polynomial_ops.reductum(result, p);
+  }
+
   return Polynomial_create(result);
 }
 
