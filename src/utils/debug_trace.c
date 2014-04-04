@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "debug_trace.h"
+#include "utils/debug_trace.h"
 
 #include <string.h>
 #include <malloc.h>
@@ -14,7 +14,6 @@
 char* tags_to_trace[1000];
 size_t tags_to_trace_size = 0;
 
-static
 void trace_enable(const char* tag) {
 #ifndef NDEBUG
   tags_to_trace[tags_to_trace_size++] = strdup(tag);
@@ -35,7 +34,6 @@ int trace_is_enabled(const char* tag) {
 }
 #endif
 
-static
 void trace_disable(const char* tag) {
 #ifndef NDEBUG
   int i = trace_is_enabled(tag) - 1;
@@ -50,18 +48,6 @@ void trace_disable(const char* tag) {
 
 FILE* trace_out = 0;
 
-__attribute__ (( __constructor__ (101) ))
-void trace_out_set(void) {
-  trace_out = stderr;
-}
-
 void trace_set_output(FILE* file) {
   trace_out = file;
 }
-
-const debug_trace_ops_t debug_trace_ops = {
-    trace_enable,
-    trace_disable,
-    trace_is_enabled,
-    trace_set_output
-};

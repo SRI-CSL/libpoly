@@ -2,10 +2,11 @@ set(poly_SOURCES
     utils/debug_trace.c
     utils/assignment.c
     utils/statistics.c
-    number/rational.c
-    number/algebraic_number.c
-    number/dyadic_rational.c
     number/integer.c
+    number/rational.c
+    number/dyadic_rational.c
+    number/algebraic_number.c
+    number/value.c
     interval/interval.c
     interval/arithmetic.c
     variable/variable.c
@@ -24,6 +25,7 @@ set(poly_SOURCES
     polynomial/factorization.c
     polynomial/polynomial.c
     polynomial/polynomial_context.c
+    poly.c
 )
 
 # Add warnings as errors for good practice

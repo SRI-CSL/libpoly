@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <debug_trace.h>
+#include <stdio.h>
 
 /** Where the output goes (defaults to */
 extern FILE* trace_out;
@@ -17,7 +17,13 @@ extern FILE* trace_out;
 
 #ifndef NDEBUG
 
+void trace_enable(const char* tag);
+
+void trace_disable(const char* tag);
+
 int trace_is_enabled(const char* tag);
+
+void trace_set_output(FILE* file);
 
 #define TRACE(tag, ...) { \
   if (trace_is_enabled(tag)) { \

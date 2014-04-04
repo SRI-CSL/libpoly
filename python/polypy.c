@@ -6,9 +6,6 @@
 #include "Polynomial.h"
 #include "Assignment.h"
 
-#include "debug_trace.h"
-#include "statistics.h"
-
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {
 #ifndef NDEBUG
@@ -16,7 +13,7 @@ Trace_enable(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, "s", &tag)) {
     return 0;
   }
-  debug_trace_ops.enable(tag);
+  poly_ops.trace_enable(tag);
 #endif
   Py_RETURN_NONE;
 }
@@ -28,14 +25,14 @@ Trace_disable(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, "s", &tag)) {
     return 0;
   }
-  debug_trace_ops.disable(tag);
+  poly_ops.trace_disable(tag);
 #endif
   Py_RETURN_NONE;
 }
 
 static PyObject*
 Stats_print(PyObject* self) {
-  statistics_ops.print(stdout);
+  poly_ops.stats_print(stdout);
   Py_RETURN_NONE;
 }
 
