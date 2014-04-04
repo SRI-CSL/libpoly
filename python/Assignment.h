@@ -29,5 +29,5 @@ assignment_t* Assignment_get_default_assignment(void);
 
 /** Check if the object is an assignment */
 #define PyAssignment_CHECK(arg) \
-  (Py_TYPE(arg) == &PolynomialType)
+  (Py_TYPE(arg) == &AssignmentType)
 
