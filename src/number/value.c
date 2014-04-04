@@ -78,16 +78,18 @@ void value_approx(const value_t* v, interval_t* approx) {
     assert(0);
     break;
   case VALUE_RATIONAL:
-    interval_construct(approx, &v->value.q, 0, &v->value.q, 0);
+    interval_construct_point(approx, &v->value.q);
     break;
   case VALUE_DYADIC_RATIONAL:
     interval_construct_from_dyadic(approx, &v->value.dy_q, 0, &v->value.dy_q, 0);
     break;
   case VALUE_ALGEBRAIC:
+    interval_construct_from_dyadic_interval(approx, &v->value.a.I);
     assert(0);
     break;
   case VALUE_NONE:
     assert(0);
+    interval_construct_zero(approx);
     break;
   }
 }

@@ -372,11 +372,14 @@ void coefficient_value_approx(const polynomial_context_t* ctx, const coefficient
     interval_swap(value, &result);
     interval_destruct(&result);
   } else {
+
     interval_t result, tmp1, tmp2, x_value;
+
     interval_construct_zero(&result);
     interval_construct_zero(&tmp1);
     interval_construct_zero(&tmp2);
     interval_construct_zero(&x_value);
+
     // Get the value of x
     assignment_get_value_approx(m, VAR(C), &x_value);
 
@@ -428,12 +431,12 @@ int coefficient_sgn(const polynomial_context_t* ctx, const coefficient_t* C, con
     coefficient_value_approx(ctx, C, m, &C_approx);
 
     // Safe to give the sign based on the interval bound
+    assert(C_approx.is_point || !interval_contains_zero(&C_approx));
     sgn = interval_sgn(&C_approx);
 
     // Destruct temps
     interval_destruct(&C_approx);
   }
-
 
   return sgn;
 }

@@ -10,6 +10,7 @@
 #include "Integer.h"
 #include "Variable.h"
 #include "VariableOrder.h"
+#include "Assignment.h"
 
 #include "utils.h"
 
@@ -46,7 +47,7 @@ static PyObject*
 Polynomial_reductum(PyObject* self);
 
 static PyObject*
-Polynomial_ring(PyObject* self);
+Polynomial_sgn(PyObject* self, PyObject* arguments);
 
 static PyObject*
 Polynomial_rem(PyObject* self, PyObject* args);
@@ -83,9 +84,6 @@ Polynomial_roots_isolate(PyObject* self);
 
 static PyObject*
 Polynomial_sturm_sequence(PyObject* self);
-
-static PyObject*
-Polynomial_to_ring(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_str(PyObject* self);
@@ -127,14 +125,13 @@ PyMethodDef Polynomial_methods[] = {
     {"degree", (PyCFunction)Polynomial_degree, METH_NOARGS, "Returns the degree of the polynomial in its top variable"},
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
     {"reductum", (PyCFunction)Polynomial_reductum, METH_NOARGS, "Returns the reductum of the polynomial"},
-    {"ring", (PyCFunction)Polynomial_ring, METH_NOARGS, "Returns the base ring of the polynomial"},
-    {"to_ring", (PyCFunction)Polynomial_to_ring, METH_VARARGS, "Returns the polynomial in the given ring"},
-    {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial in the given ring"},
-    {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial in the given ring"},
-    {"sprem", (PyCFunction)Polynomial_sprem, METH_VARARGS, "Returns the sparse pseudo remainder of current and given polynomial in the given ring"},
-    {"gcd", (PyCFunction)Polynomial_gcd, METH_VARARGS, "Returns the gcd of current and given polynomial in the given ring"},
-    {"lcm", (PyCFunction)Polynomial_lcm, METH_VARARGS, "Returns the lcm of current and given polynomial in the given ring"},
-    {"extended_gcd", (PyCFunction)Polynomial_extended_gcd, METH_VARARGS, "Returns the extended gcd, i.e. (gcd, u, v), of current and given polynomial in the given ring"},
+    {"sgn", (PyCFunction)Polynomial_sgn, METH_VARARGS, "Returns the sign of the polynomials in the given model"},
+    {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial"},
+    {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial"},
+    {"sprem", (PyCFunction)Polynomial_sprem, METH_VARARGS, "Returns the sparse pseudo remainder of current and given polynomial"},
+    {"gcd", (PyCFunction)Polynomial_gcd, METH_VARARGS, "Returns the gcd of current and given polynomial"},
+    {"lcm", (PyCFunction)Polynomial_lcm, METH_VARARGS, "Returns the lcm of current and given polynomial"},
+    {"extended_gcd", (PyCFunction)Polynomial_extended_gcd, METH_VARARGS, "Returns the extended gcd, i.e. (gcd, u, v), of current and given polynomial"},
     {"factor", (PyCFunction)Polynomial_factor, METH_NOARGS, "Returns the factorization of the polynomial"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"roots_count", (PyCFunction)Polynomial_roots_count, METH_VARARGS, "Returns the number of real roots in the given interval"},
@@ -1175,11 +1172,24 @@ Polynomial_reductum(PyObject* self) {
 }
 
 static PyObject*
-Polynomial_ring(PyObject* self) {
-  return 0;
-}
+Polynomial_sgn(PyObject* self, PyObject* args) {
 
-static PyObject*
-Polynomial_to_ring(PyObject* self, PyObject* args) {
-  return 0;
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+
+  if (!PyAssignment_CHECK(assignment_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  polynomial_t* p = ((Polynomial*) self)->p;
+  assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+
+  int sgn = polynomial_ops.sgn(p, assignment);
+
+  return PyInt_FromLong(sgn);
 }

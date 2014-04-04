@@ -112,6 +112,16 @@ void interval_construct_from_dyadic(interval_t* I, const dyadic_rational_t* a, i
   }
 }
 
+void interval_construct_from_dyadic_interval(interval_t* I, const dyadic_interval_t* from) {
+  rational_construct_from_dyadic(&I->a, &from->a);
+  if (!from->is_point) {
+    rational_construct_from_dyadic(&I->b, &from->b);
+  }
+  I->a_open = from->a_open;
+  I->b_open = from->b_open;
+  I->is_point = from->is_point;
+}
+
 void dyadic_interval_construct_from_dyadic(dyadic_interval_t* I, const dyadic_rational_t* a, int a_open, const dyadic_rational_t* b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
   assert(cmp <= 0);
@@ -362,15 +372,17 @@ int dyadic_interval_sgn(const dyadic_interval_t* I) {
   return 1;
 }
 
-void dyadic_interval_construct_from_split(dyadic_interval_t* I_left, dyadic_interval_t* I_right, const dyadic_interval_t* I, int left_open, int right_open) {
-  assert(!I->is_point);
-  dyadic_rational_t m;
-  dyadic_rational_construct(&m);
-  dyadic_rational_add(&m, &I->a, &I->b);
-  dyadic_rational_div_2exp(&m, &m, 1);
-  dyadic_interval_construct(I_left, &I->a, I->a_open, &m, left_open);
-  dyadic_interval_construct(I_right, &m, right_open, &I->b, I->b_open);
-  dyadic_rational_destruct(&m);
+int interval_contains(const interval_t* I, const rational_t* q) {
+  int cmp_a = rational_cmp(&I->a, q);
+  if (I->is_point) {
+    return cmp_a == 0;
+  }
+  if (I->a_open && !(cmp_a < 0)) return 0;
+  if (!I->a_open && !(cmp_a <= 0)) return 0;
+  int cmp_b = rational_cmp(q, &I->b);
+  if (I->b_open && !(cmp_b < 0)) return 0;
+  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  return 1;
 }
 
 int dyadic_interval_contains(const dyadic_interval_t* I, const dyadic_rational_t* q) {
@@ -384,6 +396,44 @@ int dyadic_interval_contains(const dyadic_interval_t* I, const dyadic_rational_t
   if (I->b_open && !(cmp_b < 0)) return 0;
   if (!I->b_open && !(cmp_b <= 0)) return 0;
   return 1;
+}
+
+int interval_contains_zero(const interval_t* I) {
+  int cmp_a = rational_sgn(&I->a);
+  if (I->is_point) {
+    return cmp_a == 0;
+  }
+  if (I->a_open && !(cmp_a < 0)) return 0;
+  if (!I->a_open && !(cmp_a <= 0)) return 0;
+  int cmp_b = rational_sgn(&I->b);
+  if (I->b_open && !(cmp_b < 0)) return 0;
+  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  return 1;
+}
+
+int dyadic_interval_contains_zero(const dyadic_interval_t* I) {
+  int cmp_a = dyadic_rational_sgn(&I->a);
+  if (I->is_point) {
+    return cmp_a == 0;
+  }
+  if (I->a_open && !(cmp_a < 0)) return 0;
+  if (!I->a_open && !(cmp_a <= 0)) return 0;
+  int cmp_b = dyadic_rational_sgn(&I->b);
+  if (I->b_open && !(cmp_b < 0)) return 0;
+  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  return 1;
+}
+
+
+void dyadic_interval_construct_from_split(dyadic_interval_t* I_left, dyadic_interval_t* I_right, const dyadic_interval_t* I, int left_open, int right_open) {
+  assert(!I->is_point);
+  dyadic_rational_t m;
+  dyadic_rational_construct(&m);
+  dyadic_rational_add(&m, &I->a, &I->b);
+  dyadic_rational_div_2exp(&m, &m, 1);
+  dyadic_interval_construct(I_left, &I->a, I->a_open, &m, left_open);
+  dyadic_interval_construct(I_right, &m, right_open, &I->b, I->b_open);
+  dyadic_rational_destruct(&m);
 }
 
 void dyadic_interval_construct_intersection(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
