@@ -7,6 +7,7 @@
 
 #include "upolynomial/upolynomial_dense.h"
 #include "upolynomial/upolynomial.h"
+#include "upolynomial/output.h"
 
 #include "utils/debug_trace.h"
 
@@ -153,22 +154,6 @@ upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, 
   assert(p_d->size > 0);
   upolynomial_t* result = upolynomial_construct(K, p_d->size - 1, p_d->coefficients);
   return result;
-}
-
-int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file) {
-  int len = 0;
-  int k = p_d->size - 1;
-  for (; k >= 0; --k) {
-    int sgn = integer_sgn(Z, p_d->coefficients + k);
-    if (sgn) {
-      if (sgn > 0) {
-        fprintf(file, "+");
-      }
-      len += integer_print(p_d->coefficients + k, file);
-      len += fprintf(file, "*x^%d ", k);
-    }
-  }
-  return len;
 }
 
 void upolynomial_dense_touch(upolynomial_dense_t* p_d, size_t degree) {

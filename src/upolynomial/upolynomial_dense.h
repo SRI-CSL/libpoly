@@ -112,11 +112,6 @@ int upolynomial_dense_sgn_at_minus_inf(const upolynomial_dense_t* p_d);
 upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, int_ring K);
 
 /**
- * Print the polynomial.
- */
-int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file);
-
-/**
  * Call when modifying a coefficient, so as to keep internal consistency.
  */
 void upolynomial_dense_touch(upolynomial_dense_t* p_d, size_t degree);

@@ -48,11 +48,7 @@ int_ring upolynomial_ring(const upolynomial_t* p);
 void upolynomial_set_ring(upolynomial_t* p, int_ring K);
 
 const integer_t* upolynomial_lead_coeff(const upolynomial_t* p);
-
-int upolynomial_print(const upolynomial_t* p, FILE* out);
-
-char* upolynomial_to_string(const upolynomial_t* p);
-
+\
 int upolynomial_cmp(const upolynomial_t* p, const upolynomial_t* q);
 
 int upolynomial_is_zero(const upolynomial_t* p);

@@ -8,6 +8,7 @@
 #include "upolynomial/umonomial.h"
 #include "upolynomial/upolynomial_dense.h"
 
+#include "upolynomial/output.h"
 #include "upolynomial/gcd.h"
 #include "upolynomial/factorization.h"
 #include "upolynomial/root_finding.h"
@@ -225,31 +226,6 @@ const integer_t* upolynomial_lead_coeff(const upolynomial_t* p) {
   assert(p);
   assert(p->size > 0);
   return &p->monomials[p->size-1].coefficient;
-}
-
-int upolynomial_print(const upolynomial_t* p, FILE* out) {
-  assert(p);
-  int len = 0;
-  unsigned i;
-  for (i = 0; i < p->size; ++ i) {
-    if (i) {
-      len += fprintf(out, " + ");
-    }
-    len += umonomial_print(&p->monomials[p->size-i-1], out);
-  }
-  len += fprintf(out, " [");
-  len += int_ring_ops.print(p->K, out);
-  len += fprintf(out, "]");
-  return len;
-}
-
-char* upolynomial_to_string(const upolynomial_t* p) {
-  char* str = 0;
-  size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
-  upolynomial_print(p, f);
-  fclose(f);
-  return str;
 }
 
 int upolynomial_cmp(const upolynomial_t* p, const upolynomial_t* q) {

@@ -9,14 +9,12 @@
 
 #include "utils/statistics.h"
 #include "utils/debug_trace.h"
+#include "utils/output.h"
+
 
 void poly_init(void) {
   stats_construct();
   trace_set_output(stderr);
-}
-
-void poly_set_output_language(poly_output_language_t lang) {
-  (void) lang;
 }
 
 const poly_ops_t poly_ops = {
@@ -25,5 +23,5 @@ const poly_ops_t poly_ops = {
     trace_disable,
     trace_set_output,
     stats_print,
-    poly_set_output_language
+    set_output_language
 };

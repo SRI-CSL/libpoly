@@ -12,7 +12,9 @@
 #include "interval/interval.h"
 #include "interval/arithmetic.h"
 #include "polynomial/coefficient.h"
+#include "polynomial/output.h"
 #include "upolynomial/upolynomial.h"
+#include "upolynomial/output.h"
 
 #include "utils/debug_trace.h"
 

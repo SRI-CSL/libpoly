@@ -8,6 +8,7 @@
 #include "upolynomial/factorization.h"
 #include "upolynomial/upolynomial.h"
 #include "upolynomial/bounds.h"
+#include "upolynomial/output.h"
 
 #include "utils/statistics.h"
 #include "utils/debug_trace.h"

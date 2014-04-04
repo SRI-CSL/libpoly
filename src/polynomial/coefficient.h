@@ -170,12 +170,6 @@ int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C
 /** Returns true if C1 divides C2. */
 int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
 
-/** Prints the coefficient to the given stream. */
-int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, FILE* out);
-
-/** Returns the string representation of the coefficient. */
-char* coefficient_to_string(const polynomial_context_t* ctx, const coefficient_t* C);
-
 /** Order the polynomial according to the given order */
 void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C);
 
@@ -258,9 +252,6 @@ void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, 
  * array of size deg(B) + 1 filled with 0.
  */
 void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2);
-
-/** Set the power symbol for print-outs */
-void coefficient_set_power_symbol(const char* pow);
 
 /** Function type called on coefficient traversal */
 typedef void (*traverse_f) (const polynomial_context_t* ctx, monomial_t* p, void* data);

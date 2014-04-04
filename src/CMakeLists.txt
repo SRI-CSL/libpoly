@@ -2,6 +2,7 @@ set(poly_SOURCES
     utils/debug_trace.c
     utils/assignment.c
     utils/statistics.c
+    utils/output.c
     number/integer.c
     number/rational.c
     number/dyadic_rational.c
@@ -13,6 +14,7 @@ set(poly_SOURCES
     variable/variable_order.c
     upolynomial/umonomial.c
     upolynomial/upolynomial.c
+    upolynomial/output.c
     upolynomial/upolynomial_dense.c
     upolynomial/bounds.c
     upolynomial/gcd.c
@@ -21,6 +23,7 @@ set(poly_SOURCES
     upolynomial/root_finding.c
     polynomial/monomial.c
     polynomial/coefficient.c
+    polynomial/output.c
     polynomial/gcd.c
     polynomial/factorization.c
     polynomial/polynomial.c

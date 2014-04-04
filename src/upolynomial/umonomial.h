@@ -20,5 +20,3 @@ void umonomial_construct_copy(int_ring K, umonomial_t* m, const umonomial_t* fro
 
 void umonomial_destruct(umonomial_t* m);
 
-int umonomial_print(const umonomial_t* m, FILE* out);
-

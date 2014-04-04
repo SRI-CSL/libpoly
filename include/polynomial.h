@@ -194,9 +194,6 @@ typedef struct {
    */
   void (*factor_square_free) (const polynomial_t* A, polynomial_t*** factors, size_t** multiplicities, size_t* size);
 
-  /** Set the power symbol for printouts */
-  void (*set_power_symbol) (const char* power);
-
 } polynomial_ops_t;
 
 extern const polynomial_ops_t polynomial_ops;

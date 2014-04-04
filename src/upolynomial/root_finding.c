@@ -8,6 +8,7 @@
 #include "upolynomial/root_finding.h"
 #include "upolynomial/factorization.h"
 #include "upolynomial/upolynomial_dense.h"
+#include "upolynomial/output.h"
 
 #include <assert.h>
 #include <malloc.h>

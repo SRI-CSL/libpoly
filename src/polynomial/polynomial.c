@@ -6,8 +6,10 @@
  */
 
 #include "polynomial/polynomial.h"
+
 #include "polynomial/gcd.h"
 #include "polynomial/factorization.h"
+#include "polynomial/output.h"
 
 #include "utils/debug_trace.h"
 
@@ -686,12 +688,6 @@ void polynomial_factor_square_free(const polynomial_t* A, polynomial_t*** factor
   coefficient_factors_destruct(&coeff_factors);
 }
 
-/** Set the power symbol for printouts */
-void polynomial_set_power_symbol(const char* power) {
-  coefficient_set_power_symbol(power);
-}
-
-
 const polynomial_ops_t polynomial_ops = {
   polynomial_construct,
   polynomial_construct_simple,
@@ -734,7 +730,6 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_lcm,
   polynomial_resultant,
   polynomial_psc,
-  polynomial_factor_square_free,
-  polynomial_set_power_symbol
+  polynomial_factor_square_free
 };
 

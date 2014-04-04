@@ -7,6 +7,7 @@
 
 #include "upolynomial/upolynomial.h"
 #include "upolynomial/factors.h"
+#include "upolynomial/output.h"
 
 upolynomial_factors_t* upolynomial_factors_construct(void) {
   upolynomial_factors_t* f = malloc(sizeof(upolynomial_factors_t));
@@ -69,19 +70,6 @@ void upolynomial_factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t 
   f->factors[f->size] = p;
   f->multiplicities[f->size] = d;
   f->size ++;
-}
-
-int upolynomial_factors_print(const upolynomial_factors_t* f, FILE* out) {
-  int len = 0;
-  len += integer_print(&f->constant, out);
-  size_t i;
-  for (i = 0; i < f->size; ++ i) {
-    len += fprintf(out, " * ");
-    len += fprintf(out, "[");
-    len += upolynomial_print(f->factors[i], out);
-    len += fprintf(out, "]^%zu", f->multiplicities[i]);
-  }
-  return len;
 }
 
 int_ring upolynomial_factors_ring(const upolynomial_factors_t* f) {

@@ -83,20 +83,6 @@ void monomial_pop(monomial_t* m) {
   -- m->n;
 }
 
-int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* out) {
-  int ret = 0;
-  ret += integer_print(&m->a, out);
-  ret += fprintf(out, " * ");
-  size_t i = 0;
-  for (i = 0; i < m->n; ++ i) {
-    if (i) {
-      ret += fprintf(out, "*");
-    }
-    ret += fprintf(out, "%s^%u", variable_db_ops.get_name(ctx->var_db, m->p[i].x), m->p[i].d);
-  }
-  return ret;
-}
-
 #define SWAP(m1, m2) { monomial_t tmp = m1; m1 = m2; m2 = tmp; }
 #define MIN(x, y) (x < y ? x : y)
 

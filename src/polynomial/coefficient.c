@@ -8,6 +8,7 @@
 #include "polynomial/polynomial.h"
 #include "polynomial/monomial.h"
 #include "polynomial/coefficient.h"
+#include "polynomial/output.h"
 #include "polynomial/gcd.h"
 
 #include "upolynomial/upolynomial.h"
@@ -21,8 +22,6 @@
 #include "utils/statistics.h"
 
 #include <assert.h>
-#include <malloc.h>
-#include <string.h>
 
 /**
  * Make sure that the coefficient has the given capacity for the given variable.
@@ -552,96 +551,6 @@ int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C
   STAT(coefficient, cmp_type) ++;
 
   return coefficient_cmp_general(ctx, C1, C2, 0);
-}
-
-char* power_symbol = 0;
-
-/** Set the power symbol for print-outs */
-void coefficient_set_power_symbol(const char* pow) {
-  if (power_symbol) {
-    free(power_symbol);
-    power_symbol = 0;
-  }
-  if (pow) {
-    power_symbol = malloc(sizeof(char)*(strlen(pow)+1));
-    strcpy(power_symbol, pow);
-  }
-}
-
-const char* coefficient_get_power_symbol(void) {
-  if (power_symbol) return power_symbol;
-  else return "^";
-}
-
-int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, FILE* out) {
-  int i, k = 0, ret = 0;
-  switch (C->type) {
-  case COEFFICIENT_NUMERIC:
-    ret += integer_print(&C->value.num, out);
-    break;
-  case COEFFICIENT_POLYNOMIAL: {
-    // The polynomial
-    const char* var_name = variable_db_ops.get_name(ctx->var_db, C->value.rec.x);
-    for (i = SIZE(C) - 1; i >= 0; -- i) {
-      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
-        switch (COEFF(C, i)->type) {
-        case COEFFICIENT_POLYNOMIAL:
-
-          if (k ++ ) {
-            ret += fprintf(out, " + ");
-          }
-          ret += fprintf(out, "(");
-          ret += coefficient_print(ctx, COEFF(C, i), out);
-          ret += fprintf(out, ")");
-
-          break;
-
-        case COEFFICIENT_NUMERIC:
-
-          if (integer_sgn(ctx->K, &COEFF(C, i)->value.num) > 0) {
-            if (k ++) {
-              ret += fprintf(out, " + ");
-            }
-            ret += integer_print(&COEFF(C, i)->value.num, out);
-          } else {
-            if (k ++) {
-              ret += fprintf(out, " - ");
-              integer_t tmp;
-              integer_construct_from_int(ctx->K, &tmp, 0);
-              integer_neg(ctx->K, &tmp, &COEFF(C, i)->value.num);
-              ret += integer_print(&tmp, out);
-              integer_destruct(&tmp);
-            } else {
-              ret += integer_print(&COEFF(C, i)->value.num, out);
-            }
-          }
-
-          break;
-        }
-
-        // Power
-        if (i > 0) {
-          if (i == 1) {
-            ret += fprintf(out, "*%s", var_name);
-          } else {
-            ret += fprintf(out, "*%s%s%d", var_name, coefficient_get_power_symbol(), i);
-          }
-        }
-      }
-    }
-    break;
-  }
-  }
-  return ret;
-}
-
-char* coefficient_to_string(const polynomial_context_t* ctx, const coefficient_t* C) {
-  char* str = 0;
-  size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
-  coefficient_print(ctx, C, f);
-  fclose(f);
-  return str;
 }
 
 void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data) {

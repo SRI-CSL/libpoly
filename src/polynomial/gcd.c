@@ -7,6 +7,7 @@
 
 #include "polynomial/gcd.h"
 #include "polynomial/monomial.h"
+#include "polynomial/output.h"
 
 #include "upolynomial/upolynomial.h"
 

@@ -50,9 +50,6 @@ void monomial_clear(const polynomial_context_t* ctx, monomial_t* m);
 /** Assign another monomial */
 void monomial_assign(const polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort);
 
-/** Print the monomial */
-int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* out);
-
 /** Add a variable power to the end of the monomial */
 void monomial_push(monomial_t* m, variable_t x, unsigned d);
 

@@ -30,19 +30,3 @@ void umonomial_construct_copy(int_ring K, umonomial_t* m, const umonomial_t* fro
 void umonomial_destruct(umonomial_t* m) {
   integer_destruct(&m->coefficient);
 }
-
-int umonomial_print(const umonomial_t* m, FILE* out) {
-  int len = 0;
-  int sgn = integer_sgn(Z, &m->coefficient);
-  if (sgn < 0) len += fprintf(out, "(");
-  len += integer_print(&m->coefficient, out);
-  if (m->degree) {
-    if (m->degree == 1) {
-      len += fprintf(out, "*x");
-    } else {
-      len += fprintf(out, "*x^%zu", m->degree);
-    }
-  }
-  if (sgn < 0) len += fprintf(out, ")");
-  return len;
-}

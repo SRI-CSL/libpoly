@@ -40,8 +40,6 @@ const integer_t* upolynomial_factors_get_constant(const upolynomial_factors_t* f
 
 void upolynomial_factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d);
 
-int upolynomial_factors_print(const upolynomial_factors_t* f, FILE* out);
-
 int_ring upolynomial_factors_ring(const upolynomial_factors_t* f);
 
 void upolynomial_factors_set_ring(upolynomial_factors_t* f, int_ring K);
