@@ -16,6 +16,7 @@ tests = ["python/upolynomial_gcd.py",
          "python/algebraic_number.py",
          "python/variable.py",
          "python/polynomial_arithmetic.py",
+         "python/polynomial_sgn.py",
          "python/polynomial_gcd.py",
          "python/polynomial_factorization.py"]
 

@@ -10,7 +10,7 @@ polypy.variable_order.set([z, y, x])
 
 def check_sgn(p, assignment, expected_sgn):
     sgn = p.sgn(assignment)
-    ok = (sgn == expected_sgn)
+    ok = (sgn > 0 and expected_sgn > 0) or (sgn < 0 and expected_sgn < 0) or (sgn == 0 and expected_sgn == 0)
     if (not ok):
         print "p =", p
         print "assignment =", assignment
@@ -37,3 +37,19 @@ check_sgn(p, assignment, 1)
 
 p = x + y + z - 1
 check_sgn(p, assignment, -1)
+
+assignment.set_value(x, -1)
+assignment.set_value(y, -1)
+assignment.set_value(z, -1)
+
+p = (y+z)*x**3
+check_sgn(p, assignment, 2)
+
+p = (y-z)*x**2
+check_sgn(p, assignment, 0)
+
+p = y*x
+check_sgn(p, assignment, 1)
+
+p = (y+z)*x**3 + (y-z)*x**2 + y*x + z
+check_sgn(p, assignment, 2)
