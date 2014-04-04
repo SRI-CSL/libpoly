@@ -129,6 +129,9 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
 /** Get the leading coefficient of this coefficient */
 const coefficient_t* coefficient_lc(const coefficient_t* C);
 
+/** Get the reductum of the coefficient */
+void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C);
+
 /** Returns true if the coefficient is 0 */
 int coefficient_is_zero(const polynomial_context_t* ctx, const coefficient_t* C);
 

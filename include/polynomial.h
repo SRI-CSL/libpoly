@@ -72,6 +72,9 @@ typedef struct {
   /** Puts the k-th coefficient of A into C */
   void (*get_coefficient) (polynomial_t* C, const polynomial_t* A, size_t k);
 
+  /** Get the reductum of the polynomial (the polynomial withough the leading coefficient) */
+  void (*reductum) (polynomial_t* R, const polynomial_t* A);
+
   /** Returns true if the polynomial is a constant */
   int (*is_constant) (const polynomial_t* A);
 
@@ -152,6 +155,12 @@ typedef struct {
 
   /** Compute A1 = D*A2 + R (assumes that exact division). */
   void (*rem) (polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
+
+  /** Compute a*A1 = D*A2 + R (pseudo remainder). */
+  void (*prem) (polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
+
+  /** Compute a*A1 = D*A2 + R (sparse pseudo remainder). */
+  void (*sprem) (polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
 
   /** Compute A1 = D*A2 + R (assumes that exact division). */
   void (*divrem) (polynomial_t* D, polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);

@@ -68,8 +68,9 @@ initpolypy(void)
 
   m = Py_InitModule3("polypy", polypy_methods, "PolyPy Libarary.");
 
-  // Set ** as the power symbol
-  polynomial_ops.set_power_symbol("**");
+  // Initialize the library
+  poly_ops.init();
+  poly_ops.set_output_language(OUTPUT_PYTHON);
 
   Py_INCREF(&CoefficientRingType);
   PyModule_AddObject(m, "CoefficientRing", (PyObject*)&CoefficientRingType);

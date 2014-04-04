@@ -8,6 +8,7 @@
 #include "polynomial/polynomial.h"
 #include "polynomial/monomial.h"
 #include "polynomial/coefficient.h"
+#include "polynomial/gcd.h"
 
 #include "upolynomial/upolynomial.h"
 
@@ -264,6 +265,32 @@ const coefficient_t* coefficient_lc(const coefficient_t* C) {
   }
   assert(0);
   return 0;
+}
+
+void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C) {
+
+  assert(C->type == COEFFICIENT_POLYNOMIAL);
+
+  // Locate the first non-zero ceofficient past the top one
+  int i = SIZE(C) - 2;
+  while (coefficient_is_zero(ctx, COEFF(C, i))) {
+    -- i;
+  }
+
+  coefficient_t result;
+  coefficient_construct_rec(ctx, &result, VAR(C), i + 1);
+
+  // Copy the other coefficients
+  while (i >= 0) {
+    if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+      coefficient_assign(ctx, COEFF(&result, i), COEFF(C, i));
+    }
+    -- i;
+  }
+
+  coefficient_normalize(ctx, &result);
+  coefficient_swap(R, &result);
+  coefficient_destruct(&result);
 }
 
 int coefficient_is_constant(const coefficient_t* C) {
@@ -1255,16 +1282,6 @@ void coefficient_div_degrees(const polynomial_context_t* ctx, coefficient_t* C, 
 
 void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
 
-void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C);
-
-void coefficient_pp(const polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C);
-
-void coefficient_cont(const polynomial_context_t* ctx, coefficient_t* cont, const coefficient_t* C);
-
-void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2);
-
-void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2);
-
 //
 // Implementation of the division/reduction/gcd stuff
 //
@@ -2042,7 +2059,7 @@ coefficient_ensure_capacity(const polynomial_context_t* ctx, coefficient_t* C, v
       for (i = C->value.rec.capacity; i < capacity; ++ i) {
         coefficient_construct(ctx, C->value.rec.coefficients + i);
       }
-      C->value.rec.capacity = capacity;
+      C->value.rec.capacity  = capacity;
       C->value.rec.size = capacity;
     }
     break;

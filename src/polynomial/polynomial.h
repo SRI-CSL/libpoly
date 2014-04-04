@@ -11,46 +11,11 @@
 
 #include "polynomial/coefficient.h"
 
-typedef struct {
-
-  /**
-   * This bit is set for univariate polynomials. This property is invariant wrt
-   * reordering.
-   */
-
-  unsigned univariate : 1;
-
-  /**
-   * This bit is set for primitive polynomials (gcd(coeff) = 1) and the lead
-   * integer coefficient (lexicographically) is positive. This property is
-   * not invariant with respect to reordering. For example y*x^2 + x is
-   * primitive if x is the top variable and not primitive if y is the top
-   * variable.
-   */
-
-  unsigned primitive  : 1;
-
-  /**
-   * This bit is set for known prime polynomials. This property is invariant
-   * with respect to reordering.
-   */
-
-  unsigned prime      : 1;
-
-  /**
-   * This bit is if the polynomial is meant to be used externally. This means
-   * that the context needs to be attached and that before every operations we
-   * need to check if the variable order is correct.
-   */
-  unsigned external   : 1;
-
-} polynomial_flags_t;
-
 struct polynomial_struct {
   /** The actual polynomial representation (so we can use it as a coefficient) */
   coefficient_t data;
   /** Flags as above */
-  polynomial_flags_t flags;
+  char external;
   /** Context of the polynomial */
   const polynomial_context_t* ctx;
 };
@@ -82,6 +47,8 @@ variable_t polynomial_top_variable(const polynomial_t* A);
 size_t polynomial_degree(const polynomial_t* A);
 
 void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t k);
+
+void polynomial_reductum(polynomial_t* R, const polynomial_t* A);
 
 int polynomial_is_constant(const polynomial_t* A);
 

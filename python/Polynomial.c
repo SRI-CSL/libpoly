@@ -43,7 +43,19 @@ static PyObject*
 Polynomial_coefficients(PyObject* self);
 
 static PyObject*
+Polynomial_reductum(PyObject* self);
+
+static PyObject*
 Polynomial_ring(PyObject* self);
+
+static PyObject*
+Polynomial_rem(PyObject* self, PyObject* args);
+
+static PyObject*
+Polynomial_prem(PyObject* self, PyObject* args);
+
+static PyObject*
+Polynomial_sprem(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_gcd(PyObject* self, PyObject* args);
@@ -97,7 +109,7 @@ static PyObject*
 Polynomial_div(PyObject* self, PyObject* args);
 
 static PyObject*
-Polynomial_rem(PyObject* self, PyObject* args);
+Polynomial_rem_operator(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_divmod(PyObject* self, PyObject* args);
@@ -114,8 +126,12 @@ Polynomial_psc(PyObject* self, PyObject* args);
 PyMethodDef Polynomial_methods[] = {
     {"degree", (PyCFunction)Polynomial_degree, METH_NOARGS, "Returns the degree of the polynomial in its top variable"},
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
+    {"reductum", (PyCFunction)Polynomial_reductum, METH_NOARGS, "Returns the reductum of the polynomial"},
     {"ring", (PyCFunction)Polynomial_ring, METH_NOARGS, "Returns the base ring of the polynomial"},
     {"to_ring", (PyCFunction)Polynomial_to_ring, METH_VARARGS, "Returns the polynomial in the given ring"},
+    {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial in the given ring"},
+    {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial in the given ring"},
+    {"sprem", (PyCFunction)Polynomial_sprem, METH_VARARGS, "Returns the sparse pseudo remainder of current and given polynomial in the given ring"},
     {"gcd", (PyCFunction)Polynomial_gcd, METH_VARARGS, "Returns the gcd of current and given polynomial in the given ring"},
     {"lcm", (PyCFunction)Polynomial_lcm, METH_VARARGS, "Returns the lcm of current and given polynomial in the given ring"},
     {"extended_gcd", (PyCFunction)Polynomial_extended_gcd, METH_VARARGS, "Returns the extended gcd, i.e. (gcd, u, v), of current and given polynomial in the given ring"},
@@ -136,7 +152,7 @@ PyNumberMethods Polynomial_NumberMethods = {
      Polynomial_sub, // binaryfunc nb_subtract;
      Polynomial_mul, // binaryfunc nb_multiply;
      Polynomial_div, // binaryfunc nb_divide;
-     Polynomial_rem, // binaryfunc nb_remainder;
+     Polynomial_rem_operator, // binaryfunc nb_remainder;
      Polynomial_divmod, // binaryfunc nb_divmod;
      (ternaryfunc)Polynomial_pow, // ternaryfunc nb_power;
      Polynomial_neg, // unaryfunc nb_negative;
@@ -616,7 +632,7 @@ Polynomial_div(PyObject* self, PyObject* other) {
 }
 
 static PyObject*
-Polynomial_rem(PyObject* self, PyObject* other) {
+Polynomial_rem_operator(PyObject* self, PyObject* other) {
   int dec_other = 0;
 
   if (!PyPolynomial_CHECK(self)) {
@@ -724,6 +740,86 @@ Polynomial_nonzero(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
   // Return the result
   return !polynomial_ops.is_zero(p->p);
+}
+
+enum rem_type {
+  REM_EXACT,
+  REM_PSEUDO,
+  REM_SPARSE_PSEUDO
+};
+
+static PyObject*
+Polynomial_rem_general(PyObject* self, PyObject* args, enum rem_type type) {
+  int dec_other = 0;
+
+  // self is always a polynomial
+  Polynomial* p1 = (Polynomial*) self;
+  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* other = PyTuple_GetItem(args, 0);
+
+  // Make sure other is a polynomial
+  if (!PyPolynomial_CHECK(other)) {
+    if (PyVariable_CHECK(other)) {
+      other = PyPolynomial_FromVariable(other, p1_ctx);
+      dec_other = 1;
+    } else if (PyLong_or_Int_Check(other)) {
+      other = PyPolynomial_FromLong_or_Int(other, p1_ctx);
+      dec_other = 1;
+    } else {
+      Py_INCREF(Py_NotImplemented);
+      return Py_NotImplemented;
+    }
+  }
+
+  // other can be a variable or a number
+  Polynomial* p2 = (Polynomial*) other;
+  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  // Multiply the polynomials
+  polynomial_t* rem = polynomial_ops.new(p1_ctx);
+  switch (type) {
+  case REM_EXACT:
+    polynomial_ops.rem(rem, p1->p, p2->p);
+    break;
+  case REM_PSEUDO:
+    polynomial_ops.prem(rem, p1->p, p2->p);
+    break;
+  case REM_SPARSE_PSEUDO:
+    polynomial_ops.sprem(rem, p1->p, p2->p);
+    break;
+  }
+
+  if (dec_other) {
+    Py_DECREF(other);
+  }
+
+  // Return the result
+  return Polynomial_create(rem);
+}
+
+static PyObject*
+Polynomial_rem(PyObject* self, PyObject* other) {
+  return Polynomial_rem_general(self, other, REM_EXACT);
+}
+
+static PyObject*
+Polynomial_prem(PyObject* self, PyObject* other) {
+  return Polynomial_rem_general(self, other, REM_PSEUDO);
+}
+
+static PyObject*
+Polynomial_sprem(PyObject* self, PyObject* other) {
+  return Polynomial_rem_general(self, other, REM_SPARSE_PSEUDO);
 }
 
 static PyObject*
@@ -1067,6 +1163,15 @@ Polynomial_coefficients(PyObject* self) {
   }
 
   return list;
+}
+
+static PyObject*
+Polynomial_reductum(PyObject* self) {
+  polynomial_t* p = ((Polynomial*) self)->p;
+  const polynomial_context_t* ctx = polynomial_ops.context(p);
+  polynomial_t* result = polynomial_ops.new(ctx);
+  polynomial_ops.reductum(result, p);
+  return Polynomial_create(result);
 }
 
 static PyObject*

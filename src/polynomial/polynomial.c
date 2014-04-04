@@ -17,20 +17,19 @@
 #define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 
 void polynomial_external_clean(const polynomial_t* A_const) {
-  if (A_const->flags.external && !coefficient_in_order(A_const->ctx, &A_const->data)) {
+  if (A_const->external && !coefficient_in_order(A_const->ctx, &A_const->data)) {
     polynomial_t* A = (polynomial_t*) A_const;
     coefficient_order(A->ctx, &A->data);
-    A->flags.primitive = 0;
   }
 }
 
 void polynomial_set_context(polynomial_t* A, const polynomial_context_t* ctx) {
   if (A->ctx != ctx) {
-    if (A->ctx && A->flags.external) {
+    if (A->ctx && A->external) {
       polynomial_context_ops.detach((polynomial_context_t*)A->ctx);
     }
     A->ctx = ctx;
-    if (A->ctx && A->flags.external) {
+    if (A->ctx && A->external) {
       polynomial_context_ops.attach((polynomial_context_t*)A->ctx);
     }
   }
@@ -38,29 +37,21 @@ void polynomial_set_context(polynomial_t* A, const polynomial_context_t* ctx) {
 
 void polynomial_construct(polynomial_t* A, const polynomial_context_t* ctx) {
   A->ctx = 0;
-  A->flags.external = 0;
-  A->flags.prime = 1;
-  A->flags.primitive = 1;
-  A->flags.univariate = 1;
+  A->external = 0;
   polynomial_set_context(A, ctx);
   coefficient_construct(ctx, &A->data);
 }
 
-void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_context_t* ctx,
-    const coefficient_t* from) {
+void polynomial_construct_from_coefficient(polynomial_t* A, const polynomial_context_t* ctx, const coefficient_t* from) {
   A->ctx = 0;
-  A->flags.prime = 0;
-  A->flags.primitive = 0;
-  A->flags.univariate = 0;
-  A->flags.external = 0;
+  A->external = 0;
   polynomial_set_context(A, ctx);
   coefficient_construct_copy(A->ctx, &A->data, from);
 }
 
 void polynomial_construct_copy(polynomial_t* A, const polynomial_t* from) {
   A->ctx = 0;
-  A->flags = from->flags;
-  A->flags.external = 0;
+  A->external = 0;
   polynomial_set_context(A, from->ctx);
   coefficient_construct_copy(A->ctx, &A->data, &from->data);
 }
@@ -71,17 +62,14 @@ void polynomial_construct_simple(
     const integer_t* c, variable_t x, unsigned n)
 {
   A->ctx = 0;
-  A->flags.external = 0;
-  A->flags.prime = 0;
-  A->flags.primitive = 0;
-  A->flags.univariate = 1;
+  A->external = 0;
   polynomial_set_context(A, ctx);
   coefficient_construct_simple(ctx, &A->data, c, x, n);
 }
 
 void polynomial_destruct(polynomial_t* A) {
   coefficient_destruct(&A->data);
-  if (A->flags.external) {
+  if (A->external) {
     polynomial_context_ops.detach((polynomial_context_t*)A->ctx);
   }
 }
@@ -98,8 +86,8 @@ polynomial_t* polynomial_new(const polynomial_context_t* ctx) {
 }
 
 void polynomial_set_external(polynomial_t* A) {
-  if (!A->flags.external) {
-    A->flags.external = 1;
+  if (!A->external) {
+    A->external = 1;
     polynomial_context_ops.attach((polynomial_context_t*) A->ctx);
   }
 }
@@ -109,19 +97,12 @@ void polynomial_set_external(polynomial_t* A) {
 void polynomial_swap(polynomial_t* A1, polynomial_t* A2) {
   // Swap everything, but keep the external flags
   polynomial_t tmp = *A1; *A1 = *A2; *A2 = tmp;
-  SWAP(unsigned, A1->flags.external, A2->flags.external);
+  SWAP(unsigned, A1->external, A2->external);
 }
 
 void polynomial_assign(polynomial_t* A, const polynomial_t* from) {
   if (A != from) {
     polynomial_set_context(A, from->ctx);
-    if (A->flags.external) {
-      A->flags = from->flags;
-      A->flags.external = 1;
-    } else {
-      A->flags = from->flags;
-      A->flags.external = 0;
-    }
     coefficient_assign(A->ctx, &A->data, &from->data);
   }
 }
@@ -155,6 +136,12 @@ void polynomial_get_coefficient(polynomial_t* C_p, const polynomial_t* A, size_t
     polynomial_swap(C_p, &result);
     polynomial_destruct(&result);
   }
+}
+
+void polynomial_reductum(polynomial_t* R, const polynomial_t* A) {
+  polynomial_external_clean(A);
+  polynomial_set_context(R, A->ctx);
+  coefficient_reductum(A->ctx, &R->data, &A->data);
 }
 
 int polynomial_is_constant(const polynomial_t* A) {
@@ -219,24 +206,6 @@ char* polynomial_to_string(const polynomial_t* A) {
   return coefficient_to_string(A->ctx, &A->data);
 }
 
-inline
-int polynomial_same_var_univariate(const polynomial_t* A1, const polynomial_t* A2) {
-  if (!A1->flags.univariate) {
-    return 0;
-  }
-  if (!A2->flags.univariate) {
-    return 0;
-  }
-  if (A1->data.type == COEFFICIENT_NUMERIC) {
-    return 1;
-  }
-  if (A2->data.type == COEFFICIENT_NUMERIC) {
-    return 1;
-  }
-  // Both univariate and not constant
-  return A1->data.value.rec.x == A2->data.value.rec.x;
-}
-
 void polynomial_add(polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2) {
 
   if (trace_is_enabled("polynomial")) {
@@ -251,10 +220,6 @@ void polynomial_add(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-
-  S->flags.prime = 0;
-  S->flags.primitive = 0;
-  S->flags.univariate = polynomial_same_var_univariate(A1, A2);
 
   polynomial_set_context(S, A1->ctx);
 
@@ -280,10 +245,6 @@ void polynomial_sub(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
 
-  S->flags.prime = 0;
-  S->flags.primitive = 0;
-  S->flags.univariate = polynomial_same_var_univariate(A1, A2);
-
   polynomial_set_context(S, A1->ctx);
 
   coefficient_sub(S->ctx, &S->data, &A1->data, &A2->data);
@@ -296,10 +257,6 @@ void polynomial_sub(polynomial_t* S, const polynomial_t* A1, const polynomial_t*
 void polynomial_neg(polynomial_t* N, const polynomial_t* A) {
 
   polynomial_external_clean(A);
-
-  N->flags.prime = 0;
-  N->flags.primitive = 0;
-  N->flags.univariate = A->flags.univariate;
 
   polynomial_set_context(N, N->ctx);
 
@@ -321,10 +278,6 @@ void polynomial_mul(polynomial_t* P, const polynomial_t* A1, const polynomial_t*
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
 
-  P->flags.prime = 0;
-  P->flags.primitive = 0;
-  P->flags.univariate = polynomial_same_var_univariate(A1, A2);
-
   polynomial_set_context(P, A1->ctx);
 
   coefficient_mul(P->ctx, &P->data, &A1->data, &A2->data);
@@ -337,10 +290,6 @@ void polynomial_mul(polynomial_t* P, const polynomial_t* A1, const polynomial_t*
 void polynomial_shl(polynomial_t* S, const polynomial_t* A, unsigned n) {
 
   polynomial_external_clean(A);
-
-  S->flags.prime = 0;
-  S->flags.primitive = 0;
-  S->flags.univariate = A->flags.univariate;
 
   polynomial_set_context(S, A->ctx);
 
@@ -359,10 +308,6 @@ void polynomial_pow(polynomial_t* P, const polynomial_t* A, unsigned n) {
   }
 
   polynomial_external_clean(A);
-
-  P->flags.prime = 0;
-  P->flags.primitive = 0;
-  P->flags.univariate = A->flags.univariate;
 
   polynomial_set_context(P, A->ctx);
 
@@ -384,10 +329,6 @@ void polynomial_add_mul(polynomial_t* S, const polynomial_t* A1, const polynomia
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
 
-  S->flags.prime = 0;
-  S->flags.primitive = 0;
-  S->flags.univariate = polynomial_same_var_univariate(A1, A2) && polynomial_same_var_univariate(S, A1);
-
   coefficient_add_mul(ctx, &S->data, &A1->data, &A2->data);
 }
 
@@ -401,10 +342,6 @@ void polynomial_sub_mul(polynomial_t* S, const polynomial_t* A1, const polynomia
   polynomial_external_clean(S);
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-
-  S->flags.prime = 0;
-  S->flags.primitive = 0;
-  S->flags.univariate = polynomial_same_var_univariate(A1, A2) && polynomial_same_var_univariate(S, A1);
 
   coefficient_sub_mul(ctx, &S->data, &A1->data, &A2->data);
 }
@@ -423,10 +360,6 @@ void polynomial_div(polynomial_t* D, const polynomial_t* A1, const polynomial_t*
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-
-  D->flags.prime = 0;
-  D->flags.primitive = 0;
-  D->flags.univariate = polynomial_same_var_univariate(A1, A2);
 
   polynomial_set_context(D, A1->ctx);
 
@@ -452,16 +385,60 @@ void polynomial_rem(polynomial_t* R, const polynomial_t* A1, const polynomial_t*
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
 
-  R->flags.prime = 0;
-  R->flags.primitive = 0;
-  R->flags.univariate = polynomial_same_var_univariate(A1, A2);
-
   polynomial_set_context(R, A1->ctx);
 
   coefficient_rem(R->ctx, &R->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_rem() => "); polynomial_print(R, trace_out); tracef("\n");
+  }
+}
+
+void polynomial_prem(polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_prem("); polynomial_print(R, trace_out); tracef(", "); polynomial_print(A1, trace_out); tracef(", "); polynomial_print(A2, trace_out); tracef(")\n");
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
+    tracef("\n");
+  }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
+
+  polynomial_external_clean(A1);
+  polynomial_external_clean(A2);
+
+  polynomial_set_context(R, A1->ctx);
+
+  coefficient_prem(R->ctx, &R->data, &A1->data, &A2->data);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_prem() => "); polynomial_print(R, trace_out); tracef("\n");
+  }
+}
+
+void polynomial_sprem(polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_sprem("); polynomial_print(R, trace_out); tracef(", "); polynomial_print(A1, trace_out); tracef(", "); polynomial_print(A2, trace_out); tracef(")\n");
+    variable_order_simple_ops.print(
+        (variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
+    tracef("\n");
+  }
+
+  assert(polynomial_context_ops.equal(A1->ctx, A2->ctx));
+
+  polynomial_external_clean(A1);
+  polynomial_external_clean(A2);
+
+  polynomial_set_context(R, A1->ctx);
+
+  coefficient_sprem(R->ctx, &R->data, &A1->data, &A2->data);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_sprem() => "); polynomial_print(R, trace_out); tracef("\n");
   }
 }
 
@@ -479,10 +456,6 @@ void polynomial_divrem(polynomial_t* D, polynomial_t* R, const polynomial_t* A1,
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
-
-  R->flags.prime = 0;
-  R->flags.primitive = 0;
-  R->flags.univariate = polynomial_same_var_univariate(A1, A2);
 
   polynomial_set_context(D, A1->ctx);
   polynomial_set_context(R, A1->ctx);
@@ -505,14 +478,6 @@ void polynomial_derivative(polynomial_t* A_d, const polynomial_t* A) {
   }
 
   polynomial_external_clean(A);
-
-  // primitive polynomials are not invariant with derivative
-  // A = x*2 + 2x
-  // A' = 2x + 2
-
-  A_d->flags.prime = 0;
-  A_d->flags.primitive = 0;
-  A_d->flags.univariate = A->flags.univariate;
 
   polynomial_set_context(A_d, A->ctx);
 
@@ -540,10 +505,6 @@ void polynomial_gcd(polynomial_t* gcd, const polynomial_t* A1, const polynomial_
 
   polynomial_set_context(gcd, A1->ctx);
 
-  gcd->flags.prime = 0;
-  gcd->flags.primitive = A1->flags.primitive && A2->flags.primitive;
-  gcd->flags.univariate = polynomial_same_var_univariate(A1, A2);
-
   coefficient_gcd(gcd->ctx, &gcd->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
@@ -558,10 +519,6 @@ void polynomial_lcm(polynomial_t* lcm, const polynomial_t* A1, const polynomial_
   polynomial_external_clean(A2);
 
   polynomial_set_context(lcm, A1->ctx);
-
-  lcm->flags.prime = 0;
-  lcm->flags.primitive = A1->flags.primitive && A2->flags.primitive;
-  lcm->flags.univariate = polynomial_same_var_univariate(A1, A2);
 
   coefficient_lcm(lcm->ctx, &lcm->data, &A1->data, &A2->data);
 }
@@ -749,6 +706,7 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_degree,
   polynomial_top_variable,
   polynomial_get_coefficient,
+  polynomial_reductum,
   polynomial_is_constant,
   polynomial_is_zero,
   polynomial_sgn,
@@ -768,6 +726,8 @@ const polynomial_ops_t polynomial_ops = {
   polynomial_reduce,
   polynomial_div,
   polynomial_rem,
+  polynomial_prem,
+  polynomial_sprem,
   polynomial_divrem,
   polynomial_derivative,
   polynomial_gcd,
