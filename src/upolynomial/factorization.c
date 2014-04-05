@@ -151,6 +151,7 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
         upolynomial_factors_add(factors, sub_factors->factors[i], sub_factors->multiplicities[i] * p);
       }
       upolynomial_factors_destruct(sub_factors, 0);
+      upolynomial_delete(P_p);
     }
 
     upolynomial_delete(P);
