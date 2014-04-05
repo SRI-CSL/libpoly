@@ -25,6 +25,8 @@ assignment_t* assignment_new(const variable_db_t* var_db);
 
 void assignment_destruct(assignment_t* m);
 
+void assignment_delete(assignment_t* m);
+
 int assignment_print(const assignment_t* m, FILE* out);
 
 char* assignment_to_string(const assignment_t* m);

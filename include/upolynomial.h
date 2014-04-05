@@ -51,7 +51,7 @@ typedef struct {
 
   /**
    * Frees the polynomial data and detaches the ring. */
-  void (*destruct) (upolynomial_t* p);
+  void (*delete) (upolynomial_t* p);
 
   /**
    * Returns the degree of the polynomial. Note that the degree of the constat
@@ -334,7 +334,7 @@ typedef struct {
   size_t (*size) (const upolynomial_factors_t* f);
 
   /** Get a factor with the given index i < size() */
-  upolynomial_t* (*get_factor) (upolynomial_factors_t* f, size_t i, size_t* multiplicit);
+  upolynomial_t* (*get_factor) (upolynomial_factors_t* f, size_t i, size_t* multiplicity);
 
   /** Returns the constant of the factorization */
   const integer_t* (*get_constant) (const upolynomial_factors_t* f);

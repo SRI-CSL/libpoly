@@ -517,7 +517,7 @@ upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomi
 
     // Check if it divides both (B is smaller degree)
     if (!upolynomial_divides(D, B) || !upolynomial_divides(D, A)) {
-      upolynomial_destruct(D);
+      upolynomial_delete(D);
       D = 0;
     }
 

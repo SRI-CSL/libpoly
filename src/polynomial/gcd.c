@@ -133,9 +133,9 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
   upolynomial_t* gcd_u = upolynomial_gcd(C1_u, C2_u);
   coefficient_construct_from_univariate(ctx, gcd, gcd_u, x);
 
-  upolynomial_destruct(C1_u);
-  upolynomial_destruct(C2_u);
-  upolynomial_destruct(gcd_u);
+  upolynomial_delete(C1_u);
+  upolynomial_delete(C2_u);
+  upolynomial_delete(gcd_u);
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_gcd_pp_univariate() => ");

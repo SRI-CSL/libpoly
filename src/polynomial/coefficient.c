@@ -157,6 +157,7 @@ void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
     integer_swap(&COEFF(C, i)->value.num, coeff + i);
     integer_destruct(coeff + i);
   }
+  free(coeff);
 
   // Normalize (it might be constant)
   coefficient_normalize(ctx, C);

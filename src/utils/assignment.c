@@ -48,8 +48,14 @@ void assignment_destruct(assignment_t* m) {
     for (i = 0; i < m->size; ++ i) {
       value_ops.destruct(m->values + i);
     }
+    free(m->values);
   }
   variable_db_ops.detach((variable_db_t*)m->var_db);
+}
+
+void assignment_delete(assignment_t* m) {
+  assignment_destruct(m);
+  free(m);
 }
 
 int assignment_print(const assignment_t* m, FILE* out) {
@@ -116,6 +122,7 @@ const assignment_ops_t assignment_ops = {
     assignment_construct,
     assignment_new,
     assignment_destruct,
+    assignment_delete,
     assignment_print,
     assignment_to_string,
     assignment_set_value,

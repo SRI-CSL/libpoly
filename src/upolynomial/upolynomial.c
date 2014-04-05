@@ -77,7 +77,7 @@ upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t*
   return new_p;
 }
 
-void upolynomial_destruct(upolynomial_t* p) {
+void upolynomial_delete(upolynomial_t* p) {
   assert(p);
   size_t i = 0;
   for (i = 0; i < p->size; ++ i) {
@@ -472,14 +472,14 @@ upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow) {
       if (pow & 1) {
         prev = result;
         result = upolynomial_mul(result, tmp);
-        upolynomial_destruct(prev);
+        upolynomial_delete(prev);
       }
       prev = tmp;
       tmp = upolynomial_mul(tmp, tmp);
       pow >>= 1;
-      upolynomial_destruct(prev);
+      upolynomial_delete(prev);
     }
-    upolynomial_destruct(tmp);
+    upolynomial_delete(tmp);
   }
 
   if (trace_is_enabled("arithmetic")) {
@@ -819,14 +819,14 @@ int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q) {
       if (K && K->is_prime) {
         upolynomial_t* rem = upolynomial_rem_exact(q, p);
         result = upolynomial_is_zero(rem);
-        upolynomial_destruct(rem);
+        upolynomial_delete(rem);
       } else {
         upolynomial_t* div = 0;
         upolynomial_t* rem = 0;
         upolynomial_div_pseudo(&div, &rem, q, p);
         result = upolynomial_is_zero(rem);
-        upolynomial_destruct(div);
-        upolynomial_destruct(rem);
+        upolynomial_delete(div);
+        upolynomial_delete(rem);
       }
     }
   }
@@ -1050,12 +1050,12 @@ void upolynomial_solve_bezout(const upolynomial_t* p, const upolynomial_t* q, co
   *u = upolynomial_rem_exact(u2, q);
   *v = upolynomial_rem_exact(v2, p);
 
-  upolynomial_destruct(u1);
-  upolynomial_destruct(v1);
-  upolynomial_destruct(u2);
-  upolynomial_destruct(v2);
-  upolynomial_destruct(gcd);
-  upolynomial_destruct(m);
+  upolynomial_delete(u1);
+  upolynomial_delete(v1);
+  upolynomial_delete(u2);
+  upolynomial_delete(v2);
+  upolynomial_delete(gcd);
+  upolynomial_delete(m);
 }
 
 upolynomial_factors_t* upolynomial_factor(const upolynomial_t* p) {
@@ -1158,7 +1158,7 @@ const upolynomial_ops_struct upolynomial_ops = {
     upolynomial_construct_from_long,
     upolynomial_construct_copy,
     upolynomial_construct_copy_K,
-    upolynomial_destruct,
+    upolynomial_delete,
     upolynomial_degree,
     upolynomial_ring,
     upolynomial_set_ring,

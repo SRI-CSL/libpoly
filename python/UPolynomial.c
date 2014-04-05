@@ -207,7 +207,7 @@ PyTypeObject UPolynomialType = {
 static void
 UPolynomial_dealloc(UPolynomialObject* self)
 {
-  if (self->p) upolynomial_ops.destruct(self->p);
+  if (self->p) upolynomial_ops.delete(self->p);
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -321,7 +321,7 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
     }
 
     if (PyInt_Check(other)) {
-      upolynomial_ops.destruct(other_p);
+      upolynomial_ops.delete(other_p);
     }
   }
 
@@ -436,7 +436,7 @@ UPolynomialObject_add_number(PyObject* self, PyObject* other) {
   PyLong_or_Int_to_integer(other, K, &c);
   upolynomial_t* c_p = upolynomial_ops.construct(K, 0, &c);
   upolynomial_t* sum = upolynomial_ops.add(p1->p, c_p);
-  upolynomial_ops.destruct(c_p);
+  upolynomial_ops.delete(c_p);
   integer_ops.destruct(&c);
   return PyUPolynomial_create(sum);
 }
@@ -473,7 +473,7 @@ UPolynomialObject_sub_int(PyObject* self, PyObject* other, int negate) {
   upolynomial_t* c_p = upolynomial_ops.construct(K, 0, &c);
   upolynomial_t* sub =
       negate ? upolynomial_ops.sub(c_p, p1->p) : upolynomial_ops.sub(p1->p, c_p);
-  upolynomial_ops.destruct(c_p);
+  upolynomial_ops.delete(c_p);
   integer_ops.destruct(&c);
   return PyUPolynomial_create(sub);
 }

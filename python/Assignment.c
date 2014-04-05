@@ -121,19 +121,18 @@ static void
 Assignment_dealloc(Assignment* self)
 {
   if (self->assignment) {
-    assignment_ops.destruct(self->assignment);
-    free(self->assignment);
+    assignment_ops.delete(self->assignment);
   }
   self->ob_type->tp_free((PyObject*)self);
 }
 
 static PyObject* Assignment_str(PyObject* self) {
   Assignment* a = (Assignment*) self;
-  const char* a_str = assignment_ops.to_string(a->assignment);
+  char* a_str = assignment_ops.to_string(a->assignment);
   PyObject* str = PyString_FromString(a_str);
+  free(a_str);
   return str;
 }
-
 
 static PyObject*
 Assignment_get_value(PyObject* self, PyObject* args) {

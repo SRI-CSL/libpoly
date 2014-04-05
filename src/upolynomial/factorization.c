@@ -90,7 +90,7 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
     for (i = 0; i < factors->size; ++ i) {
       factors->multiplicities[i] *= p;
     }
-    upolynomial_destruct(f_p);
+    upolynomial_delete(f_p);
   } else {
 
     // Construct the factorization
@@ -130,9 +130,9 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
       if (trace_is_enabled("factorization")) {
         tracef("P = "); upolynomial_print(P, trace_out); tracef("\n");
       }
-      upolynomial_destruct(tmp);
+      upolynomial_delete(tmp);
       // L = R
-      upolynomial_destruct(L);
+      upolynomial_delete(L);
       L = R;
       if (trace_is_enabled("factorization")) {
         tracef("L = "); upolynomial_print(L, trace_out); tracef("\n");
@@ -153,12 +153,12 @@ upolynomial_factors_t* upolynomial_factor_square_free(const upolynomial_t* f) {
       upolynomial_factors_destruct(sub_factors, 0);
     }
 
-    upolynomial_destruct(P);
-    upolynomial_destruct(L);
+    upolynomial_delete(P);
+    upolynomial_delete(L);
   }
 
   // Destroy
-  upolynomial_destruct(d_f);
+  upolynomial_delete(d_f);
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_square_free("); upolynomial_print(f, trace_out); tracef(") = ");
@@ -236,40 +236,40 @@ upolynomial_factors_t* upolynomial_factor_distinct_degree(const upolynomial_t* f
     // Power up TODO: optimize power, make one modular
     tmp = x_pow;
     x_pow = upolynomial_pow(x_pow, p);
-    upolynomial_destruct(tmp);
+    upolynomial_delete(tmp);
     tmp = x_pow;
     x_pow = upolynomial_rem_exact(x_pow, f_rest);
-    upolynomial_destruct(tmp);
+    upolynomial_delete(tmp);
 
     // Compute x^q - x (big product from description)
     tmp = upolynomial_sub(x_pow, x);
 
     // Filter with gcd
     upolynomial_t* f_d = upolynomial_gcd(tmp, f_rest);
-    upolynomial_destruct(tmp);
+    upolynomial_delete(tmp);
 
     if (upolynomial_degree(f_d) > 0) {
       // Remove the factor
       tmp = f_rest;
       f_rest = upolynomial_div_exact(f_rest, tmp);
-      upolynomial_destruct(tmp);
+      upolynomial_delete(tmp);
       // Simplify the power
       tmp = x_pow;
       x_pow = upolynomial_rem_exact(x_pow, f_rest);
-      upolynomial_destruct(tmp);
+      upolynomial_delete(tmp);
       // Remember the factor
       upolynomial_factors_add(factors, f_d, d);
     }
 
-    upolynomial_destruct(f_d);
+    upolynomial_delete(f_d);
 
   } while (1);
 
   // Remove temps
-  upolynomial_destruct(f_rest);
-  upolynomial_destruct(x);
-  upolynomial_destruct(x_pow);
-  upolynomial_destruct(tmp);
+  upolynomial_delete(f_rest);
+  upolynomial_delete(x);
+  upolynomial_delete(x_pow);
+  upolynomial_delete(tmp);
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_distinct_degree("); upolynomial_print(f, trace_out); tracef(") = ");
@@ -297,8 +297,8 @@ static void Q_construct(integer_t* Q, size_t size, const upolynomial_t* u) {
     upolynomial_t* x_pk = upolynomial_construct_power(K, k*p, 1);
     upolynomial_t* q_k = upolynomial_rem_exact(x_pk, u);
     upolynomial_unpack(q_k, Q + k*size);
-    upolynomial_destruct(q_k);
-    upolynomial_destruct(x_pk);
+    upolynomial_delete(q_k);
+    upolynomial_delete(x_pk);
   }
 
   // Q - I
@@ -584,20 +584,20 @@ upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const upolynomia
           if (gcd_degree > 0 && gcd_degree != upolynomial_degree(factor)) {
             // Split the current factor into factor/gcd and gcd (added to back)
             upolynomial_t* reduced_factor = upolynomial_div_exact(factor, gcd);
-            upolynomial_destruct(factor);
+            upolynomial_delete(factor);
             factor = factors->factors[factor_i] = reduced_factor;
             upolynomial_factors_add(factors, gcd, 1);
             // Are we done
             done = factors->size == v_size;
           } else {
-            upolynomial_destruct(gcd);
+            upolynomial_delete(gcd);
           }
         }
       }
 
       // Free  the v[i](x) -s polynomials
       for (s = 0; s < p; ++ s) {
-        upolynomial_destruct(v_poly[s]);
+        upolynomial_delete(v_poly[s]);
       }
     }
 
@@ -688,7 +688,7 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
         if (linear_factors_product) {
           upolynomial_t* tmp = linear_factors_product;
           linear_factors_product = upolynomial_mul(linear_factors_product, linear_factor);
-          upolynomial_destruct(tmp);
+          upolynomial_delete(tmp);
         } else {
           linear_factors_product = upolynomial_construct_copy(linear_factor);
         }
@@ -701,8 +701,9 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
     // Remove any linear factors
     if (linear_factors_product) {
       f_i = upolynomial_div_exact(f_i, linear_factors_product);
-      upolynomial_destruct(sq_free_factors->factors[i]);
+      upolynomial_delete(sq_free_factors->factors[i]);
       sq_free_factors->factors[i] = f_i;
+      upolynomial_delete(linear_factors_product);
     }
 
     if (!upolynomial_is_one(f_i)) {
@@ -721,7 +722,7 @@ upolynomial_factors_t* upolynomial_factor_Zp(const upolynomial_t* f) {
 
   // Free the temporaries
   upolynomial_factors_destruct(sq_free_factors, 1);
-  upolynomial_destruct(to_factor);
+  upolynomial_delete(to_factor);
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_Zp("); upolynomial_print(f, trace_out); tracef(") = ");
@@ -809,7 +810,7 @@ void hensel_lift_initialize(const upolynomial_factors_t* A, upolynomial_factors_
     upolynomial_factors_add(U, Ui, 1);
 
     // Next to solve for
-    upolynomial_destruct(D);
+    upolynomial_delete(D);
     D = Vi;
   }
 
@@ -818,7 +819,7 @@ void hensel_lift_initialize(const upolynomial_factors_t* A, upolynomial_factors_
 
   // Remove temporaries
   for (i = 0; i < r; ++ i) {
-    upolynomial_destruct(Q[i]);
+    upolynomial_delete(Q[i]);
   }
 
   if (trace_is_enabled("hensel")) {
@@ -883,9 +884,9 @@ void hensel_lift_compute_products(const upolynomial_factors_t* A, upolynomial_t*
 
   // Free the temps
   for(k = 0; k < n; ++ k) {
-    upolynomial_destruct(A_z[k]);
-    upolynomial_destruct(P1_z[k]);
-    upolynomial_destruct(P2_z[k]);
+    upolynomial_delete(A_z[k]);
+    upolynomial_delete(P1_z[k]);
+    upolynomial_delete(P2_z[k]);
   }
 
   if (trace_is_enabled("hensel")) {
@@ -989,8 +990,8 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     upolynomial_t* tmp1 = upolynomial_construct_copy_K(Z, A->factors[k]);
     upolynomial_t* tmp2 = prod_Ak;
     prod_Ak = upolynomial_mul(tmp1, tmp2);
-    upolynomial_destruct(tmp1);
-    upolynomial_destruct(tmp2);
+    upolynomial_delete(tmp1);
+    upolynomial_delete(tmp2);
   }
 
   if (trace_is_enabled("hensel")) {
@@ -1044,11 +1045,11 @@ void hensel_lift_quadratic(const upolynomial_t* F,
 
     upolynomial_factors_add(B, Bk_qq, 1);
 
-    upolynomial_destruct(D_mult_Uk_q);
-    upolynomial_destruct(Sk_q);
-    upolynomial_destruct(Sk_qq);
-    upolynomial_destruct(Ak_qq);
-    upolynomial_destruct(Sk_times_q_qq);
+    upolynomial_delete(D_mult_Uk_q);
+    upolynomial_delete(Sk_q);
+    upolynomial_delete(Sk_qq);
+    upolynomial_delete(Ak_qq);
+    upolynomial_delete(Sk_times_q_qq);
   }
 
   /**
@@ -1087,9 +1088,9 @@ void hensel_lift_quadratic(const upolynomial_t* F,
     upolynomial_t* Uk = upolynomial_construct_copy_K(Z, U->factors[k]);
     upolynomial_t* mul = upolynomial_mul(Uk, P[k]);
     upolynomial_t* sub = upolynomial_sub(E, mul);
-    upolynomial_destruct(Uk);
-    upolynomial_destruct(mul);
-    upolynomial_destruct(E);
+    upolynomial_delete(Uk);
+    upolynomial_delete(mul);
+    upolynomial_delete(E);
     E = sub;
     if (trace_is_enabled("hensel")) {
       tracef("E = "); upolynomial_print(E, trace_out); tracef("\n");
@@ -1100,7 +1101,7 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   if (trace_is_enabled("hensel")) {
     tracef("E = "); upolynomial_print(E, trace_out); tracef("\n");
   }
-  upolynomial_destruct(tmp);
+  upolynomial_delete(tmp);
   upolynomial_t* E_q = upolynomial_construct_copy_K(Zq, E);
   if (trace_is_enabled("hensel")) {
     tracef("E_q = "); upolynomial_print(E_q, trace_out); tracef("\n");
@@ -1135,11 +1136,11 @@ void hensel_lift_quadratic(const upolynomial_t* F,
 
     upolynomial_factors_add(V, Vk_qq, 1);
 
-    upolynomial_destruct(E_times_Uk_q);
-    upolynomial_destruct(Tk_q);
-    upolynomial_destruct(Tk_qq);
-    upolynomial_destruct(Tk_times_q_qq);
-    upolynomial_destruct(Uk_qq);
+    upolynomial_delete(E_times_Uk_q);
+    upolynomial_delete(Tk_q);
+    upolynomial_delete(Tk_qq);
+    upolynomial_delete(Tk_times_q_qq);
+    upolynomial_delete(Uk_qq);
   }
 
   if (trace_is_enabled("hensel")) {
@@ -1153,14 +1154,14 @@ void hensel_lift_quadratic(const upolynomial_t* F,
   integer_destruct(&qq);
   int_ring_ops.detach(Zqq);
   for (k = 0; k < A->size; ++ k) {
-    upolynomial_destruct(P[k]);
+    upolynomial_delete(P[k]);
   }
-  upolynomial_destruct(prod_Ak);
-  upolynomial_destruct(F_sub_prod_Ak);
-  upolynomial_destruct(D);
-  upolynomial_destruct(D_q);
-  upolynomial_destruct(E);
-  upolynomial_destruct(E_q);
+  upolynomial_delete(prod_Ak);
+  upolynomial_delete(F_sub_prod_Ak);
+  upolynomial_delete(D);
+  upolynomial_delete(D_q);
+  upolynomial_delete(E);
+  upolynomial_delete(E_q);
 }
 
 
@@ -1298,7 +1299,7 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
         for (i = 1; i < sel_size; ++ i) {
           upolynomial_t* tmp = candidate;
           candidate = upolynomial_mul(candidate, factors_p->factors[sel[i]]);
-          upolynomial_destruct(tmp);
+          upolynomial_delete(tmp);
         }
         upolynomial_set_ring(candidate, Z);
         if (trace_is_enabled("factorization")) {
@@ -1311,7 +1312,7 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
           upolynomial_factors_add(factors, candidate, 1);
           upolynomial_t* tmp = to_factor;
           to_factor = upolynomial_div_exact(to_factor, candidate);
-          upolynomial_destruct(tmp);
+          upolynomial_delete(tmp);
           // Disable current selection
           for (i = 0; i < sel_size; ++ i) {
             enabled[sel[i]] = 0;
@@ -1323,7 +1324,7 @@ void factorization_recombination(const upolynomial_t* f, const upolynomial_facto
 
   // Last one standing
   if (upolynomial_degree(to_factor) == 0) {
-    upolynomial_destruct(to_factor);
+    upolynomial_delete(to_factor);
   } else {
     upolynomial_factors_add(factors, to_factor, 1);
   }
@@ -1424,9 +1425,9 @@ upolynomial_factors_t* upolynomial_factor_Z_square_free(const upolynomial_t* f) 
       }
 
       // Get rid of temps
-      upolynomial_destruct(f_p);
-      upolynomial_destruct(f_d_p);
-      upolynomial_destruct(gcd_p);
+      upolynomial_delete(f_p);
+      upolynomial_delete(f_d_p);
+      upolynomial_delete(gcd_p);
       int_ring_ops.detach(K_p);
     }
 
@@ -1516,6 +1517,9 @@ upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
     // Factorize the square-free factor
     upolynomial_factors_t* sq_free_factor_factors = upolynomial_factor_Z_square_free(sq_free_factor);
 
+    // We don't need it anymore
+    upolynomial_delete(sq_free_factor);
+
     // Add the factors
     size_t current;
     for (current = 0; current < sq_free_factor_factors->size; ++ current) {
@@ -1527,6 +1531,9 @@ upolynomial_factors_t* upolynomial_factor_Z(const upolynomial_t* f) {
     // Remove the factorization
     upolynomial_factors_destruct(sq_free_factor_factors, 0);
   }
+
+  // Get rid of the square free factors
+  upolynomial_factors_destruct(sq_free_factors, 0);
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_Z("); upolynomial_print(f, trace_out); tracef(") = ");

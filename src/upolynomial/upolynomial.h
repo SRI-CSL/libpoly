@@ -29,7 +29,7 @@ upolynomial_t* upolynomial_construct_empty(int_ring K, size_t size);
 
 upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t* coefficients);
 
-void upolynomial_destruct(upolynomial_t* p);
+void upolynomial_delete(upolynomial_t* p);
 
 upolynomial_t* upolynomial_construct_power(int_ring K, size_t degree, long c);
 

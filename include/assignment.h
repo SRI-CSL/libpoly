@@ -39,6 +39,9 @@ typedef struct {
   /** Destruct the assignment */
   void (*destruct) (assignment_t* m);
 
+  /** Destruct and free the assignment */
+  void (*delete) (assignment_t* m);
+
   /** Print the model */
   int (*print) (const assignment_t* m, FILE* out);
 

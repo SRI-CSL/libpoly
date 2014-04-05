@@ -30,8 +30,9 @@ void upolynomial_factors_clear(upolynomial_factors_t* f) {
   integer_assign_int(Z, &f->constant, 1);
   for (i = 0; i < f->size; ++i) {
     if (f->factors[i]) {
-      upolynomial_destruct(f->factors[i]);
+      upolynomial_delete(f->factors[i]);
     }
+    f->factors[i] = 0;
   }
   f->size = 0;
 }

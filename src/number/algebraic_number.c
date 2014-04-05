@@ -54,7 +54,7 @@ void algebraic_number_construct_from_dyadic_rational(algebraic_number_t* a, cons
 
 void algebraic_number_destruct(algebraic_number_t* a) {
   if (a->f) {
-    upolynomial_destruct(a->f);
+    upolynomial_delete(a->f);
   }
   dyadic_interval_destruct(&a->I);
 }
@@ -74,7 +74,7 @@ void algebraic_number_reduce_polynomial(const algebraic_number_t* a, const upoly
   assert(sgn_at_a * sgn_at_b < 0);
   assert(upolynomial_is_primitive(f));
   algebraic_number_t* a_nonconst = (algebraic_number_t*) a;
-  upolynomial_destruct(a_nonconst->f);
+  upolynomial_delete(a_nonconst->f);
   a_nonconst->f = upolynomial_construct_copy(f);
 }
 
@@ -84,7 +84,7 @@ void algebraic_number_collapse_to_point(const algebraic_number_t* a_const, const
   assert(upolynomial_sgn_at_dyadic_rational(a_const->f, q) == 0);
   // We'll modify the number so unconst it
   algebraic_number_t* a = (algebraic_number_t*) a_const;
-  upolynomial_destruct(a->f);
+  upolynomial_delete(a->f);
   a->f = 0;
   dyadic_interval_collapse_to(&a->I, q);
   a->sgn_at_a = 0;
@@ -236,7 +236,7 @@ int algebraic_number_cmp(const algebraic_number_t* a1, const algebraic_number_t*
         d2 = algebraic_number_refine_const(a2);
       }
     }
-    upolynomial_destruct(gcd);
+    upolynomial_delete(gcd);
   }
 
   int result;
@@ -451,8 +451,8 @@ void algebraic_number_op(
   // Get the roots of f
   size_t f_roots_size = 0;
   algebraic_number_t* f_roots = malloc(sizeof(algebraic_number_t)*upolynomial_degree(f));
-
   upolynomial_roots_isolate(f, f_roots, &f_roots_size);
+  upolynomial_delete(f);
 
   // Interval for the result
   dyadic_interval_t I;
