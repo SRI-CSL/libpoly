@@ -135,7 +135,7 @@ STAT_DECLARE(int, coefficient, construct_from_univariate)
 void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
     coefficient_t* C, const upolynomial_t* C_u, variable_t x) {
 
-  TRACE("coefficient::internal", "coefficient_construct_from_int()\n");
+  TRACE("coefficient::internal", "coefficient_construct_from_univariate()\n");
   STAT(coefficient, construct_from_univariate) ++;
 
   // Get the coefficients
@@ -178,6 +178,9 @@ void coefficient_destruct(coefficient_t* C) {
       coefficient_destruct(COEFF(C, i));
     }
     free(C->value.rec.coefficients);
+    break;
+  default:
+    assert(0);
   }
 }
 
@@ -405,7 +408,7 @@ void coefficient_value_approx(const polynomial_context_t* ctx, const coefficient
     interval_construct_zero(&result);
     interval_construct_zero(&tmp1);
     interval_construct_zero(&tmp2);
-    interval_construct_zero(&x_value);
+    // x_value constructed in get_value_approx
 
     // Get the value of x
     assignment_get_value_approx(m, VAR(C), &x_value);

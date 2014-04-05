@@ -581,14 +581,16 @@ void algebraic_number_neg(algebraic_number_t* neg, const algebraic_number_t* a) 
   if (integer_sgn(Z, upolynomial_lead_coeff(f_neg_x)) < 0) {
     upolynomial_neg_in_place(f_neg_x);
   }
-  dyadic_interval_t I_neg;
+  dyadic_interval_t I_neg; // To destroy
   dyadic_interval_construct_copy(&I_neg, &a->I);
   dyadic_interval_neg(&I_neg, &I_neg);
 
-  algebraic_number_t result;
+  algebraic_number_t result; // To destroy
   algebraic_number_construct(&result, f_neg_x, &I_neg);
   algebraic_number_swap(&result, neg);
+
   algebraic_number_destruct(&result);
+  dyadic_interval_destruct(&I_neg);
 }
 
 void algebraic_number_mul_construct_op(coefficient_t* f_r, void* data) {
