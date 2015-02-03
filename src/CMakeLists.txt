@@ -50,3 +50,5 @@ include_directories(${libpoly_SOURCE_DIR}/src)
 
 add_library(poly SHARED ${poly_SOURCES})
 target_link_libraries(poly ${GMP_LIBRARY})
+
+install(TARGETS poly LIBRARY DESTINATION lib)
