@@ -39,23 +39,23 @@ typedef struct {
   lp_value_union_t value;
 } lp_value_t;
 
-typedef struct {
-  /** Construct a value */
-  void (*construct) (lp_value_t* v, lp_value_type_t type, const void* data);
-  /** Construct a copy of the given value */
-  void (*construct_copy) (lp_value_t* v, const lp_value_t* from);
-  /** Destruct the value */
-  void (*destruct) (lp_value_t* v);
-  /** Get the approximate value */
-  void (*approximate) (const lp_value_t* v, lp_interval_t* approx);
-  /** Compare two values. */
-  int (*cmp) (const lp_value_t* v1, const lp_value_t* v2);
-  /** Void version of the comparison, use with care. */
-  int (*cmp_void) (const void* v1, const void* v2);
-  /** Print the value */
-  int (*print) (const lp_value_t* v, FILE* out);
-} lp_value_ops_t;
+/** Construct a value */
+void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data);
 
-/** Implementation of the value operations */
-extern const lp_value_ops_t lp_value_ops;
+/** Construct a copy of the given value */
+void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from);
 
+/** Destruct the value */
+void lp_value_destruct(lp_value_t* v);
+
+/** Get the approximate value */
+void lp_value_approximate(const lp_value_t* v, lp_interval_t* approx);
+
+/** Compare two values. */
+int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2);
+
+/** Void version of the comparison, use with care. */
+int lp_value_cmp_void(const void* v1, const void* v2);
+
+/** Print the value */
+int lp_value_print(const lp_value_t* v, FILE* out);

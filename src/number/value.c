@@ -14,7 +14,7 @@
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
 
-void value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
+void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   v->type = type;
   switch(type) {
   case LP_VALUE_NONE:
@@ -34,27 +34,27 @@ void value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   }
 }
 
-void value_construct_copy(lp_value_t* v, const lp_value_t* from) {
+void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from) {
   switch(from->type) {
   case LP_VALUE_NONE:
-    value_construct(v, LP_VALUE_NONE, 0);
+    lp_value_construct(v, LP_VALUE_NONE, 0);
     break;
   case LP_VALUE_INTEGER:
-    value_construct(v, LP_VALUE_INTEGER, &from->value.z);
+    lp_value_construct(v, LP_VALUE_INTEGER, &from->value.z);
     break;
   case LP_VALUE_RATIONAL:
-    value_construct(v, LP_VALUE_RATIONAL, &from->value.q);
+    lp_value_construct(v, LP_VALUE_RATIONAL, &from->value.q);
     break;
   case LP_VALUE_DYADIC_RATIONAL:
-    value_construct(v, LP_VALUE_DYADIC_RATIONAL, &from->value.dy_q);
+    lp_value_construct(v, LP_VALUE_DYADIC_RATIONAL, &from->value.dy_q);
     break;
   case LP_VALUE_ALGEBRAIC:
-    value_construct(v, LP_VALUE_ALGEBRAIC, &from->value.a);
+    lp_value_construct(v, LP_VALUE_ALGEBRAIC, &from->value.a);
     break;
   }
 }
 
-void value_destruct(lp_value_t* v) {
+void lp_value_destruct(lp_value_t* v) {
   switch(v->type) {
   case LP_VALUE_NONE:
     break;
@@ -73,7 +73,7 @@ void value_destruct(lp_value_t* v) {
   }
 }
 
-void value_approx(const lp_value_t* v, lp_interval_t* approx) {
+void lp_value_approx(const lp_value_t* v, lp_interval_t* approx) {
   switch (v->type) {
   case LP_VALUE_INTEGER:
     assert(0);
@@ -95,7 +95,7 @@ void value_approx(const lp_value_t* v, lp_interval_t* approx) {
   }
 }
 
-int value_print(const lp_value_t* v, FILE* out) {
+int lp_value_print(const lp_value_t* v, FILE* out) {
   int ret = 0;
   switch (v->type) {
   case LP_VALUE_NONE:
@@ -117,20 +117,10 @@ int value_print(const lp_value_t* v, FILE* out) {
   return ret;
 }
 
-int value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
+int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
   return v1 == v2;
 }
 
-int value_cmp_void(const void* v1, const void* v2) {
+int lp_value_cmp_void(const void* v1, const void* v2) {
   return v1 == v2;
 }
-
-const lp_value_ops_t lp_value_ops = {
-    value_construct,
-    value_construct_copy,
-    value_destruct,
-    value_approx,
-    value_cmp,
-    value_cmp_void,
-    value_print
-};
