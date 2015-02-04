@@ -11,8 +11,8 @@
 #include <limits.h>
 
 void interval_construct(interval_t* I,
-    const rational_t* a, int a_open,
-    const rational_t* b, int b_open)
+    const lp_rational_t* a, int a_open,
+    const lp_rational_t* b, int b_open)
 {
   int cmp = rational_cmp(a, b);
   assert(cmp <= 0);
@@ -29,9 +29,9 @@ void interval_construct(interval_t* I,
   }
 }
 
-void dyadic_interval_construct(dyadic_interval_t* I,
-    const dyadic_rational_t* a, int a_open,
-    const dyadic_rational_t* b, int b_open)
+void dyadic_interval_construct(lp_dyadic_interval_t* I,
+    const lp_dyadic_rational_t* a, int a_open,
+    const lp_dyadic_rational_t* b, int b_open)
 {
   int cmp = dyadic_rational_cmp(a, b);
   assert(cmp <= 0);
@@ -48,7 +48,7 @@ void dyadic_interval_construct(dyadic_interval_t* I,
   }
 }
 
-void interval_construct_point(interval_t* I, const rational_t* a)
+void interval_construct_point(interval_t* I, const lp_rational_t* a)
 {
   rational_construct_copy(&I->a, a);
   I->a_open = 0;
@@ -56,7 +56,7 @@ void interval_construct_point(interval_t* I, const rational_t* a)
   I->is_point = 1;
 }
 
-void dyadic_interval_construct_point(dyadic_interval_t* I, const dyadic_rational_t* q) {
+void dyadic_interval_construct_point(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
   dyadic_rational_construct_copy(&I->a, q);
   I->a_open = 0;
   I->b_open = 0;
@@ -69,7 +69,7 @@ void interval_construct_zero(interval_t* I) {
   I->is_point = 1;
 }
 
-void dyadic_interval_construct_zero(dyadic_interval_t* I) {
+void dyadic_interval_construct_zero(lp_dyadic_interval_t* I) {
   dyadic_rational_construct(&I->a);
   I->a_open = 0;
   I->b_open = 0;
@@ -86,7 +86,7 @@ void interval_construct_copy(interval_t* I, const interval_t* from) {
   I->is_point = from->is_point;
 }
 
-void dyadic_interval_construct_copy(dyadic_interval_t* I, const dyadic_interval_t* from) {
+void dyadic_interval_construct_copy(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* from) {
   dyadic_rational_construct_copy(&I->a, &from->a);
   if (!from->is_point) {
     dyadic_rational_construct_copy(&I->b, &from->b);
@@ -96,7 +96,7 @@ void dyadic_interval_construct_copy(dyadic_interval_t* I, const dyadic_interval_
   I->is_point = from->is_point;
 }
 
-void interval_construct_from_dyadic(interval_t* I, const dyadic_rational_t* a, int a_open, const dyadic_rational_t* b, int b_open) {
+void interval_construct_from_dyadic(interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
   assert(cmp <= 0);
   rational_construct_from_dyadic(&I->a, a);
@@ -112,7 +112,7 @@ void interval_construct_from_dyadic(interval_t* I, const dyadic_rational_t* a, i
   }
 }
 
-void interval_construct_from_dyadic_interval(interval_t* I, const dyadic_interval_t* from) {
+void interval_construct_from_dyadic_interval(interval_t* I, const lp_dyadic_interval_t* from) {
   rational_construct_from_dyadic(&I->a, &from->a);
   if (!from->is_point) {
     rational_construct_from_dyadic(&I->b, &from->b);
@@ -122,7 +122,7 @@ void interval_construct_from_dyadic_interval(interval_t* I, const dyadic_interva
   I->is_point = from->is_point;
 }
 
-void dyadic_interval_construct_from_dyadic(dyadic_interval_t* I, const dyadic_rational_t* a, int a_open, const dyadic_rational_t* b, int b_open) {
+void dyadic_interval_construct_from_dyadic(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
   assert(cmp <= 0);
   dyadic_rational_construct_copy(&I->a, a);
@@ -156,7 +156,7 @@ void interval_construct_from_int(interval_t* I,
   }
 }
 
-void dyadic_interval_construct_from_int(dyadic_interval_t* I,
+void dyadic_interval_construct_from_int(lp_dyadic_interval_t* I,
     long a, int a_open,
     long b, int b_open)
 {
@@ -175,10 +175,10 @@ void dyadic_interval_construct_from_int(dyadic_interval_t* I,
 }
 
 void interval_construct_from_integer(interval_t* I,
-    const integer_t* a, int a_open,
-    const integer_t* b, int b_open)
+    const lp_integer_t* a, int a_open,
+    const lp_integer_t* b, int b_open)
 {
-  int cmp = integer_cmp(Z, a, b);
+  int cmp = integer_cmp(lp_Z, a, b);
   assert(cmp <= 0);
   rational_construct_from_integer(&I->a, a);
   if (cmp != 0) {
@@ -193,11 +193,11 @@ void interval_construct_from_integer(interval_t* I,
   }
 }
 
-void dyadic_interval_construct_from_integer(dyadic_interval_t* I,
-    const integer_t* a, int a_open,
-    const integer_t* b, int b_open)
+void dyadic_interval_construct_from_integer(lp_dyadic_interval_t* I,
+    const lp_integer_t* a, int a_open,
+    const lp_integer_t* b, int b_open)
 {
-  int cmp = integer_cmp(Z, a, b);
+  int cmp = integer_cmp(lp_Z, a, b);
   assert(cmp <= 0);
   dyadic_rational_construct_from_integer(&I->a, a);
   if (cmp != 0) {
@@ -219,7 +219,7 @@ void interval_destruct(interval_t* I) {
   }
 }
 
-void dyadic_interval_destruct(dyadic_interval_t* I) {
+void dyadic_interval_destruct(lp_dyadic_interval_t* I) {
   dyadic_rational_destruct(&I->a);
   if (!I->is_point) {
     dyadic_rational_destruct(&I->b);
@@ -256,7 +256,7 @@ void interval_assign(interval_t* I, const interval_t* from) {
   }
 }
 
-void dyadic_interval_assign(dyadic_interval_t* I, const dyadic_interval_t* from) {
+void dyadic_interval_assign(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* from) {
   if (I != from) {
     if (I->is_point) {
       if (from->is_point) {
@@ -292,8 +292,8 @@ void interval_swap(interval_t* I1, interval_t* I2) {
   *I2 = tmp;
 }
 
-void dyadic_interval_swap(dyadic_interval_t* I1, dyadic_interval_t* I2) {
-  dyadic_interval_t tmp = *I1;
+void dyadic_interval_swap(lp_dyadic_interval_t* I1, lp_dyadic_interval_t* I2) {
+  lp_dyadic_interval_t tmp = *I1;
   *I1 = *I2;
   *I2 = tmp;
 }
@@ -335,7 +335,7 @@ int interval_sgn(const interval_t* I) {
   return 1;
 }
 
-int dyadic_interval_sgn(const dyadic_interval_t* I) {
+int dyadic_interval_sgn(const lp_dyadic_interval_t* I) {
   int a_sgn = dyadic_rational_sgn(&I->a);
   if (I->is_point) {
     return a_sgn;
@@ -372,7 +372,7 @@ int dyadic_interval_sgn(const dyadic_interval_t* I) {
   return 1;
 }
 
-int interval_contains(const interval_t* I, const rational_t* q) {
+int interval_contains(const interval_t* I, const lp_rational_t* q) {
   int cmp_a = rational_cmp(&I->a, q);
   if (I->is_point) {
     return cmp_a == 0;
@@ -385,7 +385,7 @@ int interval_contains(const interval_t* I, const rational_t* q) {
   return 1;
 }
 
-int dyadic_interval_contains(const dyadic_interval_t* I, const dyadic_rational_t* q) {
+int dyadic_interval_contains(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
   int cmp_a = dyadic_rational_cmp(&I->a, q);
   if (I->is_point) {
     return cmp_a == 0;
@@ -411,7 +411,7 @@ int interval_contains_zero(const interval_t* I) {
   return 1;
 }
 
-int dyadic_interval_contains_zero(const dyadic_interval_t* I) {
+int dyadic_interval_contains_zero(const lp_dyadic_interval_t* I) {
   int cmp_a = dyadic_rational_sgn(&I->a);
   if (I->is_point) {
     return cmp_a == 0;
@@ -425,9 +425,9 @@ int dyadic_interval_contains_zero(const dyadic_interval_t* I) {
 }
 
 
-void dyadic_interval_construct_from_split(dyadic_interval_t* I_left, dyadic_interval_t* I_right, const dyadic_interval_t* I, int left_open, int right_open) {
+void dyadic_interval_construct_from_split(lp_dyadic_interval_t* I_left, lp_dyadic_interval_t* I_right, const lp_dyadic_interval_t* I, int left_open, int right_open) {
   assert(!I->is_point);
-  dyadic_rational_t m;
+  lp_dyadic_rational_t m;
   dyadic_rational_construct(&m);
   dyadic_rational_add(&m, &I->a, &I->b);
   dyadic_rational_div_2exp(&m, &m, 1);
@@ -436,7 +436,7 @@ void dyadic_interval_construct_from_split(dyadic_interval_t* I_left, dyadic_inte
   dyadic_rational_destruct(&m);
 }
 
-void dyadic_interval_construct_intersection(dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
+void dyadic_interval_construct_intersection(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point) {
     assert(dyadic_interval_contains(I2, &I1->a));
     dyadic_interval_construct_copy(I, I1);
@@ -446,7 +446,7 @@ void dyadic_interval_construct_intersection(dyadic_interval_t* I, const dyadic_i
   } else {
     // (   [  )   ]
     int cmp_a = dyadic_rational_cmp(&I1->a, &I2->a);
-    const dyadic_rational_t* max_a = cmp_a < 0 ? &I2->a : &I1->a;
+    const lp_dyadic_rational_t* max_a = cmp_a < 0 ? &I2->a : &I1->a;
     int a_open;
     if (cmp_a == 0) {
       a_open = I1->a_open || I2->a_open;
@@ -457,7 +457,7 @@ void dyadic_interval_construct_intersection(dyadic_interval_t* I, const dyadic_i
     }
 
     int cmp_b = dyadic_rational_cmp(&I1->b, &I2->b);
-    const dyadic_rational_t* min_b = cmp_b < 0 ? &I1->b : &I2->b;
+    const lp_dyadic_rational_t* min_b = cmp_b < 0 ? &I1->b : &I2->b;
     int b_open;
     if (cmp_b == 0) {
       b_open = I1->b_open || I2->b_open;
@@ -471,7 +471,7 @@ void dyadic_interval_construct_intersection(dyadic_interval_t* I, const dyadic_i
   }
 }
 
-void dyadic_interval_collapse_to(dyadic_interval_t* I, const dyadic_rational_t* q) {
+void dyadic_interval_collapse_to(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
   dyadic_rational_assign(&I->a, q);
   if (!I->is_point) {
     dyadic_rational_destruct(&I->b);
@@ -481,7 +481,7 @@ void dyadic_interval_collapse_to(dyadic_interval_t* I, const dyadic_rational_t* 
   I->is_point = 1;
 }
 
-void dyadic_interval_set_a(dyadic_interval_t* I, const dyadic_rational_t* a, int a_open) {
+void dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open) {
   assert(!I->is_point);
   int cmp = dyadic_rational_cmp(a, &I->b);
   assert(cmp <= 0);
@@ -494,7 +494,7 @@ void dyadic_interval_set_a(dyadic_interval_t* I, const dyadic_rational_t* a, int
   }
 }
 
-void dyadic_interval_set_b(dyadic_interval_t* I, const dyadic_rational_t* b, int b_open) {
+void dyadic_interval_set_b(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* b, int b_open) {
   assert(!I->is_point);
   int cmp = dyadic_rational_cmp(&I->a, b);
   assert(cmp <= 0);
@@ -507,7 +507,7 @@ void dyadic_interval_set_b(dyadic_interval_t* I, const dyadic_rational_t* b, int
   }
 }
 
-int dyadic_interval_equals(const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
+int dyadic_interval_equals(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point && !I2->is_point) {
     return 0;
   }
@@ -525,7 +525,7 @@ int dyadic_interval_equals(const dyadic_interval_t* I1, const dyadic_interval_t*
   return 1;
 }
 
-int dyadic_interval_disjunct(const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
+int dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point) {
     return !dyadic_interval_contains(I2, &I1->a);
   }
@@ -543,7 +543,7 @@ int dyadic_interval_disjunct(const dyadic_interval_t* I1, const dyadic_interval_
   return 0;
 }
 
-void dyadic_interval_scale(dyadic_interval_t* I, int n) {
+void dyadic_interval_scale(lp_dyadic_interval_t* I, int n) {
   assert(!I->is_point);
   if (n > 0) {
     dyadic_rational_mul_2exp(&I->a, &I->a, n);
@@ -583,7 +583,7 @@ int interval_print(const interval_t* I, FILE* out) {
   return ret;
 }
 
-int dyadic_interval_print(const dyadic_interval_t* I, FILE* out) {
+int dyadic_interval_print(const lp_dyadic_interval_t* I, FILE* out) {
   int ret = 0;
   if (I) {
     if (I->is_point) {
@@ -623,7 +623,7 @@ const interval_ops_t interval_ops = {
     interval_print
 };
 
-const dyadic_interval_ops_t dyadic_interval_ops = {
+const lp_dyadic_interval_ops_t lp_dyadic_interval_ops = {
     dyadic_interval_construct,
     dyadic_interval_construct_copy,
     dyadic_interval_construct_from_int,

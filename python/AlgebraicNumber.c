@@ -148,22 +148,22 @@ PyTypeObject AlgebraicNumberType = {
 static void
 AlgebraicNumber_dealloc(AlgebraicNumber* self)
 {
-  algebraic_number_ops.destruct(&self->a);
+  lp_algebraic_number_ops.destruct(&self->a);
   self->ob_type->tp_free((PyObject*)self);
 }
 
 PyObject*
-PyAlgebraicNumber_create(const algebraic_number_t* a) {
+PyAlgebraicNumber_create(const lp_algebraic_number_t* a) {
   AlgebraicNumber *self;
   self = (AlgebraicNumber*)AlgebraicNumberType.tp_alloc(&AlgebraicNumberType, 0);
   if (self != NULL) {
     if (a) {
-      algebraic_number_ops.construct_copy(&self->a, a);
+      lp_algebraic_number_ops.construct_copy(&self->a, a);
     } else {
-      dyadic_rational_t zero;
-      dyadic_rational_ops.construct(&zero);
-      algebraic_number_ops.construct_from_dyadic_rational(&self->a, &zero);
-      dyadic_rational_ops.destruct(&zero);
+      lp_dyadic_rational_t zero;
+      lp_dyadic_rational_ops.construct(&zero);
+      lp_algebraic_number_ops.construct_from_dyadic_rational(&self->a, &zero);
+      lp_dyadic_rational_ops.destruct(&zero);
     }
   }
   return (PyObject *)self;
@@ -182,20 +182,20 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
     PyObject* f_obj = PyTuple_GetItem(args, 0);
     PyObject* root_index_obj = PyTuple_GetItem(args, 1);
     if (PyUPolynomial_CHECK(f_obj) && PyInt_Check(root_index_obj)) {
-      upolynomial_t* f = ((UPolynomialObject*) f_obj)->p;
+      lp_upolynomial_t* f = ((UPolynomialObject*) f_obj)->p;
       long root_index = PyInt_AsLong(root_index_obj);
       size_t roots_count = upolynomial_ops.roots_count(f, 0);
       if (root_index < 0 || root_index >= roots_count) {
         // Not enough roots
         return -1;
       }
-      algebraic_number_t* roots = malloc(roots_count * sizeof(algebraic_number_t));
+      lp_algebraic_number_t* roots = malloc(roots_count * sizeof(lp_algebraic_number_t));
       upolynomial_ops.roots_isolate(f, roots, &roots_count);
-      algebraic_number_ops.destruct(&self->a);
-      algebraic_number_ops.construct_copy(&self->a, roots + root_index);
+      lp_algebraic_number_ops.destruct(&self->a);
+      lp_algebraic_number_ops.construct_copy(&self->a, roots + root_index);
       int i;
       for (i = 0; i < roots_count; ++ i) {
-        algebraic_number_ops.destruct(roots + i);
+        lp_algebraic_number_ops.destruct(roots + i);
       }
       free(roots);
     } else {
@@ -218,7 +218,7 @@ AlgebraicNumber_to_double(PyObject* self) {
 static PyObject*
 AlgebraicNumber_refine(PyObject* self) {
   AlgebraicNumber* a = (AlgebraicNumber*) self;
-  algebraic_number_ops.refine(&a->a);
+  lp_algebraic_number_ops.refine(&a->a);
   Py_RETURN_NONE;
 }
 
@@ -233,7 +233,7 @@ AlgebraicNumber_cmp(PyObject* self, PyObject* other) {
   AlgebraicNumber* a1 = (AlgebraicNumber*) self;
   AlgebraicNumber* a2 = (AlgebraicNumber*) other;
   // Compare
-  return algebraic_number_ops.cmp(&a1->a, &a2->a);
+  return lp_algebraic_number_ops.cmp(&a1->a, &a2->a);
 }
 
 static PyObject*
@@ -243,9 +243,9 @@ AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op) {
   if (!PyAlgebraicNumber_CHECK(other)) {
     result = Py_NotImplemented;
   } else {
-    algebraic_number_t* self_a = &((AlgebraicNumber*) self)->a;
-    algebraic_number_t* other_a = &((AlgebraicNumber*) other)->a;
-    int cmp = algebraic_number_ops.cmp(self_a, other_a);
+    lp_algebraic_number_t* self_a = &((AlgebraicNumber*) self)->a;
+    lp_algebraic_number_t* other_a = &((AlgebraicNumber*) other)->a;
+    int cmp = lp_algebraic_number_ops.cmp(self_a, other_a);
 
     switch (op) {
     case Py_LT:
@@ -275,7 +275,7 @@ AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op) {
 
 static PyObject* AlgebraicNumber_str(PyObject* self) {
   AlgebraicNumber* a = (AlgebraicNumber*) self;
-  char* cstr = algebraic_number_ops.to_string(&a->a);
+  char* cstr = lp_algebraic_number_ops.to_string(&a->a);
   PyObject* pystr = PyString_FromString(cstr);
   free(cstr);
   return pystr;
@@ -301,11 +301,11 @@ AlgebraicNumber_add(PyObject* self, PyObject* other) {
   AlgebraicNumber* a1 = (AlgebraicNumber*) self;
   AlgebraicNumber* a2 = (AlgebraicNumber*) other;
 
-  algebraic_number_t sum;
-  algebraic_number_ops.construct_zero(&sum);
-  algebraic_number_ops.add(&sum, &a1->a, &a2->a);
+  lp_algebraic_number_t sum;
+  lp_algebraic_number_ops.construct_zero(&sum);
+  lp_algebraic_number_ops.add(&sum, &a1->a, &a2->a);
   PyObject* result = PyAlgebraicNumber_create(&sum);
-  algebraic_number_ops.destruct(&sum);
+  lp_algebraic_number_ops.destruct(&sum);
 
   return result;
 }
@@ -319,11 +319,11 @@ AlgebraicNumber_neg(PyObject* self) {
 
   AlgebraicNumber* a1 = (AlgebraicNumber*) self;
 
-  algebraic_number_t neg;
-  algebraic_number_ops.construct_zero(&neg);
-  algebraic_number_ops.neg(&neg, &a1->a);
+  lp_algebraic_number_t neg;
+  lp_algebraic_number_ops.construct_zero(&neg);
+  lp_algebraic_number_ops.neg(&neg, &a1->a);
   PyObject* result = PyAlgebraicNumber_create(&neg);
-  algebraic_number_ops.destruct(&neg);
+  lp_algebraic_number_ops.destruct(&neg);
 
   return result;
 }
@@ -338,11 +338,11 @@ AlgebraicNumber_sub(PyObject* self, PyObject* other) {
   AlgebraicNumber* a1 = (AlgebraicNumber*) self;
   AlgebraicNumber* a2 = (AlgebraicNumber*) other;
 
-  algebraic_number_t sub;
-  algebraic_number_ops.construct_zero(&sub);
-  algebraic_number_ops.sub(&sub, &a1->a, &a2->a);
+  lp_algebraic_number_t sub;
+  lp_algebraic_number_ops.construct_zero(&sub);
+  lp_algebraic_number_ops.sub(&sub, &a1->a, &a2->a);
   PyObject* result = PyAlgebraicNumber_create(&sub);
-  algebraic_number_ops.destruct(&sub);
+  lp_algebraic_number_ops.destruct(&sub);
 
   return result;
 }
@@ -357,11 +357,11 @@ AlgebraicNumber_mul(PyObject* self, PyObject* other) {
   AlgebraicNumber* a1 = (AlgebraicNumber*) self;
   AlgebraicNumber* a2 = (AlgebraicNumber*) other;
 
-  algebraic_number_t mul;
-  algebraic_number_ops.construct_zero(&mul);
-  algebraic_number_ops.mul(&mul, &a1->a, &a2->a);
+  lp_algebraic_number_t mul;
+  lp_algebraic_number_ops.construct_zero(&mul);
+  lp_algebraic_number_ops.mul(&mul, &a1->a, &a2->a);
   PyObject* result = PyAlgebraicNumber_create(&mul);
-  algebraic_number_ops.destruct(&mul);
+  lp_algebraic_number_ops.destruct(&mul);
 
   return result;
 }
@@ -376,11 +376,11 @@ AlgebraicNumber_pow(PyObject* self, PyObject* other) {
   AlgebraicNumber* a1 = (AlgebraicNumber*) self;
   long n = PyInt_AsLong(other);
 
-  algebraic_number_t pow;
-  algebraic_number_ops.construct_zero(&pow);
-  algebraic_number_ops.pow(&pow, &a1->a, n);
+  lp_algebraic_number_t pow;
+  lp_algebraic_number_ops.construct_zero(&pow);
+  lp_algebraic_number_ops.pow(&pow, &a1->a, n);
   PyObject* result = PyAlgebraicNumber_create(&pow);
-  algebraic_number_ops.destruct(&pow);
+  lp_algebraic_number_ops.destruct(&pow);
 
   return result;
 }

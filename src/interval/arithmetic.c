@@ -7,7 +7,7 @@
 
 #include "interval/arithmetic.h"
 
-int interval_endpoint_lt(const rational_t* a, int a_open, const rational_t* b, int b_open) {
+int interval_endpoint_lt(const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open) {
   int cmp = rational_cmp(a, b);
   if (cmp == 0) {
     return (!a_open && b_open);
@@ -16,7 +16,7 @@ int interval_endpoint_lt(const rational_t* a, int a_open, const rational_t* b, i
   }
 }
 
-int dyadic_interval_endpoint_lt(const dyadic_rational_t* a, int a_open, const dyadic_rational_t*b, int b_open) {
+int dyadic_interval_endpoint_lt(const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t*b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
   if (cmp == 0) {
     return (!a_open && b_open);
@@ -64,7 +64,7 @@ void interval_add(interval_t* S, const interval_t* I1, const interval_t* I2) {
   interval_destruct(&result);
 }
 
-void dyadic_interval_add(dyadic_interval_t* S, const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
+void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
 
   if (I1->is_point && I2->is_point) {
     if (!S->is_point) {
@@ -92,7 +92,7 @@ void dyadic_interval_add(dyadic_interval_t* S, const dyadic_interval_t* I1, cons
 
   // Both non-points
   // [a, b] + [c, d] = [a + c, b + d]
-  dyadic_interval_t result;
+  lp_dyadic_interval_t result;
   dyadic_rational_construct(&result.a);
   dyadic_rational_construct(&result.b);
   dyadic_rational_add(&result.a, &I1->a, &I2->a);
@@ -133,7 +133,7 @@ void interval_neg(interval_t* N, const interval_t* I) {
   N->b_open = tmp;
 }
 
-void dyadic_interval_neg(dyadic_interval_t* N, const dyadic_interval_t* I) {
+void dyadic_interval_neg(lp_dyadic_interval_t* N, const lp_dyadic_interval_t* I) {
   if (I->is_point) {
     if (!N->is_point) {
       dyadic_rational_destruct(&N->b);
@@ -170,8 +170,8 @@ void interval_sub(interval_t* S, const interval_t* I1, const interval_t* I2) {
   interval_destruct(&neg);
 }
 
-void dyadic_interval_sub(dyadic_interval_t* S, const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
-  dyadic_interval_t neg;
+void dyadic_interval_sub(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
+  lp_dyadic_interval_t neg;
   dyadic_interval_construct_copy(&neg, I2);
   dyadic_interval_neg(&neg, &neg);
   dyadic_interval_add(S, I1, &neg);
@@ -237,7 +237,7 @@ void interval_mul(interval_t* P, const interval_t* I1, const interval_t* I2) {
     interval_t result;
     interval_construct_zero(&result);
 
-    rational_t tmp;
+    lp_rational_t tmp;
     rational_construct(&tmp);
 
     // I1.a x I2.a
@@ -285,7 +285,7 @@ void interval_mul(interval_t* P, const interval_t* I1, const interval_t* I2) {
   }
 }
 
-void dyadic_interval_mul(dyadic_interval_t* P, const dyadic_interval_t* I1, const dyadic_interval_t* I2) {
+void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point) {
     if (I2->is_point) {
       // Just multiply the points
@@ -341,10 +341,10 @@ void dyadic_interval_mul(dyadic_interval_t* P, const dyadic_interval_t* I1, cons
     //         = { x*y | I1.a < x < I1.b, I2.a < y < I2.b }
     //         = { x*y |
 
-    dyadic_interval_t result;
+    lp_dyadic_interval_t result;
     dyadic_interval_construct_zero(&result);
 
-    dyadic_rational_t tmp;
+    lp_dyadic_rational_t tmp;
     dyadic_rational_construct(&tmp);
 
     // I1.a x I2.a
@@ -448,7 +448,7 @@ void interval_pow(interval_t* P, const interval_t* I, unsigned n) {
   }
 }
 
-void dyadic_interval_pow(dyadic_interval_t* P, const dyadic_interval_t* I, unsigned n) {
+void dyadic_interval_pow(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I, unsigned n) {
   if (n == 0) {
     // I^0 = [1]
     if (!P->is_point) {

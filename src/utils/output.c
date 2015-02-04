@@ -9,22 +9,22 @@
 
 #include <assert.h>
 
-poly_output_language_t output_language = OUTPUT_LATEX;
+lp_output_language_t output_language = LP_OUTPUT_LATEX;
 
-void set_output_language(poly_output_language_t lang) {
+void set_output_language(lp_output_language_t lang) {
   output_language = lang;
 }
 
 const char* get_power_symbol(void) {
  switch (output_language) {
- case OUTPUT_LATEX:
+ case LP_OUTPUT_LATEX:
    return "^";
    break;
- case OUTPUT_SMT2:
+ case LP_OUTPUT_SMT2:
    assert(0);
    return "^";
    break;
- case OUTPUT_PYTHON:
+ case LP_OUTPUT_PYTHON:
    return "**";
    break;
  default:

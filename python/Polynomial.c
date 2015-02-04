@@ -16,11 +16,11 @@
 
 #include <structmember.h>
 
-static polynomial_context_t* default_ctx = 0;
+static lp_polynomial_context_t* default_ctx = 0;
 
-const polynomial_context_t* Polynomial_get_default_context(void) {
+const lp_polynomial_context_t* Polynomial_get_default_context(void) {
   if (!default_ctx) {
-    default_ctx = polynomial_context_ops.new(0, Variable_get_default_db(), (variable_order_t*) VariableOrder_get_default_order());
+    default_ctx = polynomial_context_ops.new(0, Variable_get_default_db(), (lp_variable_order_t*) VariableOrder_get_default_order());
   }
   return default_ctx;
 }
@@ -245,7 +245,7 @@ Polynomial_dealloc(Polynomial* self)
 }
 
 PyObject*
-Polynomial_create(polynomial_t* p) {
+Polynomial_create(lp_polynomial_t* p) {
   Polynomial *self;
   self = (Polynomial*)PolynomialType.tp_alloc(&PolynomialType, 0);
   polynomial_ops.set_external(p);
@@ -262,7 +262,7 @@ static PyObject*
 Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
   PyObject *result = 0;
 
-  const polynomial_context_t* ctx = 0;
+  const lp_polynomial_context_t* ctx = 0;
 
   // One of them is a polynomial
   if (PyPolynomial_CHECK(self)) {
@@ -302,8 +302,8 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
     }
   }
 
-  polynomial_t* self_p = ((Polynomial*) self)->p;
-  polynomial_t* other_p = ((Polynomial*) other)->p;
+  lp_polynomial_t* self_p = ((Polynomial*) self)->p;
+  lp_polynomial_t* other_p = ((Polynomial*) other)->p;
 
   int cmp = polynomial_ops.cmp(self_p, other_p);
 
@@ -368,20 +368,20 @@ static PyObject* Polynomial_str(PyObject* self) {
 }
 
 PyObject*
-PyPolynomial_FromVariable(PyObject* variable, const polynomial_context_t* ctx) {
+PyPolynomial_FromVariable(PyObject* variable, const lp_polynomial_context_t* ctx) {
   // The variable
-  variable_t x = ((Variable*) variable)->x;
+  lp_variable_t x = ((Variable*) variable)->x;
 
   // The constant
-  integer_t one;
-  integer_ops.construct_from_int(ctx->K, &one, 1);
+  lp_integer_t one;
+  lp_integer_ops.construct_from_int(ctx->K, &one, 1);
 
   // The x polynomial
-  polynomial_t* p_x = polynomial_ops.alloc();
+  lp_polynomial_t* p_x = polynomial_ops.alloc();
   polynomial_ops.construct_simple(p_x, ctx, &one, x, 1);
 
   // Remove temps
-  integer_ops.destruct(&one);
+  lp_integer_ops.destruct(&one);
 
   // Return the polynomial
   PyObject* result = Polynomial_create(p_x);
@@ -390,17 +390,17 @@ PyPolynomial_FromVariable(PyObject* variable, const polynomial_context_t* ctx) {
 }
 
 PyObject*
-PyPolynomial_FromLong_or_Int(PyObject* number, const polynomial_context_t* ctx) {
+PyPolynomial_FromLong_or_Int(PyObject* number, const lp_polynomial_context_t* ctx) {
   // The constants
-  integer_t c;
+  lp_integer_t c;
   PyLong_or_Int_to_integer(number, 0, &c);
 
   // The c polynomial
-  polynomial_t* p_c = polynomial_ops.alloc();
+  lp_polynomial_t* p_c = polynomial_ops.alloc();
   polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
 
   // Remove temps
-  integer_ops.destruct(&c);
+  lp_integer_ops.destruct(&c);
 
   // Return the polynomial
   PyObject* result = Polynomial_create(p_c);
@@ -418,7 +418,7 @@ Polynomial_add(PyObject* self, PyObject* other) {
   }
 
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   // Check argument
   if (!PyPolynomial_CHECK(other)) {
@@ -436,14 +436,14 @@ Polynomial_add(PyObject* self, PyObject* other) {
 
   // Get arguments
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (p1_ctx != p2_ctx) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Add the polynomials
-  polynomial_t* sum = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* sum = polynomial_ops.new(p1_ctx);
   polynomial_ops.add(sum, p1->p, p2->p);
 
   if (dec_other) {
@@ -457,8 +457,8 @@ Polynomial_add(PyObject* self, PyObject* other) {
 static PyObject*
 Polynomial_neg(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
-  const polynomial_context_t* p_ctx = polynomial_ops.context(p->p);
-  polynomial_t* neg = polynomial_ops.new(p_ctx);
+  const lp_polynomial_context_t* p_ctx = polynomial_ops.context(p->p);
+  lp_polynomial_t* neg = polynomial_ops.new(p_ctx);
   polynomial_ops.neg(neg, p->p);
   return Polynomial_create(neg);
 }
@@ -475,7 +475,7 @@ Polynomial_sub(PyObject* self, PyObject* other) {
   }
 
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   // Check argument
   if (!PyPolynomial_CHECK(other)) {
@@ -493,14 +493,14 @@ Polynomial_sub(PyObject* self, PyObject* other) {
 
   // Get arguments
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (p1_ctx != p2_ctx) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Subtract the polynomials
-  polynomial_t* sub = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* sub = polynomial_ops.new(p1_ctx);
   polynomial_ops.sub(sub, p1->p, p2->p);
 
   if (dec_other) {
@@ -521,7 +521,7 @@ Polynomial_mul(PyObject* self, PyObject* other) {
   }
 
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   // Check argument
   if (!PyPolynomial_CHECK(other)) {
@@ -539,14 +539,14 @@ Polynomial_mul(PyObject* self, PyObject* other) {
 
   // Get arguments
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* mul = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* mul = polynomial_ops.new(p1_ctx);
   polynomial_ops.mul(mul, p1->p, p2->p);
 
   if (dec_other) {
@@ -572,9 +572,9 @@ Polynomial_pow(PyObject* self, PyObject* other) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
-  const polynomial_context_t* p_ctx = polynomial_ops.context(p->p);
+  const lp_polynomial_context_t* p_ctx = polynomial_ops.context(p->p);
   // Compute
-  polynomial_t* pow = polynomial_ops.new(p_ctx);
+  lp_polynomial_t* pow = polynomial_ops.new(p_ctx);
   polynomial_ops.pow(pow, p->p, n);
   // Return the result
   return Polynomial_create(pow);
@@ -592,7 +592,7 @@ Polynomial_div(PyObject* self, PyObject* other) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   // Make sure other is a polynomial
   if (!PyPolynomial_CHECK(other)) {
@@ -610,14 +610,14 @@ Polynomial_div(PyObject* self, PyObject* other) {
 
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* div = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* div = polynomial_ops.new(p1_ctx);
   polynomial_ops.div(div, p1->p, p2->p);
 
   if (dec_other) {
@@ -639,7 +639,7 @@ Polynomial_rem_operator(PyObject* self, PyObject* other) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   // Make sure other is a polynomial
   if (!PyPolynomial_CHECK(other)) {
@@ -657,14 +657,14 @@ Polynomial_rem_operator(PyObject* self, PyObject* other) {
 
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* rem = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* rem = polynomial_ops.new(p1_ctx);
   polynomial_ops.rem(rem, p1->p, p2->p);
 
   if (dec_other) {
@@ -687,7 +687,7 @@ Polynomial_divmod(PyObject* self, PyObject* other) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   // Make sure other is a polynomial
   if (!PyPolynomial_CHECK(other)) {
@@ -705,15 +705,15 @@ Polynomial_divmod(PyObject* self, PyObject* other) {
 
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* rem = polynomial_ops.new(p1_ctx);
-  polynomial_t* div = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* rem = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* div = polynomial_ops.new(p1_ctx);
   polynomial_ops.divrem(div, rem, p1->p, p2->p);
 
   if (dec_other) {
@@ -751,7 +751,7 @@ Polynomial_rem_general(PyObject* self, PyObject* args, enum rem_type type) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
@@ -776,14 +776,14 @@ Polynomial_rem_general(PyObject* self, PyObject* args, enum rem_type type) {
 
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* rem = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* rem = polynomial_ops.new(p1_ctx);
   switch (type) {
   case REM_EXACT:
     polynomial_ops.rem(rem, p1->p, p2->p);
@@ -826,7 +826,7 @@ Polynomial_gcd(PyObject* self, PyObject* args) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
@@ -851,14 +851,14 @@ Polynomial_gcd(PyObject* self, PyObject* args) {
 
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* gcd = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* gcd = polynomial_ops.new(p1_ctx);
   polynomial_ops.gcd(gcd, p1->p, p2->p);
 
   if (dec_other) {
@@ -876,7 +876,7 @@ Polynomial_lcm(PyObject* self, PyObject* args) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
@@ -901,14 +901,14 @@ Polynomial_lcm(PyObject* self, PyObject* args) {
 
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
   // Multiply the polynomials
-  polynomial_t* lcm = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* lcm = polynomial_ops.new(p1_ctx);
   polynomial_ops.lcm(lcm, p1->p, p2->p);
 
   if (dec_other) {
@@ -924,7 +924,7 @@ Polynomial_psc(PyObject* self, PyObject* args) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
@@ -951,7 +951,7 @@ Polynomial_psc(PyObject* self, PyObject* args) {
 
   // Othe polynomial
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
@@ -973,7 +973,7 @@ Polynomial_psc(PyObject* self, PyObject* args) {
   size_t p2_deg = polynomial_ops.degree(p2->p);
   int size = p1_deg > p2_deg ? p2_deg + 1 : p1_deg + 1;
 
-  polynomial_t** psc = malloc(sizeof(polynomial_t*)*size);
+  lp_polynomial_t** psc = malloc(sizeof(lp_polynomial_t*)*size);
   int i;
   for (i = 0; i < size; ++ i) {
     psc[i] = polynomial_ops.new(p1_ctx);
@@ -1002,7 +1002,7 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
-  const polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
+  const lp_polynomial_context_t* p1_ctx = polynomial_ops.context(p1->p);
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
@@ -1029,7 +1029,7 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
 
   // Othe polynomial
   Polynomial* p2 = (Polynomial*) other;
-  const polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
+  const lp_polynomial_context_t* p2_ctx = polynomial_ops.context(p2->p);
   if (!polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
@@ -1047,7 +1047,7 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
   }
 
   // Allocate the resultant
-  polynomial_t* resultant = polynomial_ops.new(p1_ctx);
+  lp_polynomial_t* resultant = polynomial_ops.new(p1_ctx);
 
   // Compute the psc
   polynomial_ops.resultant(resultant, p1->p, p2->p);
@@ -1072,7 +1072,7 @@ Polynomial_factor(PyObject* self) {
 }
 
 // Creates a python list from the factors, taking over the polynomials
-PyObject* factors_to_PyList(polynomial_t** factors, size_t* multiplicities, size_t size) {
+PyObject* factors_to_PyList(lp_polynomial_t** factors, size_t* multiplicities, size_t size) {
   // Construct the result
   PyObject* factors_list = PyList_New(size);
 
@@ -1098,7 +1098,7 @@ Polynomial_factor_square_free(PyObject* self) {
   // Get arguments
   Polynomial* p = (Polynomial*) self;
   // Factor
-  polynomial_t** factors = 0;
+  lp_polynomial_t** factors = 0;
   size_t* multiplicities = 0;
   size_t factors_size = 0;
   polynomial_ops.factor_square_free(p->p, &factors, &multiplicities, &factors_size);
@@ -1123,8 +1123,8 @@ Polynomial_roots_isolate(PyObject* self) {
 
 static PyObject*
 Polynomial_derivative(PyObject* self) {
-  polynomial_t* p = ((Polynomial*) self)->p;
-  polynomial_t* p_derivative = polynomial_ops.new(polynomial_ops.context(p));
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_polynomial_t* p_derivative = polynomial_ops.new(polynomial_ops.context(p));
   polynomial_ops.derivative(p_derivative, p);
   return Polynomial_create(p_derivative);
 }
@@ -1144,16 +1144,16 @@ static PyObject*
 Polynomial_coefficients(PyObject* self) {
   int i;
 
-  polynomial_t* p = ((Polynomial*) self)->p;
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
   size_t size = polynomial_ops.degree(p) + 1;
 
   // Get the coefficients
-  const polynomial_context_t* ctx = polynomial_ops.context(p);
+  const lp_polynomial_context_t* ctx = polynomial_ops.context(p);
 
   // Copy the polynomials into a list
   PyObject* list = PyList_New(size);
   for (i = 0; i < size; ++i) {
-    polynomial_t* c_p = polynomial_ops.new(ctx);
+    lp_polynomial_t* c_p = polynomial_ops.new(ctx);
     polynomial_ops.get_coefficient(c_p, p, i);
     PyObject* c = Polynomial_create(c_p);
     PyList_SetItem(list, i, c);
@@ -1164,15 +1164,15 @@ Polynomial_coefficients(PyObject* self) {
 
 static PyObject*
 Polynomial_reductum(PyObject* self, PyObject* args) {
-  polynomial_t* p = ((Polynomial*) self)->p;
-  const polynomial_context_t* ctx = polynomial_ops.context(p);
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* ctx = polynomial_ops.context(p);
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) > 1) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
-  assignment_t* assignment = 0;
+  lp_assignment_t* assignment = 0;
 
   if (PyTuple_Size(args) == 1) {
     PyObject* assignment_obj = PyTuple_GetItem(args, 0);
@@ -1184,7 +1184,7 @@ Polynomial_reductum(PyObject* self, PyObject* args) {
     }
   }
 
-  polynomial_t* result = polynomial_ops.new(ctx);
+  lp_polynomial_t* result = polynomial_ops.new(ctx);
   if (assignment) {
     polynomial_ops.reductum_m(result, p, assignment);
   } else {
@@ -1209,8 +1209,8 @@ Polynomial_sgn(PyObject* self, PyObject* args) {
     return Py_NotImplemented;
   }
 
-  polynomial_t* p = ((Polynomial*) self)->p;
-  assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
 
   int sgn = polynomial_ops.sgn(p, assignment);
 

@@ -12,13 +12,12 @@
 #include "utils/output.h"
 
 
-void poly_init(void) {
+void lp_init(void) {
   stats_construct();
   trace_set_output(stderr);
 }
 
-const poly_ops_t poly_ops = {
-    poly_init,
+const lp_ops_t lp_poly_ops = {
     trace_enable,
     trace_disable,
     trace_set_output,

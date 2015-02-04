@@ -12,7 +12,7 @@
 
 int umonomial_print(const umonomial_t* m, FILE* out) {
   int len = 0;
-  int sgn = integer_sgn(Z, &m->coefficient);
+  int sgn = integer_sgn(lp_Z, &m->coefficient);
   if (sgn < 0) len += fprintf(out, "(");
   len += integer_print(&m->coefficient, out);
   if (m->degree) {
@@ -30,7 +30,7 @@ int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file) {
   int len = 0;
   int k = p_d->size - 1;
   for (; k >= 0; --k) {
-    int sgn = integer_sgn(Z, p_d->coefficients + k);
+    int sgn = integer_sgn(lp_Z, p_d->coefficients + k);
     if (sgn) {
       if (sgn > 0) {
         fprintf(file, "+");
@@ -42,7 +42,7 @@ int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file) {
   return len;
 }
 
-int upolynomial_print(const upolynomial_t* p, FILE* out) {
+int upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
   assert(p);
   int len = 0;
   unsigned i;
@@ -53,12 +53,12 @@ int upolynomial_print(const upolynomial_t* p, FILE* out) {
     len += umonomial_print(&p->monomials[p->size-i-1], out);
   }
   len += fprintf(out, " [");
-  len += int_ring_ops.print(p->K, out);
+  len += lp_int_ring_ops.print(p->K, out);
   len += fprintf(out, "]");
   return len;
 }
 
-char* upolynomial_to_string(const upolynomial_t* p) {
+char* upolynomial_to_string(const lp_upolynomial_t* p) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);
@@ -67,7 +67,7 @@ char* upolynomial_to_string(const upolynomial_t* p) {
   return str;
 }
 
-int upolynomial_factors_print(const upolynomial_factors_t* f, FILE* out) {
+int upolynomial_factors_print(const lp_upolynomial_factors_t* f, FILE* out) {
   int len = 0;
   len += integer_print(&f->constant, out);
   size_t i;

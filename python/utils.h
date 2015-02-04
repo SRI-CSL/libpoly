@@ -22,24 +22,24 @@ int PyLong_or_Int_Check(PyObject* o);
 /**
  * Construct the integer from pytong Long or int.
  */
-void PyLong_or_Int_to_integer(PyObject* o, int_ring K, integer_t* x);
+void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring K, lp_integer_t* x);
 
 /**
  * Get a python integer from our integer.
  */
-PyObject* integer_to_PyInt(const integer_t* x);
+PyObject* integer_to_PyInt(const lp_integer_t* x);
 
 /**
  * Construct the rational from Python float.
  */
-void PyFloat_to_dyadic_rational(PyObject* o, dyadic_rational_t* x);
+void PyFloat_to_dyadic_rational(PyObject* o, lp_dyadic_rational_t* x);
 
 /**
  * Get a python float from our dyadic rational.
  */
-PyObject* dyadic_rational_to_PyFloat(const dyadic_rational_t* x);
+PyObject* dyadic_rational_to_PyFloat(const lp_dyadic_rational_t* x);
 
 /**
  * Get a python float from our algebraic number
  */
-PyObject* algebraic_number_to_PyFloat(const algebraic_number_t* x);
+PyObject* algebraic_number_to_PyFloat(const lp_algebraic_number_t* x);

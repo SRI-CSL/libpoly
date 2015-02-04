@@ -14,7 +14,7 @@
 /** Definition of the python AlgebraicNumber object */
 typedef struct {
   PyObject_HEAD
-  algebraic_number_t a;
+  lp_algebraic_number_t a;
 } AlgebraicNumber;
 
 /** Methods on coefficient rings */
@@ -24,7 +24,7 @@ extern PyMethodDef AlgebraicNumber_methods[];
 extern PyTypeObject AlgebraicNumberType;
 
 /** Create an algebraic object (makes a copy of a) */
-PyObject* PyAlgebraicNumber_create(const algebraic_number_t* a);
+PyObject* PyAlgebraicNumber_create(const lp_algebraic_number_t* a);
 
 /** Check if the object is a polynomial */
 #define PyAlgebraicNumber_CHECK(arg) \

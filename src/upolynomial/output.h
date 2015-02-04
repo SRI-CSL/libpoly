@@ -14,10 +14,10 @@
 
 int umonomial_print(const umonomial_t* m, FILE* out);
 
-int upolynomial_print(const upolynomial_t* p, FILE* out);
+int upolynomial_print(const lp_upolynomial_t* p, FILE* out);
 
-char* upolynomial_to_string(const upolynomial_t* p);
+char* upolynomial_to_string(const lp_upolynomial_t* p);
 
-int upolynomial_factors_print(const upolynomial_factors_t* f, FILE* out);
+int upolynomial_factors_print(const lp_upolynomial_factors_t* f, FILE* out);
 
 int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file);

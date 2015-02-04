@@ -9,28 +9,28 @@
 
 #include <variable_order.h>
 
-void variable_order_simple_construct(variable_order_simple_t* var_order);
+void variable_order_simple_construct(lp_variable_order_simple_t* var_order);
 
-void variable_order_simple_destruct(variable_order_simple_t* var_order);
+void variable_order_simple_destruct(lp_variable_order_simple_t* var_order);
 
-void variable_order_simple_attach(variable_order_t* var_order);
+void variable_order_simple_attach(lp_variable_order_t* var_order);
 
-void variable_order_simple_detach(variable_order_t* var_order);
+void variable_order_simple_detach(lp_variable_order_t* var_order);
 
-variable_order_t* variable_order_simple_new(void);
+lp_variable_order_t* variable_order_simple_new(void);
 
-int variable_order_simple_cmp(const variable_order_t* var_order, variable_t x, variable_t y);
+int variable_order_simple_cmp(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y);
 
-size_t variable_order_simple_size(const variable_order_simple_t* var_order);
+size_t variable_order_simple_size(const lp_variable_order_simple_t* var_order);
 
-void variable_order_simple_clear(variable_order_simple_t* var_order);
+void variable_order_simple_clear(lp_variable_order_simple_t* var_order);
 
-void variable_order_simple_push(variable_order_simple_t* var_order, variable_t var);
+void variable_order_simple_push(lp_variable_order_simple_t* var_order, lp_variable_t var);
 
-void variable_order_simple_pop(variable_order_simple_t* var_order);
+void variable_order_simple_pop(lp_variable_order_simple_t* var_order);
 
-int variable_order_simple_print(const variable_order_simple_t* var_order, const variable_db_t* var_db, FILE* out);
+int variable_order_simple_print(const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db, FILE* out);
 
-char* variable_order_simple_to_string(const variable_order_simple_t* var_order, const variable_db_t* var_db);
+char* variable_order_simple_to_string(const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db);
 
-int variable_order_simple_contains(variable_order_simple_t* var_order, variable_t x);
+int variable_order_simple_contains(lp_variable_order_simple_t* var_order, lp_variable_t x);

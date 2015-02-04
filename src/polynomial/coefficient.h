@@ -32,7 +32,7 @@ struct polynomial_rec_struct {
   /** Capacity of the coefficient array */
   size_t capacity;
   /** The main variable */
-  variable_t x;
+  lp_variable_t x;
   /** Coefficients */
   coefficient_t* coefficients;
 };
@@ -41,7 +41,7 @@ struct polynomial_rec_struct {
  * Value of each coefficient is either a base value or a polynomial.
  */
 typedef union {
-  integer_t num;
+  lp_integer_t num;
   polynomial_rec_t rec;
 } coefficient_union_t;
 
@@ -73,22 +73,22 @@ typedef enum {
 } remaindering_type_t;
 
 /** Construct a zero coefficient */
-void coefficient_construct(const polynomial_context_t* ctx, coefficient_t* C);
+void coefficient_construct(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
 /** Construct a coefficient from integer */
-void coefficient_construct_from_int(const polynomial_context_t* ctx, coefficient_t* C, long C_int);
+void coefficient_construct_from_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long C_int);
 
 /** Construct a coefficient from integer */
-void coefficient_construct_from_integer(const polynomial_context_t* ctx, coefficient_t* C, const integer_t* C_integer);
+void coefficient_construct_from_integer(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* C_integer);
 
 /** Construct from a univariate polynomial */
-void coefficient_construct_from_univariate(const polynomial_context_t* ctx, coefficient_t* C, const upolynomial_t* p, variable_t x);
+void coefficient_construct_from_univariate(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_upolynomial_t* p, lp_variable_t x);
 
 /** Construct a simple monomial coefficient a*x^n */
-void coefficient_construct_simple(const polynomial_context_t* ctx, coefficient_t* C, const integer_t* a, variable_t x, unsigned n);
+void coefficient_construct_simple(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* a, lp_variable_t x, unsigned n);
 
 /** Construct a copy of the given coefficient. */
-void coefficient_construct_copy(const polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from);
+void coefficient_construct_copy(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from);
 
 /** Destructs the coefficient. */
 void coefficient_destruct(coefficient_t* C);
@@ -97,31 +97,31 @@ void coefficient_destruct(coefficient_t* C);
 void coefficient_swap(coefficient_t* C1, coefficient_t* C2);
 
 /** Assign the coefficient a given coefficient. */
-void coefficient_assign(const polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from);
+void coefficient_assign(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from);
 
 /** Assign the coefficient a give integer */
-void coefficient_assign_int(const polynomial_context_t* ctx, coefficient_t* C, long x);
+void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long x);
 
 /** Check if the coefficient is univariate */
 int coefficient_is_univariate(const coefficient_t* C);
 
 /** Returns true if the coefficient conforms to internal representation (mainly debug purposes) */
-int coefficient_is_normalized(const polynomial_context_t* ctx, coefficient_t* C);
+int coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
 /** Returns the univariate version of this coefficient (must be univariate) */
-upolynomial_t* coefficient_to_univariate(const polynomial_context_t* ctx, const coefficient_t* C);
+lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /** Returns true if the coefficient is a constant */
 int coefficient_is_constant(const coefficient_t* C);
 
 /** Returns the constant of the polynomial (the actual deep constant) */
-const integer_t* coefficient_get_constant(const coefficient_t* C);
+const lp_integer_t* coefficient_get_constant(const coefficient_t* C);
 
 /** The degree of the coefficient */
 size_t coefficient_degree(const coefficient_t* C);
 
 /** The top variable of the coefficient */
-variable_t coefficient_top_variable(const coefficient_t* C);
+lp_variable_t coefficient_top_variable(const coefficient_t* C);
 
 /** Get the k-th coefficient of this coefficient */
 const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t k);
@@ -130,37 +130,37 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
 const coefficient_t* coefficient_lc(const coefficient_t* C);
 
 /** Get the reductum of the coefficient */
-void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C);
+void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C);
 
 /** Get the model-based reductum of the coefficient */
-void coefficient_reductum_m(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const assignment_t* m);
+void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m);
 
 /** Returns true if the coefficient is 0 */
-int coefficient_is_zero(const polynomial_context_t* ctx, const coefficient_t* C);
+int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /** Returns true if the coefficient is 1 */
-int coefficient_is_one(const polynomial_context_t* ctx, const coefficient_t* C);
+int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /** Returns the sign of the coefficient in the model */
-int coefficient_sgn(const polynomial_context_t* ctx, const coefficient_t* C, const assignment_t* m);
+int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
 
 /**
  * Returns the approximation of value of the coefficient (is either zero or
  * does not contain zero.
  */
-void coefficient_value_approx(const polynomial_context_t* ctx, const coefficient_t* C, const assignment_t* m, interval_t* value);
+void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, interval_t* value);
 
 /** Returns the sign of the leading coefficient */
-int coefficient_lc_sgn(const polynomial_context_t* ctx, const coefficient_t* C);
+int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /** Returns treu if the coefficient is properly ordered according to ctx */
-int coefficient_in_order(const polynomial_context_t* ctx, const coefficient_t* C);
+int coefficient_in_order(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /**
  * Compare the two coefficients in the ring. Not necessarily +/- 1, could be
  * any integer, only the sign matters.
  */
-int coefficient_cmp(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
+int coefficient_cmp(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
  * Compare the type of two coefficients. Type if either a constant or a
@@ -168,43 +168,43 @@ int coefficient_cmp(const polynomial_context_t* ctx, const coefficient_t* C1, co
  * and constants are smaller than other polynomials. This is not a total
  * ORDER.
  */
-int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
+int coefficient_cmp_type(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Returns true if C1 divides C2. */
-int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
+int coefficient_divides(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Order the polynomial according to the given order */
-void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C);
+void coefficient_order(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
 /** Compute S = C1 + C2. */
-void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_add(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute S = C1 - C2 in the given ring. */
-void coefficient_sub(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_sub(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute N = -C. */
-void coefficient_neg(const polynomial_context_t* ctx, coefficient_t* N, const coefficient_t* C);
+void coefficient_neg(const lp_polynomial_context_t* ctx, coefficient_t* N, const coefficient_t* C);
 
 /** Compute P = C1 * C2. */
-void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_mul(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute P = C * a. */
-void coefficient_mul_int(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a);
+void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a);
 
 /** Multiplication with x^n (x should be equal or biggier then top variable of C)  */
-void coefficient_shl(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, variable_t x, unsigned n);
+void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n);
 
 /** Division with x^n (C should have degree at least n)  */
-void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n);
+void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n);
 
 /** Compute P = C^n. */
-void coefficient_pow(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n);
+void coefficient_pow(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n);
 
 /** Compute S += C1*C2. */
-void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_add_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute S -= C1*C2. */
-void coefficient_sub_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_sub_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
  * Reduce the coefficient A in Z[y,x] using B in Z[y,x] so that
@@ -222,51 +222,51 @@ void coefficient_sub_mul(const polynomial_context_t* ctx, coefficient_t* S, cons
  *
  * If the exact flag is on, we assume that all division is exact.
  */
-void coefficient_reduce(const polynomial_context_t* ctx, const coefficient_t* A, const coefficient_t* B, coefficient_t* P, coefficient_t* Q, coefficient_t* R, remaindering_type_t type);
+void coefficient_reduce(const lp_polynomial_context_t* ctx, const coefficient_t* A, const coefficient_t* B, coefficient_t* P, coefficient_t* Q, coefficient_t* R, remaindering_type_t type);
 
 /** Compute C1 = D*C2, in the given ring (assumes that C2 divides C1). */
-void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Divide the degrees of the main variable of coefficient with the given number */
-void coefficient_div_degrees(const polynomial_context_t* ctx, coefficient_t* C, size_t p);
+void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* C, size_t p);
 
 /** Compute R = D*C2 - C1, in the given ring (assumes division is exact). */
-void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_rem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute the pseudo remainder */
-void coefficient_prem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_prem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute the sparse pseudo remainder */
-void coefficient_sprem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_sprem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute C1 = D*C2 + R, in the given ring (assumes division is exact). */
-void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Computes the derivative of the coefficient (in the main variable) */
-void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d, const coefficient_t* C);
+void coefficient_derivative(const lp_polynomial_context_t* ctx, coefficient_t* C_d, const coefficient_t* C);
 
 /**
  * Compute the resultant of C1 and C2 over their (common) top variable.
  */
-void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
  * Compute the principal subresultant coefficients. PSC should be a constructed
  * array of size deg(B) + 1 filled with 0.
  */
-void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Function type called on coefficient traversal */
-typedef void (*traverse_f) (const polynomial_context_t* ctx, monomial_t* p, void* data);
+typedef void (*traverse_f) (const lp_polynomial_context_t* ctx, monomial_t* p, void* data);
 
 /**
  * Run on the coefficient to traverse all monomials. The traverse_f function will be called on he monomial with
  * the associated data.
  */
-void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data);
+void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data);
 
 /**
  * Method called to add a monomial to C. The monomial should be ordered in the
  * same order as C, top variable at the m[0].
  */
-void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void);
+void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m, void* C_void);

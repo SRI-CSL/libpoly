@@ -15,7 +15,7 @@
 /** Definition of the python Variable object */
 typedef struct {
   PyObject_HEAD
-  assignment_t* assignment;
+  lp_assignment_t* assignment;
 } Assignment;
 
 /** Methods on assignments */
@@ -25,7 +25,7 @@ extern PyMethodDef Assignment_methods[];
 extern PyTypeObject AssignmentType;
 
 /** Get the default assignment  */
-assignment_t* Assignment_get_default_assignment(void);
+lp_assignment_t* Assignment_get_default_assignment(void);
 
 /** Check if the object is an assignment */
 #define PyAssignment_CHECK(arg) \

@@ -7,7 +7,7 @@
 
 #include "number/dyadic_rational.h"
 
-const dyadic_rational_ops_t dyadic_rational_ops = {
+const lp_dyadic_rational_ops_t lp_dyadic_rational_ops = {
     dyadic_rational_construct,
     dyadic_rational_construct_from_int,
     dyadic_rational_construct_from_integer,

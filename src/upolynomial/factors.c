@@ -9,25 +9,25 @@
 #include "upolynomial/factors.h"
 #include "upolynomial/output.h"
 
-upolynomial_factors_t* upolynomial_factors_construct(void) {
-  upolynomial_factors_t* f = malloc(sizeof(upolynomial_factors_t));
-  integer_construct_from_int(Z, &f->constant, 1);
+lp_upolynomial_factors_t* upolynomial_factors_construct(void) {
+  lp_upolynomial_factors_t* f = malloc(sizeof(lp_upolynomial_factors_t));
+  integer_construct_from_int(lp_Z, &f->constant, 1);
   f->size = 0;
   f->capacity = 10;
-  f->factors = calloc(f->capacity, sizeof(upolynomial_t*));
+  f->factors = calloc(f->capacity, sizeof(lp_upolynomial_t*));
   f->multiplicities = calloc(f->capacity, sizeof(size_t));
   return f;
 }
 
-void upolynomial_factors_swap(upolynomial_factors_t* f1, upolynomial_factors_t* f2) {
-  upolynomial_factors_t tmp = *f1;
+void upolynomial_factors_swap(lp_upolynomial_factors_t* f1, lp_upolynomial_factors_t* f2) {
+  lp_upolynomial_factors_t tmp = *f1;
   *f1 = *f2;
   *f2 = tmp;
 }
 
-void upolynomial_factors_clear(upolynomial_factors_t* f) {
+void upolynomial_factors_clear(lp_upolynomial_factors_t* f) {
   size_t i;
-  integer_assign_int(Z, &f->constant, 1);
+  integer_assign_int(lp_Z, &f->constant, 1);
   for (i = 0; i < f->size; ++i) {
     if (f->factors[i]) {
       upolynomial_delete(f->factors[i]);
@@ -37,7 +37,7 @@ void upolynomial_factors_clear(upolynomial_factors_t* f) {
   f->size = 0;
 }
 
-void upolynomial_factors_destruct(upolynomial_factors_t* f, int destruct_factors) {
+void upolynomial_factors_destruct(lp_upolynomial_factors_t* f, int destruct_factors) {
   if (destruct_factors) {
     upolynomial_factors_clear(f);
   }
@@ -47,25 +47,25 @@ void upolynomial_factors_destruct(upolynomial_factors_t* f, int destruct_factors
   free(f);
 }
 
-size_t upolynomial_factors_size(const upolynomial_factors_t* f) {
+size_t upolynomial_factors_size(const lp_upolynomial_factors_t* f) {
   return f->size;
 }
 
-upolynomial_t* upolynomial_factors_get_factor(upolynomial_factors_t* f, size_t i, size_t* d) {
+lp_upolynomial_t* upolynomial_factors_get_factor(lp_upolynomial_factors_t* f, size_t i, size_t* d) {
   *d = f->multiplicities[i];
   return f->factors[i];
 }
 
-const integer_t* upolynomial_factors_get_constant(const upolynomial_factors_t* f) {
+const lp_integer_t* upolynomial_factors_get_constant(const lp_upolynomial_factors_t* f) {
   return &f->constant;
 }
 
-void upolynomial_factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t d) {
+void upolynomial_factors_add(lp_upolynomial_factors_t* f, lp_upolynomial_t* p, size_t d) {
   // assert(upolynomial_degree(p) > 0); (we reuse this as general sets)
 
   if (f->size == f->capacity) {
     f->capacity *= 2;
-    f->factors = realloc(f->factors, f->capacity*sizeof(upolynomial_t*));
+    f->factors = realloc(f->factors, f->capacity*sizeof(lp_upolynomial_t*));
     f->multiplicities = realloc(f->multiplicities, f->capacity*sizeof(size_t));
   }
   f->factors[f->size] = p;
@@ -73,15 +73,15 @@ void upolynomial_factors_add(upolynomial_factors_t* f, upolynomial_t* p, size_t 
   f->size ++;
 }
 
-int_ring upolynomial_factors_ring(const upolynomial_factors_t* f) {
+lp_int_ring upolynomial_factors_ring(const lp_upolynomial_factors_t* f) {
   if (f->size == 0) {
-    return Z;
+    return lp_Z;
   } else {
     return f->factors[0]->K;
   }
 }
 
-void upolynomial_factors_set_ring(upolynomial_factors_t* f, int_ring K) {
+void upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, lp_int_ring K) {
   size_t i;
   for (i = 0; i < f->size; ++ i) {
     upolynomial_set_ring(f->factors[i], K);

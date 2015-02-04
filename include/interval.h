@@ -24,30 +24,30 @@ typedef struct interval_struct {
   /** Is this a single point */
   size_t is_point : 1;
   /** The left end */
-  rational_t a;
+  lp_rational_t a;
   /** The right end */
-  rational_t b;
+  lp_rational_t b;
 } interval_t;
 
 typedef struct {
 
   /** Construct the interval (a, b) */
-  void (*construct) (interval_t* I, const rational_t* a, int a_open, const rational_t* b, int b_open);
+  void (*construct) (interval_t* I, const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open);
 
   /** Construct the interval [a, a] */
-  void (*consturct_point) (interval_t* I, const rational_t* a);
+  void (*consturct_point) (interval_t* I, const lp_rational_t* a);
 
   /** Construct the interval (a, b) */
   void (*construct_copy) (interval_t* I, const interval_t* from);
 
   /** Construct the interval (a, b) */
-  void (*construct_from_dyadic) (interval_t* I, const dyadic_rational_t* a, int a_open, const dyadic_rational_t* b, int b_open);
+  void (*construct_from_dyadic) (interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open);
 
   /** Construct from interval (a, b) from integers */
   void (*construct_from_int) (interval_t* I, long a, int a_open, long b, int b_open);
 
   /** Construct from interval (a, b) from integers */
-  void (*construct_from_integer) (interval_t* I, const integer_t* a, int a_open, const integer_t* b, int b_open);
+  void (*construct_from_integer) (interval_t* I, const lp_integer_t* a, int a_open, const lp_integer_t* b, int b_open);
 
   /** Destroy the interval */
   void (*destruct) (interval_t* I);
@@ -77,67 +77,67 @@ typedef struct {
   /** Is this interval a point */
   size_t is_point : 1;
   /** The left end */
-  dyadic_rational_t a;
+  lp_dyadic_rational_t a;
   /** The right end */
-  dyadic_rational_t b;
-} dyadic_interval_t;
+  lp_dyadic_rational_t b;
+} lp_dyadic_interval_t;
 
 typedef struct {
 
   /** Construct the interval (a, b) */
-  void (*construct) (dyadic_interval_t* I, const dyadic_rational_t* a, int a_open, const dyadic_rational_t* b, int b_open);
+  void (*construct) (lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open);
 
   /** Construct the interval (a, b) */
-  void (*construct_copy) (dyadic_interval_t* I, const dyadic_interval_t* from);
+  void (*construct_copy) (lp_dyadic_interval_t* I, const lp_dyadic_interval_t* from);
 
   /** Construct from interval (a, b) from integers */
-  void (*construct_from_int) (dyadic_interval_t* I, long a, int a_open, long b, int b_open);
+  void (*construct_from_int) (lp_dyadic_interval_t* I, long a, int a_open, long b, int b_open);
 
   /** Construct from interval (a, b) from integers */
-  void (*construct_from_integer) (dyadic_interval_t* I, const integer_t* a, int a_open, const integer_t* b, int b_open);
+  void (*construct_from_integer) (lp_dyadic_interval_t* I, const lp_integer_t* a, int a_open, const lp_integer_t* b, int b_open);
 
   /** Construct the interval [q, q] */
-  void (*construct_point) (dyadic_interval_t* I, const dyadic_rational_t* q);
+  void (*construct_point) (lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
 
   /**
    * Construct the split of I into left and right in the middle. The mid point
    * will be open in left/right depending on the passed flags.
    */
-  void (*construct_from_split) (dyadic_interval_t* I_left, dyadic_interval_t* I_right, const dyadic_interval_t* I, int left_open, int right_open);
+  void (*construct_from_split) (lp_dyadic_interval_t* I_left, lp_dyadic_interval_t* I_right, const lp_dyadic_interval_t* I, int left_open, int right_open);
 
   /** Construct an intersection of two non-disjoint intervals of the SAME SIZE. */
-  void (*construct_intersection) (dyadic_interval_t* I, const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+  void (*construct_intersection) (lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
   /** Destroy the interval */
-  void (*destruct) (dyadic_interval_t* I);
+  void (*destruct) (lp_dyadic_interval_t* I);
 
   /** Swap two intervals */
-  void (*swap) (dyadic_interval_t* I1, dyadic_interval_t* I2);
+  void (*swap) (lp_dyadic_interval_t* I1, lp_dyadic_interval_t* I2);
 
   /** Collapse the interval to a single point */
-  void (*collapse_to) (dyadic_interval_t* I, const dyadic_rational_t* q);
+  void (*collapse_to) (lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
 
   /** Set the left point of the interval */
-  void (*set_a) (dyadic_interval_t* I, const dyadic_rational_t* a, int a_open);
+  void (*set_a) (lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open);
 
-  void (*set_b) (dyadic_interval_t* I, const dyadic_rational_t* b, int b_open);
+  void (*set_b) (lp_dyadic_interval_t* I, const lp_dyadic_rational_t* b, int b_open);
   /** Set the right point of the interval */
 
   /** Prints the interval to the given stream. */
-  int (*print) (const dyadic_interval_t* I, FILE* out);
+  int (*print) (const lp_dyadic_interval_t* I, FILE* out);
 
   /** Check whether two intervals are equal  */
-  int (*equals) (const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+  int (*equals) (const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
   /** Check whether the number q is in the interval I */
-  int (*contains) (const dyadic_interval_t* I, const dyadic_rational_t* q);
+  int (*contains) (const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
 
   /** Check whether two intervals are disjunct */
-  int (*disjunct) (const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+  int (*disjunct) (const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
   /** Scale the interval by power of 2 */
-  void (*scale) (dyadic_interval_t* I, int n);
+  void (*scale) (lp_dyadic_interval_t* I, int n);
 
-} dyadic_interval_ops_t;
+} lp_dyadic_interval_ops_t;
 
-extern const dyadic_interval_ops_t dyadic_interval_ops;
+extern const lp_dyadic_interval_ops_t lp_dyadic_interval_ops;

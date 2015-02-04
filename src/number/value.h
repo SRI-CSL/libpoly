@@ -9,16 +9,16 @@
 
 #include <value.h>
 
-void value_construct(value_t* v, value_type_t type, const void* data);
+void value_construct(lp_value_t* v, lp_value_type_t type, const void* data);
 
-void value_construct_copy(value_t* v, const value_t* from);
+void value_construct_copy(lp_value_t* v, const lp_value_t* from);
 
-void value_destruct(value_t* v);
+void value_destruct(lp_value_t* v);
 
-void value_approx(const value_t* v, interval_t* approx);
+void value_approx(const lp_value_t* v, interval_t* approx);
 
-int value_print(const value_t* v, FILE* out);
+int value_print(const lp_value_t* v, FILE* out);
 
-int value_cmp(const value_t* v1, const value_t* v2);
+int value_cmp(const lp_value_t* v1, const lp_value_t* v2);
 
 int value_cmp_void(const void* v1, const void* v2);

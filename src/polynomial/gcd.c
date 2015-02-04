@@ -14,7 +14,7 @@
 #include "utils/statistics.h"
 #include "utils/debug_trace.h"
 
-void monomial_gcd_visit(const polynomial_context_t* ctx, monomial_t* m, void* data) {
+void monomial_gcd_visit(const lp_polynomial_context_t* ctx, monomial_t* m, void* data) {
   monomial_t* gcd = (monomial_t*) data;
   if (integer_is_zero(ctx->K, &gcd->a)) {
     monomial_assign(ctx, gcd, m, 0);
@@ -36,7 +36,7 @@ void monomial_gcd_visit(const polynomial_context_t* ctx, monomial_t* m, void* da
  *  P = 2*x^2 + 1
  *  Q = 2*y*x^3
  */
-void coefficient_gcd_monomial_extract(const polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
+void coefficient_gcd_monomial_extract(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_monomial_extract()\n");
 
@@ -105,7 +105,7 @@ void coefficient_gcd_monomial_extract(const polynomial_context_t* ctx, coefficie
  * univariate gcd of these. If the coefficients were univariate already, or
  * the result is a constant (i.e. gcd = 1), the result is precise.
  */
-int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
+int coefficient_gcd_pp_univariate(const lp_polynomial_context_t* ctx,
     coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2) {
 
   assert(C1->type == COEFFICIENT_POLYNOMIAL);
@@ -125,12 +125,12 @@ int coefficient_gcd_pp_univariate(const polynomial_context_t* ctx,
     return 0;
   }
 
-  variable_t x = VAR(C1);
+  lp_variable_t x = VAR(C1);
   assert(x == VAR(C2));
 
-  upolynomial_t* C1_u = coefficient_to_univariate(ctx, C1);
-  upolynomial_t* C2_u = coefficient_to_univariate(ctx, C2);
-  upolynomial_t* gcd_u = upolynomial_gcd(C1_u, C2_u);
+  lp_upolynomial_t* C1_u = coefficient_to_univariate(ctx, C1);
+  lp_upolynomial_t* C2_u = coefficient_to_univariate(ctx, C2);
+  lp_upolynomial_t* gcd_u = upolynomial_gcd(C1_u, C2_u);
 
   coefficient_t gcd_tmp;
   coefficient_construct_from_univariate(ctx, &gcd_tmp, gcd_u, x);
@@ -162,7 +162,7 @@ STAT_DECLARE(int, coefficient, gcd_pp)
  * Compute the gcd of two primitive polynomials P and Q. The polynomials P and
  * Q will be used and changed in the computation.
  */
-void coefficient_gcd_pp(const polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
+void coefficient_gcd_pp(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_pp()\n");
   STAT(coefficient, gcd_pp) ++;
@@ -231,7 +231,7 @@ void coefficient_gcd_pp(const polynomial_context_t* ctx, coefficient_t* gcd, coe
 
 STAT_DECLARE(int, coefficient, gcd)
 
-void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_gcd(const lp_polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_gcd()\n");
   STAT(coefficient, gcd) ++;
 
@@ -240,7 +240,7 @@ void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const 
     tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
-  assert(ctx->K == Z);
+  assert(ctx->K == lp_Z);
 
   int cmp_type = coefficient_cmp_type(ctx, C1, C2);
 
@@ -346,7 +346,7 @@ void coefficient_gcd(const polynomial_context_t* ctx, coefficient_t* gcd, const 
 
 STAT_DECLARE(int, coefficient, lcm)
 
-void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_lcm(const lp_polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_lcm()\n");
   STAT(coefficient, lcm) ++;
 
@@ -355,7 +355,7 @@ void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const 
     tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
-  assert(ctx->K == Z);
+  assert(ctx->K == lp_Z);
 
   if (C1->type == COEFFICIENT_NUMERIC && C2->type == COEFFICIENT_NUMERIC) {
     // Integer LCM
@@ -395,7 +395,7 @@ void coefficient_lcm(const polynomial_context_t* ctx, coefficient_t* lcm, const 
 
 STAT_DECLARE(int, coefficient, pp_cont)
 
-void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C) {
+void coefficient_pp_cont(const lp_polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C) {
 
   TRACE("coefficient", "coefficient_pp_cont()\n");
   STAT(coefficient, pp_cont) ++;
@@ -404,7 +404,7 @@ void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coe
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
-  assert(ctx->K == Z);
+  assert(ctx->K == lp_Z);
 
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -473,10 +473,10 @@ void coefficient_pp_cont(const polynomial_context_t* ctx, coefficient_t* pp, coe
   }
 }
 
-void coefficient_cont(const polynomial_context_t* ctx, coefficient_t* cont, const coefficient_t* C) {
+void coefficient_cont(const lp_polynomial_context_t* ctx, coefficient_t* cont, const coefficient_t* C) {
   coefficient_pp_cont(ctx, 0, cont, C);
 }
 
-void coefficient_pp(const polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C) {
+void coefficient_pp(const lp_polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C) {
   coefficient_pp_cont(ctx, pp, 0, C);
 }

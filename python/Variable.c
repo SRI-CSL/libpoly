@@ -12,16 +12,16 @@
 #include <structmember.h>
 
 /** Default variable database */
-static variable_db_t* default_var_db = 0;
+static lp_variable_db_t* default_var_db = 0;
 
 void Variable_init_default_db(void) {
   if (default_var_db) {
-    variable_db_ops.detach(default_var_db);
+    lp_variable_db_ops.detach(default_var_db);
   }
-  default_var_db = variable_db_ops.new();
+  default_var_db = lp_variable_db_ops.new();
 }
 
-variable_db_t* Variable_get_default_db(void) {
+lp_variable_db_t* Variable_get_default_db(void) {
   if (!default_var_db) {
     Variable_init_default_db();
   }
@@ -153,7 +153,7 @@ PyTypeObject VariableType = {
 };
 
 PyObject*
-PyVariable_create(variable_t x) {
+PyVariable_create(lp_variable_t x) {
   Variable *self;
   self = (Variable*)VariableType.tp_alloc(&VariableType, 0);
   if (self != NULL) {
@@ -174,7 +174,7 @@ Variable_init(Variable* self, PyObject* args)
     PyObject* obj = PyTuple_GetItem(args, 0);
     if (PyString_Check(obj)) {
       const char* c_str = PyString_AsString(obj);
-      variable_t x = variable_db_ops.new_variable(Variable_get_default_db(), c_str);
+      lp_variable_t x = lp_variable_db_ops.new_variable(Variable_get_default_db(), c_str);
       self->x = x;
     } else {
       return -1;
@@ -193,14 +193,14 @@ Variable_dealloc(Variable* self)
 
 static PyObject* Variable_str(PyObject* self) {
   Variable* x = (Variable*) self;
-  const char* x_str = variable_db_ops.get_name(Variable_get_default_db(), x->x);
+  const char* x_str = lp_variable_db_ops.get_name(Variable_get_default_db(), x->x);
   PyObject* str = PyString_FromString(x_str);
   return str;
 }
 
 static PyObject* Variable_repr(PyObject* self) {
   Variable* x = (Variable*) self;
-  const char* x_str = variable_db_ops.get_name(Variable_get_default_db(), x->x);
+  const char* x_str = lp_variable_db_ops.get_name(Variable_get_default_db(), x->x);
   char* x_repr = malloc(strlen(x_str) + strlen(VariableType.tp_name) + 5);
   sprintf(x_repr, "%s('%s')", VariableType.tp_name, x_str);
   PyObject* str = PyString_FromString(x_repr);
@@ -209,40 +209,40 @@ static PyObject* Variable_repr(PyObject* self) {
 }
 
 static
-polynomial_t* PyLong_Or_Int_to_polynomial(PyObject* number) {
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
-  integer_t c;
+lp_polynomial_t* PyLong_Or_Int_to_polynomial(PyObject* number) {
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
+  lp_integer_t c;
   PyLong_or_Int_to_integer(number, 0, &c);
-  polynomial_t* p_c = polynomial_ops.alloc();
+  lp_polynomial_t* p_c = polynomial_ops.alloc();
   polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
-  integer_ops.destruct(&c);
+  lp_integer_ops.destruct(&c);
   return p_c;
 }
 
 static
-polynomial_t* Variable_to_polynomial(PyObject* var) {
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+lp_polynomial_t* Variable_to_polynomial(PyObject* var) {
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
   Variable* x = (Variable*) var;
-  integer_t one;
-  integer_ops.construct_from_int(Z, &one, 1);
-  polynomial_t* p_x = polynomial_ops.alloc();
+  lp_integer_t one;
+  lp_integer_ops.construct_from_int(lp_Z, &one, 1);
+  lp_polynomial_t* p_x = polynomial_ops.alloc();
   polynomial_ops.construct_simple(p_x, ctx, &one, x->x, 1);
-  integer_ops.destruct(&one);
+  lp_integer_ops.destruct(&one);
   return p_x;
 }
 
 static PyObject*
 Variable_add_number(PyObject* self, PyObject* other) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
   // The c polynomial
-  polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
+  lp_polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_sum = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_sum = polynomial_ops.new(ctx);
   polynomial_ops.add(p_sum, p_x, p_c);
 
   // Remove temporaries
@@ -257,15 +257,15 @@ Variable_add_number(PyObject* self, PyObject* other) {
 static PyObject*
 Variable_add_Variable(PyObject* self, PyObject* other) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
   // The c polynomial
-  polynomial_t* p_y = Variable_to_polynomial(other);
+  lp_polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_sum = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_sum = polynomial_ops.new(ctx);
   polynomial_ops.add(p_sum, p_x, p_y);
 
   // Remove temporaries
@@ -295,13 +295,13 @@ Variable_add(PyObject* self, PyObject* other) {
 static PyObject*
 Variable_neg(PyObject* self) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
 
   // -x polynomial
-  polynomial_t* p_neg = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_neg = polynomial_ops.new(ctx);
   polynomial_ops.neg(p_neg, p_x);
 
   // Remove temporaries
@@ -314,15 +314,15 @@ Variable_neg(PyObject* self) {
 static PyObject*
 Variable_sub_number(PyObject* self, PyObject* other) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
   // The c polynomial
-  polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
+  lp_polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_sub = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_sub = polynomial_ops.new(ctx);
   polynomial_ops.sub(p_sub, p_x, p_c);
 
   // Remove temporaries
@@ -337,15 +337,15 @@ Variable_sub_number(PyObject* self, PyObject* other) {
 static PyObject*
 Variable_sub_Variable(PyObject* self, PyObject* other) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
   // The c polynomial
-  polynomial_t* p_y = Variable_to_polynomial(other);
+  lp_polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x - y polynomial
-  polynomial_t* p_sub = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_sub = polynomial_ops.new(ctx);
   polynomial_ops.sub(p_sub, p_x, p_y);
 
   // Remove temporaries
@@ -377,15 +377,15 @@ Variable_sub(PyObject* self, PyObject* other) {
 static PyObject*
 Variable_mul_number(PyObject* self, PyObject* other) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
   // The c polynomial
-  polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
+  lp_polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_mul = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_mul = polynomial_ops.new(ctx);
   polynomial_ops.mul(p_mul, p_x, p_c);
 
   // Remove temporaries
@@ -400,15 +400,15 @@ Variable_mul_number(PyObject* self, PyObject* other) {
 static PyObject*
 Variable_mul_Variable(PyObject* self, PyObject* other) {
 
-  const polynomial_context_t* ctx = Polynomial_get_default_context();
+  const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
 
   // The x polynomial
-  polynomial_t* p_x = Variable_to_polynomial(self);
+  lp_polynomial_t* p_x = Variable_to_polynomial(self);
   // The c polynomial
-  polynomial_t* p_y = Variable_to_polynomial(other);
+  lp_polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x + c polynomial
-  polynomial_t* p_mul = polynomial_ops.new(ctx);
+  lp_polynomial_t* p_mul = polynomial_ops.new(ctx);
   polynomial_ops.mul(p_mul, p_x, p_y);
 
   // Remove temporaries
@@ -447,13 +447,13 @@ Variable_pow(PyObject* self, PyObject* other) {
       Py_INCREF(Py_NotImplemented);
       return Py_NotImplemented;
     } else {
-      const polynomial_context_t* ctx = Polynomial_get_default_context();
+      const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
       Variable* var = (Variable*) self;
-      integer_t one;
-      integer_ops.construct_from_int(Z, &one, 1);
-      polynomial_t* pow_x = polynomial_ops.alloc();
+      lp_integer_t one;
+      lp_integer_ops.construct_from_int(lp_Z, &one, 1);
+      lp_polynomial_t* pow_x = polynomial_ops.alloc();
       polynomial_ops.construct_simple(pow_x, ctx, &one, var->x, n);
-      integer_ops.destruct(&one);
+      lp_integer_ops.destruct(&one);
       return Polynomial_create(pow_x);
     }
   }

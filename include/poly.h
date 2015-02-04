@@ -16,20 +16,23 @@
 #include <stdio.h>
 
 //
-// Definitions of all relevan types
+// Definitions of all relevant types
 //
 
-typedef struct upolynomial_struct upolynomial_t;
-typedef struct upolynomial_factors_struct upolynomial_factors_t;
-typedef struct algebraic_number_struct algebraic_number_t;
-typedef struct polynomial_context_struct polynomial_context_t;
-typedef struct polynomial_struct polynomial_t;
-typedef struct assignment_struct assignment_t;
+typedef struct lp_upolynomial_struct lp_upolynomial_t;
+typedef struct lp_upolynomial_factors_struct lp_upolynomial_factors_t;
+typedef struct lp_algebraic_number_struct lp_algebraic_number_t;
+typedef struct lp_polynomial_context_struct lp_polynomial_context_t;
+typedef struct lp_polynomial_struct lp_polynomial_t;
+typedef struct lp_assignment_struct lp_assignment_t;
+
+/**
+ * Function to initialize the library (statistics, logging). Should be called
+ * before any other function.
+ */
+void lp_init();
 
 typedef struct {
-
-  /** Initialize the library (should be called before anything else) */
-  void (*init) (void);
 
   /** Enable a given tag for tracing */
   void (*trace_enable) (const char* tag);
@@ -44,8 +47,10 @@ typedef struct {
   void (*stats_print) (FILE* file);
 
   /** Set the output language */
-  void (*set_output_language) (poly_output_language_t lang);
+  void (*set_output_language) (lp_output_language_t lang);
 
-} poly_ops_t;
+} lp_ops_t;
 
-extern const poly_ops_t poly_ops;
+extern const lp_ops_t lp_poly_ops;
+
+

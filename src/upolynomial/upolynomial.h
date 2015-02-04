@@ -14,112 +14,112 @@
 /**
  * A polynomial is the ring, number of monomials and the monomials.
  */
-struct upolynomial_struct {
+struct lp_upolynomial_struct {
   /** The ring of coefficients */
-  int_ring K;
+  lp_int_ring K;
   /** The number of monomials */
   size_t size;
   /** The monomials */
   umonomial_t monomials[];
 };
 
-size_t upolynomial_degree(const upolynomial_t* p);
+size_t upolynomial_degree(const lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_construct_empty(int_ring K, size_t size);
+lp_upolynomial_t* upolynomial_construct_empty(lp_int_ring K, size_t size);
 
-upolynomial_t* upolynomial_construct(int_ring K, size_t degree, const integer_t* coefficients);
+lp_upolynomial_t* upolynomial_construct(lp_int_ring K, size_t degree, const lp_integer_t* coefficients);
 
-void upolynomial_delete(upolynomial_t* p);
+void upolynomial_delete(lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_construct_power(int_ring K, size_t degree, long c);
+lp_upolynomial_t* upolynomial_construct_power(lp_int_ring K, size_t degree, long c);
 
-upolynomial_t* upolynomial_construct_from_int(int_ring K, size_t degree, const int* coefficients);
+lp_upolynomial_t* upolynomial_construct_from_int(lp_int_ring K, size_t degree, const int* coefficients);
 
-upolynomial_t* upolynomial_construct_from_long(int_ring K, size_t degree, const long* coefficients);
+lp_upolynomial_t* upolynomial_construct_from_long(lp_int_ring K, size_t degree, const long* coefficients);
 
-upolynomial_t* upolynomial_construct_copy(const upolynomial_t* p);
+lp_upolynomial_t* upolynomial_construct_copy(const lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_construct_copy_K(int_ring K, const upolynomial_t* p);
+lp_upolynomial_t* upolynomial_construct_copy_K(lp_int_ring K, const lp_upolynomial_t* p);
 
-void upolynomial_unpack(const upolynomial_t* p, integer_t* out);
+void upolynomial_unpack(const lp_upolynomial_t* p, lp_integer_t* out);
 
-int_ring upolynomial_ring(const upolynomial_t* p);
+lp_int_ring upolynomial_ring(const lp_upolynomial_t* p);
 
-void upolynomial_set_ring(upolynomial_t* p, int_ring K);
+void upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring K);
 
-const integer_t* upolynomial_lead_coeff(const upolynomial_t* p);
+const lp_integer_t* upolynomial_lead_coeff(const lp_upolynomial_t* p);
 \
-int upolynomial_cmp(const upolynomial_t* p, const upolynomial_t* q);
+int upolynomial_cmp(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-int upolynomial_is_zero(const upolynomial_t* p);
+int upolynomial_is_zero(const lp_upolynomial_t* p);
 
-int upolynomial_is_one(const upolynomial_t* p);
+int upolynomial_is_one(const lp_upolynomial_t* p);
 
-int upolynomial_is_monic(const upolynomial_t* p);
+int upolynomial_is_monic(const lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_add(const upolynomial_t* p, const upolynomial_t* q);
+lp_upolynomial_t* upolynomial_add(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-upolynomial_t* upolynomial_sub(const upolynomial_t* p, const upolynomial_t* q);
+lp_upolynomial_t* upolynomial_sub(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-upolynomial_t* upolynomial_neg(const upolynomial_t* p);
+lp_upolynomial_t* upolynomial_neg(const lp_upolynomial_t* p);
 
-void upolynomial_neg_in_place(upolynomial_t* p);
+void upolynomial_neg_in_place(lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_mul(const upolynomial_t* p, const upolynomial_t* q);
+lp_upolynomial_t* upolynomial_mul(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-upolynomial_t* upolynomial_mul_c(const upolynomial_t* p, const integer_t* c);
+lp_upolynomial_t* upolynomial_mul_c(const lp_upolynomial_t* p, const lp_integer_t* c);
 
-upolynomial_t* upolynomial_pow(const upolynomial_t* p, long pow);
+lp_upolynomial_t* upolynomial_pow(const lp_upolynomial_t* p, long pow);
 
-upolynomial_t* upolynomial_derivative(const upolynomial_t* p);
+lp_upolynomial_t* upolynomial_derivative(const lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_div_degrees(const upolynomial_t* p, size_t a);
+lp_upolynomial_t* upolynomial_div_degrees(const lp_upolynomial_t* p, size_t a);
 
-upolynomial_t* upolynomial_div_exact(const upolynomial_t* p, const upolynomial_t* q);
+lp_upolynomial_t* upolynomial_div_exact(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-upolynomial_t* upolynomial_div_exact_c(const upolynomial_t* p, const integer_t* c);
+lp_upolynomial_t* upolynomial_div_exact_c(const lp_upolynomial_t* p, const lp_integer_t* c);
 
-upolynomial_t* upolynomial_rem_exact(const upolynomial_t* p, const upolynomial_t* q);
+lp_upolynomial_t* upolynomial_rem_exact(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-void upolynomial_div_rem_exact(const upolynomial_t* p, const upolynomial_t* q, upolynomial_t** div, upolynomial_t** rem);
+void upolynomial_div_rem_exact(const lp_upolynomial_t* p, const lp_upolynomial_t* q, lp_upolynomial_t** div, lp_upolynomial_t** rem);
 
-void upolynomial_div_pseudo(upolynomial_t** div, upolynomial_t** rem, const upolynomial_t* p, const upolynomial_t* q);
+void upolynomial_div_pseudo(lp_upolynomial_t** div, lp_upolynomial_t** rem, const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-int upolynomial_divides(const upolynomial_t* p, const upolynomial_t* q);
+int upolynomial_divides(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-void upolynomial_content_Z(const upolynomial_t* p, integer_t* content);
+void upolynomial_content_Z(const lp_upolynomial_t* p, lp_integer_t* content);
 
-int upolynomial_is_primitive(const upolynomial_t* p);
+int upolynomial_is_primitive(const lp_upolynomial_t* p);
 
-void upolynomial_make_primitive_Z(upolynomial_t* p);
+void upolynomial_make_primitive_Z(lp_upolynomial_t* p);
 
-upolynomial_t* upolynomial_primitive_part_Z(const upolynomial_t* p);
+lp_upolynomial_t* upolynomial_primitive_part_Z(const lp_upolynomial_t* p);
 
-void upolynomial_evaluate_at_integer(const upolynomial_t* p, const integer_t* x, integer_t* value);
+void upolynomial_evaluate_at_integer(const lp_upolynomial_t* p, const lp_integer_t* x, lp_integer_t* value);
 
-void upolynomial_evaluate_at_dyadic_rational(const upolynomial_t* p, const dyadic_rational_t* x, dyadic_rational_t* value);
+void upolynomial_evaluate_at_dyadic_rational(const lp_upolynomial_t* p, const lp_dyadic_rational_t* x, lp_dyadic_rational_t* value);
 
-int upolynomial_sgn_at_integer(const upolynomial_t* p, const integer_t* x);
+int upolynomial_sgn_at_integer(const lp_upolynomial_t* p, const lp_integer_t* x);
 
-int upolynomial_sgn_at_rational(const upolynomial_t* p, const rational_t* x);
+int upolynomial_sgn_at_rational(const lp_upolynomial_t* p, const lp_rational_t* x);
 
-int upolynomial_sgn_at_dyadic_rational(const upolynomial_t* p, const dyadic_rational_t* x);
+int upolynomial_sgn_at_dyadic_rational(const lp_upolynomial_t* p, const lp_dyadic_rational_t* x);
 
-upolynomial_t* upolynomial_gcd(const upolynomial_t* p, const upolynomial_t* q);
+lp_upolynomial_t* upolynomial_gcd(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
-upolynomial_t* upolynomial_extended_gcd(const upolynomial_t* p, const upolynomial_t* q, upolynomial_t** u, upolynomial_t** v);
+lp_upolynomial_t* upolynomial_extended_gcd(const lp_upolynomial_t* p, const lp_upolynomial_t* q, lp_upolynomial_t** u, lp_upolynomial_t** v);
 
-void upolynomial_solve_bezout(const upolynomial_t* p, const upolynomial_t* q, const upolynomial_t* r, upolynomial_t** u, upolynomial_t** v);
+void upolynomial_solve_bezout(const lp_upolynomial_t* p, const lp_upolynomial_t* q, const lp_upolynomial_t* r, lp_upolynomial_t** u, lp_upolynomial_t** v);
 
-upolynomial_factors_t* upolynomial_factor(const upolynomial_t* p);
+lp_upolynomial_factors_t* upolynomial_factor(const lp_upolynomial_t* p);
 
-int upolynomial_roots_count(const upolynomial_t* p, const interval_t* ab);
+int upolynomial_roots_count(const lp_upolynomial_t* p, const interval_t* ab);
 
-void upolynomial_roots_isolate(const upolynomial_t* p, algebraic_number_t* roots, size_t* roots_size);
+void upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
 
-void upolynomial_roots_sturm_sequence(const upolynomial_t* f, upolynomial_t*** S, size_t* size);
+void upolynomial_roots_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t*** S, size_t* size);
 
 /** Compute f(-x) */
-upolynomial_t* upolynomial_subst_x_neg(const upolynomial_t* f);
+lp_upolynomial_t* upolynomial_subst_x_neg(const lp_upolynomial_t* f);
 
 

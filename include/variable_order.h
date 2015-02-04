@@ -11,11 +11,11 @@
 
 #include "variable.h"
 
-typedef struct variable_order_struct variable_order_t;
-typedef struct variable_order_ops_struct variable_order_ops_t;
+typedef struct lp_variable_order_struct lp_variable_order_t;
+typedef struct lp_variable_order_ops_struct lp_variable_order_ops_t;
 
-struct variable_order_struct {
-  variable_order_ops_t* ops;
+struct lp_variable_order_struct {
+  lp_variable_order_ops_t* ops;
 };
 
 /**
@@ -30,24 +30,24 @@ struct variable_order_struct {
  * To do so we can keep the maximal time-stamp of all the variables. If the
  * timestamp of any of the variables
  */
-struct variable_order_ops_struct {
+struct lp_variable_order_ops_struct {
 
   /** Construct a new variable order */
-  variable_order_t* (*new) (void);
+  lp_variable_order_t* (*new) (void);
 
   /** Attach an object to this order (constructor should attach) */
-  void (*attach) (variable_order_t* var_order);
+  void (*attach) (lp_variable_order_t* var_order);
 
   /** Detach an object from this order (frees if refcount = 0) */
-  void (*detach) (variable_order_t* var_order);
+  void (*detach) (lp_variable_order_t* var_order);
 
   /** Compare two variables */
-  int (*cmp) (const variable_order_t* var_order, variable_t x, variable_t y);
+  int (*cmp) (const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y);
 
 };
 
-typedef struct variable_order_simple_struct variable_order_simple_t;
-typedef struct variable_order_simple_ops_struct variable_order_simple_ops_t;
+typedef struct variable_order_simple_struct lp_variable_order_simple_t;
+typedef struct lp_variable_order_simple_ops_struct lp_variable_order_simple_ops_t;
 
 /**
  * A simple variable order that orders variable based on a given list, and
@@ -55,38 +55,38 @@ typedef struct variable_order_simple_ops_struct variable_order_simple_ops_t;
  */
 struct variable_order_simple_struct {
   /** The operations */
-  variable_order_simple_ops_t* ops;
+  lp_variable_order_simple_ops_t* ops;
   /** Reference count */
   size_t ref_count;
   /** The actual order */
-  variable_list_t list;
+  lp_variable_list_t list;
 };
 
-struct variable_order_simple_ops_struct {
+struct lp_variable_order_simple_ops_struct {
 
-  variable_order_ops_t variable_order_ops;
+  lp_variable_order_ops_t variable_order_ops;
 
   /** Get the size of the order */
-  size_t (*size) (const variable_order_simple_t* var_order);
+  size_t (*size) (const lp_variable_order_simple_t* var_order);
 
   /** Clear the order */
-  void (*clear) (variable_order_simple_t* var_order);
+  void (*clear) (lp_variable_order_simple_t* var_order);
 
   /** Does the order have an opinion on x */
-  int (*contains) (variable_order_simple_t* var_order, variable_t x);
+  int (*contains) (lp_variable_order_simple_t* var_order, lp_variable_t x);
 
   /** Push a variable to the list */
-  void (*push) (variable_order_simple_t* var_order, variable_t var);
+  void (*push) (lp_variable_order_simple_t* var_order, lp_variable_t var);
 
   /** Pop the last variable from the list */
-  void (*pop) (variable_order_simple_t* var_order);
+  void (*pop) (lp_variable_order_simple_t* var_order);
 
   /** Print the list of variables */
-  int (*print) (const variable_order_simple_t* var_order, const variable_db_t* var_db, FILE* out);
+  int (*print) (const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db, FILE* out);
 
   /** Return a string representation of the order */
-  char* (*to_string) (const variable_order_simple_t* var_order, const variable_db_t* var_db);
+  char* (*to_string) (const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db);
 
 };
 
-extern variable_order_simple_ops_t variable_order_simple_ops;
+extern lp_variable_order_simple_ops_t lp_variable_order_simple_ops;

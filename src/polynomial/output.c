@@ -11,7 +11,7 @@
 #include <malloc.h>
 #include <string.h>
 
-int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* out) {
+int monomial_print(const lp_polynomial_context_t* ctx, const monomial_t* m, FILE* out) {
   int ret = 0;
   ret += integer_print(&m->a, out);
   ret += fprintf(out, " * ");
@@ -20,12 +20,12 @@ int monomial_print(const polynomial_context_t* ctx, const monomial_t* m, FILE* o
     if (i) {
       ret += fprintf(out, "*");
     }
-    ret += fprintf(out, "%s%s%u", variable_db_ops.get_name(ctx->var_db, m->p[i].x), get_power_symbol(), m->p[i].d);
+    ret += fprintf(out, "%s%s%u", lp_variable_db_ops.get_name(ctx->var_db, m->p[i].x), get_power_symbol(), m->p[i].d);
   }
   return ret;
 }
 
-int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, FILE* out) {
+int coefficient_print(const lp_polynomial_context_t* ctx, const coefficient_t* C, FILE* out) {
   int i, k = 0, ret = 0;
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -33,7 +33,7 @@ int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, F
     break;
   case COEFFICIENT_POLYNOMIAL: {
     // The polynomial
-    const char* var_name = variable_db_ops.get_name(ctx->var_db, C->value.rec.x);
+    const char* var_name = lp_variable_db_ops.get_name(ctx->var_db, C->value.rec.x);
     for (i = SIZE(C) - 1; i >= 0; -- i) {
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         switch (COEFF(C, i)->type) {
@@ -58,7 +58,7 @@ int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, F
           } else {
             if (k ++) {
               ret += fprintf(out, " - ");
-              integer_t tmp;
+              lp_integer_t tmp;
               integer_construct_from_int(ctx->K, &tmp, 0);
               integer_neg(ctx->K, &tmp, &COEFF(C, i)->value.num);
               ret += integer_print(&tmp, out);
@@ -87,7 +87,7 @@ int coefficient_print(const polynomial_context_t* ctx, const coefficient_t* C, F
   return ret;
 }
 
-char* coefficient_to_string(const polynomial_context_t* ctx, const coefficient_t* C) {
+char* coefficient_to_string(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);

@@ -19,13 +19,13 @@
  *
  * with deg(U) < deg(B) - deg(D) and deg(V) < deg(A) - deg(D).
  */
-upolynomial_t* upolynomial_gcd_euclid(const upolynomial_t* A, const upolynomial_t* B, upolynomial_t** U, upolynomial_t** V);
+lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upolynomial_t* B, lp_upolynomial_t** U, lp_upolynomial_t** V);
 
 /**
  * Compute the GCD using the Subresultant algorithm. Degree of A should be >= than the
  * degree of B.
  */
-upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolynomial_t* B);
+lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const lp_upolynomial_t* B);
 
 
 /**
@@ -35,5 +35,5 @@ upolynomial_t* upolynomial_gcd_subresultant(const upolynomial_t* A, const upolyn
  *
  * @param tries how many attempts
  */
-upolynomial_t* upolynomial_gcd_heuristic(const upolynomial_t* A, const upolynomial_t* B, int attempts);
+lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_upolynomial_t* B, int attempts);
 

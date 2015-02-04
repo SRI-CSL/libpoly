@@ -12,9 +12,9 @@
 #include <structmember.h>
 
 /** Default variable database */
-static assignment_t* default_assignment = 0;
+static lp_assignment_t* default_assignment = 0;
 
-assignment_t* Assignment_get_default_assignment(void) {
+lp_assignment_t* Assignment_get_default_assignment(void) {
   if (!default_assignment) {
     default_assignment = assignment_ops.new(Variable_get_default_db());
   }
@@ -92,7 +92,7 @@ PyTypeObject AssignmentType = {
 };
 
 PyObject*
-PyAssignment_create(assignment_t* assignment) {
+PyAssignment_create(lp_assignment_t* assignment) {
   Assignment *self;
   self = (Assignment*)AssignmentType.tp_alloc(&AssignmentType, 0);
   if (self != NULL) {
@@ -141,18 +141,18 @@ Assignment_get_value(PyObject* self, PyObject* args) {
     if (PyVariable_CHECK(var_obj)) {
       Variable* var = (Variable*) var_obj;
       Assignment* a = (Assignment*) self;
-      const value_t* value = assignment_ops.get_value(a->assignment, var->x);
+      const lp_value_t* value = assignment_ops.get_value(a->assignment, var->x);
       switch (value->type) {
-      case VALUE_ALGEBRAIC:
+      case LP_VALUE_ALGEBRAIC:
         return 0;
         break;
-      case VALUE_DYADIC_RATIONAL:
+      case LP_VALUE_DYADIC_RATIONAL:
         return dyadic_rational_to_PyFloat(&value->value.dy_q);
         break;
-      case VALUE_NONE:
+      case LP_VALUE_NONE:
         Py_RETURN_NONE;
         break;
-      case VALUE_RATIONAL:
+      case LP_VALUE_RATIONAL:
         return 0;
         break;
       default:
@@ -177,25 +177,25 @@ Assignment_set_value(PyObject* self, PyObject* args) {
         Assignment* a = (Assignment*) self;
         Variable* var = (Variable*) var_obj;
         if (PyFloat_Check(value_obj)) {
-          dyadic_rational_t value_dyrat;
+          lp_dyadic_rational_t value_dyrat;
           PyFloat_to_dyadic_rational(value_obj, &value_dyrat);
-          value_t value;
-          value_ops.construct(&value, VALUE_DYADIC_RATIONAL, &value_dyrat);
+          lp_value_t value;
+          lp_value_ops.construct(&value, LP_VALUE_DYADIC_RATIONAL, &value_dyrat);
           assignment_ops.set_value(a->assignment, var->x, &value);
-          value_ops.destruct(&value);
-          dyadic_rational_ops.destruct(&value_dyrat);
+          lp_value_ops.destruct(&value);
+          lp_dyadic_rational_ops.destruct(&value_dyrat);
           Py_RETURN_NONE;
         } else if (PyLong_or_Int_Check(value_obj)) {
-          integer_t value_int;
-          PyLong_or_Int_to_integer(value_obj, Z, &value_int);
-          dyadic_rational_t value_dyrat;
-          dyadic_rational_ops.construct_from_integer(&value_dyrat, &value_int);
-          value_t value;
-          value_ops.construct(&value, VALUE_DYADIC_RATIONAL, &value_dyrat);
+          lp_integer_t value_int;
+          PyLong_or_Int_to_integer(value_obj, lp_Z, &value_int);
+          lp_dyadic_rational_t value_dyrat;
+          lp_dyadic_rational_ops.construct_from_integer(&value_dyrat, &value_int);
+          lp_value_t value;
+          lp_value_ops.construct(&value, LP_VALUE_DYADIC_RATIONAL, &value_dyrat);
           assignment_ops.set_value(a->assignment, var->x, &value);
-          value_ops.destruct(&value);
-          dyadic_rational_ops.destruct(&value_dyrat);
-          integer_ops.destruct(&value_int);
+          lp_value_ops.destruct(&value);
+          lp_dyadic_rational_ops.destruct(&value_dyrat);
+          lp_integer_ops.destruct(&value_int);
           Py_RETURN_NONE;
         } else {
           Py_INCREF(Py_NotImplemented);

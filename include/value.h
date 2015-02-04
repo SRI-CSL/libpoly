@@ -18,44 +18,44 @@
 
 /** Types of values for the assignment */
 typedef enum {
-  VALUE_NONE,
-  VALUE_INTEGER,
-  VALUE_DYADIC_RATIONAL,
-  VALUE_RATIONAL,
-  VALUE_ALGEBRAIC
-} value_type_t;
+  LP_VALUE_NONE,
+  LP_VALUE_INTEGER,
+  LP_VALUE_DYADIC_RATIONAL,
+  LP_VALUE_RATIONAL,
+  LP_VALUE_ALGEBRAIC
+} lp_value_type_t;
 
 /** A value is a choice of the available types */
 typedef union {
-  integer_t z;
-  rational_t q;
-  dyadic_rational_t dy_q;
-  algebraic_number_t a;
-} value_union_t;
+  lp_integer_t z;
+  lp_rational_t q;
+  lp_dyadic_rational_t dy_q;
+  lp_algebraic_number_t a;
+} lp_value_union_t;
 
 /** A value is a tagged union of available type */
 typedef struct {
-  value_type_t type;
-  value_union_t value;
-} value_t;
+  lp_value_type_t type;
+  lp_value_union_t value;
+} lp_value_t;
 
 typedef struct {
   /** Construct a value */
-  void (*construct) (value_t* v, value_type_t type, const void* data);
+  void (*construct) (lp_value_t* v, lp_value_type_t type, const void* data);
   /** Construct a copy of the given value */
-  void (*construct_copy) (value_t* v, const value_t* from);
+  void (*construct_copy) (lp_value_t* v, const lp_value_t* from);
   /** Destruct the value */
-  void (*destruct) (value_t* v);
+  void (*destruct) (lp_value_t* v);
   /** Get the approximate value */
-  void (*approximate) (const value_t* v, interval_t* approx);
+  void (*approximate) (const lp_value_t* v, interval_t* approx);
   /** Compare two values. */
-  int (*cmp) (const value_t* v1, const value_t* v2);
+  int (*cmp) (const lp_value_t* v1, const lp_value_t* v2);
   /** Void version of the comparison, use with care. */
   int (*cmp_void) (const void* v1, const void* v2);
   /** Print the value */
-  int (*print) (const value_t* v, FILE* out);
-} value_ops_t;
+  int (*print) (const lp_value_t* v, FILE* out);
+} lp_value_ops_t;
 
 /** Implementation of the value operations */
-extern const value_ops_t value_ops;
+extern const lp_value_ops_t lp_value_ops;
 

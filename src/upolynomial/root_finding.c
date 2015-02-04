@@ -21,14 +21,14 @@
 /** Positive infinity */
 #define INF_P (void*) 1
 
-void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dense_t* S, size_t* size) {
+void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_dense_t* S, size_t* size) {
 
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_compute_sturm_sequence("); upolynomial_print(f, trace_out); tracef("\n");
   }
 
-  integer_t a;
-  integer_construct_from_int(Z, &a, 0);
+  lp_integer_t a;
+  integer_construct_from_int(lp_Z, &a, 0);
 
   // Min size for the polynomials
   size_t f_deg = upolynomial_degree(f);
@@ -45,7 +45,7 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
 
   // f[1] = f'
   upolynomial_dense_construct(&S[1], f_deg + 1);
-  upolynomial_dense_derivative(Z, &S[0], &S[1]);
+  upolynomial_dense_derivative(lp_Z, &S[0], &S[1]);
   upolynomial_dense_mk_primitive_Z(&S[1], 1);
 
   if (trace_is_enabled("roots")) {
@@ -65,8 +65,8 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
 
     // If the coefficient of the reduction is not negative, we have to flip the
     // sign to get a Sturm sequence
-    if (integer_sgn(Z, &a) > 0) {
-      upolynomial_dense_negate(&S[i], Z);
+    if (integer_sgn(lp_Z, &a) > 0) {
+      upolynomial_dense_negate(&S[i], lp_Z);
     }
 
     if (trace_is_enabled("roots")) {
@@ -87,7 +87,7 @@ void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dens
  */
 int sturm_seqence_count_sign_changes(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
-    const rational_t* a, int max_changes)
+    const lp_rational_t* a, int max_changes)
 {
   int i, sgn_a, sgn_a_previous = 0, sgn_a_changes_count = 0;
   for (i = 0; i < sturm_sequence_size && sgn_a_changes_count < max_changes; ++ i) {
@@ -113,7 +113,7 @@ int sturm_seqence_count_sign_changes(
  */
 int sturm_seqence_count_sign_changes_dyadic(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
-    const dyadic_rational_t* a, int max_changes)
+    const lp_dyadic_rational_t* a, int max_changes)
 {
   int i, sgn_a, sgn_a_previous = 0, sgn_a_changes_count = 0;
   for (i = 0; i < sturm_sequence_size && sgn_a_changes_count < max_changes; ++ i) {
@@ -163,7 +163,7 @@ int sturm_seqence_count_roots(
 /** Count roots in the given interval */
 int sturm_seqence_count_roots_dyadic(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
-    const dyadic_interval_t* interval)
+    const lp_dyadic_interval_t* interval)
 {
   // Sign changes at a (or -inf)
   int a_sgn_changes =
@@ -194,9 +194,9 @@ int sturm_seqence_count_roots_dyadic(
  * interval (a, b]. We therefore do a square-free decomposition, check if b is
  * a zero and then count the roots in (a, b].
  */
-int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* interval) {
+int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const interval_t* interval) {
 
-  assert(f->K == Z);
+  assert(f->K == lp_Z);
 
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_root_count_sturm(");
@@ -213,12 +213,12 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
   }
 
   // Get the square-free factorization and then count roots for each factor.
-  upolynomial_factors_t* square_free_factors = upolynomial_factor_square_free(f);
+  lp_upolynomial_factors_t* square_free_factors = upolynomial_factor_square_free(f);
 
   size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
     // The factor we are working with
-    const upolynomial_t* factor = square_free_factors->factors[factor_i];
+    const lp_upolynomial_t* factor = square_free_factors->factors[factor_i];
 
     // Compute the Sturm sequence for the factor
     size_t sturm_sequence_size;
@@ -248,11 +248,11 @@ int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* inte
  */
 void sturm_seqence_isolate_roots(
     const upolynomial_dense_t* S, size_t S_size,
-    algebraic_number_t* roots, size_t* roots_size,
-    const dyadic_interval_t* interval,
+    lp_algebraic_number_t* roots, size_t* roots_size,
+    const lp_dyadic_interval_t* interval,
     int a_sgn_changes, int b_sgn_changes)
 {
-  dyadic_interval_t I;
+  lp_dyadic_interval_t I;
   dyadic_interval_construct_copy(&I, interval);
 
   for (;;) {
@@ -283,7 +283,7 @@ void sturm_seqence_isolate_roots(
       } else if (upolynomial_dense_sgn_at_dyadic_rational(&S[0], &I.a) != 0) {
         // Copy out the open interval (a, b)
         I.b_open = 1;
-        upolynomial_t* f = upolynomial_dense_to_upolynomial(&S[0], Z);
+        lp_upolynomial_t* f = upolynomial_dense_to_upolynomial(&S[0], lp_Z);
         algebraic_number_construct(&roots[*roots_size], f, &I);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
@@ -292,8 +292,8 @@ void sturm_seqence_isolate_roots(
     }
 
     // Continue with the splits (a, m], (m, b]
-    dyadic_interval_t I_left;
-    dyadic_interval_t I_right;
+    lp_dyadic_interval_t I_left;
+    lp_dyadic_interval_t I_right;
     dyadic_interval_construct_from_split(&I_left, &I_right, &I, 0, 1);
 
     // Number of sign changes in the mid-point
@@ -329,9 +329,9 @@ void sturm_seqence_isolate_roots(
 /**
  * Same as the root counting except the we
  */
-void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t* roots, size_t* roots_size) {
+void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_number_t* roots, size_t* roots_size) {
 
-  assert(f->K == Z);
+  assert(f->K == lp_Z);
 
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_root_isolate_sturm("); upolynomial_print(f, trace_out); tracef(")\n");
@@ -346,12 +346,12 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
   }
 
   // Get the square-free factorization and then count roots for each factor.
-  upolynomial_factors_t* square_free_factors = upolynomial_factor_square_free(f);
+  lp_upolynomial_factors_t* square_free_factors = upolynomial_factor_square_free(f);
 
   size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
     // The factor we are working with
-    const upolynomial_t* factor = square_free_factors->factors[factor_i];
+    const lp_upolynomial_t* factor = square_free_factors->factors[factor_i];
     int factor_deg = upolynomial_degree(factor);
 
     // Compute the Sturm sequence for the factor
@@ -362,7 +362,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
     // Get the total number of roots
     int total_count = sturm_seqence_count_roots_dyadic(sturm_sequence, sturm_sequence_size, 0);
     // Now grow the interval (-1, 1] until it captures all the roots
-    dyadic_interval_t interval_all;
+    lp_dyadic_interval_t interval_all;
     dyadic_interval_construct_from_int(&interval_all, -1, 1, 1, 1);
     int a_sgn_changes, b_sgn_changes;
     for (;;) {
@@ -404,7 +404,7 @@ void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t*
   }
 
   // Sort the roots
-  qsort(roots, *roots_size, sizeof(algebraic_number_t), algebraic_number_cmp_void);
+  qsort(roots, *roots_size, sizeof(lp_algebraic_number_t), algebraic_number_cmp_void);
 
   // Destroy the factors
   upolynomial_factors_destruct(square_free_factors, 1);

@@ -16,21 +16,21 @@
  * If the second sign is equal to the first one, then only the first one is
  * relevant.
  */
-enum sign_condition_enum {
+enum lp_sign_condition_enum {
   /** <  0 */
-  SGN_LT_0,
+  LP_SGN_LT_0,
   /** <= 0 */
-  SGN_LE_0,
+  LP_SGN_LE_0,
   /** == 0 */
-  SGN_EQ_0,
+  LP_SGN_EQ_0,
   /** != 0 */
-  SGN_NE_0,
+  LP_SGN_NE_0,
   /** >  0 */
-  SGN_GT_0,
+  LP_SGN_GT_0,
   /** >= 0 */
-  SGN_GE_0
+  LP_SGN_GE_0
 };
 
-typedef enum sign_condition_enum sign_condition_t;
+typedef enum lp_sign_condition_enum lp_sign_condition_t;
 
 

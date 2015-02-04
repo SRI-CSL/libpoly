@@ -13,7 +13,7 @@ Trace_enable(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, "s", &tag)) {
     return 0;
   }
-  poly_ops.trace_enable(tag);
+  lp_poly_ops.trace_enable(tag);
 #endif
   Py_RETURN_NONE;
 }
@@ -25,14 +25,14 @@ Trace_disable(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, "s", &tag)) {
     return 0;
   }
-  poly_ops.trace_disable(tag);
+  lp_poly_ops.trace_disable(tag);
 #endif
   Py_RETURN_NONE;
 }
 
 static PyObject*
 Stats_print(PyObject* self) {
-  poly_ops.stats_print(stdout);
+  lp_poly_ops.stats_print(stdout);
   Py_RETURN_NONE;
 }
 
@@ -69,13 +69,13 @@ initpolypy(void)
   m = Py_InitModule3("polypy", polypy_methods, "PolyPy Libarary.");
 
   // Initialize the library
-  poly_ops.init();
-  poly_ops.set_output_language(OUTPUT_PYTHON);
+  lp_init();
+  lp_poly_ops.set_output_language(LP_OUTPUT_PYTHON);
 
   Py_INCREF(&CoefficientRingType);
   PyModule_AddObject(m, "CoefficientRing", (PyObject*)&CoefficientRingType);
 
-  PyObject* PyZ = PyCoefficientRing_create(Z);
+  PyObject* PyZ = PyCoefficientRing_create(lp_Z);
   Py_INCREF(PyZ);
   PyModule_AddObject(m, "Z", PyZ);
 
@@ -99,7 +99,7 @@ initpolypy(void)
   PyModule_AddObject(m, "UPolynomial", (PyObject*)&UPolynomialType);
 
   int x_coeff[2] = { 0, 1 };
-  upolynomial_t* x_poly = upolynomial_ops.construct_from_int(Z, 1, x_coeff);
+  lp_upolynomial_t* x_poly = upolynomial_ops.construct_from_int(lp_Z, 1, x_coeff);
   PyObject* x = PyUPolynomial_create(x_poly);
   Py_INCREF(x);
   PyModule_AddObject(m, "x", x);

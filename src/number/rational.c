@@ -7,7 +7,7 @@
 
 #include "number/rational.h"
 
-const rational_ops_t rational_ops = {
+const lp_rational_ops_t lp_rational_ops = {
     rational_construct,
     rational_construct_from_int,
     rational_construct_from_integer,

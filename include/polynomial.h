@@ -34,64 +34,64 @@
 typedef struct {
 
   /** Construct a zero polynomial (does not attach the context) */
-  void (*construct) (polynomial_t* A, const polynomial_context_t* ctx);
+  void (*construct) (lp_polynomial_t* A, const lp_polynomial_context_t* ctx);
 
   /** Construct a simple polynomial c*x^n */
-  void (*construct_simple) (polynomial_t* A, const polynomial_context_t* ctx, const integer_t* c, variable_t x, unsigned n);
+  void (*construct_simple) (lp_polynomial_t* A, const lp_polynomial_context_t* ctx, const lp_integer_t* c, lp_variable_t x, unsigned n);
 
   /** Construct a copy of the given polynomial (does not attach the context). */
-  void (*construct_copy) (polynomial_t* A, const polynomial_t* from);
+  void (*construct_copy) (lp_polynomial_t* A, const lp_polynomial_t* from);
 
   /** Destruct the polynomial. */
-  void (*destruct) (polynomial_t* A);
+  void (*destruct) (lp_polynomial_t* A);
 
   /** Allocate a new polynomial (unconstructed) */
-  polynomial_t* (*alloc) (void);
+  lp_polynomial_t* (*alloc) (void);
 
   /** Allocate and construct a new polynomial */
-  polynomial_t* (*new) (const polynomial_context_t* ctx);
+  lp_polynomial_t* (*new) (const lp_polynomial_context_t* ctx);
 
   /** Makr the polynomial as external */
-  void (*set_external) (polynomial_t* A);
+  void (*set_external) (lp_polynomial_t* A);
 
   /** Swap two polynomials. */
-  void (*swap) (polynomial_t* A1, polynomial_t* A2);
+  void (*swap) (lp_polynomial_t* A1, lp_polynomial_t* A2);
 
   /** Assign the polynomial a given polynomial. */
-  void (*assign) (polynomial_t* A, const polynomial_t* from);
+  void (*assign) (lp_polynomial_t* A, const lp_polynomial_t* from);
 
   /** Returns the context of the polynomial */
-  const polynomial_context_t* (*context) (const polynomial_t* A);
+  const lp_polynomial_context_t* (*context) (const lp_polynomial_t* A);
 
   /** Returns the degree of the polynomial (in it's top variable) */
-  size_t (*degree) (const polynomial_t* A);
+  size_t (*degree) (const lp_polynomial_t* A);
 
   /** Returns the top variable of the polynomial */
-  variable_t (*top_variable) (const polynomial_t* A);
+  lp_variable_t (*top_variable) (const lp_polynomial_t* A);
 
   /** Puts the k-th coefficient of A into C */
-  void (*get_coefficient) (polynomial_t* C, const polynomial_t* A, size_t k);
+  void (*get_coefficient) (lp_polynomial_t* C, const lp_polynomial_t* A, size_t k);
 
   /** Get the reductum of the polynomial (the polynomial withough the leading coefficient) */
-  void (*reductum) (polynomial_t* R, const polynomial_t* A);
+  void (*reductum) (lp_polynomial_t* R, const lp_polynomial_t* A);
 
   /** Get the model-based reductum of the polynomial (the polynomial withough the leading coefficient) */
-  void (*reductum_m) (polynomial_t* R, const polynomial_t* A, const assignment_t* m);
+  void (*reductum_m) (lp_polynomial_t* R, const lp_polynomial_t* A, const lp_assignment_t* m);
 
   /** Returns true if the polynomial is a constant */
-  int (*is_constant) (const polynomial_t* A);
+  int (*is_constant) (const lp_polynomial_t* A);
 
   /** Returns true if the polynomial is 0 */
-  int (*is_zero) (const polynomial_t* A);
+  int (*is_zero) (const lp_polynomial_t* A);
 
   /** returns the sign of the polynomial in the model */
-  int (*sgn) (const polynomial_t* A, const assignment_t* m);
+  int (*sgn) (const lp_polynomial_t* A, const lp_assignment_t* m);
 
   /**
    * Compare the two polynomials in the ring. Not necessarily +/- 1, could be
    * any integer, only the sign matters.
    */
-  int (*cmp) (const polynomial_t* A1, const polynomial_t* A2);
+  int (*cmp) (const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /**
    * Compare the type of two polynomials. Type if either a constant or a
@@ -99,42 +99,42 @@ typedef struct {
    * and constants are smaller than other polynomials. This is not a total
    * ORDER.
    */
-  int (*cmp_type) (const polynomial_t* A1, const polynomial_t* A2);
+  int (*cmp_type) (const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Returns true if A1 divides A2. */
-  int (*divides) (const polynomial_t* A1, const polynomial_t* A2);
+  int (*divides) (const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Prints the polynomial to the given stream. */
-  int (*print) (const polynomial_t* A, FILE* out);
+  int (*print) (const lp_polynomial_t* A, FILE* out);
 
   /** Returns the string representation of the polynomial. */
-  char* (*to_string) (const polynomial_t* A);
+  char* (*to_string) (const lp_polynomial_t* A);
 
   /** Compute S = A1 + A2. */
-  void (*add) (polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2);
+  void (*add) (lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute S = A1 - A2 in the given ring. */
-  void (*sub) (polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2);
+  void (*sub) (lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute N = -C. */
-  void (*neg) (polynomial_t* N, const polynomial_t* A);
+  void (*neg) (lp_polynomial_t* N, const lp_polynomial_t* A);
 
   /** Compute P = A1 * A2. */
-  void (*mul) (polynomial_t* P, const polynomial_t* A1, const polynomial_t* A2);
+  void (*mul) (lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /**
    * Multiplication with x^n.
    */
-  void (*shl) (polynomial_t* S, const polynomial_t* A, unsigned n);
+  void (*shl) (lp_polynomial_t* S, const lp_polynomial_t* A, unsigned n);
 
   /** Compute P = C^n. */
-  void (*pow) (polynomial_t* P, const polynomial_t* A, unsigned n);
+  void (*pow) (lp_polynomial_t* P, const lp_polynomial_t* A, unsigned n);
 
   /** Compute S += A1*A2. */
-  void (*add_mul) (polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2);
+  void (*add_mul) (lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute S -= A1*A2. */
-  void (*sub_mul) (polynomial_t* S, const polynomial_t* A1, const polynomial_t* A2);
+  void (*sub_mul) (lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /**
    * Reduce the polynomial A in Z[y,x] using B in Z[y,x] so that
@@ -150,52 +150,52 @@ typedef struct {
    *
    *   deg(R) < deg(B) or deg(R) = 0
    */
-  void (*reduce) (const polynomial_t* A, const polynomial_t* B,
-      polynomial_t* P, polynomial_t* Q, polynomial_t* R);
+  void (*reduce) (const lp_polynomial_t* A, const lp_polynomial_t* B,
+      lp_polynomial_t* P, lp_polynomial_t* Q, lp_polynomial_t* R);
 
   /** Compute A1 = D*A2 (assumes that A2 divides A1). */
-  void (*div) (polynomial_t* D, const polynomial_t* A1, const polynomial_t* A2);
+  void (*div) (lp_polynomial_t* D, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute A1 = D*A2 + R (assumes that exact division). */
-  void (*rem) (polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
+  void (*rem) (lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute a*A1 = D*A2 + R (pseudo remainder). */
-  void (*prem) (polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
+  void (*prem) (lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute a*A1 = D*A2 + R (sparse pseudo remainder). */
-  void (*sprem) (polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
+  void (*sprem) (lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute A1 = D*A2 + R (assumes that exact division). */
-  void (*divrem) (polynomial_t* D, polynomial_t* R, const polynomial_t* A1, const polynomial_t* A2);
+  void (*divrem) (lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute A_d = A' (in the top variable). */
-  void (*derivative) (polynomial_t* A_d, const polynomial_t* A);
+  void (*derivative) (lp_polynomial_t* A_d, const lp_polynomial_t* A);
 
   /** Compute the greatest common divisor gcd(A1, A2). */
-  void (*gcd) (polynomial_t* gcd, const polynomial_t* A1, const polynomial_t* A2);
+  void (*gcd) (lp_polynomial_t* gcd, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /** Compute the least common multiple lcm(A1, A2). */
-  void (*lcm) (polynomial_t* lcm, const polynomial_t* A1, const polynomial_t* A2);
+  void (*lcm) (lp_polynomial_t* lcm, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /**
    * Compute the resultant of A1 and A2 in their top variable. Both A1 and A2
    * must be (non-trivial) polynomials over the same variable.
    */
-  void (*resultant) (polynomial_t* res, const polynomial_t* A1, const polynomial_t* A2);
+  void (*resultant) (lp_polynomial_t* res, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /**
    * Compute the principal subresultant coefficients (psc) of A1 and A1. Bot A1
    * and A2 must be (non-trivial) polynomials over the same variable. If
    *  deg(A1) = m, deg(A2) = n, and output will be of size min(m, n).
    */
-  void (*psc) (polynomial_t** psc, const polynomial_t* A1, const polynomial_t* A2);
+  void (*psc) (lp_polynomial_t** psc, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
   /**
    * Get the square-free factorization of the given polynomial. It will allocate
    * the given arrays and return the polynomials and their multiplicities in
    * them.
    */
-  void (*factor_square_free) (const polynomial_t* A, polynomial_t*** factors, size_t** multiplicities, size_t* size);
+  void (*factor_square_free) (const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size);
 
 } polynomial_ops_t;
 

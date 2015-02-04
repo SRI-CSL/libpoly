@@ -29,7 +29,7 @@
  * transform it into a polynomial and adjust the coefficent.
  */
 static void
-coefficient_ensure_capacity(const polynomial_context_t* ctx, coefficient_t* C, variable_t x, size_t capacity);
+coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C, lp_variable_t x, size_t capacity);
 
 /**
  * Assumes:
@@ -41,14 +41,14 @@ coefficient_ensure_capacity(const polynomial_context_t* ctx, coefficient_t* C, v
  * * The highest coefficient should be non-zero
  */
 static void
-coefficient_normalize(const polynomial_context_t* ctx, coefficient_t* C);
+coefficient_normalize(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
 int
-coefficient_is_normalized(const polynomial_context_t* ctx, coefficient_t* C);
+coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
 STAT_DECLARE(int, coefficient, construct)
 
-void coefficient_construct(const polynomial_context_t* ctx, coefficient_t* C) {
+void coefficient_construct(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_construct()\n");
   STAT(coefficient, construct) ++;
 
@@ -58,7 +58,7 @@ void coefficient_construct(const polynomial_context_t* ctx, coefficient_t* C) {
 
 STAT_DECLARE(int, coefficient, construct_from_int)
 
-void coefficient_construct_from_int(const polynomial_context_t* ctx, coefficient_t* C, long C_int) {
+void coefficient_construct_from_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long C_int) {
   TRACE("coefficient::internal", "coefficient_construct_from_int()\n");
   STAT(coefficient, construct_from_int) ++;
 
@@ -68,7 +68,7 @@ void coefficient_construct_from_int(const polynomial_context_t* ctx, coefficient
 
 STAT_DECLARE(int, coefficient, construct_from_integer)
 
-void coefficient_construct_from_integer(const polynomial_context_t* ctx, coefficient_t* C, const integer_t* C_integer) {
+void coefficient_construct_from_integer(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* C_integer) {
   TRACE("coefficient::internal", "coefficient_construct_from_integer()\n");
   STAT(coefficient, construct_from_integer) ++;
 
@@ -78,7 +78,7 @@ void coefficient_construct_from_integer(const polynomial_context_t* ctx, coeffic
 
 STAT_DECLARE(int, coefficient, construct_rec)
 
-void coefficient_construct_rec(const polynomial_context_t* ctx, coefficient_t* C, variable_t x, size_t capacity) {
+void coefficient_construct_rec(const lp_polynomial_context_t* ctx, coefficient_t* C, lp_variable_t x, size_t capacity) {
   TRACE("coefficient::internal", "coefficient_construct_rec()\n");
   STAT(coefficient, construct_rec) ++;
 
@@ -92,7 +92,7 @@ void coefficient_construct_rec(const polynomial_context_t* ctx, coefficient_t* C
 
 STAT_DECLARE(int, coefficient, construct_simple)
 
-void coefficient_construct_simple(const polynomial_context_t* ctx, coefficient_t* C, const integer_t* a, variable_t x, unsigned n) {
+void coefficient_construct_simple(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* a, lp_variable_t x, unsigned n) {
   TRACE("coefficient::internal", "coefficient_construct_simple()\n");
   STAT(coefficient, construct_simple) ++;
 
@@ -107,7 +107,7 @@ void coefficient_construct_simple(const polynomial_context_t* ctx, coefficient_t
 
 STAT_DECLARE(int, coefficient, construct_copy)
 
-void coefficient_construct_copy(const polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
+void coefficient_construct_copy(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
   TRACE("coefficient::internal", "coefficient_construct_copy()\n");
   STAT(coefficient, construct_copy) ++;
 
@@ -132,15 +132,15 @@ void coefficient_construct_copy(const polynomial_context_t* ctx, coefficient_t* 
 
 STAT_DECLARE(int, coefficient, construct_from_univariate)
 
-void coefficient_construct_from_univariate(const polynomial_context_t* ctx,
-    coefficient_t* C, const upolynomial_t* C_u, variable_t x) {
+void coefficient_construct_from_univariate(const lp_polynomial_context_t* ctx,
+    coefficient_t* C, const lp_upolynomial_t* C_u, lp_variable_t x) {
 
   TRACE("coefficient::internal", "coefficient_construct_from_univariate()\n");
   STAT(coefficient, construct_from_univariate) ++;
 
   // Get the coefficients
   size_t C_u_deg = upolynomial_degree(C_u);
-  integer_t* coeff = malloc(sizeof(integer_t)*(C_u_deg + 1));
+  lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*(C_u_deg + 1));
 
   size_t i;
   for (i = 0; i <= C_u_deg; ++ i) {
@@ -196,7 +196,7 @@ void coefficient_swap(coefficient_t* C1, coefficient_t* C2) {
 
 STAT_DECLARE(int, coefficient, assign)
 
-void coefficient_assign(const polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
+void coefficient_assign(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
   TRACE("coefficient::internal", "coefficient_assign()\n");
   STAT(coefficient, assign) ++;
 
@@ -224,7 +224,7 @@ void coefficient_assign(const polynomial_context_t* ctx, coefficient_t* C, const
 
 STAT_DECLARE(int, coefficient, assign_int)
 
-void coefficient_assign_int(const polynomial_context_t* ctx, coefficient_t* C, long x) {
+void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long x) {
   TRACE("coefficient::internal", "coefficient_assign_int()\n");
   STAT(coefficient, assign) ++;
 
@@ -238,7 +238,7 @@ void coefficient_assign_int(const polynomial_context_t* ctx, coefficient_t* C, l
   assert(coefficient_is_normalized(ctx, C));
 }
 
-const coefficient_t* coefficient_lc_safe(const polynomial_context_t* ctx, const coefficient_t* C, variable_t x) {
+const coefficient_t* coefficient_lc_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_variable_t x) {
   __unused(ctx);
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -270,7 +270,7 @@ const coefficient_t* coefficient_lc(const coefficient_t* C) {
   return 0;
 }
 
-void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C) {
+void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C) {
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
@@ -296,7 +296,7 @@ void coefficient_reductum(const polynomial_context_t* ctx, coefficient_t* R, con
   coefficient_destruct(&result);
 }
 
-void coefficient_reductum_m(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const assignment_t* m) {
+void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m) {
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
@@ -339,7 +339,7 @@ size_t coefficient_degree(const coefficient_t* C) {
   return 0;
 }
 
-size_t coefficient_degree_safe(const polynomial_context_t* ctx, const coefficient_t* C, variable_t x) {
+size_t coefficient_degree_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_variable_t x) {
   __unused(ctx);
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -358,7 +358,7 @@ size_t coefficient_degree_safe(const polynomial_context_t* ctx, const coefficien
   return 0;
 }
 
-variable_t coefficient_top_variable(const coefficient_t* C) {
+lp_variable_t coefficient_top_variable(const coefficient_t* C) {
   assert(C->type == COEFFICIENT_POLYNOMIAL);
   return VAR(C);
 }
@@ -382,19 +382,19 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
 
 STAT_DECLARE(int, coefficient, is_zero)
 
-int coefficient_is_zero(const polynomial_context_t* ctx, const coefficient_t* C) {
+int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   STAT(coefficient, is_zero) ++;
   return C->type == COEFFICIENT_NUMERIC && integer_is_zero(ctx->K, &C->value.num);
 }
 
 STAT_DECLARE(int, coefficient, is_one)
 
-int coefficient_is_one(const polynomial_context_t* ctx, const coefficient_t* C) {
+int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   STAT(coefficient, is_one) ++;
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, 1) == 0;
 }
 
-void coefficient_value_approx(const polynomial_context_t* ctx, const coefficient_t* C, const assignment_t* m, interval_t* value) {
+void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, interval_t* value) {
 
   if (C->type == COEFFICIENT_NUMERIC) {
     interval_t result;
@@ -440,7 +440,7 @@ void coefficient_value_approx(const polynomial_context_t* ctx, const coefficient
 
 STAT_DECLARE(int, coefficient, sgn)
 
-int coefficient_sgn(const polynomial_context_t* ctx, const coefficient_t* C, const assignment_t* m) {
+int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {
 
   TRACE("coefficient::internal", "coefficient_sgn()\n");
   STAT(coefficient, sgn) ++;
@@ -473,7 +473,7 @@ int coefficient_sgn(const polynomial_context_t* ctx, const coefficient_t* C, con
 
 STAT_DECLARE(int, coefficient, lc_sgn)
 
-int coefficient_lc_sgn(const polynomial_context_t* ctx, const coefficient_t* C) {
+int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   STAT(coefficient, lc_sgn) ++;
 
   while (C->type != COEFFICIENT_NUMERIC) {
@@ -486,7 +486,7 @@ int coefficient_lc_sgn(const polynomial_context_t* ctx, const coefficient_t* C) 
 
 STAT_DECLARE(int, coefficient, in_order)
 
-int coefficient_in_order(const polynomial_context_t* ctx, const coefficient_t* C) {
+int coefficient_in_order(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_in_order()\n");
   STAT(coefficient, in_order) ++;
 
@@ -517,7 +517,7 @@ int coefficient_in_order(const polynomial_context_t* ctx, const coefficient_t* C
 }
 
 
-int coefficient_cmp_general(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, int compare_values) {
+int coefficient_cmp_general(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, int compare_values) {
   int cmp;
 
   if (C1->type == COEFFICIENT_NUMERIC && C2->type == COEFFICIENT_NUMERIC) {
@@ -570,7 +570,7 @@ int coefficient_cmp_general(const polynomial_context_t* ctx, const coefficient_t
 
 STAT_DECLARE(int, coefficient, cmp)
 
-int coefficient_cmp(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
+int coefficient_cmp(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_cmp()\n");
   STAT(coefficient, cmp) ++;
 
@@ -579,17 +579,17 @@ int coefficient_cmp(const polynomial_context_t* ctx, const coefficient_t* C1, co
 
 STAT_DECLARE(int, coefficient, cmp_type)
 
-int coefficient_cmp_type(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
+int coefficient_cmp_type(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::internal", "coefficient_cmp_type()\n");
   STAT(coefficient, cmp_type) ++;
 
   return coefficient_cmp_general(ctx, C1, C2, 0);
 }
 
-void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data) {
+void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data) {
 
   if (trace_is_enabled("coefficient::order")) {
-    tracef("order = "); variable_order_simple_ops.print((variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
+    tracef("order = "); lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
     tracef("m = "); monomial_print(ctx, m, trace_out); tracef("\n");
   }
@@ -621,7 +621,7 @@ void coefficient_traverse(const polynomial_context_t* ctx, const coefficient_t* 
  * Method called to add a monomial to C. The monomial should be ordered in the
  * same order as C, top variable at the m[0].
  */
-void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void) {
+void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m, void* C_void) {
 
   coefficient_t* C = (coefficient_t*) C_void;
 
@@ -643,7 +643,7 @@ void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, vo
     }
   } else {
     // Proper monomial (first variable is the top one)
-    variable_t x = m->p[0].x;
+    lp_variable_t x = m->p[0].x;
     unsigned d = m->p[0].d;
     // Compare the variables
     if (C->type == COEFFICIENT_NUMERIC || ctx->var_order->ops->cmp(ctx->var_order, x, VAR(C)) >= 0) {
@@ -663,7 +663,7 @@ void coefficient_add_monomial(const polynomial_context_t* ctx, monomial_t* m, vo
   assert(coefficient_is_normalized(ctx, C));
 }
 
-void coefficient_order_and_add_monomial(const polynomial_context_t* ctx, monomial_t* m, void* C_void) {
+void coefficient_order_and_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m, void* C_void) {
   monomial_t m_ordered;
   monomial_construct_copy(ctx, &m_ordered, m, /** sort */ 1);
   coefficient_add_monomial(ctx, &m_ordered, C_void);
@@ -672,7 +672,7 @@ void coefficient_order_and_add_monomial(const polynomial_context_t* ctx, monomia
 
 STAT_DECLARE(int, coefficient, order)
 
-void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C) {
+void coefficient_order(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   TRACE("coefficient", "coefficient_order()\n");
   STAT(coefficient, order) ++;
 
@@ -682,7 +682,7 @@ void coefficient_order(const polynomial_context_t* ctx, coefficient_t* C) {
   }
 
   if (trace_is_enabled("coefficient::order")) {
-    tracef("order = "); variable_order_simple_ops.print((variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
+    tracef("order = "); lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
@@ -707,7 +707,7 @@ STAT_DECLARE(int, coefficient, add)
 
 #define MAX(x, y) (x >= y ? x : y)
 
-void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_add(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_add()\n");
   STAT(coefficient, add) ++;
 
@@ -779,7 +779,7 @@ void coefficient_add(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, neg)
 
-void coefficient_neg(const polynomial_context_t* ctx, coefficient_t* N, const coefficient_t* C) {
+void coefficient_neg(const lp_polynomial_context_t* ctx, coefficient_t* N, const coefficient_t* C) {
   TRACE("coefficient::arith", "coefficient_neg()\n");
   STAT(coefficient, neg) ++;
 
@@ -821,7 +821,7 @@ void coefficient_neg(const polynomial_context_t* ctx, coefficient_t* N, const co
 
 STAT_DECLARE(int, coefficient, sub)
 
-void coefficient_sub(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_sub(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_sub()\n");
   STAT(coefficient, sub) ++;
 
@@ -885,11 +885,11 @@ void coefficient_sub(const polynomial_context_t* ctx, coefficient_t* S, const co
 }
 
 
-void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_add_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 STAT_DECLARE(int, coefficient, mul)
 
-void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_mul(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_mul()\n");
   STAT(coefficient, mul) ++;
 
@@ -963,7 +963,7 @@ void coefficient_mul(const polynomial_context_t* ctx, coefficient_t* P, const co
 
 STAT_DECLARE(int, coefficient, mul_int)
 
-void coefficient_mul_int(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a) {
+void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a) {
   TRACE("coefficient::arith", "coefficient_mul_int()\n");
   STAT(coefficient, mul_int) ++;
 
@@ -1003,13 +1003,13 @@ void coefficient_mul_int(const polynomial_context_t* ctx, coefficient_t* P, cons
 
 STAT_DECLARE(int, coefficient, shl)
 
-void coefficient_shl(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, variable_t x, unsigned n) {
+void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shl()\n");
   STAT(coefficient, shl) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
-    tracef("x = %s\n", variable_db_ops.get_name(ctx->var_db, x));
+    tracef("x = %s\n", lp_variable_db_ops.get_name(ctx->var_db, x));
     tracef("n  = %u\n", n);
   }
 
@@ -1034,7 +1034,7 @@ void coefficient_shl(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, shr)
 
-void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n) {
+void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shr()\n");
   STAT(coefficient, shl) ++;
 
@@ -1077,7 +1077,7 @@ void coefficient_shr(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, pow)
 
-void coefficient_pow(const polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n) {
+void coefficient_pow(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n) {
   TRACE("coefficient", "coefficient_pow()\n");
   STAT(coefficient, pow) ++;
 
@@ -1134,7 +1134,7 @@ void coefficient_pow(const polynomial_context_t* ctx, coefficient_t* P, const co
 
 STAT_DECLARE(int, coefficient, add_mul)
 
-void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_add_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_add_mul()\n");
   STAT(coefficient, add_mul) ++;
 
@@ -1159,7 +1159,7 @@ void coefficient_add_mul(const polynomial_context_t* ctx, coefficient_t* S, cons
 
 STAT_DECLARE(int, coefficient, sub_mul)
 
-void coefficient_sub_mul(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_sub_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_sub_mul()\n");
   STAT(coefficient, sub_mul) ++;
 
@@ -1178,7 +1178,7 @@ void coefficient_sub_mul(const polynomial_context_t* ctx, coefficient_t* S, cons
 
 STAT_DECLARE(int, coefficient, derivative)
 
-void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d, const coefficient_t* C) {
+void coefficient_derivative(const lp_polynomial_context_t* ctx, coefficient_t* C_d, const coefficient_t* C) {
   TRACE("coefficient", "coefficient_derivative()\n");
   STAT(coefficient, derivative) ++;
 
@@ -1204,7 +1204,7 @@ void coefficient_derivative(const polynomial_context_t* ctx, coefficient_t* C_d,
   assert(coefficient_is_normalized(ctx, C_d));
 }
 
-void coefficient_div_degrees(const polynomial_context_t* ctx, coefficient_t* C, size_t p) {
+void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* C, size_t p) {
   if (C->type == COEFFICIENT_POLYNOMIAL) {
     size_t i;
     for (i = 1; i < SIZE(C); ++ i) {
@@ -1222,7 +1222,7 @@ void coefficient_div_degrees(const polynomial_context_t* ctx, coefficient_t* C, 
 /// Forward declarations of division/reduction/gcd stuff
 ///
 
-void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
 
 //
 // Implementation of the division/reduction/gcd stuff
@@ -1231,7 +1231,7 @@ void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const co
 STAT_DECLARE(int, coefficient, reduce)
 
 void coefficient_reduce(
-    const polynomial_context_t* ctx,
+    const lp_polynomial_context_t* ctx,
     const coefficient_t* A, const coefficient_t* B,
     coefficient_t* P, coefficient_t* Q, coefficient_t* R,
     remaindering_type_t type)
@@ -1257,7 +1257,7 @@ void coefficient_reduce(
   coefficient_construct_copy(ctx, &R_tmp, A);
 
   // The main variable we are reducing
-  variable_t x = VAR(A);
+  lp_variable_t x = VAR(A);
 
   // Keep track of the degrees of the reduct to account for dense/sparse
   int R_deg = coefficient_degree(&R_tmp);
@@ -1452,7 +1452,7 @@ void coefficient_reduce(
 
 STAT_DECLARE(int, coefficient, div)
 
-void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_div()\n");
   STAT(coefficient, div) ++;
 
@@ -1505,7 +1505,7 @@ void coefficient_div(const polynomial_context_t* ctx, coefficient_t* D, const co
 
 STAT_DECLARE(int, coefficient, rem)
 
-void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_rem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_rem()\n");
   STAT(coefficient, rem) ++;
 
@@ -1540,7 +1540,7 @@ void coefficient_rem(const polynomial_context_t* ctx, coefficient_t* R, const co
 
 STAT_DECLARE(int, coefficient, sprem)
 
-void coefficient_sprem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_sprem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_sprem()\n");
   STAT(coefficient, sprem) ++;
 
@@ -1575,7 +1575,7 @@ void coefficient_sprem(const polynomial_context_t* ctx, coefficient_t* R, const 
 
 STAT_DECLARE(int, coefficient, prem)
 
-void coefficient_prem(const polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_prem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_prem()\n");
   STAT(coefficient, rem) ++;
 
@@ -1611,7 +1611,7 @@ void coefficient_prem(const polynomial_context_t* ctx, coefficient_t* R, const c
 
 STAT_DECLARE(int, coefficient, divrem)
 
-void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_divrem()\n");
   STAT(coefficient, divrem) ++;
 
@@ -1661,7 +1661,7 @@ void coefficient_divrem(const polynomial_context_t* ctx, coefficient_t* D, coeff
 
 STAT_DECLARE(int, coefficient, divides)
 
-int coefficient_divides(const polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
+int coefficient_divides(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_divides()\n");
   STAT(coefficient, divides) ++;
 
@@ -1688,24 +1688,24 @@ int coefficient_is_univariate(const coefficient_t* C) {
   }
 }
 
-const integer_t* coefficient_get_constant(const coefficient_t* C) {
+const lp_integer_t* coefficient_get_constant(const coefficient_t* C) {
   while (C->type == COEFFICIENT_POLYNOMIAL) {
     C = COEFF(C, 0);
   }
   return &C->value.num;
 }
 
-upolynomial_t* coefficient_to_univariate(const polynomial_context_t* ctx, const coefficient_t* C) {
+lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-  integer_t* coeff = malloc(sizeof(integer_t)*SIZE(C));
+  lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*SIZE(C));
 
   size_t i;
   for (i = 0; i < SIZE(C); ++ i) {
     integer_construct_copy(ctx->K, coeff + i, coefficient_get_constant(COEFF(C, i)));
   }
 
-  upolynomial_t* C_u = upolynomial_construct(ctx->K, SIZE(C) - 1, coeff);
+  lp_upolynomial_t* C_u = upolynomial_construct(ctx->K, SIZE(C) - 1, coeff);
 
   for (i = 0; i < SIZE(C); ++ i) {
     integer_destruct(coeff + i);
@@ -1722,7 +1722,7 @@ STAT_DECLARE(int, coefficient, psc)
  *
  * [2000] Ducos - Optimizations of the subresltant algorithm.
  */
-void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
+void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_psc()\n");
   STAT(coefficient, psc) ++;
@@ -1735,7 +1735,7 @@ void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* S, const co
   assert(P->type == COEFFICIENT_POLYNOMIAL);
   assert(Q->type == COEFFICIENT_POLYNOMIAL);
 
-  variable_t x = VAR(P);
+  lp_variable_t x = VAR(P);
   assert(VAR(Q) == x);
 
   size_t P_deg = coefficient_degree(P);
@@ -1880,7 +1880,7 @@ void coefficient_psc(const polynomial_context_t* ctx, coefficient_t* S, const co
 
 STAT_DECLARE(int, coefficient, resultant)
 
-void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* A, const coefficient_t* B) {
+void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* A, const coefficient_t* B) {
   TRACE("coefficient", "coefficient_resultant()\n");
   STAT(coefficient, resultant) ++;
 
@@ -1929,7 +1929,7 @@ void coefficient_resultant(const polynomial_context_t* ctx, coefficient_t* res, 
 ///
 
 static void
-coefficient_normalize(const polynomial_context_t* ctx, coefficient_t* C) {
+coefficient_normalize(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   if (C->type == COEFFICIENT_POLYNOMIAL) {
     assert(C->value.rec.size >= 1);
     size_t i = C->value.rec.size - 1;
@@ -1953,7 +1953,7 @@ coefficient_normalize(const polynomial_context_t* ctx, coefficient_t* C) {
 }
 
 int
-coefficient_is_normalized(const polynomial_context_t* ctx, coefficient_t* C) {
+coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return 1;
@@ -1975,7 +1975,7 @@ coefficient_is_normalized(const polynomial_context_t* ctx, coefficient_t* C) {
 }
 
 static void
-coefficient_ensure_capacity(const polynomial_context_t* ctx, coefficient_t* C, variable_t x, size_t capacity) {
+coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C, lp_variable_t x, size_t capacity) {
   assert(capacity >= 1);
   coefficient_t tmp;
   switch(C->type) {

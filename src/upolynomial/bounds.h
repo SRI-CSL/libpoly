@@ -21,7 +21,7 @@
  *
  *  B = 1 + max(a_0, ..., a_{n-1})/|a_n|
  */
-void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B);
+void upolynomial_root_bound_cauchy(const lp_upolynomial_t* f, lp_integer_t* B);
 
 /**
  * Computes the bound on the size of coefficients of any polynomial g with
@@ -35,4 +35,4 @@ void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B);
  *
  *  B = 2^d*norm(f)
  */
-void upolynomial_factor_bound_landau_mignotte(const upolynomial_t* f, size_t n, integer_t* B);
+void upolynomial_factor_bound_landau_mignotte(const lp_upolynomial_t* f, size_t n, lp_integer_t* B);

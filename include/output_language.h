@@ -7,13 +7,13 @@
 
 #pragma once
 
-enum poly_output_language_enum {
+enum lp_output_language_enum {
   /** Output in latex format, i.e. x^2 - 1 */
-  OUTPUT_LATEX,
+  LP_OUTPUT_LATEX,
   /** Output in SMT2 format, i.e. (+ (* x x) (- 1)) */
-  OUTPUT_SMT2,
+  LP_OUTPUT_SMT2,
   /** Output in Python format, i.e. x**2 - 1 */
-  OUTPUT_PYTHON,
+  LP_OUTPUT_PYTHON,
 };
 
-typedef enum poly_output_language_enum poly_output_language_t;
+typedef enum lp_output_language_enum lp_output_language_t;

@@ -23,41 +23,41 @@
  *
  *   |z| < (max / |a_n|) + 1
  */
-void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B) {
+void upolynomial_root_bound_cauchy(const lp_upolynomial_t* f, lp_integer_t* B) {
 
-  assert(f->K == Z);
+  assert(f->K == lp_Z);
 
-  integer_t M_p; // Positive
-  integer_t M_n; // Negative
-  integer_construct_from_int(Z, &M_p, 0);
-  integer_construct_from_int(Z, &M_n, 0);
+  lp_integer_t M_p; // Positive
+  lp_integer_t M_n; // Negative
+  integer_construct_from_int(lp_Z, &M_p, 0);
+  integer_construct_from_int(lp_Z, &M_n, 0);
 
   int k;
   int d = f->size - 1;
   for (k = 0; k < d; ++ k) {
     if (f->monomials[k].degree > 0) {
-      if (integer_cmp(Z, &f->monomials[k].coefficient, &M_p) > 0) {
-        integer_assign(Z, &M_p, &f->monomials[k].coefficient);
-        integer_neg(Z, &M_n, &f->monomials[k].coefficient);
-      } else if (integer_cmp(Z, &f->monomials[k].coefficient, &M_n) < 0) {
-        integer_assign(Z, &M_n, &f->monomials[k].coefficient);
-        integer_neg(Z, &M_p, &f->monomials[k].coefficient);
+      if (integer_cmp(lp_Z, &f->monomials[k].coefficient, &M_p) > 0) {
+        integer_assign(lp_Z, &M_p, &f->monomials[k].coefficient);
+        integer_neg(lp_Z, &M_n, &f->monomials[k].coefficient);
+      } else if (integer_cmp(lp_Z, &f->monomials[k].coefficient, &M_n) < 0) {
+        integer_assign(lp_Z, &M_n, &f->monomials[k].coefficient);
+        integer_neg(lp_Z, &M_p, &f->monomials[k].coefficient);
       }
     }
   }
 
-  integer_construct_from_int(Z, B, 0);
-  if (integer_sgn(Z, &f->monomials[d].coefficient) > 0) {
+  integer_construct_from_int(lp_Z, B, 0);
+  if (integer_sgn(lp_Z, &f->monomials[d].coefficient) > 0) {
     integer_div_Z(B, &M_p, &f->monomials[d].coefficient);
   } else {
-    integer_t neg;
-    integer_construct_from_int(Z, &neg, 0);
-    integer_neg(Z, &neg, &f->monomials[d].coefficient);
+    lp_integer_t neg;
+    integer_construct_from_int(lp_Z, &neg, 0);
+    integer_neg(lp_Z, &neg, &f->monomials[d].coefficient);
     integer_div_Z(B, &M_p, &f->monomials[d].coefficient);
     integer_destruct(&neg);
   }
 
-  integer_inc(Z, B);
+  integer_inc(lp_Z, B);
 
   integer_destruct(&M_p);
   integer_destruct(&M_n);
@@ -107,42 +107,42 @@ void upolynomial_root_bound_cauchy(const upolynomial_t* f, integer_t* B) {
  *
  *  |b_j| <= 2^n*norm(f).
  */
-void upolynomial_factor_bound_landau_mignotte(const upolynomial_t* f, size_t n, integer_t* B) {
+void upolynomial_factor_bound_landau_mignotte(const lp_upolynomial_t* f, size_t n, lp_integer_t* B) {
 
-  assert(f->K == Z);
+  assert(f->K == lp_Z);
   assert(upolynomial_degree(f) >= n);
 
-  integer_t tmp;
-  integer_t norm;
-  integer_t ak_sq;
-  integer_construct_from_int(Z, &tmp, 0);
-  integer_construct_from_int(Z, &norm, 0);
-  integer_construct_from_int(Z, &ak_sq, 0);
+  lp_integer_t tmp;
+  lp_integer_t norm;
+  lp_integer_t ak_sq;
+  integer_construct_from_int(lp_Z, &tmp, 0);
+  integer_construct_from_int(lp_Z, &norm, 0);
+  integer_construct_from_int(lp_Z, &ak_sq, 0);
 
   size_t k;
 
   // Sum of squares
   for(k = 0; k < f->size; ++ k) {
-    const integer_t* ak = &f->monomials[k].coefficient;
-    integer_mul(Z, &ak_sq, ak, ak);
-    integer_add(Z, &tmp, &norm, &ak_sq);
+    const lp_integer_t* ak = &f->monomials[k].coefficient;
+    integer_mul(lp_Z, &ak_sq, ak, ak);
+    integer_add(lp_Z, &tmp, &norm, &ak_sq);
     integer_swap(&tmp, &norm);
   }
 
   // Square root
   integer_sqrt_Z(&tmp, &norm);
   integer_swap(&tmp, &norm);
-  integer_inc(Z, &norm);
+  integer_inc(lp_Z, &norm);
 
   // Power of two
-  integer_t two;
-  integer_t power;
-  integer_construct_from_int(Z, &two, 2);
-  integer_construct_from_int(Z, &power, 0);
-  integer_pow(Z, &power, &two, n);
+  lp_integer_t two;
+  lp_integer_t power;
+  integer_construct_from_int(lp_Z, &two, 2);
+  integer_construct_from_int(lp_Z, &power, 0);
+  integer_pow(lp_Z, &power, &two, n);
 
   // Result
-  integer_mul(Z, B, &power, &norm);
+  integer_mul(lp_Z, B, &power, &norm);
 
   integer_destruct(&tmp);
   integer_destruct(&norm);

@@ -25,17 +25,17 @@
  *
  * with a*b < 0.
  */
-void upolynomial_compute_sturm_sequence(const upolynomial_t* f, upolynomial_dense_t* S, size_t* size);
+void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_dense_t* S, size_t* size);
 
 /**
  * Count the number of real roots that the polynomial f has in the given open
  * interval. The polynomial f should be square-free.
  */
-int upolynomial_roots_count_sturm(const upolynomial_t* f, const interval_t* interval);
+int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const interval_t* interval);
 
 /**
  * Isolate the root intervals of the polynomial f and construct the resulting
  * numbers into the given array (should be at least deg(f) size). The size
  * will be updated to the number of roots.
  */
-void upolynomial_roots_isolate_sturm(const upolynomial_t* f, algebraic_number_t* roots, size_t* roots_size);
+void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_number_t* roots, size_t* roots_size);

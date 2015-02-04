@@ -17,12 +17,12 @@ void interval_mul(interval_t* P, const interval_t* I1, const interval_t* I2);
 
 void interval_pow(interval_t* P, const interval_t* I, unsigned n);
 
-void dyadic_interval_add(dyadic_interval_t* S, const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
-void dyadic_interval_neg(dyadic_interval_t* N, const dyadic_interval_t* I);
+void dyadic_interval_neg(lp_dyadic_interval_t* N, const lp_dyadic_interval_t* I);
 
-void dyadic_interval_sub(dyadic_interval_t* S, const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+void dyadic_interval_sub(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
-void dyadic_interval_mul(dyadic_interval_t* P, const dyadic_interval_t* I1, const dyadic_interval_t* I2);
+void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
-void dyadic_interval_pow(dyadic_interval_t* P, const dyadic_interval_t* I, unsigned n);
+void dyadic_interval_pow(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I, unsigned n);

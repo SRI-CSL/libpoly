@@ -15,7 +15,7 @@
 /** Definition of the python UPolynomial object */
 typedef struct {
   PyObject_HEAD
-  upolynomial_t* p;
+  lp_upolynomial_t* p;
 } UPolynomialObject;
 
 /** Methods on univariate polynomials */
@@ -28,7 +28,7 @@ extern PyNumberMethods UPolynomial_NumberMethods;
 extern PyTypeObject UPolynomialType;
 
 /** Create a new polynomial */
-PyObject* PyUPolynomial_create(upolynomial_t* p);
+PyObject* PyUPolynomial_create(lp_upolynomial_t* p);
 
 /** Check if the object is a polynomial */
 #define PyUPolynomial_CHECK(arg) \
