@@ -28,25 +28,17 @@ struct lp_polynomial_context_struct {
   lp_variable_order_t* var_order;
 };
 
-/** Operations on the polynomial context */
-typedef struct {
+/** Create a new context and attach. */
+lp_polynomial_context_t* lp_polynomial_context_new(lp_int_ring_t* K, lp_variable_db_t* var_db, lp_variable_order_t* var_order);
 
-  /** Create a new context and attach. */
-  lp_polynomial_context_t* (*new) (lp_int_ring_t* K, lp_variable_db_t* var_db, lp_variable_order_t* var_order);
+/** Attach to existing context */
+void lp_polynomial_context_attach(lp_polynomial_context_t* ctx);
 
-  /** Attach to existing context */
-  void (*attach) (lp_polynomial_context_t* ctx);
+/** Delete the context (dec reference count and if 0 also free the memory) */
+void lp_polynomial_context_detach(lp_polynomial_context_t* ctx);
 
-  /** Delete the context (dec reference count and if 0 also free the memory) */
-  void (*detach) (lp_polynomial_context_t* ctx);
-
-  /**
-   * Compare two contexts. Two contexts are equal if their rings test for
-   * equality and their variable order is identical (pointers)
-   */
-  int (*equal) (const lp_polynomial_context_t* ctx1, const lp_polynomial_context_t* ctx2);
-
-} lp_polynomial_context_ops_t;
-
-/** Implementation of the context operations */
-extern const lp_polynomial_context_ops_t lp_polynomial_context_ops;
+/**
+ * Compare two contexts. Two contexts are equal if their rings test for
+ * equality and their variable order is identical (pointers)
+ */
+int lp_polynomial_context_equal(const lp_polynomial_context_t* ctx1, const lp_polynomial_context_t* ctx2);

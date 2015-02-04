@@ -20,7 +20,7 @@ static lp_polynomial_context_t* default_ctx = 0;
 
 const lp_polynomial_context_t* Polynomial_get_default_context(void) {
   if (!default_ctx) {
-    default_ctx = lp_polynomial_context_ops.new(0, Variable_get_default_db(), (lp_variable_order_t*) VariableOrder_get_default_order());
+    default_ctx = lp_polynomial_context_new(0, Variable_get_default_db(), (lp_variable_order_t*) VariableOrder_get_default_order());
   }
   return default_ctx;
 }
@@ -540,7 +540,7 @@ Polynomial_mul(PyObject* self, PyObject* other) {
   // Get arguments
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -611,7 +611,7 @@ Polynomial_div(PyObject* self, PyObject* other) {
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -658,7 +658,7 @@ Polynomial_rem_operator(PyObject* self, PyObject* other) {
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -706,7 +706,7 @@ Polynomial_divmod(PyObject* self, PyObject* other) {
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -777,7 +777,7 @@ Polynomial_rem_general(PyObject* self, PyObject* args, enum rem_type type) {
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -852,7 +852,7 @@ Polynomial_gcd(PyObject* self, PyObject* args) {
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -902,7 +902,7 @@ Polynomial_lcm(PyObject* self, PyObject* args) {
   // other can be a variable or a number
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -952,7 +952,7 @@ Polynomial_psc(PyObject* self, PyObject* args) {
   // Othe polynomial
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -1030,7 +1030,7 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
   // Othe polynomial
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_ops.context(p2->p);
-  if (!lp_polynomial_context_ops.equal(p1_ctx, p2_ctx)) {
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }

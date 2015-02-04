@@ -28,11 +28,11 @@ void polynomial_external_clean(const lp_polynomial_t* A_const) {
 void polynomial_set_context(lp_polynomial_t* A, const lp_polynomial_context_t* ctx) {
   if (A->ctx != ctx) {
     if (A->ctx && A->external) {
-      lp_polynomial_context_ops.detach((lp_polynomial_context_t*)A->ctx);
+      lp_polynomial_context_detach((lp_polynomial_context_t*)A->ctx);
     }
     A->ctx = ctx;
     if (A->ctx && A->external) {
-      lp_polynomial_context_ops.attach((lp_polynomial_context_t*)A->ctx);
+      lp_polynomial_context_attach((lp_polynomial_context_t*)A->ctx);
     }
   }
 }
@@ -72,7 +72,7 @@ void polynomial_construct_simple(
 void polynomial_destruct(lp_polynomial_t* A) {
   coefficient_destruct(&A->data);
   if (A->external) {
-    lp_polynomial_context_ops.detach((lp_polynomial_context_t*)A->ctx);
+    lp_polynomial_context_detach((lp_polynomial_context_t*)A->ctx);
   }
 }
 
@@ -90,7 +90,7 @@ lp_polynomial_t* polynomial_new(const lp_polynomial_context_t* ctx) {
 void polynomial_set_external(lp_polynomial_t* A) {
   if (!A->external) {
     A->external = 1;
-    lp_polynomial_context_ops.attach((lp_polynomial_context_t*) A->ctx);
+    lp_polynomial_context_attach((lp_polynomial_context_t*) A->ctx);
   }
 }
 
@@ -170,7 +170,7 @@ int polynomial_cmp(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
     tracef("polynomial_cmp("); polynomial_print(A1, trace_out); tracef(", "); polynomial_print(A2, trace_out); tracef(")\n");
   }
 
-  if (!lp_polynomial_context_ops.equal(A1->ctx, A2->ctx)) {
+  if (!lp_polynomial_context_equal(A1->ctx, A2->ctx)) {
     // random order for different contexts
     return A1 - A2;
   }
@@ -188,15 +188,15 @@ int polynomial_cmp(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
 
 int polynomial_cmp_type(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
   const lp_polynomial_context_t* ctx = A1->ctx;
-  assert(lp_polynomial_context_ops.equal(A1->ctx, ctx));
-  assert(lp_polynomial_context_ops.equal(A2->ctx, ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, ctx));
+  assert(lp_polynomial_context_equal(A2->ctx, ctx));
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
   return coefficient_cmp_type(ctx, &A1->data, &A2->data);
 }
 
 int polynomial_divides(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
-  if (!lp_polynomial_context_ops.equal(A1->ctx, A2->ctx)) {
+  if (!lp_polynomial_context_equal(A1->ctx, A2->ctx)) {
     return 0;
   }
   polynomial_external_clean(A1);
@@ -224,7 +224,7 @@ void polynomial_add(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_poly
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -248,7 +248,7 @@ void polynomial_sub(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_poly
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -281,7 +281,7 @@ void polynomial_mul(lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_poly
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -329,9 +329,9 @@ void polynomial_pow(lp_polynomial_t* P, const lp_polynomial_t* A, unsigned n) {
 void polynomial_add_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
   const lp_polynomial_context_t* ctx = A1->ctx;
 
-  assert(lp_polynomial_context_ops.equal(S->ctx, ctx));
-  assert(lp_polynomial_context_ops.equal(A1->ctx, ctx));
-  assert(lp_polynomial_context_ops.equal(A2->ctx, ctx));
+  assert(lp_polynomial_context_equal(S->ctx, ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, ctx));
+  assert(lp_polynomial_context_equal(A2->ctx, ctx));
 
   polynomial_external_clean(S);
   polynomial_external_clean(A1);
@@ -343,9 +343,9 @@ void polynomial_add_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_
 void polynomial_sub_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
   const lp_polynomial_context_t* ctx = A1->ctx;
 
-  assert(lp_polynomial_context_ops.equal(S->ctx, ctx));
-  assert(lp_polynomial_context_ops.equal(A1->ctx, ctx));
-  assert(lp_polynomial_context_ops.equal(A2->ctx, ctx));
+  assert(lp_polynomial_context_equal(S->ctx, ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, ctx));
+  assert(lp_polynomial_context_equal(A2->ctx, ctx));
 
   polynomial_external_clean(S);
   polynomial_external_clean(A1);
@@ -364,7 +364,7 @@ void polynomial_div(lp_polynomial_t* D, const lp_polynomial_t* A1, const lp_poly
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -388,7 +388,7 @@ void polynomial_rem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_poly
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -412,7 +412,7 @@ void polynomial_prem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_pol
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -436,7 +436,7 @@ void polynomial_sprem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_po
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -460,7 +460,7 @@ void polynomial_divrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomi
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -506,7 +506,7 @@ void polynomial_gcd(lp_polynomial_t* gcd, const lp_polynomial_t* A1, const lp_po
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -521,7 +521,7 @@ void polynomial_gcd(lp_polynomial_t* gcd, const lp_polynomial_t* A1, const lp_po
 }
 
 void polynomial_lcm(lp_polynomial_t* lcm, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
-  assert(lp_polynomial_context_ops.equal(A1->ctx, A2->ctx));
+  assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
 
   polynomial_external_clean(A1);
   polynomial_external_clean(A2);
@@ -545,7 +545,7 @@ void polynomial_reduce(
     tracef("\n");
   }
 
-  assert(lp_polynomial_context_ops.equal(B->ctx, ctx));
+  assert(lp_polynomial_context_equal(B->ctx, ctx));
 
   polynomial_external_clean(A);
   polynomial_external_clean(B);
@@ -583,7 +583,7 @@ void polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp_po
   }
 
   const lp_polynomial_context_t* ctx = A->ctx;
-  assert(lp_polynomial_context_ops.equal(B->ctx, ctx));
+  assert(lp_polynomial_context_equal(B->ctx, ctx));
 
   if (trace_is_enabled("polynomial")) {
     lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
@@ -633,7 +633,7 @@ void polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A, const 
   assert(VAR(&A->data) == VAR(&B->data));
 
   const lp_polynomial_context_t* ctx = A->ctx;
-  assert(lp_polynomial_context_ops.equal(B->ctx, ctx));
+  assert(lp_polynomial_context_equal(B->ctx, ctx));
 
   if (trace_is_enabled("polynomial")) {
     lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
