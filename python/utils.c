@@ -20,18 +20,18 @@ int PyLong_or_Int_Check(PyObject* o) {
 void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring K, lp_integer_t* c) {
   if (PyInt_Check(o)) {
     long c_long  = PyInt_AsLong(o);
-    lp_integer_ops.construct_from_int(K, c, c_long);
+    lp_integer_construct_from_int(K, c, c_long);
   }
   if (PyLong_Check(o)) {
     PyObject* o_str = PyObject_Str(o);
     char* o_cstr = PyString_AsString(o_str);
-    lp_integer_ops.construct_from_string(K, c, o_cstr, 10);
+    lp_integer_construct_from_string(K, c, o_cstr, 10);
     Py_DECREF(o_str);
   }
 }
 
 PyObject* integer_to_PyInt(const lp_integer_t* x) {
-  char* str = lp_integer_ops.to_string(x);
+  char* str = lp_integer_to_string(x);
   char* str_p = 0;
   PyObject* result = PyInt_FromString(str, &str_p, 10);
   free(str);

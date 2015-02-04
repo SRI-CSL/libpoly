@@ -374,14 +374,14 @@ PyPolynomial_FromVariable(PyObject* variable, const lp_polynomial_context_t* ctx
 
   // The constant
   lp_integer_t one;
-  lp_integer_ops.construct_from_int(ctx->K, &one, 1);
+  lp_integer_construct_from_int(ctx->K, &one, 1);
 
   // The x polynomial
   lp_polynomial_t* p_x = lp_polynomial_ops.alloc();
   lp_polynomial_ops.construct_simple(p_x, ctx, &one, x, 1);
 
   // Remove temps
-  lp_integer_ops.destruct(&one);
+  lp_integer_destruct(&one);
 
   // Return the polynomial
   PyObject* result = Polynomial_create(p_x);
@@ -400,7 +400,7 @@ PyPolynomial_FromLong_or_Int(PyObject* number, const lp_polynomial_context_t* ct
   lp_polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
 
   // Remove temps
-  lp_integer_ops.destruct(&c);
+  lp_integer_destruct(&c);
 
   // Return the polynomial
   PyObject* result = Polynomial_create(p_c);

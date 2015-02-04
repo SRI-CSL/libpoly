@@ -364,7 +364,7 @@ UPolynomial_coefficients(PyObject* self) {
 
   lp_integer_t coefficients[size];
   for (i = 0; i < size; ++ i) {
-    lp_integer_ops.construct_from_int(lp_Z, coefficients + i, 0);
+    lp_integer_construct_from_int(lp_Z, coefficients + i, 0);
   }
 
   upolynomial_ops.unpack(p, coefficients);
@@ -374,7 +374,7 @@ UPolynomial_coefficients(PyObject* self) {
   for (i = 0; i < size; ++ i) {
     PyObject* c = integer_to_PyInt(coefficients + i);
     PyList_SetItem(list, i, c);
-    lp_integer_ops.destruct(coefficients + i);
+    lp_integer_destruct(coefficients + i);
   }
 
   return list;
@@ -437,7 +437,7 @@ UPolynomialObject_add_number(PyObject* self, PyObject* other) {
   lp_upolynomial_t* c_p = upolynomial_ops.construct(K, 0, &c);
   lp_upolynomial_t* sum = upolynomial_ops.add(p1->p, c_p);
   upolynomial_ops.delete(c_p);
-  lp_integer_ops.destruct(&c);
+  lp_integer_destruct(&c);
   return PyUPolynomial_create(sum);
 }
 
@@ -474,7 +474,7 @@ UPolynomialObject_sub_int(PyObject* self, PyObject* other, int negate) {
   lp_upolynomial_t* sub =
       negate ? upolynomial_ops.sub(c_p, p1->p) : upolynomial_ops.sub(p1->p, c_p);
   upolynomial_ops.delete(c_p);
-  lp_integer_ops.destruct(&c);
+  lp_integer_destruct(&c);
   return PyUPolynomial_create(sub);
 }
 
@@ -508,7 +508,7 @@ UPolynomialObject_mul_int(PyObject* self, PyObject* other) {
   lp_integer_t c;
   PyLong_or_Int_to_integer(other, upolynomial_ops.ring(p1->p), &c);
   lp_upolynomial_t* sum = upolynomial_ops.multiply_c(p1->p, &c);
-  lp_integer_ops.destruct(&c);
+  lp_integer_destruct(&c);
   return PyUPolynomial_create(sum);
 }
 
@@ -605,9 +605,9 @@ UPolynomialObject_neg(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   // Add the polynomials
   lp_integer_t c;
-  lp_integer_ops.construct_from_int(upolynomial_ops.ring(p->p), &c, -1);
+  lp_integer_construct_from_int(upolynomial_ops.ring(p->p), &c, -1);
   lp_upolynomial_t* neg = upolynomial_ops.multiply_c(p->p, &c);
-  lp_integer_ops.destruct(&c);
+  lp_integer_destruct(&c);
   // Return the result
   return PyUPolynomial_create(neg);
 }
@@ -755,7 +755,7 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
       lp_integer_t a_int;
       PyLong_or_Int_to_integer(a, lp_Z, &a_int);
       lp_dyadic_rational_construct_from_integer(&a_rat, &a_int);
-      lp_integer_ops.destruct(&a_int);
+      lp_integer_destruct(&a_int);
     } else if (PyFloat_Check(a)) {
       PyFloat_to_dyadic_rational(a, &a_rat);
     } else {
@@ -766,7 +766,7 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
       lp_integer_t b_int;
       PyLong_or_Int_to_integer(b, lp_Z, &b_int);
       lp_dyadic_rational_construct_from_integer(&b_rat, &b_int);
-      lp_integer_ops.destruct(&b_int);
+      lp_integer_destruct(&b_int);
     } else if (PyFloat_Check(b)) {
       PyFloat_to_dyadic_rational(b, &b_rat);
     } else {
@@ -873,7 +873,7 @@ UPolynomial_evaluate(PyObject* self, PyObject* args) {
         lp_integer_t x_int;
         PyLong_or_Int_to_integer(x, lp_Z, &x_int);
         lp_dyadic_rational_construct_from_integer(&x_rat, &x_int);
-        lp_integer_ops.destruct(&x_int);
+        lp_integer_destruct(&x_int);
       } else if (PyFloat_Check(x)) {
         PyFloat_to_dyadic_rational(x, &x_rat);
       } else {

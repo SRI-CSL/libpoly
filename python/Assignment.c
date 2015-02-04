@@ -195,7 +195,7 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           lp_assignment_set_value(a->assignment, var->x, &value);
           lp_value_ops.destruct(&value);
           lp_dyadic_rational_destruct(&value_dyrat);
-          lp_integer_ops.destruct(&value_int);
+          lp_integer_destruct(&value_int);
           Py_RETURN_NONE;
         } else {
           Py_INCREF(Py_NotImplemented);

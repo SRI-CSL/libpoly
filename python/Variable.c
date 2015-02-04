@@ -215,7 +215,7 @@ lp_polynomial_t* PyLong_Or_Int_to_polynomial(PyObject* number) {
   PyLong_or_Int_to_integer(number, 0, &c);
   lp_polynomial_t* p_c = lp_polynomial_ops.alloc();
   lp_polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
-  lp_integer_ops.destruct(&c);
+  lp_integer_destruct(&c);
   return p_c;
 }
 
@@ -224,10 +224,10 @@ lp_polynomial_t* Variable_to_polynomial(PyObject* var) {
   const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
   Variable* x = (Variable*) var;
   lp_integer_t one;
-  lp_integer_ops.construct_from_int(lp_Z, &one, 1);
+  lp_integer_construct_from_int(lp_Z, &one, 1);
   lp_polynomial_t* p_x = lp_polynomial_ops.alloc();
   lp_polynomial_ops.construct_simple(p_x, ctx, &one, x->x, 1);
-  lp_integer_ops.destruct(&one);
+  lp_integer_destruct(&one);
   return p_x;
 }
 
@@ -450,10 +450,10 @@ Variable_pow(PyObject* self, PyObject* other) {
       const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
       Variable* var = (Variable*) self;
       lp_integer_t one;
-      lp_integer_ops.construct_from_int(lp_Z, &one, 1);
+      lp_integer_construct_from_int(lp_Z, &one, 1);
       lp_polynomial_t* pow_x = lp_polynomial_ops.alloc();
       lp_polynomial_ops.construct_simple(pow_x, ctx, &one, var->x, n);
-      lp_integer_ops.destruct(&one);
+      lp_integer_destruct(&one);
       return Polynomial_create(pow_x);
     }
   }

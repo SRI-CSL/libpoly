@@ -112,10 +112,10 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
           } else {
             long M_int = PyInt_AsLong(modulus);
             lp_integer_t M;
-            lp_integer_ops.construct_from_int(lp_Z, &M, M_int);
-            int is_prime = lp_integer_ops.is_prime(&M);
+            lp_integer_construct_from_int(lp_Z, &M, M_int);
+            int is_prime = lp_integer_is_prime(&M);
             self->K = lp_int_ring_create(&M, is_prime);
-            lp_integer_ops.destruct(&M);
+            lp_integer_destruct(&M);
           }
         } else {
           int overflow = 0;
@@ -124,14 +124,14 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
             PyObject* M_str = PyObject_Str(modulus);
             char* M_cstr = PyString_AsString(M_str);
             lp_integer_t M;
-            lp_integer_ops.construct_from_string(lp_Z, &M, M_cstr, 10);
-            int is_prime = lp_integer_ops.is_prime(&M);
+            lp_integer_construct_from_string(lp_Z, &M, M_cstr, 10);
+            int is_prime = lp_integer_is_prime(&M);
             self->K = lp_int_ring_create(&M, is_prime);
             Py_DECREF(M_str);
           } else if (M_int > 0) {
             lp_integer_t M;
-            lp_integer_ops.construct_from_int(lp_Z, &M, M_int);
-            int is_prime = lp_integer_ops.is_prime(&M);
+            lp_integer_construct_from_int(lp_Z, &M, M_int);
+            int is_prime = lp_integer_is_prime(&M);
             self->K = lp_int_ring_create(&M, is_prime);
           } else {
             return -1;
@@ -169,14 +169,14 @@ CoefficientRing_cmp(PyObject* self, PyObject* other) {
     return -1;
   }
   // Compare
-  return lp_integer_ops.cmp(lp_Z, &K1->K->M, &K2->K->M);
+  return lp_integer_cmp(lp_Z, &K1->K->M, &K2->K->M);
 }
 
 static PyObject*
 CoefficientRing_modulus(PyObject* self) {
   CoefficientRing* K = (CoefficientRing*) self;
   if (K && K->K) {
-    char* K_str = lp_integer_ops.to_string(&K->K->M);
+    char* K_str = lp_integer_to_string(&K->K->M);
     char* p = 0;
     PyObject* M = PyLong_FromString(K_str, &p, 10);
     free(K_str);
