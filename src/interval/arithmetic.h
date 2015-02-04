@@ -7,15 +7,15 @@
 
 #include "interval/interval.h"
 
-void interval_add(interval_t* S, const interval_t* I1, const interval_t* I2);
+void interval_add(lp_interval_t* S, const lp_interval_t* I1, const lp_interval_t* I2);
 
-void interval_neg(interval_t* N, const interval_t* I);
+void interval_neg(lp_interval_t* N, const lp_interval_t* I);
 
-void interval_sub(interval_t* S, const interval_t* I1, const interval_t* I2);
+void interval_sub(lp_interval_t* S, const lp_interval_t* I1, const lp_interval_t* I2);
 
-void interval_mul(interval_t* P, const interval_t* I1, const interval_t* I2);
+void interval_mul(lp_interval_t* P, const lp_interval_t* I1, const lp_interval_t* I2);
 
-void interval_pow(interval_t* P, const interval_t* I, unsigned n);
+void interval_pow(lp_interval_t* P, const lp_interval_t* I, unsigned n);
 
 void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 

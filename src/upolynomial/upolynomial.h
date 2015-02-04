@@ -113,7 +113,7 @@ void upolynomial_solve_bezout(const lp_upolynomial_t* p, const lp_upolynomial_t*
 
 lp_upolynomial_factors_t* upolynomial_factor(const lp_upolynomial_t* p);
 
-int upolynomial_roots_count(const lp_upolynomial_t* p, const interval_t* ab);
+int upolynomial_roots_count(const lp_upolynomial_t* p, const lp_interval_t* ab);
 
 void upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
 

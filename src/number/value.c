@@ -73,24 +73,24 @@ void value_destruct(lp_value_t* v) {
   }
 }
 
-void value_approx(const lp_value_t* v, interval_t* approx) {
+void value_approx(const lp_value_t* v, lp_interval_t* approx) {
   switch (v->type) {
   case LP_VALUE_INTEGER:
     assert(0);
     break;
   case LP_VALUE_RATIONAL:
-    interval_construct_point(approx, &v->value.q);
+    lp_interval_construct_point(approx, &v->value.q);
     break;
   case LP_VALUE_DYADIC_RATIONAL:
-    interval_construct_from_dyadic(approx, &v->value.dy_q, 0, &v->value.dy_q, 0);
+    lp_interval_construct_from_dyadic(approx, &v->value.dy_q, 0, &v->value.dy_q, 0);
     break;
   case LP_VALUE_ALGEBRAIC:
-    interval_construct_from_dyadic_interval(approx, &v->value.a.I);
+    lp_interval_construct_from_dyadic_interval(approx, &v->value.a.I);
     assert(0);
     break;
   case LP_VALUE_NONE:
     assert(0);
-    interval_construct_zero(approx);
+    lp_interval_construct_zero(approx);
     break;
   }
 }

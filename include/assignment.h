@@ -56,7 +56,7 @@ void lp_assignment_set_value(lp_assignment_t* m, lp_variable_t x, const lp_value
 const lp_value_t* lp_assignment_get_value(const lp_assignment_t* m, lp_variable_t x);
 
 /** Get an approximate value of the variable */
-void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, interval_t* approx);
+void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, lp_interval_t* approx);
 
 /** Get the sign of the polynomial in the model */
 int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A);

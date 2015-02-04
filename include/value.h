@@ -47,7 +47,7 @@ typedef struct {
   /** Destruct the value */
   void (*destruct) (lp_value_t* v);
   /** Get the approximate value */
-  void (*approximate) (const lp_value_t* v, interval_t* approx);
+  void (*approximate) (const lp_value_t* v, lp_interval_t* approx);
   /** Compare two values. */
   int (*cmp) (const lp_value_t* v1, const lp_value_t* v2);
   /** Void version of the comparison, use with care. */

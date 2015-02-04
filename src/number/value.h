@@ -15,7 +15,7 @@ void value_construct_copy(lp_value_t* v, const lp_value_t* from);
 
 void value_destruct(lp_value_t* v);
 
-void value_approx(const lp_value_t* v, interval_t* approx);
+void value_approx(const lp_value_t* v, lp_interval_t* approx);
 
 int value_print(const lp_value_t* v, FILE* out);
 

@@ -299,7 +299,7 @@ typedef struct {
    * Counts the number of real roots in the given interval. If the interval is
    * 0, it counts through (-inf, inf).
    */
-  int (*roots_count) (const lp_upolynomial_t* p, const interval_t* ab);
+  int (*roots_count) (const lp_upolynomial_t* p, const lp_interval_t* ab);
 
   /**
    * Isolate the distinct real roots of the given polynomial.

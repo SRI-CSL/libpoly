@@ -395,20 +395,20 @@ int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* 
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, 1) == 0;
 }
 
-void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, interval_t* value) {
+void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_interval_t* value) {
 
   if (C->type == COEFFICIENT_NUMERIC) {
-    interval_t result;
-    interval_construct_from_integer(&result, &C->value.num, 0, &C->value.num, 0);
-    interval_swap(value, &result);
-    interval_destruct(&result);
+    lp_interval_t result;
+    lp_interval_construct_from_integer(&result, &C->value.num, 0, &C->value.num, 0);
+    lp_interval_swap(value, &result);
+    lp_interval_destruct(&result);
   } else {
 
-    interval_t result, tmp1, tmp2, x_value;
+    lp_interval_t result, tmp1, tmp2, x_value;
 
-    interval_construct_zero(&result);
-    interval_construct_zero(&tmp1);
-    interval_construct_zero(&tmp2);
+    lp_interval_construct_zero(&result);
+    lp_interval_construct_zero(&tmp1);
+    lp_interval_construct_zero(&tmp2);
     // x_value constructed in get_value_approx
 
     // Get the value of x
@@ -431,11 +431,11 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
       }
     }
 
-    interval_swap(&result, value);
-    interval_destruct(&x_value);
-    interval_destruct(&tmp1);
-    interval_destruct(&tmp2);
-    interval_destruct(&result);
+    lp_interval_swap(&result, value);
+    lp_interval_destruct(&x_value);
+    lp_interval_destruct(&tmp1);
+    lp_interval_destruct(&tmp2);
+    lp_interval_destruct(&result);
   }
 }
 
@@ -455,18 +455,18 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
     assert(C->type == COEFFICIENT_POLYNOMIAL);
 
     // Approximate the value of C
-    interval_t C_approx;
-    interval_construct_zero(&C_approx);
+    lp_interval_t C_approx;
+    lp_interval_construct_zero(&C_approx);
 
     // Approximate the value
     coefficient_value_approx(ctx, C, m, &C_approx);
 
     // Safe to give the sign based on the interval bound
-    assert(C_approx.is_point || !interval_contains_zero(&C_approx));
-    sgn = interval_sgn(&C_approx);
+    assert(C_approx.is_point || !lp_interval_contains_zero(&C_approx));
+    sgn = lp_interval_sgn(&C_approx);
 
     // Destruct temps
-    interval_destruct(&C_approx);
+    lp_interval_destruct(&C_approx);
   }
 
   return sgn;
