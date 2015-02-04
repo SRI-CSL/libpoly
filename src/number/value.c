@@ -7,10 +7,11 @@
 
 #include "number/value.h"
 
+#include <algebraic_number.h>
+
 #include "number/integer.h"
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
-#include "number/algebraic_number.h"
 #include "interval/interval.h"
 
 void value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
@@ -28,7 +29,7 @@ void value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
     dyadic_rational_construct_copy(&v->value.dy_q, data);
     break;
   case LP_VALUE_ALGEBRAIC:
-    algebraic_number_construct_copy(&v->value.a, data);
+    lp_algebraic_number_construct_copy(&v->value.a, data);
     break;
   }
 }
@@ -67,7 +68,7 @@ void value_destruct(lp_value_t* v) {
     dyadic_rational_destruct(&v->value.dy_q);
     break;
   case LP_VALUE_ALGEBRAIC:
-    algebraic_number_destruct(&v->value.a);
+    lp_algebraic_number_destruct(&v->value.a);
     break;
   }
 }
@@ -110,7 +111,7 @@ int value_print(const lp_value_t* v, FILE* out) {
     ret += dyadic_rational_print(&v->value.dy_q, out);
     break;
   case LP_VALUE_ALGEBRAIC:
-    ret += algebraic_number_print(&v->value.a, out);
+    ret += lp_algebraic_number_print(&v->value.a, out);
     break;
   }
   return ret;

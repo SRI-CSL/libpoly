@@ -820,7 +820,7 @@ UPolynomial_roots_isolate(PyObject* self) {
 
   // Get rid of the temporaries
   for (i = 0; i < roots_size; ++ i) {
-    lp_algebraic_number_ops.destruct(roots + i);
+    lp_algebraic_number_destruct(roots + i);
   }
   free(roots);
 

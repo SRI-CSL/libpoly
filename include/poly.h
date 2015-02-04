@@ -32,25 +32,20 @@ typedef struct lp_assignment_struct lp_assignment_t;
  */
 void lp_init();
 
-typedef struct {
+/** Enable a given tag for tracing */
+void lp_trace_enable(const char* tag);
 
-  /** Enable a given tag for tracing */
-  void (*trace_enable) (const char* tag);
+/** Disable the given that from tracing */
+void lp_trace_disable(const char* tag);
 
-  /** Disable the given that from tracing */
-  void (*trace_disable) (const char* tag);
+/** Set the output trace file (defaults to stderr) */
+void lp_trace_set_output(FILE* file);
 
-  /** Set the output trace file (defaults to stderr) */
-  void (*trace_set_output) (FILE* file);
+/** Print statistics to a file */
+void lp_stats_print(FILE* file);
 
-  /** Print statistics to a file */
-  void (*stats_print) (FILE* file);
+/** Set the output language */
+void lp_set_output_language(lp_output_language_t lang);
 
-  /** Set the output language */
-  void (*set_output_language) (lp_output_language_t lang);
-
-} lp_ops_t;
-
-extern const lp_ops_t lp_poly_ops;
 
 

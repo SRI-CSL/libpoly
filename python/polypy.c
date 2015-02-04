@@ -13,7 +13,7 @@ Trace_enable(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, "s", &tag)) {
     return 0;
   }
-  lp_poly_ops.trace_enable(tag);
+  lp_trace_enable(tag);
 #endif
   Py_RETURN_NONE;
 }
@@ -25,14 +25,14 @@ Trace_disable(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, "s", &tag)) {
     return 0;
   }
-  lp_poly_ops.trace_disable(tag);
+  lp_trace_disable(tag);
 #endif
   Py_RETURN_NONE;
 }
 
 static PyObject*
 Stats_print(PyObject* self) {
-  lp_poly_ops.stats_print(stdout);
+  lp_stats_print(stdout);
   Py_RETURN_NONE;
 }
 
@@ -70,7 +70,7 @@ initpolypy(void)
 
   // Initialize the library
   lp_init();
-  lp_poly_ops.set_output_language(LP_OUTPUT_PYTHON);
+  lp_set_output_language(LP_OUTPUT_PYTHON);
 
   Py_INCREF(&CoefficientRingType);
   PyModule_AddObject(m, "CoefficientRing", (PyObject*)&CoefficientRingType);

@@ -17,10 +17,22 @@ void lp_init(void) {
   trace_set_output(stderr);
 }
 
-const lp_ops_t lp_poly_ops = {
-    trace_enable,
-    trace_disable,
-    trace_set_output,
-    stats_print,
-    set_output_language
-};
+void lp_trace_enable(const char* tag) {
+  trace_enable(tag);
+}
+
+void lp_trace_disable(const char* tag) {
+  trace_disable(tag);
+}
+
+void lp_trace_set_output(FILE* file) {
+  trace_set_output(file);
+}
+
+void lp_stats_print(FILE* file) {
+  stats_print(file);
+}
+
+void lp_set_output_language(lp_output_language_t lang) {
+  set_output_language(lang);
+}

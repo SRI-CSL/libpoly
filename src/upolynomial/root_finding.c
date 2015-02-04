@@ -276,7 +276,7 @@ void sturm_seqence_isolate_roots(
       // Isolated one check if it's in b
       if (upolynomial_dense_sgn_at_dyadic_rational(&S[0], &I.b) == 0) {
         // Copy out the interval [a, b]
-        algebraic_number_construct_from_dyadic_rational(&roots[*roots_size], &I.b);
+        lp_algebraic_number_construct_from_dyadic_rational(&roots[*roots_size], &I.b);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
@@ -284,7 +284,7 @@ void sturm_seqence_isolate_roots(
         // Copy out the open interval (a, b)
         I.b_open = 1;
         lp_upolynomial_t* f = upolynomial_dense_to_upolynomial(&S[0], lp_Z);
-        algebraic_number_construct(&roots[*roots_size], f, &I);
+        lp_algebraic_number_construct(&roots[*roots_size], f, &I);
         dyadic_interval_destruct(&I);
         (*roots_size) ++;
         return;
@@ -404,7 +404,7 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
   }
 
   // Sort the roots
-  qsort(roots, *roots_size, sizeof(lp_algebraic_number_t), algebraic_number_cmp_void);
+  qsort(roots, *roots_size, sizeof(lp_algebraic_number_t), lp_algebraic_number_cmp_void);
 
   // Destroy the factors
   upolynomial_factors_destruct(square_free_factors, 1);

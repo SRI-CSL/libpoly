@@ -26,60 +26,56 @@ struct lp_algebraic_number_struct {
   int sgn_at_a, sgn_at_b;
 };
 
-/** Operations on algebraic numbers */
-typedef struct {
+/**
+ * Construct the algebraic number given it's polynomial and the isolating
+ * interval. The number takes over the reference of f.
+ */
+void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f, const lp_dyadic_interval_t* I);
 
-  /**
-   * Construct the algebraic number given it's polynomial and the isolating
-   * interval. The number takes over the reference of f.
-   */
-  void (*construct) (lp_algebraic_number_t* a, lp_upolynomial_t* f, const lp_dyadic_interval_t* I);
+/** Construct a zero algebraic number */
+void lp_algebraic_number_construct_zero(lp_algebraic_number_t* a);
 
-  /** Construct a zero algebraic number. */
-  void (*construct_zero) (lp_algebraic_number_t* a);
+/** Construct a copy of the algebraic number. */
+void lp_algebraic_number_construct_copy(lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
 
-  /** Construct a copy of the algebraic number. */
-  void (*construct_copy) (lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
+/** Construct the algebraic number from a dyadic rational */
+void lp_algebraic_number_construct_from_dyadic_rational(lp_algebraic_number_t* a, const lp_dyadic_rational_t* q);
 
-  /** Construct the algebraic number from a dyadic rational. */
-  void (*construct_from_dyadic_rational) (lp_algebraic_number_t* a, const lp_dyadic_rational_t* q);
+/** Destruct the number */
+void lp_algebraic_number_destruct(lp_algebraic_number_t* a);
 
-  /** Destruct the number. */
-  void (*destruct) (lp_algebraic_number_t* a);
+/** Swap the two numbers */
+void lp_algebraic_number_swap(lp_algebraic_number_t* a, lp_algebraic_number_t* b);
 
-  /** Compare two algebraic numbers. */
-  int (*cmp) (const lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
+/** Compare two algebraic numbers */
+int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
 
-  /** Void version of the comparison, use with care. */
-  int (*cmp_void) (const void* a1, const void* a2);
+/** Void version of the comparison, use with care. */
+int lp_algebraic_number_cmp_void(const void* a1, const void* a2);
 
-  /** Print the number. */
-  int (*print) (const lp_algebraic_number_t* a, FILE* out);
+/** Print the number */
+int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out);
 
-  /** Return a string representation of the number. */
-  char* (*to_string) (const lp_algebraic_number_t* a);
+/** Return a string representation of the number */
+char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a);
 
-  /** Convert to double with the given precision. */
-  double (*to_double) (const lp_algebraic_number_t* a);
+/** Convert to double */
+double lp_algebraic_number_to_double(const lp_algebraic_number_t* a);
 
-  /** Refine the number by halfing it's interval. */
-  void (*refine) (lp_algebraic_number_t* a);
+/** Refine the number by halfing it's interval. */
+void lp_algebraic_number_refine(lp_algebraic_number_t* a);
 
-  /** Addition */
-  void (*add) (lp_algebraic_number_t* sum, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
+/** Addition */
+void lp_algebraic_number_add(lp_algebraic_number_t* sum, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 
-  /** Subtraction */
-  void (*sub) (lp_algebraic_number_t* sub, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
+/** Subtraction */
+void lp_algebraic_number_sub(lp_algebraic_number_t* sub, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 
-  /** Negation */
-  void (*neg) (lp_algebraic_number_t* neg, const lp_algebraic_number_t* a);
+/** Negation */
+void lp_algebraic_number_neg(lp_algebraic_number_t* neg, const lp_algebraic_number_t* a);
 
-  /** Multiplication */
-  void (*mul) (lp_algebraic_number_t* mul, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
+/** Multiplication */
+void lp_algebraic_number_mul(lp_algebraic_number_t* mul, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 
-  /** Multiplication */
-  void (*pow) (lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n);
-
-} lp_algebraic_number_ops_t;
-
-extern const lp_algebraic_number_ops_t lp_algebraic_number_ops;
+/** Multiplication */
+void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n);

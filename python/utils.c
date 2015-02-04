@@ -50,6 +50,6 @@ PyObject* dyadic_rational_to_PyFloat(const lp_dyadic_rational_t* x) {
 
 
 PyObject* algebraic_number_to_PyFloat(const lp_algebraic_number_t* x) {
-  double x_double = lp_algebraic_number_ops.to_double(x);
+  double x_double = lp_algebraic_number_to_double(x);
   return PyFloat_FromDouble(x_double);
 }
