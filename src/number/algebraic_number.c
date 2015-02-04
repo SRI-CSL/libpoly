@@ -247,7 +247,7 @@ int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_
     result = 0;
   } else {
     // Not equal, but disjunct, so compare the two intervals
-    int cmp = lp_dyadic_rational_ops.cmp(&a1->I.a, &a2->I.a);
+    int cmp = dyadic_rational_cmp(&a1->I.a, &a2->I.a);
     if (cmp == 0) {
       // Since they are disjunct one of them is open
       if (a1->I.a_open && !a2->I.a_open) {
@@ -283,7 +283,7 @@ int lp_algebraic_number_cmp_void(const void* a1, const void* a2) {
 
 int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out) {
   if (a->f == 0) {
-    return lp_dyadic_rational_ops.print(&a->I.a, out);
+    return dyadic_rational_print(&a->I.a, out);
   } else {
     int ret = 0;
     ret += fprintf(out, "<");
@@ -308,7 +308,7 @@ double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
 
   // If a point, just return it's double
   if (a_const->f == 0) {
-    return lp_dyadic_rational_ops.to_double(&a_const->I.a);
+    return dyadic_rational_to_double(&a_const->I.a);
   }
 
   // We do the necessary refinement on a copy
@@ -317,8 +317,8 @@ double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
 
   // Refine the number until we get the desired precision
   lp_dyadic_rational_t interval_size;
-  lp_dyadic_rational_ops.construct(&interval_size);
-  lp_dyadic_rational_ops.sub(&interval_size, &a.I.b, &a.I.a);
+  dyadic_rational_construct(&interval_size);
+  dyadic_rational_sub(&interval_size, &a.I.b, &a.I.a);
   if (interval_size.n < 100) {
     int iterations = 100 - interval_size.n;
     while (a.f && iterations > 0) {
@@ -327,9 +327,9 @@ double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
     }
   }
 
-  double result = lp_dyadic_rational_ops.to_double(&a.I.a);
+  double result = dyadic_rational_to_double(&a.I.a);
 
-  lp_dyadic_rational_ops.destruct(&interval_size);
+  dyadic_rational_destruct(&interval_size);
   lp_algebraic_number_destruct(&a);
 
   return result;

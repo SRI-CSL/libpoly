@@ -754,7 +754,7 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
     if (PyLong_or_Int_Check(a)) {
       lp_integer_t a_int;
       PyLong_or_Int_to_integer(a, lp_Z, &a_int);
-      lp_dyadic_rational_ops.construct_from_integer(&a_rat, &a_int);
+      lp_dyadic_rational_construct_from_integer(&a_rat, &a_int);
       lp_integer_ops.destruct(&a_int);
     } else if (PyFloat_Check(a)) {
       PyFloat_to_dyadic_rational(a, &a_rat);
@@ -765,12 +765,12 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
     if (PyLong_or_Int_Check(b)) {
       lp_integer_t b_int;
       PyLong_or_Int_to_integer(b, lp_Z, &b_int);
-      lp_dyadic_rational_ops.construct_from_integer(&b_rat, &b_int);
+      lp_dyadic_rational_construct_from_integer(&b_rat, &b_int);
       lp_integer_ops.destruct(&b_int);
     } else if (PyFloat_Check(b)) {
       PyFloat_to_dyadic_rational(b, &b_rat);
     } else {
-      lp_dyadic_rational_ops.destruct(&a_rat);
+      lp_dyadic_rational_destruct(&a_rat);
       Py_RETURN_NONE;
     }
 
@@ -783,8 +783,8 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
 
     // Remove the temporaries
     interval_ops.destruct(&ab);
-    lp_dyadic_rational_ops.destruct(&a_rat);
-    lp_dyadic_rational_ops.destruct(&b_rat);
+    lp_dyadic_rational_destruct(&a_rat);
+    lp_dyadic_rational_destruct(&b_rat);
 
   } else if (PyTuple_Size(args) == 0) {
     // count in (-inf, inf)
@@ -872,7 +872,7 @@ UPolynomial_evaluate(PyObject* self, PyObject* args) {
       if (PyLong_or_Int_Check(x)) {
         lp_integer_t x_int;
         PyLong_or_Int_to_integer(x, lp_Z, &x_int);
-        lp_dyadic_rational_ops.construct_from_integer(&x_rat, &x_int);
+        lp_dyadic_rational_construct_from_integer(&x_rat, &x_int);
         lp_integer_ops.destruct(&x_int);
       } else if (PyFloat_Check(x)) {
         PyFloat_to_dyadic_rational(x, &x_rat);
@@ -882,11 +882,11 @@ UPolynomial_evaluate(PyObject* self, PyObject* args) {
 
       lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
       lp_dyadic_rational_t value;
-      lp_dyadic_rational_ops.construct(&value);
+      lp_dyadic_rational_construct(&value);
       upolynomial_ops.evaluate_at_dyadic_rational(p, &x_rat, &value);
       PyObject* result = dyadic_rational_to_PyFloat(&value);
-      lp_dyadic_rational_ops.destruct(&x_rat);
-      lp_dyadic_rational_ops.destruct(&value);
+      lp_dyadic_rational_destruct(&x_rat);
+      lp_dyadic_rational_destruct(&value);
       return result;
   } else {
     Py_RETURN_NONE;

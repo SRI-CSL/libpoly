@@ -183,18 +183,18 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           lp_value_ops.construct(&value, LP_VALUE_DYADIC_RATIONAL, &value_dyrat);
           lp_assignment_set_value(a->assignment, var->x, &value);
           lp_value_ops.destruct(&value);
-          lp_dyadic_rational_ops.destruct(&value_dyrat);
+          lp_dyadic_rational_destruct(&value_dyrat);
           Py_RETURN_NONE;
         } else if (PyLong_or_Int_Check(value_obj)) {
           lp_integer_t value_int;
           PyLong_or_Int_to_integer(value_obj, lp_Z, &value_int);
           lp_dyadic_rational_t value_dyrat;
-          lp_dyadic_rational_ops.construct_from_integer(&value_dyrat, &value_int);
+          lp_dyadic_rational_construct_from_integer(&value_dyrat, &value_int);
           lp_value_t value;
           lp_value_ops.construct(&value, LP_VALUE_DYADIC_RATIONAL, &value_dyrat);
           lp_assignment_set_value(a->assignment, var->x, &value);
           lp_value_ops.destruct(&value);
-          lp_dyadic_rational_ops.destruct(&value_dyrat);
+          lp_dyadic_rational_destruct(&value_dyrat);
           lp_integer_ops.destruct(&value_int);
           Py_RETURN_NONE;
         } else {

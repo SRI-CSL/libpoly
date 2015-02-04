@@ -40,11 +40,11 @@ PyObject* integer_to_PyInt(const lp_integer_t* x) {
 
 void PyFloat_to_dyadic_rational(PyObject* o, lp_dyadic_rational_t* x) {
   double o_double = PyFloat_AsDouble(o);
-  lp_dyadic_rational_ops.construct_from_double(x, o_double);
+  lp_dyadic_rational_construct_from_double(x, o_double);
 }
 
 PyObject* dyadic_rational_to_PyFloat(const lp_dyadic_rational_t* x) {
-  double x_double = lp_dyadic_rational_ops.to_double(x);
+  double x_double = lp_dyadic_rational_to_double(x);
   return PyFloat_FromDouble(x_double);
 }
 

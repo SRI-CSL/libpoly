@@ -161,9 +161,9 @@ PyAlgebraicNumber_create(const lp_algebraic_number_t* a) {
       lp_algebraic_number_construct_copy(&self->a, a);
     } else {
       lp_dyadic_rational_t zero;
-      lp_dyadic_rational_ops.construct(&zero);
+      lp_dyadic_rational_construct(&zero);
       lp_algebraic_number_construct_from_dyadic_rational(&self->a, &zero);
-      lp_dyadic_rational_ops.destruct(&zero);
+      lp_dyadic_rational_destruct(&zero);
     }
   }
   return (PyObject *)self;
