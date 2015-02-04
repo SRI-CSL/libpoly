@@ -5,6 +5,7 @@
  *      Author: dejan
  */
 
+#include <upolynomial.h>
 #include "upolynomial/bounds.h"
 
 #include <assert.h>
@@ -110,7 +111,7 @@ void upolynomial_root_bound_cauchy(const lp_upolynomial_t* f, lp_integer_t* B) {
 void upolynomial_factor_bound_landau_mignotte(const lp_upolynomial_t* f, size_t n, lp_integer_t* B) {
 
   assert(f->K == lp_Z);
-  assert(upolynomial_degree(f) >= n);
+  assert(lp_upolynomial_degree(f) >= n);
 
   lp_integer_t tmp;
   lp_integer_t norm;

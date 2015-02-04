@@ -184,13 +184,13 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
     if (PyUPolynomial_CHECK(f_obj) && PyInt_Check(root_index_obj)) {
       lp_upolynomial_t* f = ((UPolynomialObject*) f_obj)->p;
       long root_index = PyInt_AsLong(root_index_obj);
-      size_t roots_count = upolynomial_ops.roots_count(f, 0);
+      size_t roots_count = lp_upolynomial_roots_count(f, 0);
       if (root_index < 0 || root_index >= roots_count) {
         // Not enough roots
         return -1;
       }
       lp_algebraic_number_t* roots = malloc(roots_count * sizeof(lp_algebraic_number_t));
-      upolynomial_ops.roots_isolate(f, roots, &roots_count);
+      lp_upolynomial_roots_isolate(f, roots, &roots_count);
       lp_algebraic_number_destruct(&self->a);
       lp_algebraic_number_construct_copy(&self->a, roots + root_index);
       int i;

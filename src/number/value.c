@@ -7,12 +7,12 @@
 
 #include "number/value.h"
 
+#include <interval.h>
 #include <algebraic_number.h>
 
 #include "number/integer.h"
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
-#include "interval/interval.h"
 
 void value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   v->type = type;

@@ -207,7 +207,7 @@ PyTypeObject UPolynomialType = {
 static void
 UPolynomial_dealloc(UPolynomialObject* self)
 {
-  if (self->p) upolynomial_ops.delete(self->p);
+  if (self->p) lp_upolynomial_delete(self->p);
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -233,7 +233,7 @@ UPolynomial_init(UPolynomialObject* self, PyObject* args)
       if (PyTuple_Size(args) == 0) {
         // Just a zero polynomial
         int coeff[] = { 0 };
-        self->p = upolynomial_ops.construct_from_int(lp_Z, 0, coeff);
+        self->p = lp_upolynomial_construct_from_int(lp_Z, 0, coeff);
       } else if (PyTuple_Size(args) <= 2) {
         lp_int_ring K = lp_Z;
 
@@ -263,7 +263,7 @@ UPolynomial_init(UPolynomialObject* self, PyObject* args)
                 c_ints[i] = PyInt_AsLong(c_i);
               }
             }
-            self->p = upolynomial_ops.construct_from_long(K, size-1, c_ints);
+            self->p = lp_upolynomial_construct_from_long(K, size-1, c_ints);
           } else {
             return -1;
           }
@@ -293,11 +293,11 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
       other_p = ((UPolynomialObject*) other)->p;
     } else {
       long c = PyInt_AsLong(other);
-      lp_int_ring K = upolynomial_ops.ring(self_p);
-      other_p = upolynomial_ops.construct_from_long(K, 0, &c);
+      lp_int_ring K = lp_upolynomial_ring(self_p);
+      other_p = lp_upolynomial_construct_from_long(K, 0, &c);
     }
 
-    int cmp = upolynomial_ops.cmp(self_p, other_p);
+    int cmp = lp_upolynomial_cmp(self_p, other_p);
 
     switch (op) {
     case Py_LT:
@@ -321,7 +321,7 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
     }
 
     if (PyInt_Check(other)) {
-      upolynomial_ops.delete(other_p);
+      lp_upolynomial_delete(other_p);
     }
   }
 
@@ -341,7 +341,7 @@ UPolynomial_cmp(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) other;
   // Compare
-  int cmp = upolynomial_ops.cmp(p1->p, p2->p);
+  int cmp = lp_upolynomial_cmp(p1->p, p2->p);
   return cmp > 0 ? 1 : cmp < 0 ? -1 : 0;
 }
 
@@ -349,7 +349,7 @@ static PyObject*
 UPolynomial_degree(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
-    return PyInt_FromLong(upolynomial_ops.degree(p->p));
+    return PyInt_FromLong(lp_upolynomial_degree(p->p));
   } else {
     Py_RETURN_NONE;
   }
@@ -360,14 +360,14 @@ UPolynomial_coefficients(PyObject* self) {
   int i;
 
   lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
-  size_t size = upolynomial_ops.degree(p) + 1;
+  size_t size = lp_upolynomial_degree(p) + 1;
 
   lp_integer_t coefficients[size];
   for (i = 0; i < size; ++ i) {
     lp_integer_construct_from_int(lp_Z, coefficients + i, 0);
   }
 
-  upolynomial_ops.unpack(p, coefficients);
+  lp_upolynomial_unpack(p, coefficients);
 
   PyObject* list = PyList_New(size);
 
@@ -384,7 +384,7 @@ static PyObject*
 UPolynomial_ring(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
-    lp_int_ring K = upolynomial_ops.ring(p->p);
+    lp_int_ring K = lp_upolynomial_ring(p->p);
     lp_int_ring_attach(K);
     return PyCoefficientRing_create(K);
   } else {
@@ -402,7 +402,7 @@ UPolynomial_to_ring(PyObject* self, PyObject* args) {
       PyObject* arg = PyTuple_GetItem(args, 0);
       if (PyCoefficientRing_CHECK(arg)) {
         CoefficientRing* K = (CoefficientRing*)arg;
-        lp_upolynomial_t* p_K = upolynomial_ops.construct_copy_K(K->K, p->p);
+        lp_upolynomial_t* p_K = lp_upolynomial_construct_copy_K(K->K, p->p);
         return PyUPolynomial_create(p_K);
       } else {
         Py_RETURN_NONE;
@@ -418,7 +418,7 @@ UPolynomial_to_ring(PyObject* self, PyObject* args) {
 static PyObject* UPolynomial_str(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
-    char* p_str = upolynomial_ops.to_string(p->p);
+    char* p_str = lp_upolynomial_to_string(p->p);
     PyObject* str = PyString_FromString(p_str);
     free(p_str);
     return str;
@@ -432,11 +432,11 @@ static PyObject*
 UPolynomialObject_add_number(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   lp_integer_t c;
-  lp_int_ring K = upolynomial_ops.ring(p1->p);
+  lp_int_ring K = lp_upolynomial_ring(p1->p);
   PyLong_or_Int_to_integer(other, K, &c);
-  lp_upolynomial_t* c_p = upolynomial_ops.construct(K, 0, &c);
-  lp_upolynomial_t* sum = upolynomial_ops.add(p1->p, c_p);
-  upolynomial_ops.delete(c_p);
+  lp_upolynomial_t* c_p = lp_upolynomial_construct(K, 0, &c);
+  lp_upolynomial_t* sum = lp_upolynomial_add(p1->p, c_p);
+  lp_upolynomial_delete(c_p);
   lp_integer_destruct(&c);
   return PyUPolynomial_create(sum);
 }
@@ -459,7 +459,7 @@ UPolynomialObject_add(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) other;
   // Add the polynomials
-  lp_upolynomial_t* sum = upolynomial_ops.add(p1->p, p2->p);
+  lp_upolynomial_t* sum = lp_upolynomial_add(p1->p, p2->p);
   // Return the result
   return PyUPolynomial_create(sum);
 }
@@ -468,12 +468,12 @@ static PyObject*
 UPolynomialObject_sub_int(PyObject* self, PyObject* other, int negate) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   lp_integer_t c;
-  lp_int_ring K = upolynomial_ops.ring(p1->p);
+  lp_int_ring K = lp_upolynomial_ring(p1->p);
   PyLong_or_Int_to_integer(other, K, &c);
-  lp_upolynomial_t* c_p = upolynomial_ops.construct(K, 0, &c);
+  lp_upolynomial_t* c_p = lp_upolynomial_construct(K, 0, &c);
   lp_upolynomial_t* sub =
-      negate ? upolynomial_ops.sub(c_p, p1->p) : upolynomial_ops.sub(p1->p, c_p);
-  upolynomial_ops.delete(c_p);
+      negate ? lp_upolynomial_sub(c_p, p1->p) : lp_upolynomial_sub(p1->p, c_p);
+  lp_upolynomial_delete(c_p);
   lp_integer_destruct(&c);
   return PyUPolynomial_create(sub);
 }
@@ -496,7 +496,7 @@ UPolynomialObject_sub(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) other;
   // Add the polynomials
-  lp_upolynomial_t* sum = upolynomial_ops.sub(p1->p, p2->p);
+  lp_upolynomial_t* sum = lp_upolynomial_sub(p1->p, p2->p);
   // Return the result
   return PyUPolynomial_create(sum);
 }
@@ -506,8 +506,8 @@ static PyObject*
 UPolynomialObject_mul_int(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   lp_integer_t c;
-  PyLong_or_Int_to_integer(other, upolynomial_ops.ring(p1->p), &c);
-  lp_upolynomial_t* sum = upolynomial_ops.multiply_c(p1->p, &c);
+  PyLong_or_Int_to_integer(other, lp_upolynomial_ring(p1->p), &c);
+  lp_upolynomial_t* sum = lp_upolynomial_mul_c(p1->p, &c);
   lp_integer_destruct(&c);
   return PyUPolynomial_create(sum);
 }
@@ -530,7 +530,7 @@ UPolynomialObject_mul(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) other;
   // Add the polynomials
-  lp_upolynomial_t* sum = upolynomial_ops.multiply(p1->p, p2->p);
+  lp_upolynomial_t* sum = lp_upolynomial_mul(p1->p, p2->p);
   // Return the result
   return PyUPolynomial_create(sum);
 }
@@ -546,7 +546,7 @@ UPolynomialObject_div(PyObject* self, PyObject* args) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) args;
   // Divide the polynomials
-  lp_upolynomial_t* div = upolynomial_ops.div_exact(p1->p, p2->p);
+  lp_upolynomial_t* div = lp_upolynomial_div_exact(p1->p, p2->p);
   // Return the result
   return PyUPolynomial_create(div);
 }
@@ -562,7 +562,7 @@ UPolynomialObject_rem(PyObject* self, PyObject* args) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) args;
   // Divide the polynomials
-  lp_upolynomial_t* rem = upolynomial_ops.rem_exact(p1->p, p2->p);
+  lp_upolynomial_t* rem = lp_upolynomial_rem_exact(p1->p, p2->p);
   // Return the result
   return PyUPolynomial_create(rem);
 }
@@ -581,7 +581,7 @@ UPolynomialObject_divmod(PyObject* self, PyObject* args) {
   lp_upolynomial_t* div = 0;
   lp_upolynomial_t* rem = 0;
   // Divide the polynomials
-  upolynomial_ops.div_rem_exact(p1->p, p2->p, &div, &rem);
+  lp_upolynomial_div_rem_exact(p1->p, p2->p, &div, &rem);
   // Return the result
   PyObject* pair = PyTuple_New(2);
   PyObject* divObj = PyUPolynomial_create(div);
@@ -605,8 +605,8 @@ UPolynomialObject_neg(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   // Add the polynomials
   lp_integer_t c;
-  lp_integer_construct_from_int(upolynomial_ops.ring(p->p), &c, -1);
-  lp_upolynomial_t* neg = upolynomial_ops.multiply_c(p->p, &c);
+  lp_integer_construct_from_int(lp_upolynomial_ring(p->p), &c, -1);
+  lp_upolynomial_t* neg = lp_upolynomial_mul_c(p->p, &c);
   lp_integer_destruct(&c);
   // Return the result
   return PyUPolynomial_create(neg);
@@ -623,7 +623,7 @@ UPolynomialObject_pow(PyObject* self, PyObject* other) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   long pow = PyInt_AsLong(other);
   // Power the polynomial
-  lp_upolynomial_t* p_pow = upolynomial_ops.power(p->p, pow);
+  lp_upolynomial_t* p_pow = lp_upolynomial_pow(p->p, pow);
   // Return the result
   return PyUPolynomial_create(p_pow);
 }
@@ -633,7 +633,7 @@ UPolynomialObject_nonzero(PyObject* self) {
   // Get arguments
   UPolynomialObject* p = (UPolynomialObject*) self;
   // Return the result
-  return !upolynomial_ops.is_zero(p->p);
+  return !lp_upolynomial_is_zero(p->p);
 }
 
 static PyObject*
@@ -643,7 +643,7 @@ UPolynomial_gcd(PyObject* self, PyObject* args) {
     if (PyUPolynomial_CHECK(arg)) {
       lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
       lp_upolynomial_t* q = ((UPolynomialObject*) arg)->p;
-      lp_upolynomial_t* gcd = upolynomial_ops.gcd(p, q);
+      lp_upolynomial_t* gcd = lp_upolynomial_gcd(p, q);
       return PyUPolynomial_create(gcd);
     } else {
       Py_RETURN_NONE;
@@ -662,7 +662,7 @@ UPolynomial_extended_gcd(PyObject* self, PyObject* args) {
       lp_upolynomial_t* q = ((UPolynomialObject*) arg)->p;
       lp_upolynomial_t* u = 0;
       lp_upolynomial_t* v = 0;
-      lp_upolynomial_t* gcd = upolynomial_ops.extended_gcd(p, q, &u, &v);
+      lp_upolynomial_t* gcd = lp_upolynomial_extended_gcd(p, q, &u, &v);
 
       PyObject* t = PyTuple_New(3);
       PyObject* t0 = PyUPolynomial_create(gcd);
@@ -685,18 +685,18 @@ UPolynomial_extended_gcd(PyObject* self, PyObject* args) {
 
 static PyObject* factors_to_PyList(lp_upolynomial_factors_t* factors) {
   // Construct the result
-  size_t size = lp_upolynomial_factors_ops.size(factors);
+  size_t size = lp_upolynomial_factors_size(factors);
   PyObject* factors_list = PyList_New(size + 1);
 
   // Copy the constant
-  PyObject* constant = integer_to_PyInt(lp_upolynomial_factors_ops.get_constant(factors));
+  PyObject* constant = integer_to_PyInt(lp_upolynomial_factors_get_constant(factors));
   PyList_SetItem(factors_list, 0, constant); // Steals the reference
 
   // Copy over the factors
   int i;
   for (i = 0; i < size; ++ i) {
     size_t degree;
-    PyObject* p_i = PyUPolynomial_create(lp_upolynomial_factors_ops.get_factor(factors, i, &degree));
+    PyObject* p_i = PyUPolynomial_create(lp_upolynomial_factors_get_factor(factors, i, &degree));
     Py_INCREF(p_i);
     PyObject* d = PyInt_FromSize_t(degree);
     PyObject* pair = PyTuple_New(2);
@@ -714,11 +714,11 @@ UPolynomial_factor(PyObject* self) {
   // Get arguments
   UPolynomialObject* p = (UPolynomialObject*) self;
   // Factor
-  lp_upolynomial_factors_t* factors = upolynomial_ops.factor(p->p);
+  lp_upolynomial_factors_t* factors = lp_upolynomial_factor(p->p);
   // Create the list
   PyObject* factors_list = factors_to_PyList(factors);
   // Get rid of the factors (not the polynomials)
-  lp_upolynomial_factors_ops.destruct(factors, 0);
+  lp_upolynomial_factors_destruct(factors, 0);
   // Return the list
   return factors_list;
 }
@@ -728,11 +728,11 @@ UPolynomial_factor_square_free(PyObject* self) {
   // Get arguments
   UPolynomialObject* p = (UPolynomialObject*) self;
   // Factor
-  lp_upolynomial_factors_t* factors = upolynomial_ops.factor_square_free(p->p);
+  lp_upolynomial_factors_t* factors = lp_upolynomial_factor_square_free(p->p);
   // Create the list
   PyObject* factors_list = factors_to_PyList(factors);
   // Get rid of the factors (not the polynomials)
-  lp_upolynomial_factors_ops.destruct(factors, 0);
+  lp_upolynomial_factors_destruct(factors, 0);
   // Return the list
   return factors_list;
 }
@@ -779,7 +779,7 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
     lp_interval_construct_from_dyadic(&ab, &a_rat, 1, &b_rat, 1);
 
     // Count
-    roots = upolynomial_ops.roots_count(p->p, &ab);
+    roots = lp_upolynomial_roots_count(p->p, &ab);
 
     // Remove the temporaries
     lp_interval_destruct(&ab);
@@ -788,7 +788,7 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
 
   } else if (PyTuple_Size(args) == 0) {
     // count in (-inf, inf)
-    roots = upolynomial_ops.roots_count(p->p, 0);
+    roots = lp_upolynomial_roots_count(p->p, 0);
   } else {
     Py_RETURN_NONE;
   }
@@ -803,11 +803,11 @@ UPolynomial_roots_isolate(PyObject* self) {
   lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
 
   // The isolating intervals
-  size_t roots_size = upolynomial_ops.degree(p)+1;
+  size_t roots_size = lp_upolynomial_degree(p)+1;
   lp_algebraic_number_t* roots = malloc(sizeof(lp_algebraic_number_t)*roots_size);
 
   // Isolate the intervals (up to 2^precision)
-  upolynomial_ops.roots_isolate(p, roots, &roots_size);
+  lp_upolynomial_roots_isolate(p, roots, &roots_size);
 
   // Generate a list of floats
   PyObject* list = PyList_New(roots_size);
@@ -831,7 +831,7 @@ UPolynomial_roots_isolate(PyObject* self) {
 static PyObject*
 UPolynomial_derivative(PyObject* self) {
   lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
-  lp_upolynomial_t* p_derivative = upolynomial_ops.derivative(p);
+  lp_upolynomial_t* p_derivative = lp_upolynomial_derivative(p);
   return PyUPolynomial_create(p_derivative);
 }
 
@@ -857,7 +857,7 @@ UPolynomial_sturm_sequence(PyObject* self) {
   lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
   lp_upolynomial_t** S;
   size_t S_size;
-  upolynomial_ops.sturm_sequence(p, &S, &S_size);
+  lp_upolynomial_sturm_sequence(p, &S, &S_size);
   PyObject* result = upolynomials_to_PyList(S, S_size);
   free(S);
   return result;
@@ -883,7 +883,7 @@ UPolynomial_evaluate(PyObject* self, PyObject* args) {
       lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
       lp_dyadic_rational_t value;
       lp_dyadic_rational_construct(&value);
-      upolynomial_ops.evaluate_at_dyadic_rational(p, &x_rat, &value);
+      lp_upolynomial_evaluate_at_dyadic_rational(p, &x_rat, &value);
       PyObject* result = dyadic_rational_to_PyFloat(&value);
       lp_dyadic_rational_destruct(&x_rat);
       lp_dyadic_rational_destruct(&value);

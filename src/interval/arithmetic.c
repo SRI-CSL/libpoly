@@ -7,6 +7,9 @@
 
 #include "interval/arithmetic.h"
 
+#include "number/rational.h"
+#include "number/dyadic_rational.h"
+
 int interval_endpoint_lt(const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open) {
   int cmp = rational_cmp(a, b);
   if (cmp == 0) {

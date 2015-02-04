@@ -5,7 +5,7 @@
  *      Author: dejan
  */
 
-#include "interval/interval.h"
+#include <interval.h>
 
 void interval_add(lp_interval_t* S, const lp_interval_t* I1, const lp_interval_t* I2);
 

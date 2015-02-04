@@ -65,10 +65,10 @@ STAT_DECLARE(int, upolynomial, gcd_heuristic_success)
 lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upolynomial_t* B, lp_upolynomial_t** U, lp_upolynomial_t** V)
 {
   if (trace_is_enabled("gcd")) {
-    tracef("upolynomial_gcd_euclid("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(")\n");
+    tracef("upolynomial_gcd_euclid("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(")\n");
   }
 
-  assert(!upolynomial_is_zero(B));
+  assert(!lp_upolynomial_is_zero(B));
 
   int extended_gcd = (U != 0 && V != 0);
 
@@ -76,8 +76,8 @@ lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upo
   else STAT(upolynomial, gcd_euclid) ++;
 
   // Degrees of p and q
-  size_t deg_A = upolynomial_degree(A);
-  assert(deg_A >= upolynomial_degree(B));
+  size_t deg_A = lp_upolynomial_degree(A);
+  assert(deg_A >= lp_upolynomial_degree(B));
 
   // The ring of computation
   assert(A->K == B->K);
@@ -191,7 +191,7 @@ lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upo
   upolynomial_dense_destruct(&r_1);
 
   if (trace_is_enabled("gcd")) {
-    tracef("upolynomial_gcd_euclid("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(") = "); upolynomial_print(D, trace_out); tracef("\n");
+    tracef("upolynomial_gcd_euclid("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(") = "); lp_upolynomial_print(D, trace_out); tracef("\n");
   }
 
   return D;
@@ -200,11 +200,11 @@ lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upo
 lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const lp_upolynomial_t* B) {
 
   if (trace_is_enabled("gcd")) {
-    tracef("upolynomial_gcd_subresultant("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(")\n");
+    tracef("upolynomial_gcd_subresultant("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(")\n");
   }
   STAT(upolynomial, gcd_subresultant) ++;
 
-  assert(!upolynomial_is_zero(B));
+  assert(!lp_upolynomial_is_zero(B));
 
   // The ring of compuation
   assert(A->K == B->K);
@@ -212,8 +212,8 @@ lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const 
   lp_int_ring K = A->K;
 
   // Degrees of p and q
-  size_t deg_A = upolynomial_degree(A);
-  assert(deg_A >= upolynomial_degree(B));
+  size_t deg_A = lp_upolynomial_degree(A);
+  assert(deg_A >= lp_upolynomial_degree(B));
 
   // The remainder in the calculation
   lp_upolynomial_t* D = 0;
@@ -228,8 +228,8 @@ lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const 
   lp_integer_t A_cont, B_cont;
   integer_construct_from_int(K, &A_cont, 0);
   integer_construct_from_int(K, &B_cont, 0);
-  upolynomial_content_Z(A, &A_cont);
-  upolynomial_content_Z(B, &B_cont);
+  lp_upolynomial_content_Z(A, &A_cont);
+  lp_upolynomial_content_Z(B, &B_cont);
 
   if (trace_is_enabled("gcd")) {
     tracef("cont(p) = "); integer_print(&A_cont, trace_out); tracef("\n");
@@ -326,7 +326,7 @@ lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const 
   upolynomial_dense_destruct(&r_1);
 
   if (trace_is_enabled("gcd")) {
-    tracef("upolynomial_gcd_subresultant("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(") = "); upolynomial_print(D, trace_out); tracef("\n");
+    tracef("upolynomial_gcd_subresultant("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(") = "); lp_upolynomial_print(D, trace_out); tracef("\n");
   }
 
   return D;
@@ -455,12 +455,12 @@ int bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const 
 lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_upolynomial_t* B, int attempts) {
 
   // Let's keep the smaller one in B
-  if (upolynomial_degree(A) < upolynomial_degree(B)) {
+  if (lp_upolynomial_degree(A) < lp_upolynomial_degree(B)) {
     return upolynomial_gcd_heuristic(B, A, attempts);
   }
 
   if (trace_is_enabled("gcd")) {
-    tracef("upolynomial_gcd_heuristic("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(")\n");
+    tracef("upolynomial_gcd_heuristic("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(")\n");
   }
   STAT(upolynomial, gcd_heuristic) ++;
 
@@ -474,8 +474,8 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   lp_integer_t A_cont, B_cont;
   integer_construct_from_int(lp_Z, &A_cont, 0);
   integer_construct_from_int(lp_Z, &B_cont, 0);
-  upolynomial_content_Z(A, &A_cont);
-  upolynomial_content_Z(B, &B_cont);
+  lp_upolynomial_content_Z(A, &A_cont);
+  lp_upolynomial_content_Z(B, &B_cont);
 
   if (trace_is_enabled("gcd")) {
     tracef("cont(p) = "); integer_print(&A_cont, trace_out); tracef("\n");
@@ -513,11 +513,11 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
     // Get the gcd of the values and reconstruct the possible gcd
     integer_gcd_Z(&D_v, &A_v, &B_v);
     // This also changes the value D_v
-    D = reconstruct_polynomial(upolynomial_degree(A) + 1, &D_v, n, &d);
+    D = reconstruct_polynomial(lp_upolynomial_degree(A) + 1, &D_v, n, &d);
 
     // Check if it divides both (B is smaller degree)
-    if (!upolynomial_divides(D, B) || !upolynomial_divides(D, A)) {
-      upolynomial_delete(D);
+    if (!lp_upolynomial_divides(D, B) || !lp_upolynomial_divides(D, A)) {
+      lp_upolynomial_delete(D);
       D = 0;
     }
 
@@ -528,11 +528,11 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   if (D) {
     STAT(upolynomial, gcd_heuristic_success)++;
     if (trace_is_enabled("gcd")) {
-      tracef("upolynomial_gcd_heuristic("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(") = "); upolynomial_print(D, trace_out); tracef("\n");
+      tracef("upolynomial_gcd_heuristic("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(") = "); lp_upolynomial_print(D, trace_out); tracef("\n");
     }
   } else {
     if (trace_is_enabled("gcd")) {
-      tracef("upolynomial_gcd_heuristic("); upolynomial_print(A, trace_out); tracef(", "); upolynomial_print(B, trace_out); tracef(") failed");
+      tracef("upolynomial_gcd_heuristic("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(") failed");
     }
   }
 

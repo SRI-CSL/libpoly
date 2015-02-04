@@ -5,6 +5,8 @@
  *      Author: dejan
  */
 
+#include "upolynomial/upolynomial.h"
+#include "upolynomial/factors.h"
 #include "upolynomial/root_finding.h"
 #include "upolynomial/factorization.h"
 #include "upolynomial/upolynomial_dense.h"
@@ -24,14 +26,14 @@
 void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_dense_t* S, size_t* size) {
 
   if (trace_is_enabled("roots")) {
-    tracef("upolynomial_compute_sturm_sequence("); upolynomial_print(f, trace_out); tracef("\n");
+    tracef("upolynomial_compute_sturm_sequence("); lp_upolynomial_print(f, trace_out); tracef("\n");
   }
 
   lp_integer_t a;
   integer_construct_from_int(lp_Z, &a, 0);
 
   // Min size for the polynomials
-  size_t f_deg = upolynomial_degree(f);
+  size_t f_deg = lp_upolynomial_degree(f);
 
   // f[0] = pp(f)
   upolynomial_dense_construct_p(&S[0], f_deg + 1, f);
@@ -200,20 +202,20 @@ int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_interval_t
 
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_root_count_sturm(");
-    upolynomial_print(f, trace_out); tracef(", ");
+    lp_upolynomial_print(f, trace_out); tracef(", ");
     lp_interval_print(interval, trace_out); tracef("\n");
   }
 
   int total_count = 0;
 
   // Special case for the constants
-  if (upolynomial_degree(f) == 0) {
-    assert(!upolynomial_is_zero(f));
+  if (lp_upolynomial_degree(f) == 0) {
+    assert(!lp_upolynomial_is_zero(f));
     return 0;
   }
 
   // Get the square-free factorization and then count roots for each factor.
-  lp_upolynomial_factors_t* square_free_factors = upolynomial_factor_square_free(f);
+  lp_upolynomial_factors_t* square_free_factors = lp_upolynomial_factor_square_free(f);
 
   size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
@@ -222,7 +224,7 @@ int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_interval_t
 
     // Compute the Sturm sequence for the factor
     size_t sturm_sequence_size;
-    upolynomial_dense_t* sturm_sequence = malloc((upolynomial_degree(factor) + 1)*sizeof(upolynomial_dense_t));
+    upolynomial_dense_t* sturm_sequence = malloc((lp_upolynomial_degree(factor) + 1)*sizeof(upolynomial_dense_t));
     upolynomial_compute_sturm_sequence(factor, sturm_sequence, &sturm_sequence_size);
 
     // Add the number of roots
@@ -237,7 +239,7 @@ int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_interval_t
   }
 
   // Destroy the factors
-  upolynomial_factors_destruct(square_free_factors, 1);
+  lp_upolynomial_factors_destruct(square_free_factors, 1);
 
   // Return the total number of roots
   return total_count;
@@ -334,25 +336,25 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
   assert(f->K == lp_Z);
 
   if (trace_is_enabled("roots")) {
-    tracef("upolynomial_root_isolate_sturm("); upolynomial_print(f, trace_out); tracef(")\n");
+    tracef("upolynomial_root_isolate_sturm("); lp_upolynomial_print(f, trace_out); tracef(")\n");
   }
 
   *roots_size = 0;
 
   // Special case for the constants
-  if (upolynomial_degree(f) == 0) {
-    assert(!upolynomial_is_zero(f));
+  if (lp_upolynomial_degree(f) == 0) {
+    assert(!lp_upolynomial_is_zero(f));
     return;
   }
 
   // Get the square-free factorization and then count roots for each factor.
-  lp_upolynomial_factors_t* square_free_factors = upolynomial_factor_square_free(f);
+  lp_upolynomial_factors_t* square_free_factors = lp_upolynomial_factor_square_free(f);
 
   size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
     // The factor we are working with
     const lp_upolynomial_t* factor = square_free_factors->factors[factor_i];
-    int factor_deg = upolynomial_degree(factor);
+    int factor_deg = lp_upolynomial_degree(factor);
 
     // Compute the Sturm sequence for the factor
     size_t sturm_sequence_size;
@@ -399,7 +401,7 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
 
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_root_isolate_sturm(");
-    upolynomial_print(f, trace_out);
+    lp_upolynomial_print(f, trace_out);
     tracef(" = %zu \n", *roots_size);
   }
 
@@ -407,5 +409,5 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
   qsort(roots, *roots_size, sizeof(lp_algebraic_number_t), lp_algebraic_number_cmp_void);
 
   // Destroy the factors
-  upolynomial_factors_destruct(square_free_factors, 1);
+  lp_upolynomial_factors_destruct(square_free_factors, 1);
 }

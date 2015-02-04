@@ -5,7 +5,11 @@
  *      Author: dejan
  */
 
-#include "interval/interval.h"
+#include <interval.h>
+
+#include "number/integer.h"
+#include "number/rational.h"
+#include "number/dyadic_rational.h"
 
 #include <assert.h>
 #include <limits.h>

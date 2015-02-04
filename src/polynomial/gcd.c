@@ -130,16 +130,16 @@ int coefficient_gcd_pp_univariate(const lp_polynomial_context_t* ctx,
 
   lp_upolynomial_t* C1_u = coefficient_to_univariate(ctx, C1);
   lp_upolynomial_t* C2_u = coefficient_to_univariate(ctx, C2);
-  lp_upolynomial_t* gcd_u = upolynomial_gcd(C1_u, C2_u);
+  lp_upolynomial_t* gcd_u = lp_upolynomial_gcd(C1_u, C2_u);
 
   coefficient_t gcd_tmp;
   coefficient_construct_from_univariate(ctx, &gcd_tmp, gcd_u, x);
   coefficient_swap(&gcd_tmp, gcd);
   coefficient_destruct(&gcd_tmp);
 
-  upolynomial_delete(C1_u);
-  upolynomial_delete(C2_u);
-  upolynomial_delete(gcd_u);
+  lp_upolynomial_delete(C1_u);
+  lp_upolynomial_delete(C2_u);
+  lp_upolynomial_delete(gcd_u);
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_gcd_pp_univariate() => ");

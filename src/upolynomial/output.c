@@ -6,6 +6,9 @@
  */
 
 #include "upolynomial/output.h"
+#include "upolynomial/factors.h"
+#include "upolynomial/upolynomial.h"
+
 #include "utils/output.h"
 
 #include <stdio.h>
@@ -42,7 +45,7 @@ int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file) {
   return len;
 }
 
-int upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
+int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
   assert(p);
   int len = 0;
   unsigned i;
@@ -58,23 +61,23 @@ int upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
   return len;
 }
 
-char* upolynomial_to_string(const lp_upolynomial_t* p) {
+char* lp_upolynomial_to_string(const lp_upolynomial_t* p) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);
-  upolynomial_print(p, f);
+  lp_upolynomial_print(p, f);
   fclose(f);
   return str;
 }
 
-int upolynomial_factors_print(const lp_upolynomial_factors_t* f, FILE* out) {
+int lp_upolynomial_factors_print(const lp_upolynomial_factors_t* f, FILE* out) {
   int len = 0;
   len += integer_print(&f->constant, out);
   size_t i;
   for (i = 0; i < f->size; ++ i) {
     len += fprintf(out, " * ");
     len += fprintf(out, "[");
-    len += upolynomial_print(f->factors[i], out);
+    len += lp_upolynomial_print(f->factors[i], out);
     len += fprintf(out, "]^%zu", f->multiplicities[i]);
   }
   return len;

@@ -9,14 +9,8 @@
 
 #include <stdio.h>
 
-#include "upolynomial/upolynomial.h"
-#include "upolynomial/factors.h"
-
-/**
- * Factors the given polynomial into square-free factors. Polynomial f should be
- * monic if in Z_p, or primitive if in Z.
- */
-lp_upolynomial_factors_t* upolynomial_factor_square_free(const lp_upolynomial_t* f);
+#include <upolynomial.h>
+#include <upolynomial_factors.h>
 
 /**
  * Factors the given polynomial into a distinct degree factorization.

@@ -5,6 +5,8 @@
  *      Author: dejan
  */
 
+#include <interval.h>
+
 #include "polynomial/polynomial.h"
 #include "polynomial/monomial.h"
 #include "polynomial/coefficient.h"
@@ -14,7 +16,6 @@
 #include "upolynomial/upolynomial.h"
 
 #include "number/integer.h"
-#include "interval/interval.h"
 #include "interval/arithmetic.h"
 
 #include <assignment.h>
@@ -140,7 +141,7 @@ void coefficient_construct_from_univariate(const lp_polynomial_context_t* ctx,
   STAT(coefficient, construct_from_univariate) ++;
 
   // Get the coefficients
-  size_t C_u_deg = upolynomial_degree(C_u);
+  size_t C_u_deg = lp_upolynomial_degree(C_u);
   lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*(C_u_deg + 1));
 
   size_t i;
@@ -148,7 +149,7 @@ void coefficient_construct_from_univariate(const lp_polynomial_context_t* ctx,
     integer_construct_from_int(ctx->K, coeff + i, 0);
   }
 
-  upolynomial_unpack(C_u, coeff);
+  lp_upolynomial_unpack(C_u, coeff);
 
   // Construct the polynomial
   coefficient_construct_rec(ctx, C, x, C_u_deg + 1);
@@ -1706,7 +1707,7 @@ lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, 
     integer_construct_copy(ctx->K, coeff + i, coefficient_get_constant(COEFF(C, i)));
   }
 
-  lp_upolynomial_t* C_u = upolynomial_construct(ctx->K, SIZE(C) - 1, coeff);
+  lp_upolynomial_t* C_u = lp_upolynomial_construct(ctx->K, SIZE(C) - 1, coeff);
 
   for (i = 0; i < SIZE(C); ++ i) {
     integer_destruct(coeff + i);

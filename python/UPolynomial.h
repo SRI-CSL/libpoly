@@ -11,6 +11,7 @@
 
 #include "utils.h"
 #include "upolynomial.h"
+#include "upolynomial_factors.h"
 
 /** Definition of the python UPolynomial object */
 typedef struct {

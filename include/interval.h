@@ -29,32 +29,6 @@ typedef struct lp_interval_struct {
   lp_rational_t b;
 } lp_interval_t;
 
-/** Construct the interval (a, b) */
-void lp_interval_construct(lp_interval_t* I, const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open);
-
-/** Construct the interval [a, a] */
-void lp_interval_consturct_point(lp_interval_t* I, const lp_rational_t* a);
-
-/** Construct the interval (a, b) */
-void lp_interval_construct_copy(lp_interval_t* I, const lp_interval_t* from);
-
-/** Construct the interval (a, b) */
-void lp_interval_construct_from_dyadic(lp_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open);
-
-/** Construct from interval (a, b) from integers */
-void lp_interval_construct_from_int(lp_interval_t* I, long a, int a_open, long b, int b_open);
-
-/** Construct from interval (a, b) from integers */
-void lp_interval_construct_from_integer(lp_interval_t* I, const lp_integer_t* a, int a_open, const lp_integer_t* b, int b_open);
-
-/** Destroy the interval */
-void lp_interval_destruct(lp_interval_t* I);
-
-/** Swap the two intervals */
-void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2);
-
-/** Prints the interval to the given stream. */
-int lp_interval_print(const lp_interval_t* I, FILE* out);
 
 /**
  * A dyadic interval is an interval either an interval of the form (a, b) where
@@ -76,8 +50,59 @@ typedef struct {
   lp_dyadic_rational_t b;
 } lp_dyadic_interval_t;
 
+
+/** Construct the interval (a, b) */
+void lp_interval_construct(lp_interval_t* I, const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open);
+
+/** Construct the interval [0,0] */
+void lp_interval_construct_zero(lp_interval_t* I);
+
+/** Construct the interval [a, a] */
+void lp_interval_construct_point(lp_interval_t* I, const lp_rational_t* a);
+
+/** Construct the interval (a, b) */
+void lp_interval_construct_copy(lp_interval_t* I, const lp_interval_t* from);
+
+/** Construct the interval (a, b) */
+void lp_interval_construct_from_dyadic(lp_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open);
+
+/** Construct from diadic interval */
+void lp_interval_construct_from_dyadic_interval(lp_interval_t* I, const lp_dyadic_interval_t* from);
+
+/** Construct from interval (a, b) from integers */
+void lp_interval_construct_from_int(lp_interval_t* I, long a, int a_open, long b, int b_open);
+
+/** Construct from interval (a, b) from integers */
+void lp_interval_construct_from_integer(lp_interval_t* I, const lp_integer_t* a, int a_open, const lp_integer_t* b, int b_open);
+
+/** Assign from another interval */
+void lp_interval_assign(lp_interval_t* I, const lp_interval_t* from);
+
+/** Destroy the interval */
+void lp_interval_destruct(lp_interval_t* I);
+
+/** Swap the two intervals */
+void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2);
+
+/** Prints the interval to the given stream. */
+int lp_interval_print(const lp_interval_t* I, FILE* out);
+
+/** Check if the interval contains q */
+int lp_interval_contains(const lp_interval_t* I, const lp_rational_t* q);
+
+/** Check whether the interval contains 0 */
+int lp_interval_contains_zero(const lp_interval_t* I);
+
+/** Returns the "sign" of the interval: 0 in 0 in I, negative if I < 0, positive if I > 0. */
+int lp_interval_sgn(const lp_interval_t* I);
+
+
+
 /** Construct the interval (a, b) */
 void lp_dyadic_interval_construct(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open);
+
+/** Construct the interval [0, 0] */
+void lp_dyadic_interval_construct_zero(lp_dyadic_interval_t* I);
 
 /** Construct the interval (a, b) */
 void lp_dyadic_interval_construct_copy(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* from);
@@ -99,6 +124,9 @@ void lp_dyadic_interval_construct_from_split(lp_dyadic_interval_t* I_left, lp_dy
 
 /** Construct an intersection of two non-disjoint intervals of the SAME SIZE. */
 void lp_dyadic_interval_construct_intersection(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
+
+/** Assign from another interval */
+void lp_dyadic_interval_assign(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* from);
 
 /** Destroy the interval */
 void lp_dyadic_interval_destruct(lp_dyadic_interval_t* I);
@@ -123,6 +151,12 @@ int lp_dyadic_interval_equals(const lp_dyadic_interval_t* I1, const lp_dyadic_in
 
 /** Check whether the number q is in the interval I */
 int lp_dyadic_interval_contains(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
+
+/** Check whether the interval contains 0 */
+int lp_dyadic_interval_contains_zero(const lp_dyadic_interval_t* I);
+
+/** Returns the "sign" of the interval: 0 in 0 in I, negative if I < 0, positive if I > 0. */
+int lp_dyadic_interval_sgn(const lp_dyadic_interval_t* I);
 
 /** Check whether two intervals are disjunct */
 int lp_dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);

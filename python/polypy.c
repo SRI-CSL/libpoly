@@ -99,7 +99,7 @@ initpolypy(void)
   PyModule_AddObject(m, "UPolynomial", (PyObject*)&UPolynomialType);
 
   int x_coeff[2] = { 0, 1 };
-  lp_upolynomial_t* x_poly = upolynomial_ops.construct_from_int(lp_Z, 1, x_coeff);
+  lp_upolynomial_t* x_poly = lp_upolynomial_construct_from_int(lp_Z, 1, x_coeff);
   PyObject* x = PyUPolynomial_create(x_poly);
   Py_INCREF(x);
   PyModule_AddObject(m, "x", x);

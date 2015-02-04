@@ -35,10 +35,10 @@ void upolynomial_dense_construct(upolynomial_dense_t* p_d, size_t capacity) {
 }
 
 void upolynomial_dense_construct_p(upolynomial_dense_t* p_d, size_t capacity, const lp_upolynomial_t* p) {
-  assert(capacity > upolynomial_degree(p));
+  assert(capacity > lp_upolynomial_degree(p));
   upolynomial_dense_construct(p_d, capacity);
-  upolynomial_unpack(p, p_d->coefficients);
-  p_d->size = upolynomial_degree(p) + 1;
+  lp_upolynomial_unpack(p, p_d->coefficients);
+  p_d->size = lp_upolynomial_degree(p) + 1;
 }
 
 void upolynomial_dense_destruct(upolynomial_dense_t* p_d) {
@@ -152,7 +152,7 @@ void upolynomial_dense_clear(upolynomial_dense_t* p_d) {
 
 lp_upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, lp_int_ring K) {
   assert(p_d->size > 0);
-  lp_upolynomial_t* result = upolynomial_construct(K, p_d->size - 1, p_d->coefficients);
+  lp_upolynomial_t* result = lp_upolynomial_construct(K, p_d->size - 1, p_d->coefficients);
   return result;
 }
 
@@ -237,7 +237,7 @@ void upolynomial_dense_div_c(upolynomial_dense_t* p_d, lp_int_ring K, const lp_i
 
 void upolynomial_dense_add_mult_p_c(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const lp_integer_t* c) {
   assert(integer_sgn(p->K, c));
-  size_t needed_degree = upolynomial_degree(p);
+  size_t needed_degree = lp_upolynomial_degree(p);
   assert(p_d->capacity > needed_degree);
   // Add
   size_t i;
@@ -253,7 +253,7 @@ void upolynomial_dense_add_mult_p_c(upolynomial_dense_t* p_d, const lp_upolynomi
 
 void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, int c) {
   assert(c);
-  size_t needed_degree = upolynomial_degree(p);
+  size_t needed_degree = lp_upolynomial_degree(p);
   assert(p_d->capacity > needed_degree);
   // Add
   size_t i;
@@ -269,7 +269,7 @@ void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const lp_upolyno
 
 void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const umonomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
-  size_t needed_degree = upolynomial_degree(p) + m->degree;
+  size_t needed_degree = lp_upolynomial_degree(p) + m->degree;
   assert(p_d->capacity > needed_degree);
   size_t i;
   for (i = 0; i < p->size; ++ i) {
@@ -284,7 +284,7 @@ void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolyno
 
 void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const umonomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
-  size_t needed_degree = upolynomial_degree(p) + m->degree;
+  size_t needed_degree = lp_upolynomial_degree(p) + m->degree;
   size_t i;
   for (i = 0; i < p->size; ++ i) {
     size_t degree = p->monomials[i].degree + m->degree;
