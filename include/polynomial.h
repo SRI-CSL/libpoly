@@ -197,6 +197,6 @@ typedef struct {
    */
   void (*factor_square_free) (const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size);
 
-} polynomial_ops_t;
+} lp_polynomial_ops_t;
 
-extern const polynomial_ops_t polynomial_ops;
+extern const lp_polynomial_ops_t lp_polynomial_ops;

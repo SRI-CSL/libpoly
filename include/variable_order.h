@@ -32,7 +32,7 @@ struct lp_variable_order_struct {
  */
 struct lp_variable_order_ops_struct {
 
-  /** Construct a new variable order */
+  /** Construct a new variable order. Attaches one. */
   lp_variable_order_t* (*new) (void);
 
   /** Attach an object to this order (constructor should attach) */
@@ -89,4 +89,5 @@ struct lp_variable_order_simple_ops_struct {
 
 };
 
+// Not const, it gets updated
 extern lp_variable_order_simple_ops_t lp_variable_order_simple_ops;

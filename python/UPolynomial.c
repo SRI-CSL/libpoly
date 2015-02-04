@@ -685,18 +685,18 @@ UPolynomial_extended_gcd(PyObject* self, PyObject* args) {
 
 static PyObject* factors_to_PyList(lp_upolynomial_factors_t* factors) {
   // Construct the result
-  size_t size = upolynomial_factors_ops.size(factors);
+  size_t size = lp_upolynomial_factors_ops.size(factors);
   PyObject* factors_list = PyList_New(size + 1);
 
   // Copy the constant
-  PyObject* constant = integer_to_PyInt(upolynomial_factors_ops.get_constant(factors));
+  PyObject* constant = integer_to_PyInt(lp_upolynomial_factors_ops.get_constant(factors));
   PyList_SetItem(factors_list, 0, constant); // Steals the reference
 
   // Copy over the factors
   int i;
   for (i = 0; i < size; ++ i) {
     size_t degree;
-    PyObject* p_i = PyUPolynomial_create(upolynomial_factors_ops.get_factor(factors, i, &degree));
+    PyObject* p_i = PyUPolynomial_create(lp_upolynomial_factors_ops.get_factor(factors, i, &degree));
     Py_INCREF(p_i);
     PyObject* d = PyInt_FromSize_t(degree);
     PyObject* pair = PyTuple_New(2);
@@ -718,7 +718,7 @@ UPolynomial_factor(PyObject* self) {
   // Create the list
   PyObject* factors_list = factors_to_PyList(factors);
   // Get rid of the factors (not the polynomials)
-  upolynomial_factors_ops.destruct(factors, 0);
+  lp_upolynomial_factors_ops.destruct(factors, 0);
   // Return the list
   return factors_list;
 }
@@ -732,7 +732,7 @@ UPolynomial_factor_square_free(PyObject* self) {
   // Create the list
   PyObject* factors_list = factors_to_PyList(factors);
   // Get rid of the factors (not the polynomials)
-  upolynomial_factors_ops.destruct(factors, 0);
+  lp_upolynomial_factors_ops.destruct(factors, 0);
   // Return the list
   return factors_list;
 }

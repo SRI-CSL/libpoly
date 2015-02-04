@@ -64,7 +64,7 @@
 								<option defaultValue="true" id="gnu.cpp.link.so.debug.option.shared.427239961" name="Shared (-shared)" superClass="gnu.cpp.link.so.debug.option.shared" valueType="boolean"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.348091402" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug">
-								<option id="gnu.both.asm.option.include.paths.1694686584" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath"/>
+								<option id="gnu.both.asm.option.include.paths.1694686584" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1006617343" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
@@ -173,10 +173,10 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/polylib"/>
 		</configuration>
-		<configuration configurationName="debug-dynamic">
+		<configuration configurationName="Debug (dynamic)">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
-		<configuration configurationName="Debug (dynamic)">
+		<configuration configurationName="debug-dynamic">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
 		<configuration configurationName="Multiple configurations">

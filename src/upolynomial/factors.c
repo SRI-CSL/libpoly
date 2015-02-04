@@ -88,7 +88,7 @@ void upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, lp_int_ring K) {
   }
 }
 
-const upolynomial_factors_ops_t upolynomial_factors_ops = {
+const lp_upolynomial_factors_ops_t lp_upolynomial_factors_ops = {
     upolynomial_factors_construct,
     upolynomial_factors_destruct,
     upolynomial_factors_clear,

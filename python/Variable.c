@@ -213,8 +213,8 @@ lp_polynomial_t* PyLong_Or_Int_to_polynomial(PyObject* number) {
   const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
   lp_integer_t c;
   PyLong_or_Int_to_integer(number, 0, &c);
-  lp_polynomial_t* p_c = polynomial_ops.alloc();
-  polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
+  lp_polynomial_t* p_c = lp_polynomial_ops.alloc();
+  lp_polynomial_ops.construct_simple(p_c, ctx, &c, 0, 0);
   lp_integer_ops.destruct(&c);
   return p_c;
 }
@@ -225,8 +225,8 @@ lp_polynomial_t* Variable_to_polynomial(PyObject* var) {
   Variable* x = (Variable*) var;
   lp_integer_t one;
   lp_integer_ops.construct_from_int(lp_Z, &one, 1);
-  lp_polynomial_t* p_x = polynomial_ops.alloc();
-  polynomial_ops.construct_simple(p_x, ctx, &one, x->x, 1);
+  lp_polynomial_t* p_x = lp_polynomial_ops.alloc();
+  lp_polynomial_ops.construct_simple(p_x, ctx, &one, x->x, 1);
   lp_integer_ops.destruct(&one);
   return p_x;
 }
@@ -242,12 +242,12 @@ Variable_add_number(PyObject* self, PyObject* other) {
   lp_polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  lp_polynomial_t* p_sum = polynomial_ops.new(ctx);
-  polynomial_ops.add(p_sum, p_x, p_c);
+  lp_polynomial_t* p_sum = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.add(p_sum, p_x, p_c);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
-  polynomial_ops.destruct(p_c);
+  lp_polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_c);
   free(p_x);
   free(p_c);
 
@@ -265,12 +265,12 @@ Variable_add_Variable(PyObject* self, PyObject* other) {
   lp_polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x + c polynomial
-  lp_polynomial_t* p_sum = polynomial_ops.new(ctx);
-  polynomial_ops.add(p_sum, p_x, p_y);
+  lp_polynomial_t* p_sum = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.add(p_sum, p_x, p_y);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
-  polynomial_ops.destruct(p_y);
+  lp_polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_y);
   free(p_x);
   free(p_y);
 
@@ -301,11 +301,11 @@ Variable_neg(PyObject* self) {
   lp_polynomial_t* p_x = Variable_to_polynomial(self);
 
   // -x polynomial
-  lp_polynomial_t* p_neg = polynomial_ops.new(ctx);
-  polynomial_ops.neg(p_neg, p_x);
+  lp_polynomial_t* p_neg = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.neg(p_neg, p_x);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_x);
   free(p_x);
 
   return Polynomial_create(p_neg);
@@ -322,12 +322,12 @@ Variable_sub_number(PyObject* self, PyObject* other) {
   lp_polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  lp_polynomial_t* p_sub = polynomial_ops.new(ctx);
-  polynomial_ops.sub(p_sub, p_x, p_c);
+  lp_polynomial_t* p_sub = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.sub(p_sub, p_x, p_c);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
-  polynomial_ops.destruct(p_c);
+  lp_polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_c);
   free(p_x);
   free(p_c);
 
@@ -345,12 +345,12 @@ Variable_sub_Variable(PyObject* self, PyObject* other) {
   lp_polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x - y polynomial
-  lp_polynomial_t* p_sub = polynomial_ops.new(ctx);
-  polynomial_ops.sub(p_sub, p_x, p_y);
+  lp_polynomial_t* p_sub = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.sub(p_sub, p_x, p_y);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
-  polynomial_ops.destruct(p_y);
+  lp_polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_y);
   free(p_x);
   free(p_y);
 
@@ -364,7 +364,7 @@ Variable_sub(PyObject* self, PyObject* other) {
     return Variable_sub_number(self, other);
   } else if (PyLong_or_Int_Check(self)) {
     Polynomial* result = (Polynomial*) Variable_sub_number(other, self);
-    polynomial_ops.neg(result->p, result->p);
+    lp_polynomial_ops.neg(result->p, result->p);
     return (PyObject*) result;
   } else if (PyVariable_CHECK(other)) {
     return Variable_sub_Variable(self, other);
@@ -385,12 +385,12 @@ Variable_mul_number(PyObject* self, PyObject* other) {
   lp_polynomial_t* p_c = PyLong_Or_Int_to_polynomial(other);
 
   // x + c polynomial
-  lp_polynomial_t* p_mul = polynomial_ops.new(ctx);
-  polynomial_ops.mul(p_mul, p_x, p_c);
+  lp_polynomial_t* p_mul = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.mul(p_mul, p_x, p_c);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
-  polynomial_ops.destruct(p_c);
+  lp_polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_c);
   free(p_x);
   free(p_c);
 
@@ -408,12 +408,12 @@ Variable_mul_Variable(PyObject* self, PyObject* other) {
   lp_polynomial_t* p_y = Variable_to_polynomial(other);
 
   // x + c polynomial
-  lp_polynomial_t* p_mul = polynomial_ops.new(ctx);
-  polynomial_ops.mul(p_mul, p_x, p_y);
+  lp_polynomial_t* p_mul = lp_polynomial_ops.new(ctx);
+  lp_polynomial_ops.mul(p_mul, p_x, p_y);
 
   // Remove temporaries
-  polynomial_ops.destruct(p_x);
-  polynomial_ops.destruct(p_y);
+  lp_polynomial_ops.destruct(p_x);
+  lp_polynomial_ops.destruct(p_y);
   free(p_x);
   free(p_y);
 
@@ -451,8 +451,8 @@ Variable_pow(PyObject* self, PyObject* other) {
       Variable* var = (Variable*) self;
       lp_integer_t one;
       lp_integer_ops.construct_from_int(lp_Z, &one, 1);
-      lp_polynomial_t* pow_x = polynomial_ops.alloc();
-      polynomial_ops.construct_simple(pow_x, ctx, &one, var->x, n);
+      lp_polynomial_t* pow_x = lp_polynomial_ops.alloc();
+      lp_polynomial_ops.construct_simple(pow_x, ctx, &one, var->x, n);
       lp_integer_ops.destruct(&one);
       return Polynomial_create(pow_x);
     }

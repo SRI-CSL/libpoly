@@ -1075,7 +1075,7 @@ lp_upolynomial_factors_t* upolynomial_factor(const lp_upolynomial_t* p) {
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor("); upolynomial_print(p, trace_out); tracef(") = ");
-    upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
+    lp_upolynomial_factors_ops.print(factors, trace_out); tracef("\n");
   }
 
   return factors;

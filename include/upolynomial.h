@@ -354,7 +354,7 @@ typedef struct {
    */
   void (*set_ring) (lp_upolynomial_factors_t* f, lp_int_ring K);
 
-} upolynomial_factors_ops_t;
+} lp_upolynomial_factors_ops_t;
 
-extern const upolynomial_factors_ops_t upolynomial_factors_ops;
+extern const lp_upolynomial_factors_ops_t lp_upolynomial_factors_ops;
 

@@ -46,7 +46,7 @@ typedef struct {
    */
   int (*equal) (const lp_polynomial_context_t* ctx1, const lp_polynomial_context_t* ctx2);
 
-} polynomial_context_ops_t;
+} lp_polynomial_context_ops_t;
 
 /** Implementation of the context operations */
-extern const polynomial_context_ops_t polynomial_context_ops;
+extern const lp_polynomial_context_ops_t lp_polynomial_context_ops;

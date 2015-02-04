@@ -361,7 +361,7 @@ const lp_polynomial_context_t* algebraic_pctx(void) {
     lp_variable_order_simple_ops.push(var_order, var_y);
     lp_variable_order_simple_ops.push(var_order, var_x);
     // Create the context
-    algebraic_ctx = polynomial_context_ops.new(0, var_db, (lp_variable_order_t*) var_order);
+    algebraic_ctx = lp_polynomial_context_ops.new(0, var_db, (lp_variable_order_t*) var_order);
     // Detach local references
     lp_variable_db_ops.detach(var_db);
     lp_variable_order_simple_ops.variable_order_ops.detach((lp_variable_order_t*) var_order);

@@ -66,7 +66,7 @@ int polynomial_context_equal(const lp_polynomial_context_t* ctx1, const lp_polyn
   }
 }
 
-const polynomial_context_ops_t polynomial_context_ops = {
+const lp_polynomial_context_ops_t lp_polynomial_context_ops = {
     polynomial_context_new,
     polynomial_context_attach,
     polynomial_context_detach,

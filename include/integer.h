@@ -36,7 +36,7 @@ typedef struct {
 typedef const lp_int_ring_t* lp_int_ring;
 
 /** Default ring is the whole of integers */
-lp_int_ring lp_Z;
+extern lp_int_ring lp_Z;
 
 /** Operations on the integer ring */
 typedef struct {
