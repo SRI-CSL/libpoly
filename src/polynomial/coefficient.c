@@ -17,7 +17,8 @@
 #include "interval/interval.h"
 #include "interval/arithmetic.h"
 
-#include "utils/assignment.h"
+#include <assignment.h>
+
 #include "utils/debug_trace.h"
 #include "utils/statistics.h"
 
@@ -411,7 +412,7 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     // x_value constructed in get_value_approx
 
     // Get the value of x
-    assignment_get_value_approx(m, VAR(C), &x_value);
+    lp_assignment_get_value_approx(m, VAR(C), &x_value);
 
     // We compute using powers, just an attemp to compute better. For example
     // if p = x^2 + x and x = [-1, 1] then

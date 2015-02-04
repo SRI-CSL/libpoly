@@ -16,7 +16,7 @@ static lp_assignment_t* default_assignment = 0;
 
 lp_assignment_t* Assignment_get_default_assignment(void) {
   if (!default_assignment) {
-    default_assignment = assignment_ops.new(Variable_get_default_db());
+    default_assignment = lp_assignment_new(Variable_get_default_db());
   }
   return default_assignment;
 }
@@ -110,7 +110,7 @@ static int
 Assignment_init(Assignment* self, PyObject* args)
 {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 0) {
-    self->assignment = assignment_ops.new(Variable_get_default_db());
+    self->assignment = lp_assignment_new(Variable_get_default_db());
   } else {
     return -1;
   }
@@ -121,14 +121,14 @@ static void
 Assignment_dealloc(Assignment* self)
 {
   if (self->assignment) {
-    assignment_ops.delete(self->assignment);
+    lp_assignment_delete(self->assignment);
   }
   self->ob_type->tp_free((PyObject*)self);
 }
 
 static PyObject* Assignment_str(PyObject* self) {
   Assignment* a = (Assignment*) self;
-  char* a_str = assignment_ops.to_string(a->assignment);
+  char* a_str = lp_assignment_to_string(a->assignment);
   PyObject* str = PyString_FromString(a_str);
   free(a_str);
   return str;
@@ -141,7 +141,7 @@ Assignment_get_value(PyObject* self, PyObject* args) {
     if (PyVariable_CHECK(var_obj)) {
       Variable* var = (Variable*) var_obj;
       Assignment* a = (Assignment*) self;
-      const lp_value_t* value = assignment_ops.get_value(a->assignment, var->x);
+      const lp_value_t* value = lp_assignment_get_value(a->assignment, var->x);
       switch (value->type) {
       case LP_VALUE_ALGEBRAIC:
         return 0;
@@ -181,7 +181,7 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           PyFloat_to_dyadic_rational(value_obj, &value_dyrat);
           lp_value_t value;
           lp_value_ops.construct(&value, LP_VALUE_DYADIC_RATIONAL, &value_dyrat);
-          assignment_ops.set_value(a->assignment, var->x, &value);
+          lp_assignment_set_value(a->assignment, var->x, &value);
           lp_value_ops.destruct(&value);
           lp_dyadic_rational_ops.destruct(&value_dyrat);
           Py_RETURN_NONE;
@@ -192,7 +192,7 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           lp_dyadic_rational_ops.construct_from_integer(&value_dyrat, &value_int);
           lp_value_t value;
           lp_value_ops.construct(&value, LP_VALUE_DYADIC_RATIONAL, &value_dyrat);
-          assignment_ops.set_value(a->assignment, var->x, &value);
+          lp_assignment_set_value(a->assignment, var->x, &value);
           lp_value_ops.destruct(&value);
           lp_dyadic_rational_ops.destruct(&value_dyrat);
           lp_integer_ops.destruct(&value_int);
@@ -218,7 +218,7 @@ Assignment_unset_value(PyObject* self, PyObject* args) {
     if (PyVariable_CHECK(var_obj)) {
       Variable* var = (Variable*) var_obj;
       Assignment* a = (Assignment*) self;
-      assignment_ops.set_value(a->assignment, var->x, 0);
+      lp_assignment_set_value(a->assignment, var->x, 0);
       Py_RETURN_NONE;
     } else {
       Py_INCREF(Py_NotImplemented);
