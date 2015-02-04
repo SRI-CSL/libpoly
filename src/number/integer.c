@@ -7,7 +7,7 @@
 
 #include "number/integer.h"
 
-lp_int_ring lp_integer_ring_create(const lp_integer_t* M, int is_prime) {
+lp_int_ring lp_int_ring_create(const lp_integer_t* M, int is_prime) {
 
   assert(mpz_sgn(M) > 0);
 
@@ -34,7 +34,7 @@ lp_int_ring lp_integer_ring_create(const lp_integer_t* M, int is_prime) {
   return K;
 }
 
-void lp_integer_ring_destroy(lp_int_ring K) {
+void lp_int_ring_destroy(lp_int_ring K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   mpz_clear(&nonconst->M);
   mpz_clear(&nonconst->ub);
@@ -42,24 +42,24 @@ void lp_integer_ring_destroy(lp_int_ring K) {
   free(nonconst);
 }
 
-void lp_integer_ring_attach(lp_int_ring K) {
+void lp_int_ring_attach(lp_int_ring K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   if (nonconst) {
     ++ nonconst->ref_count;
   }
 }
 
-void lp_integer_ring_detach(lp_int_ring K) {
+void lp_int_ring_detach(lp_int_ring K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   if (nonconst) {
     assert(nonconst->ref_count > 0);
     if (--nonconst->ref_count == 0) {
-      lp_integer_ring_destroy(nonconst);
+      lp_int_ring_destroy(nonconst);
     }
   }
 }
 
-int lp_integer_ring_equal(lp_int_ring K1, lp_int_ring K2) {
+int lp_int_ring_equal(lp_int_ring K1, lp_int_ring K2) {
   if (K1 == K2) {
     return 1;
   } else if (K1 && K2) {
@@ -70,7 +70,7 @@ int lp_integer_ring_equal(lp_int_ring K1, lp_int_ring K2) {
 }
 
 
-int lp_integer_ring_print(lp_int_ring K, FILE* out) {
+int lp_int_ring_print(lp_int_ring K, FILE* out) {
   int len = 0;
   len += fprintf(out, "Z");
   if (K) {
@@ -80,11 +80,11 @@ int lp_integer_ring_print(lp_int_ring K, FILE* out) {
   return len;
 }
 
-char* lp_integer_ring_to_string(lp_int_ring K) {
+char* lp_int_ring_to_string(lp_int_ring K) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);
-  lp_integer_ring_print(K, f);
+  lp_int_ring_print(K, f);
   fclose(f);
   return str;
 }
