@@ -946,7 +946,7 @@ void hensel_lift_quadratic(const lp_upolynomial_t* F,
   lp_integer_t qq;
   integer_construct_from_int(lp_Z, &qq, 0);
   integer_pow(lp_Z, &qq, q, 2);
-  lp_int_ring Zqq = lp_int_ring_ops.create(&qq, 0);
+  lp_int_ring Zqq = lp_int_ring_create(&qq, 0);
 
   if (trace_is_enabled("hensel")) {
     tracef("hensel_lift_quadratic("); upolynomial_print(F, trace_out); tracef(", ");
@@ -1153,7 +1153,7 @@ void hensel_lift_quadratic(const lp_upolynomial_t* F,
 
   // Remove the temporaries
   integer_destruct(&qq);
-  lp_int_ring_ops.detach(Zqq);
+  lp_int_ring_detach(Zqq);
   for (k = 0; k < A->size; ++ k) {
     upolynomial_delete(P[k]);
   }
@@ -1392,7 +1392,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Z_square_free(const lp_upolynomial_
     if (!integer_divides(lp_Z, &prime, upolynomial_lead_coeff(f))) {
 
       // The ring to use
-      lp_int_ring K_p = lp_int_ring_ops.create(&prime, 1);
+      lp_int_ring K_p = lp_int_ring_create(&prime, 1);
 
       // compute GCD of (f, f') in Z_p (to check for square-free
       lp_upolynomial_t* f_p = upolynomial_construct_copy_K(K_p, f);
@@ -1429,7 +1429,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Z_square_free(const lp_upolynomial_
       upolynomial_delete(f_p);
       upolynomial_delete(f_d_p);
       upolynomial_delete(gcd_p);
-      lp_int_ring_ops.detach(K_p);
+      lp_int_ring_detach(K_p);
     }
 
     integer_destruct(&prime);

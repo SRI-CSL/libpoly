@@ -65,6 +65,12 @@ void integer_construct_from_int(lp_int_ring K, lp_integer_t* c, long x) {
 }
 
 static inline
+void integer_construct_from_string(lp_int_ring K, lp_integer_t* c, const char* x, int base) {
+  mpz_init_set_str(c, x, base);
+  integer_ring_normalize(K, c);
+}
+
+static inline
 void integer_construct_copy(lp_int_ring K, lp_integer_t* c, const lp_integer_t* from) {
   mpz_init_set(c, from);
   integer_ring_normalize(K, c);
@@ -92,7 +98,29 @@ int integer_print(const lp_integer_t* c, FILE* out) {
   return mpz_out_str(out, 10, c);
 }
 
-int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out);
+static inline
+int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out) {
+  size_t i, j;
+  int len = 0;
+  for (i = 0; i < m; ++ i) {
+    for (j = 0; j < n; ++ j) {
+      len += gmp_fprintf(out, "%4Zd", c + i*m + j);
+    }
+    len += fprintf(out, "\n");
+  }
+  return len;
+}
+
+static inline
+char* integer_to_string(const lp_integer_t* c) {
+  char* str = 0;
+  size_t size = 0;
+  FILE* f = open_memstream(&str, &size);
+  integer_print(c, f);
+  fclose(f);
+  return str;
+}
+
 
 static inline
 size_t integer_bits(const lp_integer_t* c) {

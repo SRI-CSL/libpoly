@@ -53,7 +53,7 @@ int upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
     len += umonomial_print(&p->monomials[p->size-i-1], out);
   }
   len += fprintf(out, " [");
-  len += lp_int_ring_ops.print(p->K, out);
+  len += lp_int_ring_print(p->K, out);
   len += fprintf(out, "]");
   return len;
 }

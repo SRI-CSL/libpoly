@@ -21,7 +21,7 @@ void polynomial_context_construct(lp_polynomial_context_t* ctx, lp_int_ring_t* K
 
 void polynomial_context_attach(lp_polynomial_context_t* ctx) {
   if (ctx->K) {
-    lp_int_ring_ops.attach(ctx->K);
+    lp_int_ring_attach(ctx->K);
   }
   if (ctx->var_db) {
     lp_variable_db_ops.attach(ctx->var_db);
@@ -34,7 +34,7 @@ void polynomial_context_attach(lp_polynomial_context_t* ctx) {
 
 void polynomial_context_detach(lp_polynomial_context_t* ctx) {
   if (ctx->K) {
-    lp_int_ring_ops.detach(ctx->K);
+    lp_int_ring_detach(ctx->K);
   }
   if (ctx->var_db) {
     lp_variable_db_ops.detach(ctx->var_db);
@@ -60,7 +60,7 @@ lp_polynomial_context_t* polynomial_context_new(lp_int_ring_t* K, lp_variable_db
 int polynomial_context_equal(const lp_polynomial_context_t* ctx1, const lp_polynomial_context_t* ctx2) {
   if (ctx1 == ctx2) return 1;
   if (ctx1 && ctx2) {
-    return lp_int_ring_ops.equal(ctx1->K, ctx2->K) && ctx1->var_order == ctx2->var_order;
+    return lp_int_ring_equal(ctx1->K, ctx2->K) && ctx1->var_order == ctx2->var_order;
   } else {
     return 0;
   }

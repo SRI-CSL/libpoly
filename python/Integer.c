@@ -77,7 +77,7 @@ PyTypeObject CoefficientRingType = {
 static void
 CoefficientRing_dealloc(CoefficientRing* self)
 {
-  if (self->K) lp_int_ring_ops.detach(self->K);
+  if (self->K) lp_int_ring_detach(self->K);
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -114,7 +114,7 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
             lp_integer_t M;
             lp_integer_ops.construct_from_int(lp_Z, &M, M_int);
             int is_prime = lp_integer_ops.is_prime(&M);
-            self->K = lp_int_ring_ops.create(&M, is_prime);
+            self->K = lp_int_ring_create(&M, is_prime);
             lp_integer_ops.destruct(&M);
           }
         } else {
@@ -126,13 +126,13 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
             lp_integer_t M;
             lp_integer_ops.construct_from_string(lp_Z, &M, M_cstr, 10);
             int is_prime = lp_integer_ops.is_prime(&M);
-            self->K = lp_int_ring_ops.create(&M, is_prime);
+            self->K = lp_int_ring_create(&M, is_prime);
             Py_DECREF(M_str);
           } else if (M_int > 0) {
             lp_integer_t M;
             lp_integer_ops.construct_from_int(lp_Z, &M, M_int);
             int is_prime = lp_integer_ops.is_prime(&M);
-            self->K = lp_int_ring_ops.create(&M, is_prime);
+            self->K = lp_int_ring_create(&M, is_prime);
           } else {
             return -1;
           }
@@ -190,7 +190,7 @@ static PyObject* CoefficientRing_str(PyObject* self) {
   CoefficientRing* K = (CoefficientRing*) self;
   if (K) {
     if (K->K) {
-      char* K_str = lp_int_ring_ops.to_string(K->K);
+      char* K_str = lp_int_ring_to_string(K->K);
       PyObject* str = PyString_FromString(K_str);
       free(K_str);
       return str;

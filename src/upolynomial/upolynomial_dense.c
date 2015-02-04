@@ -356,7 +356,7 @@ void upolynomial_dense_div_general(lp_int_ring K, int exact, const upolynomial_d
 
   if (trace_is_enabled("division")) {
     tracef("upolynomial_div_general(");
-    lp_int_ring_ops.print(K, trace_out);
+    lp_int_ring_print(K, trace_out);
     tracef(", ");
     upolynomial_dense_print(p, trace_out);
     tracef(", ");

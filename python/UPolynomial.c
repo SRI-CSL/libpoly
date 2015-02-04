@@ -385,7 +385,7 @@ UPolynomial_ring(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
     lp_int_ring K = upolynomial_ops.ring(p->p);
-    lp_int_ring_ops.attach(K);
+    lp_int_ring_attach(K);
     return PyCoefficientRing_create(K);
   } else {
     Py_RETURN_NONE;

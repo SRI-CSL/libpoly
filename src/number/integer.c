@@ -7,20 +7,7 @@
 
 #include "number/integer.h"
 
-int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out) {
-  size_t i, j;
-  int len = 0;
-  for (i = 0; i < m; ++ i) {
-    for (j = 0; j < n; ++ j) {
-      len += gmp_fprintf(out, "%4Zd", c + i*m + j);
-    }
-    len += fprintf(out, "\n");
-  }
-  return len;
-}
-
-static
-lp_int_ring integer_ring_create(const lp_integer_t* M, int is_prime) {
+lp_int_ring lp_integer_ring_create(const lp_integer_t* M, int is_prime) {
 
   assert(mpz_sgn(M) > 0);
 
@@ -47,8 +34,7 @@ lp_int_ring integer_ring_create(const lp_integer_t* M, int is_prime) {
   return K;
 }
 
-static
-void integer_ring_destroy(lp_int_ring K) {
+void lp_integer_ring_destroy(lp_int_ring K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   mpz_clear(&nonconst->M);
   mpz_clear(&nonconst->ub);
@@ -56,27 +42,24 @@ void integer_ring_destroy(lp_int_ring K) {
   free(nonconst);
 }
 
-static
-void integer_ring_attach(lp_int_ring K) {
+void lp_integer_ring_attach(lp_int_ring K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   if (nonconst) {
     ++ nonconst->ref_count;
   }
 }
 
-static
-void integer_ring_detach(lp_int_ring K) {
+void lp_integer_ring_detach(lp_int_ring K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   if (nonconst) {
     assert(nonconst->ref_count > 0);
     if (--nonconst->ref_count == 0) {
-      integer_ring_destroy(nonconst);
+      lp_integer_ring_destroy(nonconst);
     }
   }
 }
 
-static
-int integer_ring_equal(lp_int_ring K1, lp_int_ring K2) {
+int lp_integer_ring_equal(lp_int_ring K1, lp_int_ring K2) {
   if (K1 == K2) {
     return 1;
   } else if (K1 && K2) {
@@ -87,8 +70,7 @@ int integer_ring_equal(lp_int_ring K1, lp_int_ring K2) {
 }
 
 
-static
-int integer_ring_print(lp_int_ring K, FILE* out) {
+int lp_integer_ring_print(lp_int_ring K, FILE* out) {
   int len = 0;
   len += fprintf(out, "Z");
   if (K) {
@@ -98,43 +80,16 @@ int integer_ring_print(lp_int_ring K, FILE* out) {
   return len;
 }
 
-static
-char* integer_ring_to_string(lp_int_ring K) {
+char* lp_integer_ring_to_string(lp_int_ring K) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);
-  integer_ring_print(K, f);
+  lp_integer_ring_print(K, f);
   fclose(f);
   return str;
 }
-
-lp_int_ring_ops_t lp_int_ring_ops = {
-    integer_ring_create,
-    integer_ring_attach,
-    integer_ring_detach,
-    integer_ring_equal,
-    integer_ring_print,
-    integer_ring_to_string
-};
 
 lp_int_ring lp_Z = 0;
-
-static
-void integer_construct_from_string(lp_int_ring K, lp_integer_t* c, const char* x, int base) {
-  mpz_init_set_str(c, x, base);
-  integer_ring_normalize(K, c);
-}
-
-
-static
-char* integer_to_string(const lp_integer_t* c) {
-  char* str = 0;
-  size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
-  integer_print(c, f);
-  fclose(f);
-  return str;
-}
 
 const lp_integer_ops_struct lp_integer_ops = {
     integer_construct_from_int,

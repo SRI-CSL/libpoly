@@ -31,7 +31,7 @@ lp_upolynomial_t* upolynomial_construct_empty(lp_int_ring K, size_t size) {
   lp_upolynomial_t* new_p = (lp_upolynomial_t*) malloc(malloc_size);
   new_p->K = K;
   new_p->size = size;
-  lp_int_ring_ops.attach((lp_int_ring_t*)K);
+  lp_int_ring_attach((lp_int_ring_t*)K);
   return new_p;
 }
 
@@ -83,7 +83,7 @@ void upolynomial_delete(lp_upolynomial_t* p) {
   for (i = 0; i < p->size; ++ i) {
     integer_destruct(&p->monomials[i].coefficient);
   }
-  lp_int_ring_ops.detach((lp_int_ring_t*)p->K);
+  lp_int_ring_detach((lp_int_ring_t*)p->K);
   free(p);
 }
 
@@ -151,9 +151,9 @@ lp_upolynomial_t* upolynomial_construct_copy_K(lp_int_ring K, const lp_upolynomi
   // If in Z, same, or bigger, it's just a regular copy (while swapping the rings).
   if (K == lp_Z || (p->K != lp_Z && integer_cmp(lp_Z, &K->M, &p->K->M) >= 0)) {
     lp_upolynomial_t* copy = upolynomial_construct_copy(p);
-    lp_int_ring_ops.detach(copy->K);
+    lp_int_ring_detach(copy->K);
     copy->K = K;
-    lp_int_ring_ops.attach(copy->K);
+    lp_int_ring_attach(copy->K);
     return copy;
   }
 
@@ -217,9 +217,9 @@ lp_int_ring upolynomial_ring(const lp_upolynomial_t* p) {
 
 void upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring K) {
   assert(p);
-  lp_int_ring_ops.detach(p->K);
+  lp_int_ring_detach(p->K);
   p->K = K;
-  lp_int_ring_ops.attach(p->K);
+  lp_int_ring_attach(p->K);
 }
 
 const lp_integer_t* upolynomial_lead_coeff(const lp_upolynomial_t* p) {

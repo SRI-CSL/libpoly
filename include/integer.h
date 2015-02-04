@@ -38,33 +38,25 @@ typedef const lp_int_ring_t* lp_int_ring;
 /** Default ring is the whole of integers */
 extern lp_int_ring lp_Z;
 
-/** Operations on the integer ring */
-typedef struct {
+/**
+ * Create a new ring. The new modulus is attached, so in order to remove
+ * it you need to detach it. The ring is reference counted, so it will get
+ * deallocated when the last user detaches it.
+ */
+lp_int_ring lp_int_ring_create(const lp_integer_t* M, int is_prime);
 
-  /**
-   * Create a new ring. The new modulus is attached, so in order to remove
-   * it you need to detach it. The ring is reference counted, so it will get
-   * deallocated when the last user detaches it.
-   */
-  lp_int_ring (*create) (const lp_integer_t* M, int is_prime);
+/** Attach the ring. */
+void lp_int_ring_attach(lp_int_ring K);
+/** Detach the ring. */
+void lp_int_ring_detach(lp_int_ring K);
 
-  /** Attach the ring. */
-  void (*attach) (lp_int_ring K);
-  /** Detach the ring. */
-  void (*detach) (lp_int_ring K);
+/** Are the two rings equal */
+int lp_int_ring_equal(lp_int_ring K1, lp_int_ring K2);
 
-  /** Are the two rings equal */
-  int (*equal) (lp_int_ring K1, lp_int_ring K2);
-
-  /** Print */
-  int (*print) (lp_int_ring K, FILE* out);
-  /** Get the string representation */
-  char* (*to_string) (lp_int_ring K);
-
-} lp_int_ring_ops_t;
-
-/** Implementation of the ring operations */
-extern lp_int_ring_ops_t lp_int_ring_ops;
+/** Print */
+int lp_int_ring_print(lp_int_ring K, FILE* out);
+/** Get the string representation */
+char* lp_int_ring_to_string(lp_int_ring K);
 
 /**
  * Interface for integer operations over an arbitrary ring.
