@@ -111,5 +111,5 @@ void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, l
 }
 
 int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A) {
-  return polynomial_sgn(A, m);
+  return lp_polynomial_sgn(A, m);
 }
