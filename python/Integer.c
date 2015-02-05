@@ -82,7 +82,7 @@ CoefficientRing_dealloc(CoefficientRing* self)
 }
 
 PyObject*
-PyCoefficientRing_create(lp_int_ring K) {
+PyCoefficientRing_create(lp_int_ring_t* K) {
   CoefficientRing *self;
   self = (CoefficientRing*)CoefficientRingType.tp_alloc(&CoefficientRingType, 0);
   if (self != NULL) {

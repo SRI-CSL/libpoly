@@ -14,7 +14,7 @@
 /** Definition of the python CoefficientRing object */
 typedef struct {
   PyObject_HEAD
-  lp_int_ring K;
+  lp_int_ring_t* K;
 } CoefficientRing;
 
 /** Methods on coefficient rings */
@@ -24,7 +24,7 @@ extern PyMethodDef CoefficientRing_methods[];
 extern PyTypeObject CoefficientRingType;
 
 /** Create a ring object */
-PyObject* PyCoefficientRing_create(lp_int_ring K);
+PyObject* PyCoefficientRing_create(lp_int_ring_t* K);
 
 /** Check if the object is a polynomial */
 #define PyCoefficientRing_CHECK(arg) \

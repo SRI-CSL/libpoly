@@ -8,13 +8,6 @@
 #pragma once
 
 #include "poly.h"
-
-#include "variable.h"
-#include "rational.h"
-#include "dyadic_rational.h"
-#include "algebraic_number.h"
-
-#include "polynomial.h"
 #include "value.h"
 
 #include <stdio.h>

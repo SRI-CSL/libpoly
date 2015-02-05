@@ -19,11 +19,20 @@
 // Definitions of all relevant types
 //
 
+typedef size_t lp_variable_t;
+typedef struct lp_variable_db_struct lp_variable_db_t;
+typedef struct lp_variable_list_struct lp_variable_list_t;
+typedef struct lp_variable_order_struct lp_variable_order_t;
+typedef struct lp_variable_order_ops_struct lp_variable_order_ops_t;
+
 typedef struct lp_upolynomial_struct lp_upolynomial_t;
 typedef struct lp_upolynomial_factors_struct lp_upolynomial_factors_t;
-typedef struct lp_algebraic_number_struct lp_algebraic_number_t;
+
 typedef struct lp_polynomial_context_struct lp_polynomial_context_t;
 typedef struct lp_polynomial_struct lp_polynomial_t;
+
+typedef struct lp_algebraic_number_struct lp_algebraic_number_t;
+typedef struct lp_value_struct lp_value_t;
 typedef struct lp_assignment_struct lp_assignment_t;
 
 /**

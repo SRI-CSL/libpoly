@@ -5,6 +5,9 @@
  *      Author: dejan
  */
 
+#include <poly.h>
+#include <variable_db.h>
+#include <variable_list.h>
 #include <variable_order.h>
 
 #include <assert.h>
@@ -15,8 +18,6 @@
  * order the rest of the variables based on their variable id.
  */
 struct lp_variable_order_struct {
-  /** The operations */
-  lp_variable_order_ops_t* ops;
   /** Reference count */
   size_t ref_count;
   /** The actual order */

@@ -6,6 +6,7 @@
  */
 
 #include <assignment.h>
+#include <variable_db.h>
 
 #include "number/value.h"
 #include "polynomial/polynomial.h"

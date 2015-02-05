@@ -9,7 +9,6 @@
 
 #include "poly.h"
 
-#include "variable.h"
 #include "integer.h"
 #include "variable_order.h"
 

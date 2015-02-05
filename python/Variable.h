@@ -9,8 +9,8 @@
 
 #include <Python.h>
 
-#include "variable.h"
-#include "variable_order.h"
+#include <variable_db.h>
+#include <variable_order.h>
 
 /** Definition of the python Variable object */
 typedef struct {

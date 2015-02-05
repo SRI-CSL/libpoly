@@ -32,62 +32,59 @@ typedef struct {
 
 } lp_int_ring_t;
 
-/** The ring type to pass around */
-typedef const lp_int_ring_t* lp_int_ring;
-
 /** Default ring is the whole of integers */
-extern lp_int_ring lp_Z;
+extern lp_int_ring_t* lp_Z;
 
 /**
  * Create a new ring. The new modulus is attached, so in order to remove
  * it you need to detach it. The ring is reference counted, so it will get
  * deallocated when the last user detaches it.
  */
-lp_int_ring lp_int_ring_create(const lp_integer_t* M, int is_prime);
+lp_int_ring_t* lp_int_ring_create(const lp_integer_t* M, int is_prime);
 
 /** Attach the ring. */
-void lp_int_ring_attach(lp_int_ring K);
+void lp_int_ring_attach(lp_int_ring_t* K);
 /** Detach the ring. */
-void lp_int_ring_detach(lp_int_ring K);
+void lp_int_ring_detach(lp_int_ring_t* K);
 
 /** Are the two rings equal */
-int lp_int_ring_equal(lp_int_ring K1, lp_int_ring K2);
+int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2);
 
 /** Print */
-int lp_int_ring_print(lp_int_ring K, FILE* out);
+int lp_int_ring_print(lp_int_ring_t* K, FILE* out);
 /** Get the string representation */
-char* lp_int_ring_to_string(lp_int_ring K);
+char* lp_int_ring_to_string(lp_int_ring_t* K);
 
 
 /**
  * Construct a integer from the given integer x. The integer will be
  * normalized according to the given ring.
  */
-void lp_integer_construct_from_int(lp_int_ring K, lp_integer_t* c, long x);
+void lp_integer_construct_from_int(lp_int_ring_t* K, lp_integer_t* c, long x);
 
 /**
  * Construct a integer from the given string representation. The
  * integer will be normalized according to the given ring.
  */
-void lp_integer_construct_from_string(lp_int_ring K, lp_integer_t* c, const char* x, int base);
+void lp_integer_construct_from_string(lp_int_ring_t* K, lp_integer_t* c, const char* x, int base);
 
 /**
  * Construct a copy of the given integer. The integer will be
  * normalized according to the given ring.
  */
-void lp_integer_construct_copy(lp_int_ring K, lp_integer_t* c, const lp_integer_t* from);
+void lp_integer_construct_copy(lp_int_ring_t* K, lp_integer_t* c, const lp_integer_t* from);
 
 /**
  * Assign the integer a given integer. The integer will be
  * normalized according to the given ring.
  */
-void lp_integer_assign(lp_int_ring K, lp_integer_t* c, const lp_integer_t* from);
+void lp_integer_assign(lp_int_ring_t* K, lp_integer_t* c, const lp_integer_t* from);
 
 /**
  * Assign the integer a given integer. The integer will be
  * normalized according to the given ring.
  */
-void lp_integer_assign_int(lp_int_ring K, lp_integer_t* c, long x);
+void lp_integer_assign_int(lp_int_ring_t* K, lp_integer_t* c, long x);
 
 /**
  * Deallocates the integer.
@@ -127,30 +124,30 @@ int lp_integer_is_prime(const lp_integer_t* c);
 /**
  * returns true if the integer is zero.
  */
-int lp_integer_is_zero(lp_int_ring K, const lp_integer_t* c);
+int lp_integer_is_zero(lp_int_ring_t* K, const lp_integer_t* c);
 
 /**
  * Returns true if the integer is in the given ring by value.
  */
-int lp_integer_in_ring(lp_int_ring K, const lp_integer_t* c);
+int lp_integer_in_ring(lp_int_ring_t* K, const lp_integer_t* c);
 
 /**
  * Returns the sign of the integer. The sign is depends on the ring that
  * the integer was created in (the given ring). In a modular ring, the
  * sign is negative if > floor(M/2) when normalized.
  */
-int lp_integer_sgn(lp_int_ring K, const lp_integer_t* c);
+int lp_integer_sgn(lp_int_ring_t* K, const lp_integer_t* c);
 
 /**
  * Compare the two integers in the ring. Not necessarily +/- 1, could be
  * any integer, only the sign matters.
  */
-int lp_integer_cmp(lp_int_ring K, const lp_integer_t* c, const lp_integer_t* to);
+int lp_integer_cmp(lp_int_ring_t* K, const lp_integer_t* c, const lp_integer_t* to);
 
 /**
  * Compare the two integers in the ring. Same as for sgn.
  */
-int lp_integer_cmp_int(lp_int_ring K, const lp_integer_t* c, long to);
+int lp_integer_cmp_int(lp_int_ring_t* K, const lp_integer_t* c, long to);
 
 /**
  * Returns true if a divides b in the given ring. In Z this is regular
@@ -158,7 +155,7 @@ int lp_integer_cmp_int(lp_int_ring K, const lp_integer_t* c, long to);
  * with modulus M a divides b iff gcd(a, M) divides b. If the ring is prime
  * any non-zero a divides any b (it's a field).
  */
-int lp_integer_divides(lp_int_ring K, const lp_integer_t* a, const lp_integer_t* b);
+int lp_integer_divides(lp_int_ring_t* K, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Swap two integers.
@@ -168,59 +165,59 @@ void lp_integer_swap(lp_integer_t* a, lp_integer_t* b);
 /**
  * Compute a ++.
  */
-void lp_integer_inc(lp_int_ring K, lp_integer_t* a);
+void lp_integer_inc(lp_int_ring_t* K, lp_integer_t* a);
 
 /**
  * Compute a --.
  */
-void lp_integer_dec(lp_int_ring K, lp_integer_t* a);
+void lp_integer_dec(lp_int_ring_t* K, lp_integer_t* a);
 
 /**
  * Compute sum = a + b in the given ring.
  */
-void lp_integer_add(lp_int_ring K, lp_integer_t* sum, const lp_integer_t* a, const lp_integer_t* b);
+void lp_integer_add(lp_int_ring_t* K, lp_integer_t* sum, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Compute sub = a - b in the given ring.
  */
-void lp_integer_sub(lp_int_ring K, lp_integer_t* sub, const lp_integer_t* a, const lp_integer_t* b);
+void lp_integer_sub(lp_int_ring_t* K, lp_integer_t* sub, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Compute neg = -a in the given ring. Not that, for example in Z_4, for a =
  * 2, we get that neg = 2. In Z_3 the numbers are in {-1, 0, 1, 2}, and -2 is
  * represented as 2.
  */
-void lp_integer_neg(lp_int_ring K, lp_integer_t* neg, const lp_integer_t* a);
+void lp_integer_neg(lp_int_ring_t* K, lp_integer_t* neg, const lp_integer_t* a);
 
 /**
  * Compute the absolute value.
  */
-void lp_integer_abs(lp_int_ring K, lp_integer_t* abs, const lp_integer_t* a);
+void lp_integer_abs(lp_int_ring_t* K, lp_integer_t* abs, const lp_integer_t* a);
 
 /**
  * Compute the inverse of a in the given ring. Assumes it has an inverse.
  */
-void lp_integer_inv(lp_int_ring K, lp_integer_t* inv, const lp_integer_t* a);
+void lp_integer_inv(lp_int_ring_t* K, lp_integer_t* inv, const lp_integer_t* a);
 
 /**
  * Compute product = a * b in the given ring.
  */
-void lp_integer_mul(lp_int_ring K, lp_integer_t* product, const lp_integer_t* a, const lp_integer_t* b);
+void lp_integer_mul(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Compute product = a * b in the given ring.
  */
-void lp_integer_mul_int(lp_int_ring K, lp_integer_t* product, const lp_integer_t* a, long b);
+void lp_integer_mul_int(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t* a, long b);
 
 /**
  * Compute product = a*2^n
  */
-void lp_integer_mul_pow2(lp_int_ring K, lp_integer_t* product, const lp_integer_t* a, unsigned n);
+void lp_integer_mul_pow2(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t* a, unsigned n);
 
 /**
  * Compute power = a^n in the given ring.
  */
-void lp_integer_pow(lp_int_ring K, lp_integer_t* pow, const lp_integer_t* a, unsigned n);
+void lp_integer_pow(lp_int_ring_t* K, lp_integer_t* pow, const lp_integer_t* a, unsigned n);
 
 /**
  * Compute the square root of a (in Z).
@@ -230,22 +227,22 @@ void lp_integer_sqrt_Z(lp_integer_t* sqrt, const lp_integer_t* a);
 /**
  * Compute sum_product += a*b in the given ring.
  */
-void lp_integer_add_mul(lp_int_ring K, lp_integer_t* sum_product, const lp_integer_t* a, const lp_integer_t* b);
+void lp_integer_add_mul(lp_int_ring_t* K, lp_integer_t* sum_product, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Compute sum_product += a*b in the given ring.
  */
-void lp_integer_add_mul_int(lp_int_ring K, lp_integer_t* sum_product, const lp_integer_t* a, int b);
+void lp_integer_add_mul_int(lp_int_ring_t* K, lp_integer_t* sum_product, const lp_integer_t* a, int b);
 
 /**
  * Compute sub_product -= a*b in the given ring.
  */
-void lp_integer_sub_mul(lp_int_ring K, lp_integer_t* sub_product, const lp_integer_t* a, const lp_integer_t* b);
+void lp_integer_sub_mul(lp_int_ring_t* K, lp_integer_t* sub_product, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Compute a = div*b, in the given ring (assumes that b divides a).
  */
-void lp_integer_div_exact(lp_int_ring K, lp_integer_t* div_Z, const lp_integer_t* a, const lp_integer_t* b);
+void lp_integer_div_exact(lp_int_ring_t* K, lp_integer_t* div_Z, const lp_integer_t* a, const lp_integer_t* b);
 
 /**
  * Compute a = div*b + rem, rounding div towards zero, and r will have the

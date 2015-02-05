@@ -9,7 +9,6 @@
 
 #include "poly.h"
 
-#include "variable.h"
 #include "variable_order.h"
 #include "integer.h"
 #include "polynomial_context.h"

@@ -15,7 +15,7 @@
  */
 struct lp_upolynomial_struct {
   /** The ring of coefficients */
-  lp_int_ring K;
+  lp_int_ring_t* K;
   /** The number of monomials */
   size_t size;
   /** The monomials */

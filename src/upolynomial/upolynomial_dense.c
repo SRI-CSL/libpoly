@@ -15,7 +15,7 @@
 #include <assert.h>
 
 static inline
-void upolynomial_dense_normalize(upolynomial_dense_t* p_d, lp_int_ring K) {
+void upolynomial_dense_normalize(upolynomial_dense_t* p_d, lp_int_ring_t* K) {
   int d = p_d->size - 1;
   while (d > 0 && integer_sgn(K, p_d->coefficients + d) == 0) {
     d --;
@@ -150,7 +150,7 @@ void upolynomial_dense_clear(upolynomial_dense_t* p_d) {
   p_d->size = 1;
 }
 
-lp_upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, lp_int_ring K) {
+lp_upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, lp_int_ring_t* K) {
   assert(p_d->size > 0);
   lp_upolynomial_t* result = lp_upolynomial_construct(K, p_d->size - 1, p_d->coefficients);
   return result;
@@ -207,7 +207,7 @@ void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive) {
   integer_destruct(&gcd);
 }
 
-void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, lp_int_ring K, const lp_integer_t* c) {
+void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, lp_int_ring_t* K, const lp_integer_t* c) {
   assert(integer_sgn(K, c));
   lp_integer_t mult;
   integer_construct_from_int(lp_Z, &mult, 0);
@@ -221,7 +221,7 @@ void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, lp_int_ring K, const lp_
   integer_destruct(&mult);
 }
 
-void upolynomial_dense_div_c(upolynomial_dense_t* p_d, lp_int_ring K, const lp_integer_t* c) {
+void upolynomial_dense_div_c(upolynomial_dense_t* p_d, lp_int_ring_t* K, const lp_integer_t* c) {
   assert(integer_sgn(K, c));
   lp_integer_t div;
   integer_construct_from_int(lp_Z, &div, 0);
@@ -297,7 +297,7 @@ void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolyno
   upolynomial_dense_normalize(p_d, p->K);
 }
 
-void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring K, const upolynomial_dense_t* p, const umonomial_t* m) {
+void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring_t* K, const upolynomial_dense_t* p, const umonomial_t* m) {
   assert(m->degree > 0 || integer_sgn(K, &m->coefficient));
 
   size_t needed_size = p->size + m->degree;
@@ -317,7 +317,7 @@ void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring K, con
 }
 
 
-void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, lp_int_ring K, const upolynomial_dense_t* p, const upolynomial_dense_t* q) {
+void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, lp_int_ring_t* K, const upolynomial_dense_t* p, const upolynomial_dense_t* q) {
 
   if (upolynomial_dense_is_zero(p) || upolynomial_dense_is_zero(q)) {
     return;
@@ -345,14 +345,14 @@ void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, lp_int_ring K, const u
   upolynomial_dense_normalize(p_d, K);
 }
 
-void upolynomial_dense_negate(upolynomial_dense_t* p_d, lp_int_ring K) {
+void upolynomial_dense_negate(upolynomial_dense_t* p_d, lp_int_ring_t* K) {
   size_t i;
   for (i = 0; i < p_d->size; ++ i) {
     integer_neg(K, p_d->coefficients + i, p_d->coefficients + i);
   }
 }
 
-void upolynomial_dense_div_general(lp_int_ring K, int exact, const upolynomial_dense_t* p, const upolynomial_dense_t* q, upolynomial_dense_t* div, upolynomial_dense_t* rem) {
+void upolynomial_dense_div_general(lp_int_ring_t* K, int exact, const upolynomial_dense_t* p, const upolynomial_dense_t* q, upolynomial_dense_t* div, upolynomial_dense_t* rem) {
 
   if (trace_is_enabled("division")) {
     tracef("upolynomial_div_general(");
@@ -533,7 +533,7 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
   TRACE("division", "upolynomial_dense_reduce_Z(): done\n");
 }
 
-void upolynomial_dense_derivative(lp_int_ring K, const upolynomial_dense_t* p_d, upolynomial_dense_t* p_d_prime) {
+void upolynomial_dense_derivative(lp_int_ring_t* K, const upolynomial_dense_t* p_d, upolynomial_dense_t* p_d_prime) {
   upolynomial_dense_clear(p_d_prime);
   int deg = p_d->size - 1;
   if (deg > 0) {

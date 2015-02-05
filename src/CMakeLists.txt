@@ -10,7 +10,8 @@ set(poly_SOURCES
     number/value.c
     interval/interval.c
     interval/arithmetic.c
-    variable/variable.c
+    variable/variable_db.c
+    variable/variable_list.c
     variable/variable_order.c
     upolynomial/umonomial.c
     upolynomial/upolynomial.c

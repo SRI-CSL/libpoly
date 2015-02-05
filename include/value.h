@@ -34,10 +34,10 @@ typedef union {
 } lp_value_union_t;
 
 /** A value is a tagged union of available type */
-typedef struct {
+struct lp_value_struct {
   lp_value_type_t type;
   lp_value_union_t value;
-} lp_value_t;
+};
 
 /** Construct a value */
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data);

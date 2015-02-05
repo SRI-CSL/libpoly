@@ -8,7 +8,6 @@
 #pragma once
 
 #include <polynomial_context.h>
-#include <variable.h>
 #include <assignment.h>
 
 #include "polynomial/monomial.h"

@@ -5,6 +5,8 @@
  *      Author: dejan
  */
 
+#include <upolynomial.h>
+
 #include "upolynomial/umonomial.h"
 #include "upolynomial/upolynomial_dense.h"
 
@@ -29,7 +31,7 @@ size_t lp_upolynomial_degree(const lp_upolynomial_t* p) {
 }
 
 // Construct the polynomial, but don't construct monomials
-lp_upolynomial_t* lp_upolynomial_construct_empty(lp_int_ring K, size_t size) {
+lp_upolynomial_t* lp_upolynomial_construct_empty(lp_int_ring_t* K, size_t size) {
   size_t malloc_size = sizeof(lp_upolynomial_t) + size*sizeof(umonomial_t);
   lp_upolynomial_t* new_p = (lp_upolynomial_t*) malloc(malloc_size);
   new_p->K = K;
@@ -38,7 +40,7 @@ lp_upolynomial_t* lp_upolynomial_construct_empty(lp_int_ring K, size_t size) {
   return new_p;
 }
 
-lp_upolynomial_t* lp_upolynomial_construct(lp_int_ring K, size_t degree, const lp_integer_t* coefficients) {
+lp_upolynomial_t* lp_upolynomial_construct(lp_int_ring_t* K, size_t degree, const lp_integer_t* coefficients) {
 
   // Compute the needed size
   unsigned i;
@@ -90,14 +92,14 @@ void lp_upolynomial_delete(lp_upolynomial_t* p) {
   free(p);
 }
 
-lp_upolynomial_t* lp_upolynomial_construct_power(lp_int_ring K, size_t degree, long c) {
+lp_upolynomial_t* lp_upolynomial_construct_power(lp_int_ring_t* K, size_t degree, long c) {
   lp_upolynomial_t* result = lp_upolynomial_construct_empty(K, 1);
   integer_construct_from_int(K, &result->monomials[0].coefficient, c);
   result->monomials[0].degree = degree;
   return result;
 }
 
-lp_upolynomial_t* lp_upolynomial_construct_from_int(lp_int_ring K, size_t degree, const int* coefficients) {
+lp_upolynomial_t* lp_upolynomial_construct_from_int(lp_int_ring_t* K, size_t degree, const int* coefficients) {
 
   unsigned i;
   lp_integer_t real_coefficients[degree+1];
@@ -115,7 +117,7 @@ lp_upolynomial_t* lp_upolynomial_construct_from_int(lp_int_ring K, size_t degree
   return result;
 }
 
-lp_upolynomial_t* lp_upolynomial_construct_from_long(lp_int_ring K, size_t degree, const long* coefficients) {
+lp_upolynomial_t* lp_upolynomial_construct_from_long(lp_int_ring_t* K, size_t degree, const long* coefficients) {
 
   unsigned i;
   lp_integer_t real_coefficients[degree+1];
@@ -146,7 +148,7 @@ lp_upolynomial_t* lp_upolynomial_construct_copy(const lp_upolynomial_t* p) {
   return new_p;
 }
 
-lp_upolynomial_t* lp_upolynomial_construct_copy_K(lp_int_ring K, const lp_upolynomial_t* p) {
+lp_upolynomial_t* lp_upolynomial_construct_copy_K(lp_int_ring_t* K, const lp_upolynomial_t* p) {
 
   assert(p);
   assert(K != p->K);
@@ -213,12 +215,12 @@ void lp_upolynomial_unpack(const lp_upolynomial_t* p, lp_integer_t* out) {
   }
 }
 
-lp_int_ring lp_upolynomial_ring(const lp_upolynomial_t* p) {
+lp_int_ring_t* lp_upolynomial_ring(const lp_upolynomial_t* p) {
   assert(p);
   return p->K;
 }
 
-void lp_upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring K) {
+void lp_upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring_t* K) {
   assert(p);
   lp_int_ring_detach(p->K);
   p->K = K;
@@ -294,7 +296,7 @@ lp_upolynomial_t* lp_upolynomial_add(const lp_upolynomial_t* p, const lp_upolyno
     tracef("upolynomial_add("); lp_upolynomial_print(p, trace_out); tracef(", "); lp_upolynomial_print(q, trace_out); tracef(")\n");
   }
 
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
 
   // Get the end degree
   size_t degree = lp_upolynomial_degree(p);
@@ -331,7 +333,7 @@ lp_upolynomial_t* lp_upolynomial_sub(const lp_upolynomial_t* p, const lp_upolyno
     tracef("upolynomial_sub("); lp_upolynomial_print(p, trace_out); tracef(", "); lp_upolynomial_print(q, trace_out); tracef(")\n");
   }
 
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
 
   // Get the end degree
   size_t degree = lp_upolynomial_degree(p);
@@ -542,7 +544,7 @@ void lp_upolynomial_div_general(const lp_upolynomial_t* p, const lp_upolynomial_
   assert(p->K == q->K);
   assert(lp_upolynomial_degree(q) <= lp_upolynomial_degree(p));
 
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
 
   int p_deg = lp_upolynomial_degree(p);
   int q_deg = lp_upolynomial_degree(q);
@@ -647,7 +649,7 @@ lp_upolynomial_t* lp_upolynomial_div_exact(const lp_upolynomial_t* p, const lp_u
   lp_upolynomial_t* result = 0;
 
   if (lp_upolynomial_degree(p) >= lp_upolynomial_degree(q)) {
-    lp_int_ring K = p->K;
+    lp_int_ring_t* K = p->K;
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     lp_upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
@@ -674,7 +676,7 @@ lp_upolynomial_t* lp_upolynomial_div_exact_c(const lp_upolynomial_t* p, const lp
     integer_print(c, trace_out); tracef(")\n");
   }
 
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
 
   assert(p);
   assert(integer_cmp_int(K, c, 0));
@@ -713,7 +715,7 @@ lp_upolynomial_t* lp_upolynomial_rem_exact(const lp_upolynomial_t* p, const lp_u
   lp_upolynomial_t* result = 0;
 
   if (lp_upolynomial_degree(p) >= lp_upolynomial_degree(q)) {
-    lp_int_ring K = p->K;
+    lp_int_ring_t* K = p->K;
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     lp_upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
@@ -746,7 +748,7 @@ void lp_upolynomial_div_rem_exact(const lp_upolynomial_t* p, const lp_upolynomia
   assert(*div == 0 && *rem == 0);
 
   if (lp_upolynomial_degree(p) >= lp_upolynomial_degree(q)) {
-    lp_int_ring K = p->K;
+    lp_int_ring_t* K = p->K;
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     lp_upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
@@ -780,7 +782,7 @@ void lp_upolynomial_div_pseudo(lp_upolynomial_t** div, lp_upolynomial_t** rem, c
 
   assert(lp_upolynomial_degree(p) >= lp_upolynomial_degree(q));
 
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
 
   upolynomial_dense_t rem_buffer;
   upolynomial_dense_t div_buffer;
@@ -806,7 +808,7 @@ int lp_upolynomial_divides(const lp_upolynomial_t* p, const lp_upolynomial_t* q)
 
   assert(p->K == q->K);
 
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
 
   int result = 0;
 
@@ -918,7 +920,7 @@ lp_upolynomial_t* lp_upolynomial_primitive_part_Z(const lp_upolynomial_t* p) {
 }
 
 void lp_upolynomial_evaluate_at_integer(const lp_upolynomial_t* p, const lp_integer_t* x, lp_integer_t* value) {
-  lp_int_ring K = p->K;
+  lp_int_ring_t* K = p->K;
   lp_integer_t power;
   integer_construct_from_int(lp_Z, &power, 0);
 

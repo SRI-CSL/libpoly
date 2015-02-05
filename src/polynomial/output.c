@@ -5,6 +5,8 @@
  *      Author: dejan
  */
 
+#include <variable_db.h>
+
 #include "polynomial/output.h"
 #include "utils/output.h"
 

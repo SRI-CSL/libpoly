@@ -5,6 +5,8 @@
  *      Author: dejan
  */
 
+#include <variable_db.h>
+
 #include "polynomial_context.h"
 
 #include <malloc.h>

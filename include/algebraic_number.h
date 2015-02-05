@@ -11,8 +11,7 @@
 
 #include <stdio.h>
 
-#include "upolynomial.h"
-#include "dyadic_rational.h"
+#include "interval.h"
 
 /**
  * Algebraic number represented as the only root of the polynomial f in the

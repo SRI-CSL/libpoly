@@ -75,7 +75,7 @@ void lp_upolynomial_factors_add(lp_upolynomial_factors_t* f, lp_upolynomial_t* p
   f->size ++;
 }
 
-lp_int_ring lp_upolynomial_factors_ring(const lp_upolynomial_factors_t* f) {
+lp_int_ring_t* lp_upolynomial_factors_ring(const lp_upolynomial_factors_t* f) {
   if (f->size == 0) {
     return lp_Z;
   } else {
@@ -83,7 +83,7 @@ lp_int_ring lp_upolynomial_factors_ring(const lp_upolynomial_factors_t* f) {
   }
 }
 
-void lp_upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, lp_int_ring K) {
+void lp_upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, lp_int_ring_t* K) {
   size_t i;
   for (i = 0; i < f->size; ++ i) {
     lp_upolynomial_set_ring(f->factors[i], K);

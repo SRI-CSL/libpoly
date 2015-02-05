@@ -81,7 +81,7 @@ lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upo
 
   // The ring of computation
   assert(A->K == B->K);
-  lp_int_ring K = A->K;
+  lp_int_ring_t* K = A->K;
   assert(K && K->is_prime);
 
   // The remainder in the calculation
@@ -209,7 +209,7 @@ lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const 
   // The ring of compuation
   assert(A->K == B->K);
   assert(A->K == lp_Z);
-  lp_int_ring K = A->K;
+  lp_int_ring_t* K = A->K;
 
   // Degrees of p and q
   size_t deg_A = lp_upolynomial_degree(A);

@@ -7,7 +7,7 @@
 
 #include "number/integer.h"
 
-lp_int_ring lp_int_ring_create(const lp_integer_t* M, int is_prime) {
+lp_int_ring_t* lp_int_ring_create(const lp_integer_t* M, int is_prime) {
 
   assert(mpz_sgn(M) > 0);
 
@@ -34,7 +34,7 @@ lp_int_ring lp_int_ring_create(const lp_integer_t* M, int is_prime) {
   return K;
 }
 
-void lp_int_ring_destroy(lp_int_ring K) {
+void lp_int_ring_destroy(lp_int_ring_t* K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   mpz_clear(&nonconst->M);
   mpz_clear(&nonconst->ub);
@@ -42,14 +42,14 @@ void lp_int_ring_destroy(lp_int_ring K) {
   free(nonconst);
 }
 
-void lp_int_ring_attach(lp_int_ring K) {
+void lp_int_ring_attach(lp_int_ring_t* K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   if (nonconst) {
     ++ nonconst->ref_count;
   }
 }
 
-void lp_int_ring_detach(lp_int_ring K) {
+void lp_int_ring_detach(lp_int_ring_t* K) {
   lp_int_ring_t* nonconst = (lp_int_ring_t*) K;
   if (nonconst) {
     assert(nonconst->ref_count > 0);
@@ -59,7 +59,7 @@ void lp_int_ring_detach(lp_int_ring K) {
   }
 }
 
-int lp_int_ring_equal(lp_int_ring K1, lp_int_ring K2) {
+int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2) {
   if (K1 == K2) {
     return 1;
   } else if (K1 && K2) {
@@ -70,7 +70,7 @@ int lp_int_ring_equal(lp_int_ring K1, lp_int_ring K2) {
 }
 
 
-int lp_int_ring_print(lp_int_ring K, FILE* out) {
+int lp_int_ring_print(lp_int_ring_t* K, FILE* out) {
   int len = 0;
   len += fprintf(out, "Z");
   if (K) {
@@ -80,7 +80,7 @@ int lp_int_ring_print(lp_int_ring K, FILE* out) {
   return len;
 }
 
-char* lp_int_ring_to_string(lp_int_ring K) {
+char* lp_int_ring_to_string(lp_int_ring_t* K) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);
@@ -89,25 +89,25 @@ char* lp_int_ring_to_string(lp_int_ring K) {
   return str;
 }
 
-lp_int_ring lp_Z = 0;
+lp_int_ring_t* lp_Z = 0;
 
-void lp_integer_construct_from_int(lp_int_ring K, lp_integer_t* c, long x) {
+void lp_integer_construct_from_int(lp_int_ring_t* K, lp_integer_t* c, long x) {
   integer_construct_from_int(K, c, x);
 }
 
-void lp_integer_construct_from_string(lp_int_ring K, lp_integer_t* c, const char* x, int base) {
+void lp_integer_construct_from_string(lp_int_ring_t* K, lp_integer_t* c, const char* x, int base) {
   integer_construct_from_string(K, c, x, base);
 }
 
-void lp_integer_construct_copy(lp_int_ring K, lp_integer_t* c, const lp_integer_t* from) {
+void lp_integer_construct_copy(lp_int_ring_t* K, lp_integer_t* c, const lp_integer_t* from) {
   integer_construct_copy(K, c, from);
 }
 
-void lp_integer_assign(lp_int_ring K, lp_integer_t* c, const lp_integer_t* from) {
+void lp_integer_assign(lp_int_ring_t* K, lp_integer_t* c, const lp_integer_t* from) {
   integer_assign(K, c, from);
 }
 
-void lp_integer_assign_int(lp_int_ring K, lp_integer_t* c, long x) {
+void lp_integer_assign_int(lp_int_ring_t* K, lp_integer_t* c, long x) {
   integer_assign_int(K, c, x);
 }
 
@@ -139,27 +139,27 @@ int lp_integer_is_prime(const lp_integer_t* c) {
   return integer_is_prime(c);
 }
 
-int lp_integer_is_zero(lp_int_ring K, const lp_integer_t* c) {
+int lp_integer_is_zero(lp_int_ring_t* K, const lp_integer_t* c) {
   return integer_is_zero(K, c);
 }
 
-int lp_integer_in_ring(lp_int_ring K, const lp_integer_t* c) {
+int lp_integer_in_ring(lp_int_ring_t* K, const lp_integer_t* c) {
   return integer_in_ring(K, c);
 }
 
-int lp_integer_sgn(lp_int_ring K, const lp_integer_t* c) {
+int lp_integer_sgn(lp_int_ring_t* K, const lp_integer_t* c) {
   return integer_sgn(K, c);
 }
 
-int lp_integer_cmp(lp_int_ring K, const lp_integer_t* c, const lp_integer_t* to) {
+int lp_integer_cmp(lp_int_ring_t* K, const lp_integer_t* c, const lp_integer_t* to) {
   return integer_cmp(K, c, to);
 }
 
-int lp_integer_cmp_int(lp_int_ring K, const lp_integer_t* c, long to) {
+int lp_integer_cmp_int(lp_int_ring_t* K, const lp_integer_t* c, long to) {
   return integer_cmp_int(K, c, to);
 }
 
-int lp_integer_divides(lp_int_ring K, const lp_integer_t* a, const lp_integer_t* b) {
+int lp_integer_divides(lp_int_ring_t* K, const lp_integer_t* a, const lp_integer_t* b) {
   return integer_divides(K, a, b);
 }
 
@@ -167,47 +167,47 @@ void lp_integer_swap(lp_integer_t* a, lp_integer_t* b) {
   integer_swap(a, b);
 }
 
-void lp_integer_inc(lp_int_ring K, lp_integer_t* a) {
+void lp_integer_inc(lp_int_ring_t* K, lp_integer_t* a) {
   integer_inc(K, a);
 }
 
-void lp_integer_dec(lp_int_ring K, lp_integer_t* a) {
+void lp_integer_dec(lp_int_ring_t* K, lp_integer_t* a) {
   integer_dec(K, a);
 }
 
-void lp_integer_add(lp_int_ring K, lp_integer_t* sum, const lp_integer_t* a, const lp_integer_t* b) {
+void lp_integer_add(lp_int_ring_t* K, lp_integer_t* sum, const lp_integer_t* a, const lp_integer_t* b) {
   integer_add(K, sum, a, b);
 }
 
-void lp_integer_sub(lp_int_ring K, lp_integer_t* sub, const lp_integer_t* a, const lp_integer_t* b) {
+void lp_integer_sub(lp_int_ring_t* K, lp_integer_t* sub, const lp_integer_t* a, const lp_integer_t* b) {
   integer_sub(K, sub, a, b);
 }
 
-void lp_integer_neg(lp_int_ring K, lp_integer_t* neg, const lp_integer_t* a) {
+void lp_integer_neg(lp_int_ring_t* K, lp_integer_t* neg, const lp_integer_t* a) {
   integer_neg(K, neg, a);
 }
 
-void lp_integer_abs(lp_int_ring K, lp_integer_t* abs, const lp_integer_t* a) {
+void lp_integer_abs(lp_int_ring_t* K, lp_integer_t* abs, const lp_integer_t* a) {
   integer_abs(K, abs, a);
 }
 
-void lp_integer_inv(lp_int_ring K, lp_integer_t* inv, const lp_integer_t* a) {
+void lp_integer_inv(lp_int_ring_t* K, lp_integer_t* inv, const lp_integer_t* a) {
   integer_inv(K, inv, a);
 }
 
-void lp_integer_mul(lp_int_ring K, lp_integer_t* product, const lp_integer_t* a, const lp_integer_t* b) {
+void lp_integer_mul(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t* a, const lp_integer_t* b) {
   integer_mul(K, product, a, b);
 }
 
-void lp_integer_mul_int(lp_int_ring K, lp_integer_t* product, const lp_integer_t* a, long b) {
+void lp_integer_mul_int(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t* a, long b) {
   integer_mul_int(K, product, a, b);
 }
 
-void lp_integer_mul_pow2(lp_int_ring K, lp_integer_t* product, const lp_integer_t* a, unsigned n) {
+void lp_integer_mul_pow2(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t* a, unsigned n) {
   integer_mul_pow2(K, product, a, n);
 }
 
-void lp_integer_pow(lp_int_ring K, lp_integer_t* pow, const lp_integer_t *a, unsigned n) {
+void lp_integer_pow(lp_int_ring_t* K, lp_integer_t* pow, const lp_integer_t *a, unsigned n) {
   integer_pow(K, pow, a, n);
 }
 
@@ -215,19 +215,19 @@ void lp_integer_sqrt_Z(lp_integer_t* sqrt, const lp_integer_t* a) {
   integer_sqrt_Z(sqrt, a);
 }
 
-void lp_integer_add_mul(lp_int_ring K, lp_integer_t* sum_product, const lp_integer_t* a, const lp_integer_t* b) {
+void lp_integer_add_mul(lp_int_ring_t* K, lp_integer_t* sum_product, const lp_integer_t* a, const lp_integer_t* b) {
   integer_add_mul(K, sum_product, a, b);
 }
 
-void lp_integer_add_mul_int(lp_int_ring K, lp_integer_t* sum_product, const lp_integer_t* a, int b) {
+void lp_integer_add_mul_int(lp_int_ring_t* K, lp_integer_t* sum_product, const lp_integer_t* a, int b) {
   integer_add_mul_int(K, sum_product, a, b);
 }
 
-void lp_integer_sub_mul(lp_int_ring K, lp_integer_t* sub_product, const lp_integer_t* a, const lp_integer_t* b) {
+void lp_integer_sub_mul(lp_int_ring_t* K, lp_integer_t* sub_product, const lp_integer_t* a, const lp_integer_t* b) {
   integer_sub_mul(K, sub_product, a, b);
 }
 
-void lp_integer_div_exact(lp_int_ring K, lp_integer_t* div_Z, const lp_integer_t* a, const lp_integer_t* b) {
+void lp_integer_div_exact(lp_int_ring_t* K, lp_integer_t* div_Z, const lp_integer_t* a, const lp_integer_t* b) {
   integer_div_exact(K, div_Z, a, b);
 }
 

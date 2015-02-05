@@ -22,7 +22,7 @@ int PyLong_or_Int_Check(PyObject* o);
 /**
  * Construct the integer from pytong Long or int.
  */
-void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring K, lp_integer_t* x);
+void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring_t* K, lp_integer_t* x);
 
 /**
  * Get a python integer from our integer.

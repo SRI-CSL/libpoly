@@ -110,7 +110,7 @@ int upolynomial_dense_sgn_at_minus_inf(const upolynomial_dense_t* p_d);
 /**
  * Returns the sparse polynomial.
  */
-lp_upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, lp_int_ring K);
+lp_upolynomial_t* upolynomial_dense_to_upolynomial(const upolynomial_dense_t* p_d, lp_int_ring_t* K);
 
 /**
  * Call when modifying a coefficient, so as to keep internal consistency.
@@ -126,12 +126,12 @@ void upolynomial_dense_mk_primitive_Z(upolynomial_dense_t* p_d, int positive);
 /**
  * p_d *= c
  */
-void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, lp_int_ring K, const lp_integer_t* c);
+void upolynomial_dense_mult_c(upolynomial_dense_t* p_d, lp_int_ring_t* K, const lp_integer_t* c);
 
 /**
  * p_d /= c (c should should divide all coefficiants).
  */
-void upolynomial_dense_div_c(upolynomial_dense_t* p_d, lp_int_ring K, const lp_integer_t* c);
+void upolynomial_dense_div_c(upolynomial_dense_t* p_d, lp_int_ring_t* K, const lp_integer_t* c);
 
 /**
  * p_d += p*c
@@ -159,25 +159,25 @@ void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolyno
 /**
  * p_d -= p*m
  */
-void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring K,
+void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring_t* K,
     const upolynomial_dense_t* p, const umonomial_t* m);
 
 /**
  * p_d = -p_d
  */
-void upolynomial_dense_negate(upolynomial_dense_t* p_d, lp_int_ring K);
+void upolynomial_dense_negate(upolynomial_dense_t* p_d, lp_int_ring_t* K);
 
 /**
  * p_d -= p*q
  */
-void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, lp_int_ring K,
+void upolynomial_dense_sub_mult(upolynomial_dense_t* p_d, lp_int_ring_t* K,
     const upolynomial_dense_t* p, const upolynomial_dense_t* q);
 
 /**
  * General division p = div*q + rem in the ring K, if exact. If not exact, then
  * we compute lcm(q)^(p_deg - q_deg + 1) p = div*q + rem.
  */
-void upolynomial_dense_div_general(lp_int_ring K, int exact, const upolynomial_dense_t* p,
+void upolynomial_dense_div_general(lp_int_ring_t* K, int exact, const upolynomial_dense_t* p,
     const upolynomial_dense_t* q, upolynomial_dense_t* div,
     upolynomial_dense_t* rem);
 
@@ -191,6 +191,6 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p_d, const upolynomia
 /**
  * Derivative.
  */
-void upolynomial_dense_derivative(lp_int_ring K, const upolynomial_dense_t* p_d,
+void upolynomial_dense_derivative(lp_int_ring_t* K, const upolynomial_dense_t* p_d,
     upolynomial_dense_t* p_d_prime);
 

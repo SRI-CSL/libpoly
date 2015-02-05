@@ -9,6 +9,7 @@
 #include <upolynomial.h>
 #include <algebraic_number.h>
 #include <polynomial_context.h>
+#include <variable_db.h>
 
 #include "number/integer.h"
 #include "interval/arithmetic.h"

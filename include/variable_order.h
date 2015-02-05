@@ -9,11 +9,6 @@
 
 #include "poly.h"
 
-#include "variable.h"
-
-typedef struct lp_variable_order_struct lp_variable_order_t;
-typedef struct lp_variable_order_ops_struct lp_variable_order_ops_t;
-
 /** Construct a new variable order. Attaches one. */
 lp_variable_order_t* lp_variable_order_new(void);
 

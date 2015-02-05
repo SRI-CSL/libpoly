@@ -6,6 +6,8 @@
  */
 
 #include <interval.h>
+#include <upolynomial.h>
+#include <variable_db.h>
 
 #include "polynomial/polynomial.h"
 #include "polynomial/monomial.h"

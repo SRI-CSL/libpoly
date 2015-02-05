@@ -9,8 +9,6 @@
 
 #include "number/integer.h"
 
-#include "variable.h"
-
 #include <stdio.h>
 
 /**
