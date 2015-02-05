@@ -15,7 +15,7 @@
 /** Definition of the python Variable object */
 typedef struct {
   PyObject_HEAD
-  lp_variable_order_simple_t* var_order;
+  lp_variable_order_t* var_order;
 } VariableOrder;
 
 /** Methods on coefficient rings */
@@ -31,11 +31,11 @@ extern PyTypeObject VariableOrderType;
 /**
  * Create a new variable order. Takes over the order reference.
  */
-PyObject* VariableOrder_create(lp_variable_order_simple_t* var_order);
+PyObject* VariableOrder_create(lp_variable_order_t* var_order);
 
 
 /** Set the default variable database */
-lp_variable_order_simple_t* VariableOrder_get_default_order(void);
+lp_variable_order_t* VariableOrder_get_default_order(void);
 
 /** Get the variable database */
 lp_variable_db_t* Variable_get_default_db(void);

@@ -12,11 +12,11 @@
 #include <malloc.h>
 
 /** Default variable database */
-static lp_variable_order_simple_t* default_var_order = 0;
+static lp_variable_order_t* default_var_order = 0;
 
-lp_variable_order_simple_t* VariableOrder_get_default_order(void) {
+lp_variable_order_t* VariableOrder_get_default_order(void) {
   if (!default_var_order) {
-    default_var_order = (lp_variable_order_simple_t*) lp_variable_order_simple_ops.variable_order_ops.new();
+    default_var_order = lp_variable_order_new();
   }
   return default_var_order;
 }
@@ -95,7 +95,7 @@ PyTypeObject VariableOrderType = {
 };
 
 PyObject*
-VariableOrder_create(lp_variable_order_simple_t* var_order) {
+VariableOrder_create(lp_variable_order_t* var_order) {
   VariableOrder *self = (VariableOrder*)VariableOrderType.tp_alloc(&VariableOrderType, 0);
   if (self != NULL) {
     self->var_order = var_order;
@@ -123,12 +123,12 @@ VariableOrder_set(PyObject* self, PyObject* args) {
         }
       }
       // Clear the current order
-      lp_variable_order_simple_ops.clear(order->var_order);
+      lp_variable_order_clear(order->var_order);
       // Fill the order
       for (i = 0; i < PyList_Size(list); ++ i) {
         lp_variable_t var = ((Variable*) PyList_GetItem(list, i))->x;
-        if (!lp_variable_order_simple_ops.contains(order->var_order, var)) {
-          lp_variable_order_simple_ops.push(order->var_order, var);
+        if (!lp_variable_order_contains(order->var_order, var)) {
+          lp_variable_order_push(order->var_order, var);
         }
       }
     } else {
@@ -155,10 +155,10 @@ VariableOrder_init(VariableOrder* self, PyObject* args)
           return -1;
         }
       }
-      self->var_order = (lp_variable_order_simple_t*) lp_variable_order_simple_ops.variable_order_ops.new();
+      self->var_order = lp_variable_order_new();
       for (i = 0; i < PyList_Size(list); ++ i) {
         lp_variable_t var = ((Variable*) PyList_GetItem(list, i))->x;
-        lp_variable_order_simple_ops.push(self->var_order, var);
+        lp_variable_order_push(self->var_order, var);
       }
     } else {
       return -1;
@@ -173,7 +173,7 @@ static void
 VariableOrder_dealloc(VariableOrder* self)
 {
   if (self->var_order) {
-    lp_variable_order_simple_ops.variable_order_ops.detach((lp_variable_order_t*) self->var_order);
+    lp_variable_order_detach(self->var_order);
   }
   self->ob_type->tp_free((PyObject*)self);
 }
@@ -181,7 +181,7 @@ VariableOrder_dealloc(VariableOrder* self)
 static PyObject*
 VariableOrder_str(PyObject* self) {
   VariableOrder* var_order = (VariableOrder*) self;
-  char* var_order_str = lp_variable_order_simple_ops.to_string(var_order->var_order, Variable_get_default_db());
+  char* var_order_str = lp_variable_order_to_string(var_order->var_order, Variable_get_default_db());
   PyObject* str = PyString_FromString(var_order_str);
   free(var_order_str);
   return str;
@@ -190,7 +190,7 @@ VariableOrder_str(PyObject* self) {
 static PyObject*
 VariableOrder_repr(PyObject* self) {
   VariableOrder* var_order = (VariableOrder*) self;
-  char* var_order_str = lp_variable_order_simple_ops.to_string(var_order->var_order, Variable_get_default_db());
+  char* var_order_str = lp_variable_order_to_string(var_order->var_order, Variable_get_default_db());
   char* var_order_repr = malloc(strlen(var_order_str) + strlen(VariableOrderType.tp_name) + 3);
   sprintf(var_order_repr, "%s(%s)", VariableOrderType.tp_name, var_order_str);
   PyObject* str = PyString_FromString(var_order_repr);
@@ -205,10 +205,10 @@ VariableOrder_push(PyObject* self, PyObject* args) {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 1) {
     PyObject* variable = PyTuple_GetItem(args, 0);
     if (PyVariable_CHECK(variable)) {
-      lp_variable_order_simple_t* var_order = ((VariableOrder*) self)->var_order;
+      lp_variable_order_t* var_order = ((VariableOrder*) self)->var_order;
       lp_variable_t x = ((Variable*) variable)->x;
-      if (!lp_variable_order_simple_ops.contains(var_order, x)) {
-        lp_variable_order_simple_ops.push(var_order, x);
+      if (!lp_variable_order_contains(var_order, x)) {
+        lp_variable_order_push(var_order, x);
       }
     } else {
       error = 1;
@@ -225,9 +225,9 @@ VariableOrder_push(PyObject* self, PyObject* args) {
 
 static PyObject*
 VariableOrder_pop(PyObject* self) {
-  lp_variable_order_simple_t* var_order = ((VariableOrder*) self)->var_order;
-  if (lp_variable_order_simple_ops.size(var_order) > 0) {
-    lp_variable_order_simple_ops.pop(var_order);
+  lp_variable_order_t* var_order = ((VariableOrder*) self)->var_order;
+  if (lp_variable_order_size(var_order) > 0) {
+    lp_variable_order_pop(var_order);
   }
   Py_RETURN_NONE;
 }

@@ -250,7 +250,7 @@ const coefficient_t* coefficient_lc_safe(const lp_polynomial_context_t* ctx, con
     if (VAR(C) == x) {
       return COEFF(C, SIZE(C) - 1);
     } else {
-      assert(ctx->var_order->ops->cmp(ctx->var_order, x, VAR(C)) > 0);
+      assert(lp_variable_order_cmp(ctx->var_order, x, VAR(C)) > 0);
       return C;
     }
   default:
@@ -351,7 +351,7 @@ size_t coefficient_degree_safe(const lp_polynomial_context_t* ctx, const coeffic
     if (VAR(C) == x) {
       return SIZE(C) - 1;
     } else {
-      assert(ctx->var_order->ops->cmp(ctx->var_order, x, VAR(C)) > 0);
+      assert(lp_variable_order_cmp(ctx->var_order, x, VAR(C)) > 0);
       return 0;
     }
     break;
@@ -503,7 +503,7 @@ int coefficient_in_order(const lp_polynomial_context_t* ctx, const coefficient_t
     for (i = 0; i < SIZE(C); ++ i) {
       const coefficient_t* C_i = COEFF(C, i);
       if (C_i->type == COEFFICIENT_POLYNOMIAL) {
-        if (ctx->var_order->ops->cmp(ctx->var_order, VAR(C), VAR(C_i)) <= 0) {
+        if (lp_variable_order_cmp(ctx->var_order, VAR(C), VAR(C_i)) <= 0) {
           // Top variable must be bigger than others
           return 0;
         } else if (!coefficient_in_order(ctx, C_i)) {
@@ -536,7 +536,7 @@ int coefficient_cmp_general(const lp_polynomial_context_t* ctx, const coefficien
     return 1;
   } else {
     // Both are polynomials, compare the variable
-    int var_cmp = ctx->var_order->ops->cmp(ctx->var_order, VAR(C1), VAR(C2));
+    int var_cmp = lp_variable_order_cmp(ctx->var_order, VAR(C1), VAR(C2));
     if (var_cmp == 0) {
       if (compare_values) {
         // If the variables are the same, compare lexicographically
@@ -591,7 +591,7 @@ int coefficient_cmp_type(const lp_polynomial_context_t* ctx, const coefficient_t
 void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data) {
 
   if (trace_is_enabled("coefficient::order")) {
-    tracef("order = "); lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
+    tracef("order = "); lp_variable_order_print(ctx->var_order, ctx->var_db, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
     tracef("m = "); monomial_print(ctx, m, trace_out); tracef("\n");
   }
@@ -648,7 +648,7 @@ void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m,
     lp_variable_t x = m->p[0].x;
     unsigned d = m->p[0].d;
     // Compare the variables
-    if (C->type == COEFFICIENT_NUMERIC || ctx->var_order->ops->cmp(ctx->var_order, x, VAR(C)) >= 0) {
+    if (C->type == COEFFICIENT_NUMERIC || lp_variable_order_cmp(ctx->var_order, x, VAR(C)) >= 0) {
       coefficient_ensure_capacity(ctx, C, x, d+1);
       // Now, add the monomial to the right place
       m->p ++;
@@ -684,7 +684,7 @@ void coefficient_order(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   }
 
   if (trace_is_enabled("coefficient::order")) {
-    tracef("order = "); lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) ctx->var_order, ctx->var_db, trace_out); tracef("\n");
+    tracef("order = "); lp_variable_order_print(ctx->var_order, ctx->var_db, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
   }
 
@@ -1990,7 +1990,7 @@ coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C
     break;
   case COEFFICIENT_POLYNOMIAL:
     if (x != VAR(C)) {
-      assert(ctx->var_order->ops->cmp(ctx->var_order, x, VAR(C)) > 0);
+      assert(lp_variable_order_cmp(ctx->var_order, x, VAR(C)) > 0);
       // Same as for constants above
       coefficient_construct_rec(ctx, &tmp, x, capacity);
       coefficient_swap(COEFF(&tmp, 0), C);

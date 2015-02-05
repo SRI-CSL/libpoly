@@ -218,8 +218,8 @@ void lp_polynomial_add(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_p
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_add("); lp_polynomial_print(S, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -242,8 +242,8 @@ void lp_polynomial_sub(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_p
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_sub("); lp_polynomial_print(S, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -275,8 +275,8 @@ void lp_polynomial_mul(lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_p
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_mul("); lp_polynomial_print(P, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -309,8 +309,8 @@ void lp_polynomial_pow(lp_polynomial_t* P, const lp_polynomial_t* A, unsigned n)
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_pow("); lp_polynomial_print(P, trace_out); tracef(", "); lp_polynomial_print(A, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db,
+    lp_variable_order_print(
+        A->ctx->var_order, A->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -358,8 +358,8 @@ void lp_polynomial_div(lp_polynomial_t* D, const lp_polynomial_t* A1, const lp_p
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_div("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -382,8 +382,8 @@ void lp_polynomial_rem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_p
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_rem("); lp_polynomial_print(R, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -406,8 +406,8 @@ void lp_polynomial_prem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_prem("); lp_polynomial_print(R, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -430,8 +430,8 @@ void lp_polynomial_sprem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_sprem("); lp_polynomial_print(R, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -454,8 +454,8 @@ void lp_polynomial_divrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polyn
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_divrem("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(R, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -479,8 +479,8 @@ void lp_polynomial_derivative(lp_polynomial_t* A_d, const lp_polynomial_t* A) {
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_derivative("); lp_polynomial_print(A_d, trace_out); tracef(", "); lp_polynomial_print(A, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db,
+    lp_variable_order_print(
+        A->ctx->var_order, A->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -500,8 +500,8 @@ void lp_polynomial_gcd(lp_polynomial_t* gcd, const lp_polynomial_t* A1, const lp
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_gcd("); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A1->ctx->var_order, A1->ctx->var_db,
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -539,8 +539,8 @@ void lp_polynomial_reduce(
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_reduce("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
-    lp_variable_order_simple_ops.print(
-        (lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db,
+    lp_variable_order_print(
+        A->ctx->var_order, A->ctx->var_db,
         trace_out);
     tracef("\n");
   }
@@ -586,7 +586,7 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
   assert(lp_polynomial_context_equal(B->ctx, ctx));
 
   if (trace_is_enabled("polynomial")) {
-    lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out);
     tracef("\n");
   }
 
@@ -636,7 +636,7 @@ void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A, con
   assert(lp_polynomial_context_equal(B->ctx, ctx));
 
   if (trace_is_enabled("polynomial")) {
-    lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out);
     tracef("\n");
   }
 
@@ -664,7 +664,7 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
   const lp_polynomial_context_t* ctx = A->ctx;
 
   if (trace_is_enabled("polynomial")) {
-    lp_variable_order_simple_ops.print((lp_variable_order_simple_t*) A->ctx->var_order, A->ctx->var_db, trace_out);
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out);
     tracef("\n");
   }
 

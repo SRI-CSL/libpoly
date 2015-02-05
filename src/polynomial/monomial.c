@@ -40,7 +40,7 @@ void monomial_construct_copy(const lp_polynomial_context_t* ctx, monomial_t* m, 
   if (sort) {
     for (i = 0; i < m->n; ++i) {
       for (j = i + 1; j < m->n; ++j) {
-        if (ctx->var_order->ops->cmp(ctx->var_order, m->p[i].x, m->p[j].x) < 0) {
+        if (lp_variable_order_cmp(ctx->var_order, m->p[i].x, m->p[j].x) < 0) {
           power_t tmp = m->p[i];
           m->p[i] = m->p[j];
           m->p[j] = tmp;
@@ -101,7 +101,7 @@ void monomial_gcd(const lp_polynomial_context_t* ctx, monomial_t* gcd, const mon
   while (m1_i < m1->n && m2_i < m2->n) {
     // Only keep powers that are equal
     // Variables in the monomial go top to bottom
-    int var_cmp = ctx->var_order->ops->cmp(ctx->var_order, m1->p[m1_i].x, m2->p[m2_i].x);
+    int var_cmp = lp_variable_order_cmp(ctx->var_order, m1->p[m1_i].x, m2->p[m2_i].x);
     if (var_cmp == 0) {
       lp_variable_t x = m1->p[m1_i].x;
       size_t d = MIN(m1->p[m1_i].d, m2->p[m2_i].d);

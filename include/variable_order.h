@@ -14,80 +14,35 @@
 typedef struct lp_variable_order_struct lp_variable_order_t;
 typedef struct lp_variable_order_ops_struct lp_variable_order_ops_t;
 
-struct lp_variable_order_struct {
-  lp_variable_order_ops_t* ops;
-};
+/** Construct a new variable order. Attaches one. */
+lp_variable_order_t* lp_variable_order_new(void);
 
-/**
- * Variable order interface. The order should be total, but can change over
- * time.
- *
- * The interface assumes that the variables are ordered using a score function,
- * that there is an ever-increasing global-timestamp, and that a variable is
- * assigned this time-stamp
- *
- * This can be used to check if a subset of all variables has changed its order.
- * To do so we can keep the maximal time-stamp of all the variables. If the
- * timestamp of any of the variables
- */
-struct lp_variable_order_ops_struct {
+/** Attach an object to this order (constructor should attach) */
+void lp_variable_order_attach(lp_variable_order_t* var_order);
 
-  /** Construct a new variable order. Attaches one. */
-  lp_variable_order_t* (*new) (void);
+/** Detach an object from this order (frees if refcount = 0) */
+void lp_variable_order_detach(lp_variable_order_t* var_order);
 
-  /** Attach an object to this order (constructor should attach) */
-  void (*attach) (lp_variable_order_t* var_order);
+/** Compare two variables */
+int lp_variable_order_cmp(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y);
 
-  /** Detach an object from this order (frees if refcount = 0) */
-  void (*detach) (lp_variable_order_t* var_order);
+/** Get the size of the order */
+size_t lp_variable_order_size(const lp_variable_order_t* var_order);
 
-  /** Compare two variables */
-  int (*cmp) (const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y);
+/** Clear the order */
+void lp_variable_order_clear(lp_variable_order_t* var_order);
 
-};
+/** Does the order have an opinion on x */
+int lp_variable_order_contains(lp_variable_order_t* var_order, lp_variable_t x);
 
-typedef struct variable_order_simple_struct lp_variable_order_simple_t;
-typedef struct lp_variable_order_simple_ops_struct lp_variable_order_simple_ops_t;
+/** Push a variable to the list */
+void lp_variable_order_push(lp_variable_order_t* var_order, lp_variable_t var);
 
-/**
- * A simple variable order that orders variable based on a given list, and
- * order the rest of the variables based on their variable id.
- */
-struct variable_order_simple_struct {
-  /** The operations */
-  lp_variable_order_simple_ops_t* ops;
-  /** Reference count */
-  size_t ref_count;
-  /** The actual order */
-  lp_variable_list_t list;
-};
+/** Pop the last variable from the list */
+void lp_variable_order_pop(lp_variable_order_t* var_order);
 
-struct lp_variable_order_simple_ops_struct {
+/** Print the list of variables */
+int lp_variable_order_print(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db, FILE* out);
 
-  lp_variable_order_ops_t variable_order_ops;
-
-  /** Get the size of the order */
-  size_t (*size) (const lp_variable_order_simple_t* var_order);
-
-  /** Clear the order */
-  void (*clear) (lp_variable_order_simple_t* var_order);
-
-  /** Does the order have an opinion on x */
-  int (*contains) (lp_variable_order_simple_t* var_order, lp_variable_t x);
-
-  /** Push a variable to the list */
-  void (*push) (lp_variable_order_simple_t* var_order, lp_variable_t var);
-
-  /** Pop the last variable from the list */
-  void (*pop) (lp_variable_order_simple_t* var_order);
-
-  /** Print the list of variables */
-  int (*print) (const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db, FILE* out);
-
-  /** Return a string representation of the order */
-  char* (*to_string) (const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db);
-
-};
-
-// Not const, it gets updated
-extern lp_variable_order_simple_ops_t lp_variable_order_simple_ops;
+/** Return a string representation of the order */
+char* lp_variable_order_to_string(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db);
