@@ -16,11 +16,11 @@ void variable_order_simple_construct(lp_variable_order_simple_t* var_order) {
   // The operations
   var_order->ops = &lp_variable_order_simple_ops;
   // The list
-  lp_variable_list_ops.construct(&var_order->list);
+  lp_variable_list_construct(&var_order->list);
 }
 
 void variable_order_simple_destruct(lp_variable_order_simple_t* var_order) {
-  lp_variable_list_ops.destruct(&var_order->list);
+  lp_variable_list_destruct(&var_order->list);
 }
 
 void variable_order_simple_attach(lp_variable_order_t* var_order) {
@@ -48,8 +48,8 @@ lp_variable_order_t* variable_order_simple_new(void) {
 int variable_order_simple_cmp(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y) {
   const lp_variable_order_simple_t* self = (lp_variable_order_simple_t*) var_order;
 
-  int x_index = lp_variable_list_ops.index(&self->list, x);
-  int y_index = lp_variable_list_ops.index(&self->list, y);
+  int x_index = lp_variable_list_index(&self->list, x);
+  int y_index = lp_variable_list_index(&self->list, y);
 
   if (x_index == y_index) {
     return ((int) x) - ((int) y);
@@ -59,21 +59,21 @@ int variable_order_simple_cmp(const lp_variable_order_t* var_order, lp_variable_
 }
 
 size_t variable_order_simple_size(const lp_variable_order_simple_t* var_order) {
-  return lp_variable_list_ops.size(&var_order->list);
+  return lp_variable_list_size(&var_order->list);
 }
 
 void variable_order_simple_clear(lp_variable_order_simple_t* var_order) {
-  while (lp_variable_list_ops.size(&var_order->list)) {
-    lp_variable_list_ops.pop(&var_order->list);
+  while (lp_variable_list_size(&var_order->list)) {
+    lp_variable_list_pop(&var_order->list);
   }
 }
 
 void variable_order_simple_push(lp_variable_order_simple_t* var_order, lp_variable_t var) {
-  lp_variable_list_ops.push(&var_order->list, var);
+  lp_variable_list_push(&var_order->list, var);
 }
 
 void variable_order_simple_pop(lp_variable_order_simple_t* var_order) {
-  lp_variable_list_ops.pop(&var_order->list);
+  lp_variable_list_pop(&var_order->list);
 }
 
 int variable_order_simple_print(const lp_variable_order_simple_t* var_order, const lp_variable_db_t* var_db, FILE* out) {
@@ -84,7 +84,7 @@ int variable_order_simple_print(const lp_variable_order_simple_t* var_order, con
     if (i) {
       ret += fprintf(out, ", ");
     }
-    ret += fprintf(out, "%s", lp_variable_db_ops.get_name(var_db, var_order->list.list[i]));
+    ret += fprintf(out, "%s", lp_variable_db_get_name(var_db, var_order->list.list[i]));
   }
   ret += fprintf(out, "]");
   return ret;
@@ -100,7 +100,7 @@ char* variable_order_simple_to_string(const lp_variable_order_simple_t* var_orde
 }
 
 int variable_order_simple_contains(lp_variable_order_simple_t* var_order, lp_variable_t x) {
-  return lp_variable_list_ops.index(&var_order->list, x) != -1;
+  return lp_variable_list_index(&var_order->list, x) != -1;
 }
 
 lp_variable_order_simple_ops_t lp_variable_order_simple_ops = {

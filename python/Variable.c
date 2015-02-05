@@ -16,9 +16,9 @@ static lp_variable_db_t* default_var_db = 0;
 
 void Variable_init_default_db(void) {
   if (default_var_db) {
-    lp_variable_db_ops.detach(default_var_db);
+    lp_variable_db_detach(default_var_db);
   }
-  default_var_db = lp_variable_db_ops.new();
+  default_var_db = lp_variable_db_new();
 }
 
 lp_variable_db_t* Variable_get_default_db(void) {
@@ -174,7 +174,7 @@ Variable_init(Variable* self, PyObject* args)
     PyObject* obj = PyTuple_GetItem(args, 0);
     if (PyString_Check(obj)) {
       const char* c_str = PyString_AsString(obj);
-      lp_variable_t x = lp_variable_db_ops.new_variable(Variable_get_default_db(), c_str);
+      lp_variable_t x = lp_variable_db_new_variable(Variable_get_default_db(), c_str);
       self->x = x;
     } else {
       return -1;
@@ -193,14 +193,14 @@ Variable_dealloc(Variable* self)
 
 static PyObject* Variable_str(PyObject* self) {
   Variable* x = (Variable*) self;
-  const char* x_str = lp_variable_db_ops.get_name(Variable_get_default_db(), x->x);
+  const char* x_str = lp_variable_db_get_name(Variable_get_default_db(), x->x);
   PyObject* str = PyString_FromString(x_str);
   return str;
 }
 
 static PyObject* Variable_repr(PyObject* self) {
   Variable* x = (Variable*) self;
-  const char* x_str = lp_variable_db_ops.get_name(Variable_get_default_db(), x->x);
+  const char* x_str = lp_variable_db_get_name(Variable_get_default_db(), x->x);
   char* x_repr = malloc(strlen(x_str) + strlen(VariableType.tp_name) + 5);
   sprintf(x_repr, "%s('%s')", VariableType.tp_name, x_str);
   PyObject* str = PyString_FromString(x_repr);

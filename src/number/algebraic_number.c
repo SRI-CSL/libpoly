@@ -351,10 +351,10 @@ const lp_polynomial_context_t* lp_algebraic_pctx(void) {
   // Create the context if needed
   if (algebraic_ctx == 0) {
     // Create the variables
-    lp_variable_db_t* var_db = lp_variable_db_ops.new();
-    var_x = lp_variable_db_ops.new_variable(var_db, "_x");
-    var_y = lp_variable_db_ops.new_variable(var_db, "_y");
-    var_r = lp_variable_db_ops.new_variable(var_db, "_r");
+    lp_variable_db_t* var_db = lp_variable_db_new();
+    var_x = lp_variable_db_new_variable(var_db, "_x");
+    var_y = lp_variable_db_new_variable(var_db, "_y");
+    var_r = lp_variable_db_new_variable(var_db, "_r");
     // Order as Z[r, y, x]
     lp_variable_order_simple_t* var_order = (lp_variable_order_simple_t*) lp_variable_order_simple_ops.variable_order_ops.new();
     lp_variable_order_simple_ops.push(var_order, var_r);
@@ -363,7 +363,7 @@ const lp_polynomial_context_t* lp_algebraic_pctx(void) {
     // Create the context
     algebraic_ctx = lp_polynomial_context_new(0, var_db, (lp_variable_order_t*) var_order);
     // Detach local references
-    lp_variable_db_ops.detach(var_db);
+    lp_variable_db_detach(var_db);
     lp_variable_order_simple_ops.variable_order_ops.detach((lp_variable_order_t*) var_order);
   }
   return algebraic_ctx;

@@ -1011,7 +1011,7 @@ void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
-    tracef("x = %s\n", lp_variable_db_ops.get_name(ctx->var_db, x));
+    tracef("x = %s\n", lp_variable_db_get_name(ctx->var_db, x));
     tracef("n  = %u\n", n);
   }
 

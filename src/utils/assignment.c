@@ -32,7 +32,7 @@ void lp_assignment_construct(lp_assignment_t* m, const lp_variable_db_t* var_db)
   m->size = 0;
   m->values = 0;
   m->var_db = var_db;
-  lp_variable_db_ops.attach((lp_variable_db_t*)var_db);
+  lp_variable_db_attach((lp_variable_db_t*)var_db);
   lp_assignment_ensure_size(m, DEFAULT_ASSIGNMENT_SIZE);
 }
 
@@ -50,7 +50,7 @@ void lp_assignment_destruct(lp_assignment_t* m) {
     }
     free(m->values);
   }
-  lp_variable_db_ops.detach((lp_variable_db_t*)m->var_db);
+  lp_variable_db_detach((lp_variable_db_t*)m->var_db);
 }
 
 void lp_assignment_delete(lp_assignment_t* m) {
@@ -66,7 +66,7 @@ int lp_assignment_print(const lp_assignment_t* m, FILE* out) {
       if (j ++) {
         ret += fprintf(out, ", ");
       }
-      ret += fprintf(out, "%s -> ", lp_variable_db_ops.get_name(m->var_db, i));
+      ret += fprintf(out, "%s -> ", lp_variable_db_get_name(m->var_db, i));
       ret += lp_value_print(m->values + i, out);
     }
   }

@@ -20,7 +20,7 @@ int monomial_print(const lp_polynomial_context_t* ctx, const monomial_t* m, FILE
     if (i) {
       ret += fprintf(out, "*");
     }
-    ret += fprintf(out, "%s%s%u", lp_variable_db_ops.get_name(ctx->var_db, m->p[i].x), get_power_symbol(), m->p[i].d);
+    ret += fprintf(out, "%s%s%u", lp_variable_db_get_name(ctx->var_db, m->p[i].x), get_power_symbol(), m->p[i].d);
   }
   return ret;
 }
@@ -33,7 +33,7 @@ int coefficient_print(const lp_polynomial_context_t* ctx, const coefficient_t* C
     break;
   case COEFFICIENT_POLYNOMIAL: {
     // The polynomial
-    const char* var_name = lp_variable_db_ops.get_name(ctx->var_db, C->value.rec.x);
+    const char* var_name = lp_variable_db_get_name(ctx->var_db, C->value.rec.x);
     for (i = SIZE(C) - 1; i >= 0; -- i) {
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         switch (COEFF(C, i)->type) {

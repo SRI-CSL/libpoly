@@ -23,7 +23,7 @@ void lp_polynomial_context_attach(lp_polynomial_context_t* ctx) {
     lp_int_ring_attach(ctx->K);
   }
   if (ctx->var_db) {
-    lp_variable_db_ops.attach(ctx->var_db);
+    lp_variable_db_attach(ctx->var_db);
   }
   if (ctx->var_order) {
     ctx->var_order->ops->attach(ctx->var_order);
@@ -36,7 +36,7 @@ void lp_polynomial_context_detach(lp_polynomial_context_t* ctx) {
     lp_int_ring_detach(ctx->K);
   }
   if (ctx->var_db) {
-    lp_variable_db_ops.detach(ctx->var_db);
+    lp_variable_db_detach(ctx->var_db);
   }
   if (ctx->var_order) {
     ctx->var_order->ops->detach(ctx->var_order);
