@@ -15,9 +15,6 @@
 #include "integer.h"
 #include "dyadic_rational.h"
 
-/** Use the GMP rationals */
-typedef __mpq_struct lp_rational_t;
-
 /**
  * Construct rational 0/1.
  */

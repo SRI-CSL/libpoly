@@ -14,10 +14,19 @@
 #include "output_language.h"
 
 #include <stdio.h>
+#include <gmp.h>
 
 //
 // Definitions of all relevant types
 //
+
+
+/** Rationals are GMP rationals */
+typedef __mpq_struct lp_rational_t;
+
+/** Integers are GMP integers */
+typedef __mpz_struct lp_integer_t;
+
 
 typedef size_t lp_variable_t;
 typedef struct lp_variable_db_struct lp_variable_db_t;

@@ -8,13 +8,11 @@
 #pragma once
 
 #include "poly.h"
+#include "rational.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <gmp.h>
-
-/** The numeric type for the base integers */
-typedef __mpz_struct lp_integer_t;
 
 /** Modulus for computing in the congruence ring */
 typedef struct {
@@ -55,6 +53,11 @@ int lp_int_ring_print(lp_int_ring_t* K, FILE* out);
 /** Get the string representation */
 char* lp_int_ring_to_string(lp_int_ring_t* K);
 
+/**
+ * Construct a integer from the given rational x. The rational x must be
+ * an integer.
+ */
+void lp_integer_construct_from_rational(lp_int_ring_t* K, lp_integer_t* c, const lp_rational_t* q);
 
 /**
  * Construct a integer from the given integer x. The integer will be
