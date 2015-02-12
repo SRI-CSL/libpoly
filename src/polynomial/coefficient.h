@@ -188,6 +188,9 @@ void coefficient_neg(const lp_polynomial_context_t* ctx, coefficient_t* N, const
 void coefficient_mul(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute P = C * a. */
+void coefficient_mul_integer(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, const lp_integer_t* a);
+
+/** Compute P = C * a. */
 void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a);
 
 /** Multiplication with x^n (x should be equal or biggier then top variable of C)  */

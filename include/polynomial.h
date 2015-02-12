@@ -120,6 +120,9 @@ void lp_polynomial_neg(lp_polynomial_t* N, const lp_polynomial_t* A);
 /** Compute P = A1 * A2. */
 void lp_polynomial_mul(lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
+/** Compute P = A1 * C. */
+void lp_polynomial_mul_integer(lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_integer_t* C);
+
 /**
  * Multiplication with x^n.
  */

@@ -295,6 +295,30 @@ void lp_polynomial_mul(lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_p
   }
 }
 
+/** Compute P = A1 * C. */
+void lp_polynomial_mul_integer(lp_polynomial_t* P, const lp_polynomial_t* A1, const lp_integer_t* C) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_mul_c("); lp_polynomial_print(P, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_integer_print(C, trace_out); tracef(")\n");
+    lp_variable_order_print(
+        A1->ctx->var_order, A1->ctx->var_db,
+        trace_out);
+    tracef("\n");
+  }
+
+  lp_polynomial_external_clean(A1);
+
+  lp_polynomial_set_context(P, A1->ctx);
+
+  coefficient_mul_integer(P->ctx, &P->data, &A1->data, C);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_mul() => "); lp_polynomial_print(P, trace_out); tracef("\n");
+  }
+
+}
+
+
 void lp_polynomial_shl(lp_polynomial_t* S, const lp_polynomial_t* A, unsigned n) {
 
   lp_polynomial_external_clean(A);

@@ -1004,6 +1004,45 @@ void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, c
   assert(coefficient_is_normalized(ctx, P));
 }
 
+STAT_DECLARE(int, coefficient, mul_integer)
+
+void coefficient_mul_integer(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, const lp_integer_t* a) {
+  TRACE("coefficient::arith", "coefficient_mul_int()\n");
+  STAT(coefficient, mul_int) ++;
+
+  if (trace_is_enabled("coefficient::arith")) {
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
+    tracef("n  = "); integer_print(a, trace_out);
+  }
+
+  size_t i;
+  coefficient_t result;
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    if (P->type == COEFFICIENT_POLYNOMIAL) {
+      coefficient_construct(ctx, &result);
+      integer_mul(ctx->K, &result.value.num, &C->value.num, a);
+      coefficient_swap(&result, P);
+      coefficient_destruct(&result);
+    } else {
+      integer_mul(ctx->K, &P->value.num, &C->value.num, a);
+    }
+  } else {
+    coefficient_construct_rec(ctx, &result, VAR(C), SIZE(C));
+    for (i = 0; i < SIZE(C); ++ i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        coefficient_mul_integer(ctx, COEFF(&result, i), COEFF(C, i), a);
+      }
+    }
+    coefficient_normalize(ctx, &result);
+    coefficient_swap(&result, P);
+    coefficient_destruct(&result);
+  }
+
+  assert(coefficient_is_normalized(ctx, P));
+}
+
 
 STAT_DECLARE(int, coefficient, shl)
 
