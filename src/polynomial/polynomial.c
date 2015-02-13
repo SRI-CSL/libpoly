@@ -238,6 +238,26 @@ void lp_polynomial_add(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_p
   }
 }
 
+void lp_polynomial_add_monomial(lp_polynomial_t* S, const lp_monomial_t* M) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_add("); lp_polynomial_print(S, trace_out); tracef(", "); lp_monomial_print(S->ctx, M, trace_out); tracef(")\n");
+    lp_variable_order_print(
+        S->ctx->var_order, S->ctx->var_db,
+        trace_out);
+    tracef("\n");
+  }
+
+  lp_polynomial_external_clean(S);
+
+  coefficient_add_monomial(S->ctx, &S->data, M);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_add() => "); lp_polynomial_print(S, trace_out); tracef("\n");
+  }
+
+}
+
 void lp_polynomial_sub(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
 
   if (trace_is_enabled("polynomial")) {

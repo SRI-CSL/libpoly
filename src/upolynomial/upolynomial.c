@@ -32,7 +32,7 @@ size_t lp_upolynomial_degree(const lp_upolynomial_t* p) {
 
 // Construct the polynomial, but don't construct monomials
 lp_upolynomial_t* lp_upolynomial_construct_empty(lp_int_ring_t* K, size_t size) {
-  size_t malloc_size = sizeof(lp_upolynomial_t) + size*sizeof(umonomial_t);
+  size_t malloc_size = sizeof(lp_upolynomial_t) + size*sizeof(ulp_monomial_t);
   lp_upolynomial_t* new_p = (lp_upolynomial_t*) malloc(malloc_size);
   new_p->K = K;
   new_p->size = size;
@@ -360,7 +360,7 @@ lp_upolynomial_t* lp_upolynomial_sub(const lp_upolynomial_t* p, const lp_upolyno
   return result;
 }
 
-lp_upolynomial_t* lp_upolynomial_multiply_simple(const umonomial_t* m, const lp_upolynomial_t* q) {
+lp_upolynomial_t* lp_upolynomial_multiply_simple(const ulp_monomial_t* m, const lp_upolynomial_t* q) {
 
   assert(m);
   assert(q);
@@ -437,7 +437,7 @@ lp_upolynomial_t* lp_upolynomial_mul_c(const lp_upolynomial_t* p, const lp_integ
     integer_print(c, trace_out); tracef(")\n");
   }
 
-  umonomial_t m;
+  ulp_monomial_t m;
   umonomial_construct(p->K, &m, 0, c);
   lp_upolynomial_t* result = lp_upolynomial_multiply_simple(&m, p);
   umonomial_destruct(&m);
@@ -553,7 +553,7 @@ void lp_upolynomial_div_general(const lp_upolynomial_t* p, const lp_upolynomial_
   upolynomial_dense_construct(div, p_deg - q_deg + 1);
 
   // monomial we use to multiply with
-  umonomial_t m;
+  ulp_monomial_t m;
   umonomial_construct_from_int(lp_Z, &m, 0, 0);
 
   // adjustment for the powers of div

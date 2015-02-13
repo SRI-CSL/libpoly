@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 
-int umonomial_print(const umonomial_t* m, FILE* out) {
+int umonomial_print(const ulp_monomial_t* m, FILE* out) {
   int len = 0;
   int sgn = integer_sgn(lp_Z, &m->coefficient);
   if (sgn < 0) len += fprintf(out, "(");

@@ -13,7 +13,7 @@
 #include <malloc.h>
 #include <string.h>
 
-int monomial_print(const lp_polynomial_context_t* ctx, const monomial_t* m, FILE* out) {
+int monomial_print(const lp_polynomial_context_t* ctx, const lp_monomial_t* m, FILE* out) {
   int ret = 0;
   ret += integer_print(&m->a, out);
   ret += fprintf(out, " * ");
@@ -22,7 +22,7 @@ int monomial_print(const lp_polynomial_context_t* ctx, const monomial_t* m, FILE
     if (i) {
       ret += fprintf(out, "*");
     }
-    ret += fprintf(out, "%s%s%u", lp_variable_db_get_name(ctx->var_db, m->p[i].x), get_power_symbol(), m->p[i].d);
+    ret += fprintf(out, "%s%s%zu", lp_variable_db_get_name(ctx->var_db, m->p[i].x), get_power_symbol(), m->p[i].d);
   }
   return ret;
 }

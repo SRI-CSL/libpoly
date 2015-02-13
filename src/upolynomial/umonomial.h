@@ -10,13 +10,13 @@ typedef struct umonomial_struct {
   size_t degree;
   /** Coefficient with the monomial */
   lp_integer_t coefficient;
-} umonomial_t;
+} ulp_monomial_t;
 
-void umonomial_construct(lp_int_ring_t* K, umonomial_t* m, size_t degree, const lp_integer_t* coefficient);
+void umonomial_construct(lp_int_ring_t* K, ulp_monomial_t* m, size_t degree, const lp_integer_t* coefficient);
 
-void umonomial_construct_from_int(lp_int_ring_t* K, umonomial_t* m, size_t degree, long coefficient);
+void umonomial_construct_from_int(lp_int_ring_t* K, ulp_monomial_t* m, size_t degree, long coefficient);
 
-void umonomial_construct_copy(lp_int_ring_t* K, umonomial_t* m, const umonomial_t* from);
+void umonomial_construct_copy(lp_int_ring_t* K, ulp_monomial_t* m, const ulp_monomial_t* from);
 
-void umonomial_destruct(umonomial_t* m);
+void umonomial_destruct(ulp_monomial_t* m);
 

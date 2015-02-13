@@ -13,6 +13,6 @@
 
 #include <stdio.h>
 
-int umonomial_print(const umonomial_t* m, FILE* out);
+int umonomial_print(const ulp_monomial_t* m, FILE* out);
 
 int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file);

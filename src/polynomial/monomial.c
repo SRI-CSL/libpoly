@@ -5,7 +5,8 @@
  *      Author: dejan
  */
 
-#include "polynomial/monomial.h"
+#include <monomial.h>
+#include <variable_db.h>
 #include "polynomial/polynomial.h"
 
 #include "number/integer.h"
@@ -14,19 +15,19 @@
 #include <assert.h>
 #include <stdlib.h>
 
-void monomial_construct(const lp_polynomial_context_t* ctx, monomial_t* m) {
+void lp_monomial_construct(const lp_polynomial_context_t* ctx, lp_monomial_t* m) {
   integer_construct_from_int(ctx->K, &m->a, 0);
   m->n = 0;
   m->capacity = 0;
   m->p = 0;
 }
 
-void monomial_clear(const lp_polynomial_context_t* ctx, monomial_t* m) {
+void lp_monomial_clear(const lp_polynomial_context_t* ctx, lp_monomial_t* m) {
   integer_assign_int(ctx->K, &m->a, 0);
   m->n = 0;
 }
 
-void monomial_construct_copy(const lp_polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort) {
+void lp_monomial_construct_copy(const lp_polynomial_context_t* ctx, lp_monomial_t* m, const lp_monomial_t* from, int sort) {
   integer_construct_copy(ctx->K, &m->a, &from->a);
   m->n = from->n;
   m->capacity = from->n;
@@ -50,7 +51,7 @@ void monomial_construct_copy(const lp_polynomial_context_t* ctx, monomial_t* m, 
   }
 }
 
-void monomial_destruct(monomial_t* m) {
+void lp_monomial_destruct(lp_monomial_t* m) {
   integer_destruct(&m->a);
   if (m->p) {
     free(m->p);
@@ -60,14 +61,18 @@ void monomial_destruct(monomial_t* m) {
   }
 }
 
-void monomial_assign(const lp_polynomial_context_t* ctx, monomial_t* m, const monomial_t* from, int sort) {
+void lp_monomial_set_coefficient(const lp_polynomial_context_t* ctx, lp_monomial_t* m, const lp_integer_t* a) {
+  lp_integer_assign(ctx->K, &m->a, a);
+}
+
+void lp_monomial_assign(const lp_polynomial_context_t* ctx, lp_monomial_t* m, const lp_monomial_t* from, int sort) {
   if (m != from) {
-    monomial_destruct(m);
-    monomial_construct_copy(ctx, m, from, sort);
+    lp_monomial_destruct(m);
+    lp_monomial_construct_copy(ctx, m, from, sort);
   }
 }
 
-void monomial_push(monomial_t* m, lp_variable_t x, unsigned d) {
+void lp_monomial_push(lp_monomial_t* m, lp_variable_t x, size_t d) {
   if (m->n == m->capacity) {
     m->capacity += 5;
     m->p = realloc(m->p, m->capacity*sizeof(power_t));
@@ -78,20 +83,20 @@ void monomial_push(monomial_t* m, lp_variable_t x, unsigned d) {
   ++ (m->n);
 }
 
-void monomial_pop(monomial_t* m) {
+void lp_monomial_pop(lp_monomial_t* m) {
   assert(m->n > 0);
   -- m->n;
 }
 
-#define SWAP(m1, m2) { monomial_t tmp = m1; m1 = m2; m2 = tmp; }
+#define SWAP(m1, m2) { lp_monomial_t tmp = m1; m1 = m2; m2 = tmp; }
 #define MIN(x, y) (x < y ? x : y)
 
-void monomial_gcd(const lp_polynomial_context_t* ctx, monomial_t* gcd, const monomial_t* m1, const monomial_t* m2) {
+void lp_monomial_gcd(const lp_polynomial_context_t* ctx, lp_monomial_t* gcd, const lp_monomial_t* m1, const lp_monomial_t* m2) {
 
   assert(ctx->K == lp_Z);
 
-  monomial_t result;
-  monomial_construct(ctx, &result);
+  lp_monomial_t result;
+  lp_monomial_construct(ctx, &result);
 
   // GCD of the coefficients
   integer_gcd_Z(&result.a, &m1->a, &m2->a);
@@ -105,7 +110,7 @@ void monomial_gcd(const lp_polynomial_context_t* ctx, monomial_t* gcd, const mon
     if (var_cmp == 0) {
       lp_variable_t x = m1->p[m1_i].x;
       size_t d = MIN(m1->p[m1_i].d, m2->p[m2_i].d);
-      monomial_push(&result, x, d);
+      lp_monomial_push(&result, x, d);
       m1_i ++;
       m2_i ++;
     } else if (var_cmp > 0) {
@@ -116,5 +121,16 @@ void monomial_gcd(const lp_polynomial_context_t* ctx, monomial_t* gcd, const mon
   }
 
   SWAP(result, *gcd);
-  monomial_destruct(&result);
+  lp_monomial_destruct(&result);
+}
+
+int lp_monomial_print(const lp_polynomial_context_t* ctx, const lp_monomial_t* m, FILE* out) {
+  size_t i;
+  int ret = 0;
+  ret += lp_integer_print(&m->a, out);
+  ret += fprintf(out, "*");
+  for (i = 0; i < m->n; ++ i) {
+    ret += fprintf(out, "%s^%zu", lp_variable_db_get_name(ctx->var_db, m->p[i].x), m->p[i].d);
+  }
+  return ret;
 }

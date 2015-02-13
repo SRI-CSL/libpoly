@@ -8,9 +8,9 @@
 #include <interval.h>
 #include <upolynomial.h>
 #include <variable_db.h>
+#include <monomial.h>
 
 #include "polynomial/polynomial.h"
-#include "polynomial/monomial.h"
 #include "polynomial/coefficient.h"
 #include "polynomial/output.h"
 #include "polynomial/gcd.h"
@@ -590,7 +590,7 @@ int coefficient_cmp_type(const lp_polynomial_context_t* ctx, const coefficient_t
   return coefficient_cmp_general(ctx, C1, C2, 0);
 }
 
-void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data) {
+void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, lp_monomial_t* m, void* data) {
 
   if (trace_is_enabled("coefficient::order")) {
     tracef("order = "); lp_variable_order_print(ctx->var_order, ctx->var_db, trace_out); tracef("\n");
@@ -612,9 +612,9 @@ void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_
     // Power of x
     for (d = 1; d < SIZE(C); ++ d) {
       if (!coefficient_is_zero(ctx, COEFF(C, d))) {
-        monomial_push(m, VAR(C), d);
+        lp_monomial_push(m, VAR(C), d);
         coefficient_traverse(ctx, COEFF(C, d), f, m, data);
-        monomial_pop(m);
+        lp_monomial_pop(m);
       }
     }
     break;
@@ -625,7 +625,7 @@ void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_
  * Method called to add a monomial to C. The monomial should be ordered in the
  * same order as C, top variable at the m[0].
  */
-void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m, void* C_void) {
+void coefficient_add_ordered_monomial(const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* C_void) {
 
   coefficient_t* C = (coefficient_t*) C_void;
 
@@ -642,7 +642,7 @@ void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m,
       integer_add(ctx->K, &C->value.num, &C->value.num, &m->a);
       break;
     case COEFFICIENT_POLYNOMIAL:
-      coefficient_add_monomial(ctx, m, COEFF(C, 0));
+      coefficient_add_ordered_monomial(ctx, m, COEFF(C, 0));
       break;
     }
   } else {
@@ -655,23 +655,30 @@ void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m,
       // Now, add the monomial to the right place
       m->p ++;
       m->n --;
-      coefficient_add_monomial(ctx, m, COEFF(C, d));
+      coefficient_add_ordered_monomial(ctx, m, COEFF(C, d));
       coefficient_normalize(ctx, C);
       m->p --;
       m->n ++;
     } else {
-      coefficient_add_monomial(ctx, m, COEFF(C, 0));
+      coefficient_add_ordered_monomial(ctx, m, COEFF(C, 0));
     }
   }
 
   assert(coefficient_is_normalized(ctx, C));
 }
 
-void coefficient_order_and_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m, void* C_void) {
-  monomial_t m_ordered;
-  monomial_construct_copy(ctx, &m_ordered, m, /** sort */ 1);
-  coefficient_add_monomial(ctx, &m_ordered, C_void);
-  monomial_destruct(&m_ordered);
+void coefficient_order_and_add_monomial(const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* C_void) {
+  lp_monomial_t m_ordered;
+  lp_monomial_construct_copy(ctx, &m_ordered, m, /** sort */ 1);
+  coefficient_add_ordered_monomial(ctx, &m_ordered, C_void);
+  lp_monomial_destruct(&m_ordered);
+}
+
+void coefficient_add_monomial(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_monomial_t* m) {
+  lp_monomial_t m_ordered;
+  lp_monomial_construct_copy(ctx, &m_ordered, m, /** sort */ 1);
+  coefficient_add_ordered_monomial(ctx, &m_ordered, C);
+  lp_monomial_destruct(&m_ordered);
 }
 
 STAT_DECLARE(int, coefficient, order)
@@ -694,14 +701,14 @@ void coefficient_order(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   coefficient_t result;
   coefficient_construct(ctx, &result);
   // The monomials build in the original order
-  monomial_t m_tmp;
-  monomial_construct(ctx, &m_tmp);
+  lp_monomial_t m_tmp;
+  lp_monomial_construct(ctx, &m_tmp);
   // For each monomial of C, add it to the result
   coefficient_traverse(ctx, C, coefficient_order_and_add_monomial, &m_tmp, &result);
   // Keep the result
   coefficient_swap(C, &result);
   // Destroy temps
-  monomial_destruct(&m_tmp);
+  lp_monomial_destruct(&m_tmp);
   coefficient_destruct(&result);
 
   assert(coefficient_is_normalized(ctx, C));

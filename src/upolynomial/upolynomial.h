@@ -19,5 +19,5 @@ struct lp_upolynomial_struct {
   /** The number of monomials */
   size_t size;
   /** The monomials */
-  umonomial_t monomials[];
+  ulp_monomial_t monomials[];
 };

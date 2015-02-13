@@ -148,19 +148,19 @@ void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const lp_upolyno
  * p_d += p*m
  */
 void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p,
-    const umonomial_t* m);
+    const ulp_monomial_t* m);
 
 /**
  * p_d -= p*m
  */
 void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p,
-    const umonomial_t* m);
+    const ulp_monomial_t* m);
 
 /**
  * p_d -= p*m
  */
 void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring_t* K,
-    const upolynomial_dense_t* p, const umonomial_t* m);
+    const upolynomial_dense_t* p, const ulp_monomial_t* m);
 
 /**
  * p_d = -p_d

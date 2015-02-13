@@ -13,6 +13,7 @@
 #include "integer.h"
 #include "polynomial_context.h"
 #include "assignment.h"
+#include "monomial.h"
 
 /**
  * Polynomials incorporate the context and coefficient data. The also carry
@@ -110,6 +111,9 @@ char* lp_polynomial_to_string(const lp_polynomial_t* A);
 
 /** Compute S = A1 + A2. */
 void lp_polynomial_add(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
+/** Compute S += M. */
+void lp_polynomial_add_monomial(lp_polynomial_t* S, const lp_monomial_t* M);
 
 /** Compute S = A1 - A2 in the given ring. */
 void lp_polynomial_sub(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);

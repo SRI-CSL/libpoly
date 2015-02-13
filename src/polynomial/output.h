@@ -11,7 +11,7 @@
 #include "utils/output.h"
 
 /** Print the monomial */
-int monomial_print(const lp_polynomial_context_t* ctx, const monomial_t* m, FILE* out);
+int monomial_print(const lp_polynomial_context_t* ctx, const lp_monomial_t* m, FILE* out);
 
 /** Prints the coefficient to the given stream. */
 int coefficient_print(const lp_polynomial_context_t* ctx, const coefficient_t* C, FILE* out);

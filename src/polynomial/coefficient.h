@@ -8,9 +8,9 @@
 #pragma once
 
 #include <polynomial_context.h>
+#include <monomial.h>
 #include <assignment.h>
 
-#include "polynomial/monomial.h"
 #include "number/integer.h"
 
 /** Type of the coefficients */
@@ -259,16 +259,26 @@ void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* re
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Function type called on coefficient traversal */
-typedef void (*traverse_f) (const lp_polynomial_context_t* ctx, monomial_t* p, void* data);
+typedef void (*traverse_f) (const lp_polynomial_context_t* ctx, lp_monomial_t* p, void* data);
 
 /**
  * Run on the coefficient to traverse all monomials. The traverse_f function will be called on he monomial with
  * the associated data.
  */
-void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, monomial_t* m, void* data);
+void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_t* C, traverse_f f, lp_monomial_t* m, void* data);
 
 /**
  * Method called to add a monomial to C. The monomial should be ordered in the
  * same order as C, top variable at the m[0].
  */
-void coefficient_add_monomial(const lp_polynomial_context_t* ctx, monomial_t* m, void* C_void);
+void coefficient_add_ordered_monomial(const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* C_void);
+
+/**
+ * Method called to add a monomial to C.
+ */
+void coefficient_order_and_add_monomial(const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* C_void);
+
+/**
+ * Add the monomial to the coefficient.
+ */
+void coefficient_add_monomial(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_monomial_t* m);

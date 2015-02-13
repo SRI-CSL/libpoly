@@ -267,7 +267,7 @@ void upolynomial_dense_add_mult_p_int(upolynomial_dense_t* p_d, const lp_upolyno
   upolynomial_dense_normalize(p_d, p->K);
 }
 
-void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const umonomial_t* m) {
+void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const ulp_monomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
   size_t needed_degree = lp_upolynomial_degree(p) + m->degree;
   assert(p_d->capacity > needed_degree);
@@ -282,7 +282,7 @@ void upolynomial_dense_add_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolyno
   upolynomial_dense_normalize(p_d, p->K);
 }
 
-void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const umonomial_t* m) {
+void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolynomial_t* p, const ulp_monomial_t* m) {
   assert(m->degree > 0 || integer_sgn(p->K, &m->coefficient));
   size_t needed_degree = lp_upolynomial_degree(p) + m->degree;
   size_t i;
@@ -297,7 +297,7 @@ void upolynomial_dense_sub_mult_p_mon(upolynomial_dense_t* p_d, const lp_upolyno
   upolynomial_dense_normalize(p_d, p->K);
 }
 
-void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring_t* K, const upolynomial_dense_t* p, const umonomial_t* m) {
+void upolynomial_dense_sub_mult_mon(upolynomial_dense_t* p_d, lp_int_ring_t* K, const upolynomial_dense_t* p, const ulp_monomial_t* m) {
   assert(m->degree > 0 || integer_sgn(K, &m->coefficient));
 
   size_t needed_size = p->size + m->degree;
@@ -369,7 +369,7 @@ void upolynomial_dense_div_general(lp_int_ring_t* K, int exact, const upolynomia
   assert(q->size <= p->size);
 
   // monomial we use to multiply with
-  umonomial_t m;
+  ulp_monomial_t m;
   umonomial_construct_from_int(lp_Z, &m, 0, 0);
 
   // adjustment for the powers of div
@@ -465,7 +465,7 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p, const upolynomial_
   integer_assign_int(lp_Z, a, 1);
 
   // monomial we use to multiply with
-  umonomial_t m;
+  ulp_monomial_t m;
   umonomial_construct_from_int(lp_Z, &m, 0, 0);
 
   // Degrees of p and q

@@ -6,9 +6,9 @@
  */
 
 #include <upolynomial.h>
+#include <monomial.h>
 
 #include "polynomial/gcd.h"
-#include "polynomial/monomial.h"
 #include "polynomial/output.h"
 
 #include "upolynomial/upolynomial.h"
@@ -16,12 +16,12 @@
 #include "utils/statistics.h"
 #include "utils/debug_trace.h"
 
-void monomial_gcd_visit(const lp_polynomial_context_t* ctx, monomial_t* m, void* data) {
-  monomial_t* gcd = (monomial_t*) data;
+void monomial_gcd_visit(const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* data) {
+  lp_monomial_t* gcd = (lp_monomial_t*) data;
   if (integer_is_zero(ctx->K, &gcd->a)) {
-    monomial_assign(ctx, gcd, m, 0);
+    lp_monomial_assign(ctx, gcd, m, 0);
   } else {
-    monomial_gcd(ctx, gcd, gcd, m);
+    lp_monomial_gcd(ctx, gcd, gcd, m);
   }
 }
 
@@ -49,14 +49,14 @@ void coefficient_gcd_monomial_extract(const lp_polynomial_context_t* ctx, coeffi
 
   assert(P != Q);
 
-  monomial_t m_P_gcd, m_Q_gcd, m_tmp;
-  monomial_construct(ctx, &m_P_gcd);
-  monomial_construct(ctx, &m_Q_gcd);
-  monomial_construct(ctx, &m_tmp);
+  lp_monomial_t m_P_gcd, m_Q_gcd, m_tmp;
+  lp_monomial_construct(ctx, &m_P_gcd);
+  lp_monomial_construct(ctx, &m_Q_gcd);
+  lp_monomial_construct(ctx, &m_tmp);
 
   // Compute the gcd
   coefficient_traverse(ctx, P, monomial_gcd_visit, &m_tmp, &m_P_gcd);
-  monomial_clear(ctx, &m_tmp);
+  lp_monomial_clear(ctx, &m_tmp);
   coefficient_traverse(ctx, Q, monomial_gcd_visit, &m_tmp, &m_Q_gcd);
 
   if (trace_is_enabled("coefficient")) {
@@ -65,21 +65,21 @@ void coefficient_gcd_monomial_extract(const lp_polynomial_context_t* ctx, coeffi
   }
 
   // Final gcd
-  monomial_t m_gcd;
-  monomial_construct(ctx, &m_gcd);
-  monomial_gcd(ctx, &m_gcd, &m_P_gcd, &m_Q_gcd);
+  lp_monomial_t m_gcd;
+  lp_monomial_construct(ctx, &m_gcd);
+  lp_monomial_gcd(ctx, &m_gcd, &m_P_gcd, &m_Q_gcd);
 
   // Construct the result
   coefficient_t result;
   coefficient_construct(ctx, &result);
-  coefficient_add_monomial(ctx, &m_gcd, &result);
+  coefficient_add_ordered_monomial(ctx, &m_gcd, &result);
 
   // Divide P and Q with their gcds
   coefficient_t P_gcd, Q_gcd;
   coefficient_construct(ctx, &P_gcd);
   coefficient_construct(ctx, &Q_gcd);
-  coefficient_add_monomial(ctx, &m_P_gcd, &P_gcd);
-  coefficient_add_monomial(ctx, &m_Q_gcd, &Q_gcd);
+  coefficient_add_ordered_monomial(ctx, &m_P_gcd, &P_gcd);
+  coefficient_add_ordered_monomial(ctx, &m_Q_gcd, &Q_gcd);
   coefficient_div(ctx, P, P, &P_gcd);
   coefficient_div(ctx, Q, Q, &Q_gcd);
   coefficient_destruct(&P_gcd);
@@ -89,10 +89,10 @@ void coefficient_gcd_monomial_extract(const lp_polynomial_context_t* ctx, coeffi
   coefficient_swap(&result, gcd);
   coefficient_destruct(&result);
 
-  monomial_destruct(&m_gcd);
-  monomial_destruct(&m_tmp);
-  monomial_destruct(&m_Q_gcd);
-  monomial_destruct(&m_P_gcd);
+  lp_monomial_destruct(&m_gcd);
+  lp_monomial_destruct(&m_tmp);
+  lp_monomial_destruct(&m_Q_gcd);
+  lp_monomial_destruct(&m_P_gcd);
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_gcd_monomial_extract() =>"); coefficient_print(ctx, gcd, trace_out); tracef("\n");
