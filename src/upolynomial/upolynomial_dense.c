@@ -11,7 +11,7 @@
 
 #include "utils/debug_trace.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <assert.h>
 
 static inline

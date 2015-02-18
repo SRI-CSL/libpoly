@@ -11,7 +11,7 @@
 
 #include "number/integer.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <stdlib.h>
 

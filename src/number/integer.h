@@ -12,7 +12,7 @@
 #include <integer.h>
 
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <printf.h>
 
 #define __unused(x) ((void)x)

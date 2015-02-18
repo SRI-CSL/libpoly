@@ -11,7 +11,7 @@
 #include <variable_order.h>
 
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 /**
  * A simple variable order that orders variable based on a given list, and

@@ -14,7 +14,7 @@
 #include "utils/debug_trace.h"
 
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 

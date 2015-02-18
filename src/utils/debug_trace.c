@@ -8,7 +8,7 @@
 #include "utils/debug_trace.h"
 
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdarg.h>
 
 char* tags_to_trace[1000];

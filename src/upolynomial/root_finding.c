@@ -13,7 +13,7 @@
 #include "upolynomial/output.h"
 
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdlib.h>
 
 #include "utils/debug_trace.h"

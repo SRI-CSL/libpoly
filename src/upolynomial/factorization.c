@@ -17,7 +17,7 @@
 #include "utils/debug_trace.h"
 
 #include <assert.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 
 STAT_DECLARE(int, upolynomial, factor_square_free)

@@ -13,7 +13,7 @@
 #include "utils/debug_trace.h"
 #include "utils/statistics.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 
 STAT_DECLARE(int, coefficient, factor_square_free)
 STAT_DECLARE(int, coefficient, factor_square_free_pp)

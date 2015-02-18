@@ -11,7 +11,7 @@
 #include "number/value.h"
 #include "polynomial/polynomial.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 
 #define DEFAULT_ASSIGNMENT_SIZE 100
 #define DEFAULT_ASSIGNMENT_SIZE 100

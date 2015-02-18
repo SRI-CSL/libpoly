@@ -8,7 +8,7 @@
 #include "statistics.h"
 
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #define INITIAL_STATS 100
 

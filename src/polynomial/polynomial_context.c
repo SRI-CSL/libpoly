@@ -9,7 +9,7 @@
 
 #include "polynomial_context.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <assert.h>
 
 void lp_polynomial_context_construct(lp_polynomial_context_t* ctx, lp_int_ring_t* K, lp_variable_db_t* var_db, lp_variable_order_t* var_order) {

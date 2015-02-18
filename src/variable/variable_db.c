@@ -11,7 +11,7 @@
 
 #include <assert.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 struct lp_variable_db_struct {
   /** Reference count */

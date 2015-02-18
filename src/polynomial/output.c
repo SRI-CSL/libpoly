@@ -10,7 +10,7 @@
 #include "polynomial/output.h"
 #include "utils/output.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 int monomial_print(const lp_polynomial_context_t* ctx, const lp_monomial_t* m, FILE* out) {
