@@ -43,3 +43,6 @@ void lp_variable_list_push(lp_variable_list_t* list, lp_variable_t var);
 
 /** Pop the last variable from the list */
 void lp_variable_list_pop(lp_variable_list_t* list);
+
+/** Get the last variable from the list */
+lp_variable_t lp_variable_list_top(const lp_variable_list_t* list);

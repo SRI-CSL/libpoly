@@ -88,6 +88,10 @@ void lp_variable_order_pop(lp_variable_order_t* var_order) {
   lp_variable_list_pop(&var_order->list);
 }
 
+lp_variable_t lp_variable_order_top(const lp_variable_order_t* var_order) {
+  return lp_variable_list_top(&var_order->list);
+}
+
 int lp_variable_order_print(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db, FILE* out) {
   size_t i;
   int ret = 0;

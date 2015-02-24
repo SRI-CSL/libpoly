@@ -83,3 +83,8 @@ void lp_variable_list_pop(lp_variable_list_t* list) {
   lp_variable_t var = list->list[-- list->list_size];
   list->var_to_index_map[var] = -1;
 }
+
+lp_variable_t lp_variable_list_top(const lp_variable_list_t* list) {
+  assert(list->list_size > 0);
+  return list->list[list->list_size-1];
+}

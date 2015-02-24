@@ -23,7 +23,7 @@ void lp_variable_db_detach(lp_variable_db_t* var_db);
 /** Add a new variable to the database and return its id */
 lp_variable_t lp_variable_db_new_variable(lp_variable_db_t* var_db, const char* name);
 
-/** Add a new variable to database with a given id*/
+/** Add a new variable to database with a given id */
 void lp_variable_db_add_variable(lp_variable_db_t* var_db, lp_variable_t var, const char* name);
 
 /** Print the variable database */
