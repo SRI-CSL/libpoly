@@ -36,6 +36,9 @@ void lp_variable_order_push(lp_variable_order_t* var_order, lp_variable_t var);
 /** Pop the last variable from the list */
 void lp_variable_order_pop(lp_variable_order_t* var_order);
 
+/** Get the last variable from the list */
+lp_variable_t lp_variable_order_top(const lp_variable_order_t* var_order);
+
 /** Print the list of variables */
 int lp_variable_order_print(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db, FILE* out);
 
