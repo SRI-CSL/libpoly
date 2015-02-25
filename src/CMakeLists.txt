@@ -29,6 +29,7 @@ set(poly_SOURCES
     polynomial/factorization.c
     polynomial/polynomial.c
     polynomial/polynomial_context.c
+    polynomial/feasibility_set.c
     poly.c
 )
 

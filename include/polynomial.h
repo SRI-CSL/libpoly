@@ -14,6 +14,7 @@
 #include "polynomial_context.h"
 #include "assignment.h"
 #include "monomial.h"
+#include "sign_condition.h"
 
 /**
  * Polynomials incorporate the context and coefficient data. The also carry
@@ -202,3 +203,10 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const l
  */
 void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size);
 
+/**
+ * Given a polynomial p, a sign condition, and a domain, the function returns
+ * a subset of the domain where the polynomial respects the sign condition.
+ * If the the computed feasible set is the whole domain, the return value is 0
+ * to indicate that a new feasible set is not necessary.
+ */
+lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* p, lp_sign_condition_t sgn_condition, const lp_feasibility_set_t* domain);
