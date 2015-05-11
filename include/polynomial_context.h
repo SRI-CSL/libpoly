@@ -17,7 +17,7 @@
  * polynomials.
  */
 struct lp_polynomial_context_struct {
-  /** Reference count of this polynomial */
+  /** Reference count of this context */
   size_t ref_count;
   /** The ring of base operations */
   lp_int_ring_t* K;

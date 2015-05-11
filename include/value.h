@@ -18,11 +18,20 @@
 
 /** Types of values for the assignment */
 typedef enum {
+  /** No value */
   LP_VALUE_NONE,
+  /** Integer value */
   LP_VALUE_INTEGER,
+  /** Dyadic rational */
   LP_VALUE_DYADIC_RATIONAL,
+  /** Ratioanl number */
   LP_VALUE_RATIONAL,
-  LP_VALUE_ALGEBRAIC
+  /** Reduced algebraic number (univariate representation) */
+  LP_VALUE_ALGEBRAIC,
+  /** Special value +inf */
+  LP_VALUE_PLUS_INFINITY,
+  /** Special value -inf */
+  LP_VALUE_MINUS_INFINITY,
 } lp_value_type_t;
 
 /** A value is a choice of the available types */
@@ -42,11 +51,17 @@ struct lp_value_struct {
 /** Construct a value */
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data);
 
+/** Allocate an construct */
+lp_value_t* lp_value_new(lp_value_type_t type, const void* data);
+
 /** Construct a copy of the given value */
 void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from);
 
 /** Destruct the value */
 void lp_value_destruct(lp_value_t* v);
+
+/** Destruct and free the value */
+void lp_value_delete(lp_value_t* v);
 
 /** Get the approximate value */
 void lp_value_approximate(const lp_value_t* v, lp_interval_t* approx);

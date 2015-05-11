@@ -17,6 +17,8 @@
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   v->type = type;
   switch(type) {
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_MINUS_INFINITY:
   case LP_VALUE_NONE:
     break;
   case LP_VALUE_INTEGER:
@@ -34,10 +36,18 @@ void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   }
 }
 
+lp_value_t* lp_value_new(lp_value_type_t type, const void* data) {
+  lp_value_t* result = malloc(sizeof(lp_value_t));
+  lp_value_construct(result, type, data);
+  return result;
+}
+
 void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from) {
   switch(from->type) {
   case LP_VALUE_NONE:
-    lp_value_construct(v, LP_VALUE_NONE, 0);
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_MINUS_INFINITY:
+    lp_value_construct(v, from->type, 0);
     break;
   case LP_VALUE_INTEGER:
     lp_value_construct(v, LP_VALUE_INTEGER, &from->value.z);
@@ -57,6 +67,8 @@ void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from) {
 void lp_value_destruct(lp_value_t* v) {
   switch(v->type) {
   case LP_VALUE_NONE:
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_MINUS_INFINITY:
     break;
   case LP_VALUE_INTEGER:
     integer_destruct(&v->value.z);
@@ -73,9 +85,17 @@ void lp_value_destruct(lp_value_t* v) {
   }
 }
 
+void lp_value_delete(lp_value_t* v) {
+  lp_value_destruct(v);
+  free(v);
+}
+
+
 void lp_value_approx(const lp_value_t* v, lp_interval_t* approx) {
   switch (v->type) {
   case LP_VALUE_INTEGER:
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_MINUS_INFINITY:
     assert(0);
     break;
   case LP_VALUE_RATIONAL:
@@ -101,6 +121,12 @@ int lp_value_print(const lp_value_t* v, FILE* out) {
   case LP_VALUE_NONE:
     ret += fprintf(out, "<null>");
     break;
+  case LP_VALUE_PLUS_INFINITY:
+    ret += fprintf(out, "+inf");
+    break;
+  case LP_VALUE_MINUS_INFINITY:
+    ret += fprintf(out, "-inf");
+    break;
   case LP_VALUE_INTEGER:
     ret += integer_print(&v->value.z, out);
     break;
@@ -118,9 +144,11 @@ int lp_value_print(const lp_value_t* v, FILE* out) {
 }
 
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
+  assert(0);
   return v1 == v2;
 }
 
 int lp_value_cmp_void(const void* v1, const void* v2) {
+  assert(0);
   return v1 == v2;
 }

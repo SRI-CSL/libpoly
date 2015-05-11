@@ -140,8 +140,8 @@ void lp_dyadic_interval_collapse_to(lp_dyadic_interval_t* I, const lp_dyadic_rat
 /** Set the left point of the interval */
 void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open);
 
-void lp_dyadic_interval_set_b(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* b, int b_open);
 /** Set the right point of the interval */
+void lp_dyadic_interval_set_b(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* b, int b_open);
 
 /** Prints the interval to the given stream. */
 int lp_dyadic_interval_print(const lp_dyadic_interval_t* I, FILE* out);
