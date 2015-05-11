@@ -144,7 +144,42 @@ int lp_value_print(const lp_value_t* v, FILE* out) {
 }
 
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
+
+  if (v1->type == v2->type) {
+    lp_value_type_t type = v1->type;
+    switch (type) {
+    case LP_VALUE_NONE:
+    case LP_VALUE_PLUS_INFINITY:
+    case LP_VALUE_MINUS_INFINITY:
+      return 0;
+    case LP_VALUE_INTEGER:
+      return lp_integer_cmp(lp_Z, &v1->value.z, &v2->value.z);
+    case LP_VALUE_RATIONAL:
+      return rational_cmp(&v1->value.q, &v2->value.q);
+    case LP_VALUE_DYADIC_RATIONAL:
+      return dyadic_rational_cmp(&v1->value.dy_q, &v2->value.dy_q);
+    case LP_VALUE_ALGEBRAIC:
+      return lp_algebraic_number_cmp(&v1->value.a, &v2->value.a);
+    }
+  }
+
+  // Different types
+
+  if (v1->type == LP_VALUE_MINUS_INFINITY) {
+    return -1;
+  }
+  if (v2->type == LP_VALUE_MINUS_INFINITY) {
+    return 1;
+  }
+  if (v1->type == LP_VALUE_PLUS_INFINITY) {
+    return 1;
+  }
+  if (v2->type == LP_VALUE_PLUS_INFINITY) {
+    return -1;
+  }
+
   assert(0);
+
   return v1 == v2;
 }
 

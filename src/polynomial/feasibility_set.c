@@ -7,6 +7,7 @@
 
 #include <feasibility_set.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "poly.h"
 #include "value.h"
@@ -63,11 +64,11 @@ int feasibility_interval_contains(const feasibility_interval_t* interval, const 
   case FEASIBILITY_INTERVAL: {
     /** Compare to lower and upper bounds */
     int cmp_lower = lp_value_cmp(&interval->interval.lower_bound, value);
-    if (cmp_lower > 0) {
+    if (cmp_lower >= 0) {
       return 0;
     }
     int cmp_upper = lp_value_cmp(&interval->interval.upper_bound, value);
-    if (cmp_upper < 0) {
+    if (cmp_upper <= 0) {
       return 0;
     }
     return 1;
@@ -162,5 +163,6 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
 
 lp_value_t* lp_feasibility_set_pick_value(const lp_feasibility_set_t* set) {
   (void)set;
+  assert(0);
   return 0;
 }
