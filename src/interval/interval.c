@@ -376,6 +376,57 @@ int lp_dyadic_interval_sgn(const lp_dyadic_interval_t* I) {
   return 1;
 }
 
+int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_rational_t* z) {
+
+  if (I->is_point) {
+    return dyadic_rational_cmp_integer(&I->a, z);
+  }
+
+  // I = [a, b]
+
+  int cmp_lower = dyadic_rational_cmp_integer(&I->a, z);
+  if (cmp_lower > 0) {
+    // a > z => [a, b] > z
+    return 1;
+  }
+  if (cmp_lower == 0) {
+    if (I->a_open) {
+      // a == z => (a, b] > z
+      return 1;
+    } else {
+      // a == z => [a, b] == z
+      return 0;
+    }
+  }
+
+  int cmp_upper = dyadic_rational_cmp_integer(&I->b, z);
+  if (cmp_upper < 0) {
+    // [a, b] < z
+    return -1;
+  }
+  if (cmp_upper == 0) {
+    if (I->b_open) {
+      // [a, b) < z
+      return -1;
+    } else {
+      // [a, b] == z
+      return 0;
+    }
+  }
+
+  // It's inside, return 0
+  return 0;
+}
+
+int lp_dyadic_interval_cmp_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
+
+}
+
+int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rational_t* q) {
+
+}
+
+
 int lp_interval_contains(const lp_interval_t* I, const lp_rational_t* q) {
   int cmp_a = rational_cmp(&I->a, q);
   if (I->is_point) {

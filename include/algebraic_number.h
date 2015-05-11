@@ -49,6 +49,15 @@ void lp_algebraic_number_swap(lp_algebraic_number_t* a, lp_algebraic_number_t* b
 /** Compare two algebraic numbers */
 int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
 
+/** Compare algebraic number to an integer */
+int lp_algebraic_number_cmp_integer(const lp_algebraic_number_t* a1, const lp_integer_t* a2);
+
+/** Compare algebraic number to a dyadic rational */
+int lp_algebraic_number_cmp_dyadic_rational(const lp_algebraic_number_t* a1, const lp_dyadic_rational_t* a2);
+
+/** Compare algebraic number to a rational */
+int lp_algebraic_number_cmp_rational(const lp_algebraic_number_t* a1, const lp_rational_t* a2);
+
 /** Void version of the comparison, use with care. */
 int lp_algebraic_number_cmp_void(const void* a1, const void* a2);
 

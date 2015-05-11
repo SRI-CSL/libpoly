@@ -96,6 +96,24 @@ int rational_cmp(const lp_rational_t* q1, const lp_rational_t* q2) {
 }
 
 static inline
+int rational_cmp_dyadic_rational(const lp_rational_t* q1, const lp_dyadic_rational_t* q2) {
+  lp_rational_t q2_rat;
+  rational_construct_from_dyadic(&q2_rat, q2);
+  int cmp = rational_cmp(q1, &q2_rat);
+  rational_destruct(&q2_rat);
+  return cmp;
+}
+
+static inline
+int rational_cmp_integer(const lp_rational_t* q1, const lp_integer_t* q2) {
+  lp_rational_t q2_rat;
+  rational_construct_from_integer(&q2_rat, q2);
+  int cmp = rational_cmp(q1, &q2_rat);
+  rational_destruct(&q2_rat);
+  return cmp;
+}
+
+static inline
 void rational_swap(lp_rational_t* q1, lp_rational_t* q2) {
   mpq_swap(q1, q2);
 }

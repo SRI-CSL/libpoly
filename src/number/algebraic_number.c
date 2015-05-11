@@ -281,6 +281,84 @@ int lp_algebraic_number_cmp_void(const void* a1, const void* a2) {
   return lp_algebraic_number_cmp(a1, a2);
 }
 
+int lp_algebraic_number_cmp_integer(const lp_algebraic_number_t* a1, const lp_integer_t* a2) {
+  if (a1->f) {
+    assert(!a1->I.is_point);
+    // Easy check, compare to the dyadic interval
+    int cmp = lp_dyadic_interval_cmp_integer(&a1->I, a2);
+    if (cmp != 0) {
+      return cmp;
+    }
+    // Point in interval, let's evaluate
+    int poly_sgn = lp_upolynomial_sgn_at_integer(&a1->f, a2);
+    if (poly_sgn == 0) {
+      return 0;
+    }
+    // Not a zero, so bisect while not outside
+    while (cmp == 0) {
+      lp_algebraic_number_refine_const(a1);
+      cmp = lp_dyadic_interval_cmp_integer(&a1->I, a2);
+    }
+    // Return the last compare
+    return cmp;
+  } else {
+    assert(a1->I.is_point);
+    return dyadic_rational_cmp_integer(&a1->I.a, a2);
+  }
+}
+
+int lp_algebraic_number_cmp_dyadic_rational(const lp_algebraic_number_t* a1, const lp_dyadic_rational_t* a2) {
+  if (a1->f) {
+    assert(!a1->I.is_point);
+    // Easy check, compare to the dyadic interval
+    int cmp = lp_dyadic_interval_cmp_dyadic_rational(&a1->I, a2);
+    if (cmp != 0) {
+      return cmp;
+    }
+    // Point in interval, let's evaluate
+    int poly_sgn = lp_upolynomial_sgn_at_dyadic_rational(&a1->f, a2);
+    if (poly_sgn == 0) {
+      return 0;
+    }
+    // Not a zero, so bisect while not outside
+    while (cmp == 0) {
+      lp_algebraic_number_refine_const(a1);
+      cmp = lp_dyadic_interval_cmp_dyadic_rational(&a1->I, a2);
+    }
+    // Return the last compare
+    return cmp;
+  } else {
+    assert(a1->I.is_point);
+    return -dyadic_rational_cmp(&a1->I.a, a2);
+  }
+}
+
+int lp_algebraic_number_cmp_rational(const lp_algebraic_number_t* a1, const lp_rational_t* a2) {
+  if (a1->f) {
+    assert(!a1->I.is_point);
+    // Easy check, compare to the dyadic interval
+    int cmp = lp_dyadic_interval_cmp_rational(&a1->I, a2);
+    if (cmp != 0) {
+      return cmp;
+    }
+    // Point in interval, let's evaluate
+    int poly_sgn = lp_upolynomial_sgn_at_rational(&a1->f, a2);
+    if (poly_sgn == 0) {
+      return 0;
+    }
+    // Not a zero, so bisect while not outside
+    while (cmp == 0) {
+      lp_algebraic_number_refine_const(a1);
+      cmp = lp_dyadic_interval_cmp_rational(&a1->I, a2);
+    }
+    // Return the last compare
+    return cmp;
+  } else {
+    return -rational_cmp_rational(a2, &a1->I.a);
+  }
+}
+
+
 int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out) {
   if (a->f == 0) {
     return dyadic_rational_print(&a->I.a, out);

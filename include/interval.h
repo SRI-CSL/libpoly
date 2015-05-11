@@ -158,6 +158,25 @@ int lp_dyadic_interval_contains_zero(const lp_dyadic_interval_t* I);
 /** Returns the "sign" of the interval: 0 in 0 in I, negative if I < 0, positive if I > 0. */
 int lp_dyadic_interval_sgn(const lp_dyadic_interval_t* I);
 
+/**
+ * Compare the interval to a integer, returns 0 if number is inside,
+ * -1 if interval is below number, or +1 if interval is above number.
+ */
+int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_rational_t* z);
+
+/**
+ * Compare the interval to a dyadic rational, returns 0 if number is inside,
+ * -1 if interval is below number, or +1 if interval is above number.
+ */
+int lp_dyadic_interval_cmp_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
+
+/**
+ * Compare the interval to a rational, returns 0 if number is inside,
+ * -1 if interval is below number, or +1 if interval is above number.
+ */
+int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rational_t* q);
+
+
 /** Check whether two intervals are disjunct */
 int lp_dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 

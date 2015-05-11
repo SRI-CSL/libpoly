@@ -90,6 +90,16 @@ int lp_dyadic_rational_sgn(const lp_dyadic_rational_t* q);
 int lp_dyadic_rational_cmp(const lp_dyadic_rational_t* q1, const lp_dyadic_rational_t* q2);
 
 /**
+ * Compare a dyadic rational to a rational.
+ */
+int lp_dyadic_rational_cmp_integer(const lp_dyadic_rational_t* q1, const lp_integer_t* q2);
+
+/**
+ * Compare a dyadic rational to a rational.
+ */
+int lp_dyadic_rational_cmp_rational(const lp_dyadic_rational_t* q1, const lp_rational_t* q2);
+
+/**
  * Swap two numbers.
  */
 void lp_dyadic_rational_swap(lp_dyadic_rational_t* q1, lp_dyadic_rational_t* q2);
