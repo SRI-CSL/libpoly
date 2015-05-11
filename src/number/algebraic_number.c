@@ -290,7 +290,7 @@ int lp_algebraic_number_cmp_integer(const lp_algebraic_number_t* a1, const lp_in
       return cmp;
     }
     // Point in interval, let's evaluate
-    int poly_sgn = lp_upolynomial_sgn_at_integer(&a1->f, a2);
+    int poly_sgn = lp_upolynomial_sgn_at_integer(a1->f, a2);
     if (poly_sgn == 0) {
       return 0;
     }
@@ -316,7 +316,7 @@ int lp_algebraic_number_cmp_dyadic_rational(const lp_algebraic_number_t* a1, con
       return cmp;
     }
     // Point in interval, let's evaluate
-    int poly_sgn = lp_upolynomial_sgn_at_dyadic_rational(&a1->f, a2);
+    int poly_sgn = lp_upolynomial_sgn_at_dyadic_rational(a1->f, a2);
     if (poly_sgn == 0) {
       return 0;
     }
@@ -342,7 +342,7 @@ int lp_algebraic_number_cmp_rational(const lp_algebraic_number_t* a1, const lp_r
       return cmp;
     }
     // Point in interval, let's evaluate
-    int poly_sgn = lp_upolynomial_sgn_at_rational(&a1->f, a2);
+    int poly_sgn = lp_upolynomial_sgn_at_rational(a1->f, a2);
     if (poly_sgn == 0) {
       return 0;
     }
@@ -354,7 +354,7 @@ int lp_algebraic_number_cmp_rational(const lp_algebraic_number_t* a1, const lp_r
     // Return the last compare
     return cmp;
   } else {
-    return -rational_cmp_rational(a2, &a1->I.a);
+    return -rational_cmp_dyadic_rational(a2, &a1->I.a);
   }
 }
 

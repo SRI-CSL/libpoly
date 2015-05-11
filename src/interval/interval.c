@@ -376,7 +376,7 @@ int lp_dyadic_interval_sgn(const lp_dyadic_interval_t* I) {
   return 1;
 }
 
-int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_rational_t* z) {
+int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_integer_t* z) {
 
   if (I->is_point) {
     return dyadic_rational_cmp_integer(&I->a, z);
@@ -420,10 +420,86 @@ int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_ratio
 
 int lp_dyadic_interval_cmp_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
 
+  if (I->is_point) {
+    return dyadic_rational_cmp(&I->a, q);
+  }
+
+  // I = [a, b]
+
+  int cmp_lower = dyadic_rational_cmp(&I->a, q);
+  if (cmp_lower > 0) {
+    // a > z => [a, b] > z
+    return 1;
+  }
+  if (cmp_lower == 0) {
+    if (I->a_open) {
+      // a == z => (a, b] > z
+      return 1;
+    } else {
+      // a == z => [a, b] == z
+      return 0;
+    }
+  }
+
+  int cmp_upper = dyadic_rational_cmp(&I->b, q);
+  if (cmp_upper < 0) {
+    // [a, b] < z
+    return -1;
+  }
+  if (cmp_upper == 0) {
+    if (I->b_open) {
+      // [a, b) < z
+      return -1;
+    } else {
+      // [a, b] == z
+      return 0;
+    }
+  }
+
+  // It's inside, return 0
+  return 0;
 }
 
 int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rational_t* q) {
 
+  if (I->is_point) {
+    return -rational_cmp_dyadic_rational(q, &I->a);
+  }
+
+  // I = [a, b]
+
+  int cmp_lower = -rational_cmp_dyadic_rational(q, &I->a);
+  if (cmp_lower > 0) {
+    // a > z => [a, b] > z
+    return 1;
+  }
+  if (cmp_lower == 0) {
+    if (I->a_open) {
+      // a == z => (a, b] > z
+      return 1;
+    } else {
+      // a == z => [a, b] == z
+      return 0;
+    }
+  }
+
+  int cmp_upper = -rational_cmp_dyadic_rational(q, &I->b);
+  if (cmp_upper < 0) {
+    // [a, b] < z
+    return -1;
+  }
+  if (cmp_upper == 0) {
+    if (I->b_open) {
+      // [a, b) < z
+      return -1;
+    } else {
+      // [a, b] == z
+      return 0;
+    }
+  }
+
+  // It's inside, return 0
+  return 0;
 }
 
 

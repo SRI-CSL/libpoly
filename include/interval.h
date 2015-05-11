@@ -162,7 +162,7 @@ int lp_dyadic_interval_sgn(const lp_dyadic_interval_t* I);
  * Compare the interval to a integer, returns 0 if number is inside,
  * -1 if interval is below number, or +1 if interval is above number.
  */
-int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_rational_t* z);
+int lp_dyadic_interval_cmp_integer(const lp_dyadic_interval_t* I, const lp_integer_t* z);
 
 /**
  * Compare the interval to a dyadic rational, returns 0 if number is inside,
