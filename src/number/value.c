@@ -178,41 +178,38 @@ int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
     return -1;
   }
 
-  // Make sure that the first one is in the order int < dy_rat < rat < algebraic
-  if (v1->type > v2->type) {
-    return -lp_value_cmp(v2, v2);
+  // Make sure that the first one is bigger in the order int < dy_rat < rat < algebraic
+  if (v1->type < v2->type) {
+    return -lp_value_cmp(v1, v2);
   }
 
   switch (v1->type) {
-  case LP_VALUE_INTEGER:
-    // Compare integers to others
-    switch (v2->type) {
-    case LP_VALUE_DYADIC_RATIONAL:
-      return -dyadic_rational_cmp_integer(&v2->value.dy_q, &v1->value.z);
-    case LP_VALUE_RATIONAL:
-      return -rational_cmp_integer(&v2->value.q, &v1->value.z);
-    case LP_VALUE_ALGEBRAIC:
-      return -lp_algebraic_number_cmp_integer(&v2->value.a, &v1->value.z);
-    default:
-      assert(0);
-    }
-    break;
   case LP_VALUE_DYADIC_RATIONAL:
-    // Compare dyadic to others
     switch (v2->type) {
-    case LP_VALUE_RATIONAL:
-      return -rational_cmp_dyadic_rational(&v2->value.q, &v1->value.dy_q);
-    case LP_VALUE_ALGEBRAIC:
-      return -lp_algebraic_number_cmp_dyadic_rational(&v2->value.a, &v1->value.dy_q);
+    case LP_VALUE_INTEGER:
+      return dyadic_rational_cmp_integer(&v1->value.dy_q, &v2->value.z);
     default:
       assert(0);
     }
     break;
   case LP_VALUE_RATIONAL:
-    // Compare rationals to others
     switch (v2->type) {
-    case LP_VALUE_ALGEBRAIC:
-      return -lp_algebraic_number_cmp_rational(&v2->value.a, &v1->value.q);
+    case LP_VALUE_INTEGER:
+      return rational_cmp_integer(&v1->value.q, &v2->value.z);
+    case LP_VALUE_DYADIC_RATIONAL:
+      return rational_cmp_dyadic_rational(&v1->value.q, &v1->value.dy_q);
+    default:
+      assert(0);
+    }
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    switch (v2->type) {
+    case LP_VALUE_INTEGER:
+      return lp_algebraic_number_cmp_integer(&v1->value.a, &v2->value.z);
+    case LP_VALUE_DYADIC_RATIONAL:
+      return lp_algebraic_number_cmp_dyadic_rational(&v1->value.a, &v2->value.dy_q);
+    case LP_VALUE_RATIONAL:
+      return lp_algebraic_number_cmp_rational(&v1->value.a, &v2->value.q);
     default:
       assert(0);
     }
