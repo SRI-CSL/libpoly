@@ -329,7 +329,7 @@ int lp_algebraic_number_cmp_dyadic_rational(const lp_algebraic_number_t* a1, con
     return cmp;
   } else {
     assert(a1->I.is_point);
-    return -dyadic_rational_cmp(&a1->I.a, a2);
+    return dyadic_rational_cmp(&a1->I.a, a2);
   }
 }
 
