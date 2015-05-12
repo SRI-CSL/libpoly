@@ -8,6 +8,7 @@
 #pragma once
 
 #include "number/rational.h"
+#include "number/integer.h"
 
 #include <assert.h>
 
@@ -297,3 +298,13 @@ void dyadic_rational_div_2exp(lp_dyadic_rational_t* div, const lp_dyadic_rationa
   dyadic_rational_normalize(div);
 }
 
+static inline
+void dyadic_rational_get_num(const lp_dyadic_rational_t* q, lp_integer_t* num) {
+  integer_assign(lp_Z, num, &q->a);
+}
+
+static inline
+void dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den) {
+  integer_assign_int(lp_Z, den, 1);
+  integer_mul_pow2(lp_Z, den, den, q->n);
+}

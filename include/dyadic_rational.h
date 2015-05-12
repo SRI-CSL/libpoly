@@ -144,3 +144,12 @@ void lp_dyadic_rational_pow(lp_dyadic_rational_t* pow, const lp_dyadic_rational_
  */
 void lp_dyadic_rational_div_2exp(lp_dyadic_rational_t* div, const lp_dyadic_rational_t* a, unsigned long n);
 
+/**
+ * Get the numerator of the number, i.e. a.
+ */
+void lp_dyadic_rational_get_num(const lp_dyadic_rational_t* q, lp_integer_t* num);
+
+/**
+ * Get the denominator of the number, i.e. 2^n.
+ */
+void lp_dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den);

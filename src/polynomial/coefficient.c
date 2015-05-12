@@ -2086,12 +2086,54 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
 
     if (x_value->type == LP_VALUE_ALGEBRAIC || x_value->type == LP_VALUE_NONE)
     {
+      // We can not substitute so
+      //
+      //   C = a_n * x^n + ... + a_1 * x + a_0
+      //
+      // We substitutie in all a_n obtaining a_k = b_n / m_k, m = lcm(m_1, ..., m_n)
+      //
+      //   m * c = sum     b_k * x^k * m / m_k
+
+      coefficient_construct_rec(ctx, &result, x, size);
+
+      // Compute the evaluation of the coefficients
+      lp_integer_t* m = malloc(sizeof(coefficient_t)*size);
+      for (i = 0; i < size; ++ i) {
+        integer_construct(m + i);
+        coefficient_evaluate_rationals(ctx, COEFF(C, i), M, COEFF(&result, i), m + i);
+      }
+
+      // Compute the lcm of the m's
+      lp_integer_construct_copy(lp_Z, multiplier, m);
+      for (i = 1; i < size; ++ i) {
+        integer_lcm_Z(multiplier, multiplier, m + i);
+      }
+
+      // Sum up
+      lp_integer_t tmp;
+      integer_construct(&tmp);
+      for (i = 0; i < size; ++ i) {
+        // m / m_k
+        integer_div_exact(lp_Z, &tmp, multiplier, m + i);
+        // b_i = b_i * R
+        coefficient_mul_integer(ctx, COEFF(&result, i), COEFF(&result, i), &tmp);
+      }
+      integer_destruct(&tmp);
+
+      // Remove the temps
+      for (i = 0; i < size; ++ i) {
+        integer_destruct(m + i);
+      }
+      free(m);
 
     } else {
 
+      // We have a value value = p/q
       lp_integer_t p, q;
       integer_construct(&p);
       integer_construct(&q);
+      lp_value_get_num(&p, x_value);
+      lp_value_get_den(&q, x_value);
 
       // If we can substitute then
       //
@@ -2104,6 +2146,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
       // We get the m = lcm(m_1, ..., m_n) and get
       //
       //   q^n * m * c = sum     b_k * p^k * q^(n-k) * m / m_k
+
 
       // Compute the evaluation of the coefficients
       coefficient_t* b = malloc(sizeof(coefficient_t)*size);
@@ -2169,7 +2212,5 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
     coefficient_swap(&result, C_out);
     coefficient_destruct(&result);
   }
-
-
 
 }

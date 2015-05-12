@@ -74,3 +74,9 @@ int lp_value_cmp_void(const void* v1, const void* v2);
 
 /** Print the value */
 int lp_value_print(const lp_value_t* v, FILE* out);
+
+/** Get the numerator (only if integer, dyadic rational, or rational) */
+void lp_value_get_num(lp_integer_t* num, const lp_value_t* v);
+
+/** Get the denominator (only if integer, dyadic rational, or rational) */
+void lp_value_get_den(lp_integer_t* den, const lp_value_t* v);

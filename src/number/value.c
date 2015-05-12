@@ -227,3 +227,35 @@ int lp_value_cmp_void(const void* v1, const void* v2) {
   assert(0);
   return v1 == v2;
 }
+
+void lp_value_get_num(lp_integer_t* num, const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    integer_assign(lp_Z, num, &v->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    dyadic_rational_get_num(&v->value.dy_q, num);
+    break;
+  case LP_VALUE_RATIONAL:
+    rational_get_num(&v->value.q, num);
+    break;
+  default:
+    assert(0);
+  }
+}
+
+void lp_value_get_den(lp_integer_t* den, const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    integer_assign_int(lp_Z, den, 1);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    dyadic_rational_get_den(&v->value.dy_q, den);
+    break;
+  case LP_VALUE_RATIONAL:
+    rational_get_den(&v->value.q, den);
+    break;
+  default:
+    assert(0);
+  }
+}

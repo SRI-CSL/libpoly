@@ -115,3 +115,11 @@ void lp_dyadic_rational_pow(lp_dyadic_rational_t* pow, const lp_dyadic_rational_
 void lp_dyadic_rational_div_2exp(lp_dyadic_rational_t* div, const lp_dyadic_rational_t* a, unsigned long n) {
   dyadic_rational_div_2exp(div, a, n);
 }
+
+void lp_dyadic_rational_get_num(const lp_dyadic_rational_t* q, lp_integer_t* num) {
+  dyadic_rational_get_num(q, num);
+}
+
+void lp_dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den) {
+  dyadic_rational_get_den(q, den);
+}
