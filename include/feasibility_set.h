@@ -34,3 +34,9 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
  * Pick a value from the feasible set (must be non-empty).
  */
 lp_value_t* lp_feasibility_set_pick_value(const lp_feasibility_set_t* set);
+
+/**
+ * Print the set.
+ */
+int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out);
+

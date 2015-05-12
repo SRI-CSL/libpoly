@@ -314,7 +314,9 @@ void lp_upolynomial_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t**
 int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_interval_t* ab);
 
 /**
- * Isolate the distinct real roots of the given polynomial.
+ * Isolate the distinct real roots of the given polynomial. Roots should be
+ * an (unconstructed) array of algebraic numbers with size at least
+ * lp_upolynomial_roots_count(p, 0).
  */
 void lp_upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
 

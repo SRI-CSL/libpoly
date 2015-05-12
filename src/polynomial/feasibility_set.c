@@ -12,6 +12,9 @@
 #include "poly.h"
 #include "value.h"
 
+#include "polynomial/polynomial.h"
+#include "utils/debug_trace.h"
+
 /**
  * Represents either an open interval or a point.
  */
@@ -141,14 +144,21 @@ void lp_feasibility_set_delete(lp_feasibility_set_t* set) {
 }
 
 int lp_feasibility_set_is_empty(const lp_feasibility_set_t* set) {
-  return set == 0;
+  return set->size == 0;
 }
 
-lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* p, lp_sign_condition_t sgn_condition, const lp_feasibility_set_t* domain) {
-  (void)p;
-  (void)sgn_condition;
-  (void)domain;
-  return 0;
+int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
+  int ret = 0;
+  size_t i;
+  ret += fprintf(out, "{ ");
+  for(i = 0; i < set->size; ++ i) {
+    if (i) {
+      ret += fprintf(out, ", ");
+    }
+    ret += feasibility_interval_print(&set->intervals[i], out);
+  }
+  ret += fprintf(out, " }");
+  return ret;
 }
 
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value) {

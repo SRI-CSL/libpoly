@@ -5,6 +5,9 @@
  *      Author: dejan
  */
 
+#include "upolynomial.h"
+#include "feasibility_set.h"
+
 #include "polynomial/polynomial.h"
 
 #include "polynomial/gcd.h"
@@ -736,4 +739,87 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
   }
 
   coefficient_factors_destruct(&coeff_factors);
+}
+
+void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_roots_isolate("); lp_polynomial_print(A, trace_out); tracef(")\n");
+  }
+
+  lp_polynomial_external_clean(A);
+
+  // Evaluate in the rationals
+  coefficient_t A_rat;
+  coefficient_construct(A->ctx, &A_rat);
+  coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat);
+
+  // If this is a constant polynomial, no zeroes
+  if (coefficient_is_constant(&A->data)) {
+    *roots_size = 0;
+    return;
+  }
+
+  // If univariate, just isolate the univariate roots
+  if (coefficient_is_univariate(&A_rat)) {
+    // Get the univariate version
+    lp_upolynomial_t* A_rat_u = coefficient_to_univariate(A->ctx, &A_rat);
+    // Make space for the algebraic numbers
+    lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_rat_u)*sizeof(lp_algebraic_number_t));
+    lp_upolynomial_roots_isolate(A_rat_u, algebraic_roots, roots_size);
+    // Copy over the roots
+    size_t i;
+    for (i = 0; i < *roots_size; ++ i) {
+      lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
+      lp_algebraic_number_destruct(algebraic_roots + i);
+    }
+    // Free the temp numbers
+    free(algebraic_roots);
+    // Done
+    return;
+  }
+
+  // Can not evaluate in Q, do the expensive stuff
+
+}
+
+lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef("\n");
+  }
+
+  // Make sure we're in the right order
+  lp_polynomial_external_clean(A);
+
+  // The result
+  lp_feasibility_set_t* result = 0;
+
+  // The degree of the polynomial
+  size_t degree = coefficient_degree(&A->data);
+
+  // Get the roots of the polynomial
+  size_t roots_size;
+  lp_value_t* roots = malloc(sizeof(lp_value_t)*degree);
+  lp_polynomial_roots_isolate(A, M, roots, &roots_size);
+
+  // Free the roots
+  free(roots);
+
+  switch (sgn_condition) {
+  case LP_SGN_LT_0:
+  case LP_SGN_LE_0:
+  case LP_SGN_EQ_0:
+  case LP_SGN_NE_0:
+  case LP_SGN_GT_0:
+  case LP_SGN_GE_0:
+  default:
+    assert(0);
+  }
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_get_feasible_set() => "); lp_feasibility_set_print(result, trace_out); tracef("\n");
+  }
+
+  return result;
 }

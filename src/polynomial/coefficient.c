@@ -417,7 +417,7 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     // Get the value of x
     lp_assignment_get_value_approx(m, VAR(C), &x_value);
 
-    // We compute using powers, just an attemp to compute better. For example
+    // We compute using powers, just an attempt to compute better. For example
     // if p = x^2 + x and x = [-1, 1] then
     //  a) x(x + 1) = [-1, 1]*[0, 2] = [-2, 2]
     //  b) x^2 + x = [0, 1] + [-1, 1] = [-1, 2]
@@ -2058,3 +2058,26 @@ coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C
   }
 }
 
+void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, coefficient_t* C_out, lp_integer_t* multiplier) {
+
+  assert(multiplier);
+
+  lp_variable_t x;
+
+  coefficient_t tmp;
+
+  switch(C->type) {
+  case COEFFICIENT_NUMERIC:
+    // Constants get assigned over
+    coefficient_assign(C_out, C);
+    break;
+  case COEFFICIENT_POLYNOMIAL:
+    x == VAR(C);
+
+
+    break;
+  }
+
+
+
+}

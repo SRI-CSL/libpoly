@@ -215,7 +215,7 @@ void coefficient_factor_square_free_pp(const lp_polynomial_context_t* ctx, const
   coefficient_destruct(&C_d);
 
   if (trace_is_enabled("factorization")) {
-    tracef("upolynomial_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(") = ");
+    tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(") = ");
     coefficient_factors_print(ctx, factors, trace_out); tracef("\n");
   }
 }

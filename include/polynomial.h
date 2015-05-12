@@ -204,9 +204,16 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const l
 void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size);
 
 /**
- * Given a polynomial p, a sign condition, and a domain, the function returns
- * a subset of the domain where the polynomial respects the sign condition.
- * If the the computed feasible set is the whole domain, the return value is 0
- * to indicate that a new feasible set is not necessary.
+ * Given a polynomial p(x1, ..., xn, y) with y being the top variable, and an
+ * assignment M that assigns x1, ..., xn, the function returns the roots of p
+ * at M. The output array should be big enough to fit the root, i.e. at least
+ * the degree of y.
  */
-lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* p, lp_sign_condition_t sgn_condition, const lp_feasibility_set_t* domain);
+void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size);
+
+/**
+ * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a sign
+ * condition, and an assignment M that assigns x1, ..., xn, the function returns
+ * a subset of R where the constraint sgn(p(M(x1), ..., M(xn), y)) = sgn_condition.
+ */
+lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
