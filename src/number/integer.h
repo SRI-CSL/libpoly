@@ -61,6 +61,11 @@ void integer_ring_normalize(lp_int_ring_t* K, lp_integer_t* c) {
 }
 
 static inline
+void integer_construct(lp_integer_t* c) {
+  mpz_init(c);
+}
+
+static inline
 void integer_construct_from_rational(lp_int_ring_t* K, lp_integer_t* c, const lp_rational_t* q) {
   mpz_init(c);
   mpq_get_num(c, q);

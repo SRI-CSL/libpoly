@@ -182,3 +182,14 @@ static inline
 void rational_div_2exp(lp_rational_t* div, const lp_rational_t* a, unsigned n) {
   mpq_div_2exp(div, a, n);
 }
+
+static inline
+void rational_get_num(const lp_rational_t* q, lp_integer_t* num) {
+  mpq_get_num(num, q);
+}
+
+static inline
+void rational_get_den(const lp_rational_t* q, lp_integer_t* den) {
+  mpq_get_den(den, q);
+}
+

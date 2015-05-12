@@ -115,3 +115,11 @@ void lp_rational_div(lp_rational_t* div, const lp_rational_t* a, const lp_ration
 void lp_rational_div_2exp(lp_rational_t* div, const lp_rational_t* a, unsigned n) {
   rational_div_2exp(div, a, n);
 }
+
+void lp_rational_get_num(const lp_rational_t* q, lp_integer_t* num) {
+  rational_get_num(q, num);
+}
+
+void lp_rational_get_den(const lp_rational_t* q, lp_integer_t* den) {
+  rational_get_den(q, den);
+}

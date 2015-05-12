@@ -2061,21 +2061,113 @@ coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C
 void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, coefficient_t* C_out, lp_integer_t* multiplier) {
 
   assert(multiplier);
+  assert(ctx->K == lp_Z);
 
+  size_t i;
   lp_variable_t x;
 
-  coefficient_t tmp;
+  coefficient_t result;
 
-  switch(C->type) {
-  case COEFFICIENT_NUMERIC:
-    // Constants get assigned over
-    coefficient_assign(C_out, C);
-    break;
-  case COEFFICIENT_POLYNOMIAL:
-    x == VAR(C);
+  // Start wit multiplier 1
+  integer_assign_int(lp_Z, multiplier, 1);
 
+  if (C->type == COEFFICIENT_NUMERIC) {
+    // Just a number, we're done
+    coefficient_assign(ctx, C_out, C);
+  } else {
+    assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-    break;
+    // Get the variable and it's value, if any
+    x = VAR(C);
+    const lp_value_t* x_value = lp_assignment_get_value(M, x);
+
+    // The degree of the polynomial
+    size_t size = SIZE(C);
+
+    if (x_value->type == LP_VALUE_ALGEBRAIC || x_value->type == LP_VALUE_NONE)
+    {
+
+    } else {
+
+      lp_integer_t p, q;
+      integer_construct(&p);
+      integer_construct(&q);
+
+      // If we can substitute then
+      //
+      //   C = a_n * (p/q)^n + ... + a_1 * (p/q) + a_0
+      //
+      // We substitutie in all a_n obtaining a_k = b_n / m_k and get
+      //
+      //   q^n * C = b_n * (p^n/m_n) + ... + b_1 * (p*q^n-1/m_1) + b_0 * q^n/m_0
+      //
+      // We get the m = lcm(m_1, ..., m_n) and get
+      //
+      //   q^n * m * c = sum     b_k * p^k * q^(n-k) * m / m_k
+
+      // Compute the evaluation of the coefficients
+      coefficient_t* b = malloc(sizeof(coefficient_t)*size);
+      lp_integer_t* m = malloc(sizeof(coefficient_t)*size);
+      for (i = 0; i < size; ++ i) {
+        coefficient_construct(ctx, b + i);
+        integer_construct(m + i);
+        coefficient_evaluate_rationals(ctx, COEFF(C, i), M, b + i, m + i);
+      }
+
+      // Compute the lcm of the m's
+      lp_integer_t m_lcm;
+      lp_integer_construct_copy(lp_Z, &m_lcm, m);
+      for (i = 1; i < size; ++ i) {
+        integer_lcm_Z(&m_lcm, &m_lcm, m + i);
+      }
+
+      // The powers
+      lp_integer_t p_power, q_power;
+      integer_construct_from_int(lp_Z, &p_power, 1);
+      integer_construct(&q_power);
+      integer_pow(lp_Z, &q_power, &q, size-1);
+
+      // Set the multiplier
+      integer_mul(lp_Z, multiplier, &q_power, &m_lcm);
+
+      // Sum up
+      lp_integer_t R;
+      integer_construct(&R);
+      for (i = 0; i < size; ++ i) {
+        if (i) {
+          // Update powers
+          integer_mul(lp_Z, &p_power, &p_power, &p);
+          integer_div_exact(lp_Z, &q_power, &q_power, &q);
+        }
+        // R = p^i * q^(n-i) * m / m_k
+        integer_div_exact(lp_Z, &R, &m_lcm, m + i);
+        integer_mul(lp_Z, &R, &R, &p_power);
+        integer_mul(lp_Z, &R, &R, &q_power);
+        // b_i = b_i * R
+        coefficient_mul_integer(ctx, b + i, b + i, &R);
+        // Add it
+        coefficient_add(ctx, &result, &result, b + i);
+      }
+      integer_destruct(&R);
+
+      // Remove the temps
+      for (i = 0; i < size; ++ i) {
+        coefficient_destruct(b + i);
+        integer_destruct(m + i);
+      }
+      free(b);
+      free(m);
+      integer_destruct(&m_lcm);
+      integer_destruct(&p);
+      integer_destruct(&q);
+      integer_destruct(&p_power);
+      integer_destruct(&q_power);
+    }
+
+    // Finish up
+    coefficient_normalize(ctx, &result);
+    coefficient_swap(&result, C_out);
+    coefficient_destruct(&result);
   }
 
 

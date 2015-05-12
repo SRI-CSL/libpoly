@@ -54,7 +54,7 @@ int lp_int_ring_print(lp_int_ring_t* K, FILE* out);
 char* lp_int_ring_to_string(lp_int_ring_t* K);
 
 /** Construct a 0 integer. */
-void lp_integer_construct(lp_int_ring_t* K, lp_integer_t* c);
+void lp_integer_construct(lp_integer_t* c);
 
 /**
  * Construct a integer from the given rational x. The rational x must be

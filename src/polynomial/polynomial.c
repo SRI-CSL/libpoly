@@ -751,8 +751,11 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
   // Evaluate in the rationals
   coefficient_t A_rat;
+  lp_integer_t multiplier;
+  integer_construct(&multiplier);
   coefficient_construct(A->ctx, &A_rat);
-  coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat);
+  coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
+  integer_destruct(&multiplier);
 
   // If this is a constant polynomial, no zeroes
   if (coefficient_is_constant(&A->data)) {

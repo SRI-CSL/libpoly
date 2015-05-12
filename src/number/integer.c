@@ -91,8 +91,8 @@ char* lp_int_ring_to_string(lp_int_ring_t* K) {
 
 lp_int_ring_t* lp_Z = 0;
 
-void lp_integer_construct(lp_int_ring_t* K, lp_integer_t* c) {
-  integer_construct_from_int(K, c, 0);
+void lp_integer_construct(lp_integer_t* c) {
+  integer_construct(c);
 }
 
 void lp_integer_construct_from_rational(lp_int_ring_t* K, lp_integer_t* c, const lp_rational_t* q) {
