@@ -16,6 +16,13 @@ void rational_construct(lp_rational_t* q) {
 }
 
 static inline
+void rational_construct_from_div(lp_rational_t* q, const lp_integer_t* num, const lp_integer_t* den) {
+  mpq_init(q);
+  mpq_set_num(q, num);
+  mpq_set_den(q, den);
+}
+
+static inline
 void rational_construct_from_int(lp_rational_t* q, long a, unsigned long b) {
   mpq_init(q);
   mpq_set_si(q, a, b);

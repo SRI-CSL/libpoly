@@ -36,6 +36,11 @@ void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   }
 }
 
+void lp_value_assign(lp_value_t* v, lp_value_type_t type, const void* data) {
+  lp_value_destruct(v);
+  lp_value_construct(v, type, data);
+}
+
 lp_value_t* lp_value_new(lp_value_type_t type, const void* data) {
   lp_value_t* result = malloc(sizeof(lp_value_t));
   lp_value_construct(result, type, data);

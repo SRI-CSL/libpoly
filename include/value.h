@@ -63,6 +63,9 @@ void lp_value_destruct(lp_value_t* v);
 /** Destruct and free the value */
 void lp_value_delete(lp_value_t* v);
 
+/** Assign a to value */
+void lp_value_assign(lp_value_t* v, lp_value_type_t type, const void* data);
+
 /** Get the approximate value */
 void lp_value_approximate(const lp_value_t* v, lp_interval_t* approx);
 

@@ -207,7 +207,8 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
  * Given a polynomial p(x1, ..., xn, y) with y being the top variable, and an
  * assignment M that assigns x1, ..., xn, the function returns the roots of p
  * at M. The output array should be big enough to fit the root, i.e. at least
- * the degree of y.
+ * the degree of y. The array should be unconstructed, but you should destruct it
+ * once done.
  */
 void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size);
 

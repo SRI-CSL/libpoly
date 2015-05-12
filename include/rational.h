@@ -21,6 +21,11 @@
 void lp_rational_construct(lp_rational_t* q);
 
 /**
+ * Construct the rational num/den.
+ */
+void lp_rational_construct_from_div(lp_rational_t* q, const lp_integer_t* num, const lp_integer_t* den);
+
+/**
  * Construct rational a/b.
  */
 void lp_rational_construct_from_int(lp_rational_t* q, long a, unsigned long b);

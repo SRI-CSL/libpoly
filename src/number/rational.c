@@ -11,6 +11,10 @@ void lp_rational_construct(lp_rational_t* q) {
   rational_construct(q);
 }
 
+void lp_rational_construct_from_div(lp_rational_t* q, const lp_integer_t* num, const lp_integer_t* den) {
+  rational_construct_from_div(q, num, den);
+}
+
 void lp_rational_construct_from_int(lp_rational_t* q, long a, unsigned long b) {
   rational_construct_from_int(q, a, b);
 }

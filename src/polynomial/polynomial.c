@@ -14,6 +14,9 @@
 #include "polynomial/factorization.h"
 #include "polynomial/output.h"
 
+#include "number/rational.h"
+#include "number/integer.h"
+
 #include "utils/debug_trace.h"
 
 #include <assert.h>
@@ -755,35 +758,62 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   integer_construct(&multiplier);
   coefficient_construct(A->ctx, &A_rat);
   coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
-  integer_destruct(&multiplier);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_roots_isolate(): rational evaluation: "); coefficient_print(A->ctx, &A_rat, trace_out); tracef("\n");
+  }
 
   // If this is a constant polynomial, no zeroes
   if (coefficient_is_constant(&A->data)) {
+    if (trace_is_enabled("polynomial")) {
+      tracef("polynomial_roots_isolate(): constant, no roots\n");
+    }
     *roots_size = 0;
     return;
   }
 
   // If univariate, just isolate the univariate roots
   if (coefficient_is_univariate(&A_rat)) {
-    // Get the univariate version
-    lp_upolynomial_t* A_rat_u = coefficient_to_univariate(A->ctx, &A_rat);
-    // Make space for the algebraic numbers
-    lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_rat_u)*sizeof(lp_algebraic_number_t));
-    lp_upolynomial_roots_isolate(A_rat_u, algebraic_roots, roots_size);
-    // Copy over the roots
-    size_t i;
-    for (i = 0; i < *roots_size; ++ i) {
-      lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
-      lp_algebraic_number_destruct(algebraic_roots + i);
+    if (trace_is_enabled("polynomial")) {
+      tracef("polynomial_roots_isolate(): univariate, root finding\n");
     }
-    // Free the temp numbers
-    free(algebraic_roots);
-    // Done
-    return;
+
+    // Special case for linear polynomials
+    if (coefficient_degree(&A_rat) == 1) {
+      // A_rat = ax + b => root = -b/a
+      *roots_size = 1;
+      lp_rational_t root;
+      rational_construct_from_div(&root, &COEFF(&A_rat, 0)->value.num, &COEFF(&A_rat, 1)->value.num);
+      rational_neg(&root, &root);
+      lp_value_construct(roots, LP_VALUE_RATIONAL, &root);
+      rational_destruct(&root);
+    } else {
+      // Get the univariate version
+      lp_upolynomial_t* A_rat_u = coefficient_to_univariate(A->ctx, &A_rat);
+      // Make space for the algebraic numbers
+      lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_rat_u) * sizeof(lp_algebraic_number_t));
+      lp_upolynomial_roots_isolate(A_rat_u, algebraic_roots, roots_size);
+      // Copy over the roots
+      size_t i;
+      for (i = 0; i < *roots_size; ++i) {
+        lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
+        lp_algebraic_number_destruct(algebraic_roots + i);
+      }
+      // Free the temps
+      free(algebraic_roots);
+      lp_upolynomial_delete(A_rat_u);
+    }
+  } else {
+    // Can not evaluate in Q, do the expensive stuff
+    if (trace_is_enabled("polynomial")) {
+      tracef("polynomial_roots_isolate(): not univariate\n");
+    }
   }
 
-  // Can not evaluate in Q, do the expensive stuff
 
+  // Remove temps
+  coefficient_destruct(&A_rat);
+  integer_destruct(&multiplier);
 }
 
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
