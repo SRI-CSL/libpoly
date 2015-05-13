@@ -741,3 +741,19 @@ int lp_dyadic_interval_print(const lp_dyadic_interval_t* I, FILE* out) {
   }
   return ret;
 }
+
+int lp_dyadic_interval_is_point(const lp_dyadic_interval_t* I) {
+  return I->is_point;
+}
+
+int lp_interval_is_point(const lp_interval_t* I) {
+  return I->is_point;
+}
+
+const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interval_t* I) {
+  return &I->a;
+}
+
+const lp_rational_t* lp_interval_get_point(const lp_interval_t* I) {
+  return  &I->a;
+}

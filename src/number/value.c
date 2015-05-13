@@ -233,7 +233,22 @@ int lp_value_cmp_void(const void* v1, const void* v2) {
   return v1 == v2;
 }
 
-void lp_value_get_num(lp_integer_t* num, const lp_value_t* v) {
+int lp_value_is_rational(const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+  case LP_VALUE_DYADIC_RATIONAL:
+  case LP_VALUE_RATIONAL:
+    return 1;
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    return lp_dyadic_interval_is_point(&v->value.a.I);
+  default:
+    return 0;
+  }
+}
+
+void lp_value_get_num(const lp_value_t* v, lp_integer_t* num) {
+  assert(lp_value_is_rational(v));
   switch (v->type) {
   case LP_VALUE_INTEGER:
     integer_assign(lp_Z, num, &v->value.z);
@@ -244,12 +259,16 @@ void lp_value_get_num(lp_integer_t* num, const lp_value_t* v) {
   case LP_VALUE_RATIONAL:
     rational_get_num(&v->value.q, num);
     break;
+  case LP_VALUE_ALGEBRAIC:
+    dyadic_rational_get_num(lp_dyadic_interval_get_point(&v->value.a.I), num);
+    break;
   default:
     assert(0);
   }
 }
 
-void lp_value_get_den(lp_integer_t* den, const lp_value_t* v) {
+void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
+  assert(lp_value_is_rational(v));
   switch (v->type) {
   case LP_VALUE_INTEGER:
     integer_assign_int(lp_Z, den, 1);
@@ -259,6 +278,9 @@ void lp_value_get_den(lp_integer_t* den, const lp_value_t* v) {
     break;
   case LP_VALUE_RATIONAL:
     rational_get_den(&v->value.q, den);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    dyadic_rational_get_den(lp_dyadic_interval_get_point(&v->value.a.I), den);
     break;
   default:
     assert(0);

@@ -7,6 +7,7 @@
 
 #include "upolynomial.h"
 #include "feasibility_set.h"
+#include "variable_db.h"
 
 #include "polynomial/polynomial.h"
 
@@ -774,6 +775,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
   // If univariate, just isolate the univariate roots
   if (coefficient_is_univariate(&A_rat)) {
+
     if (trace_is_enabled("polynomial")) {
       tracef("polynomial_roots_isolate(): univariate, root finding\n");
     }
@@ -808,6 +810,63 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     if (trace_is_enabled("polynomial")) {
       tracef("polynomial_roots_isolate(): not univariate\n");
     }
+
+    // Not univariate, A_rat(x, y0, ..., y_n), with x the top variable. We
+    // eliminate the y variables with resolvents of the algebraic numbers to
+    // obtain a univariate polynomial that includes the zeroes of A_rat.
+    // We reverse the order, and just eliminate one-by one, until we reach x
+
+    // The variable
+    lp_variable_t x = VAR(&A_rat);
+    assert(x == VAR(&A->data));
+
+    // Rerder A_rat to A_rat(y_n, ..., y0, x), and then restore the order
+    lp_variable_order_reverse(A->ctx->var_order);
+    coefficient_order(A->ctx, &A_rat);
+
+    // Eliminate all variables
+    for (;;) {
+
+      // If no more variables, it either has no zeroes, or it vanished
+      if (A_rat.type == COEFFICIENT_NUMERIC) {
+        break;
+      }
+
+      // The variable to eliminate
+      lp_variable_t y = VAR(&A_rat);
+
+      // If x, we're done
+      if (y == x) {
+        assert(coefficient_is_univariate(&A_rat));
+        break;
+      }
+
+      // Get the algebraic number of the value of y as a polynomial in y
+      const lp_value_t* y_value = lp_assignment_get_value(M, y);
+      assert(y_value->type == LP_VALUE_ALGEBRAIC);
+      const lp_upolynomial_t* y_upoly = y_value->value.a.f;
+      assert(y_upoly != 0);
+
+      // Make it multivariate
+      coefficient_t y_poly;
+      coefficient_construct_from_univariate(A->ctx, &y_poly, y_upoly, y);
+
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): A_rat = "); coefficient_print(A->ctx, &A_rat, trace_out); tracef("\n");
+        tracef("polynomial_roots_isolate(): resolving out %s\n", lp_variable_db_get_name(A->ctx->var_db, y));
+        tracef("polynomial_roots_isolate(): y_poly = "); coefficient_print(A->ctx, &y_poly, trace_out); tracef("\n");
+      }
+
+      // Resolve
+      coefficient_resultant(A->ctx, &A_rat, &A_rat, &y_poly);
+
+      // Destroy temp
+      coefficient_destruct(&y_poly);
+    }
+
+    // Restore order
+    lp_variable_order_reverse(A->ctx->var_order);
+
   }
 
 

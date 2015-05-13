@@ -78,8 +78,14 @@ int lp_value_cmp_void(const void* v1, const void* v2);
 /** Print the value */
 int lp_value_print(const lp_value_t* v, FILE* out);
 
+/**
+ * Check if the value is a rational number: either an integer, dyadic rational,
+ * a rational, or a algebraic number that has reduced to a point.
+ */
+int lp_value_is_rational(const lp_value_t* v);
+
 /** Get the numerator (only if integer, dyadic rational, or rational) */
-void lp_value_get_num(lp_integer_t* num, const lp_value_t* v);
+void lp_value_get_num(const lp_value_t* v, lp_integer_t* num);
 
 /** Get the denominator (only if integer, dyadic rational, or rational) */
-void lp_value_get_den(lp_integer_t* den, const lp_value_t* v);
+void lp_value_get_den(const lp_value_t* v, lp_integer_t* den);

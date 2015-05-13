@@ -2084,7 +2084,8 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
     // The degree of the polynomial
     size_t size = SIZE(C);
 
-    if (x_value->type == LP_VALUE_ALGEBRAIC || x_value->type == LP_VALUE_NONE)
+    // Check if the value is rational and we can substitute it
+    if (!lp_value_is_rational(x_value))
     {
       // We can not substitute so
       //
@@ -2132,8 +2133,8 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
       lp_integer_t p, q;
       integer_construct(&p);
       integer_construct(&q);
-      lp_value_get_num(&p, x_value);
-      lp_value_get_den(&q, x_value);
+      lp_value_get_num(x_value, &p);
+      lp_value_get_den(x_value, &q);
 
       // If we can substitute then
       //

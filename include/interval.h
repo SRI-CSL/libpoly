@@ -183,3 +183,15 @@ int lp_dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_
 /** Scale the interval by power of 2 */
 void lp_dyadic_interval_scale(lp_dyadic_interval_t* I, int n);
 
+/** Is this interval a point */
+int lp_dyadic_interval_is_point(const lp_dyadic_interval_t* I);
+
+/** Get the point value */
+const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interval_t* I);
+
+/** Is this interval a point */
+int lp_interval_is_point(const lp_interval_t* I);
+
+/** Get the point value */
+const lp_rational_t* lp_interval_get_point(const lp_interval_t* I);
+

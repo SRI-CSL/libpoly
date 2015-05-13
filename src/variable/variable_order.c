@@ -22,6 +22,8 @@ struct lp_variable_order_struct {
   size_t ref_count;
   /** The actual order */
   lp_variable_list_t list;
+  /** We can reverse the order by setting this flag. */
+  int reverse;
 };
 
 void lp_variable_order_construct(lp_variable_order_t* var_order) {
@@ -29,6 +31,12 @@ void lp_variable_order_construct(lp_variable_order_t* var_order) {
   var_order->ref_count = 0;
   // The list
   lp_variable_list_construct(&var_order->list);
+  // Do not reverse
+  var_order->reverse = 0;
+}
+
+void lp_variable_order_reverse(lp_variable_order_t* var_order) {
+  var_order->reverse = var_order->reverse ? 0 : 1;
 }
 
 void lp_variable_order_destruct(lp_variable_order_t* var_order) {
@@ -63,11 +71,19 @@ int lp_variable_order_cmp(const lp_variable_order_t* var_order, lp_variable_t x,
   int x_index = lp_variable_list_index(&self->list, x);
   int y_index = lp_variable_list_index(&self->list, y);
 
+  int cmp = 0;
   if (x_index == y_index) {
-    return ((int) x) - ((int) y);
+    cmp = ((int) x) - ((int) y);
   } else {
-    return x_index - y_index;
+    cmp = x_index - y_index;
   }
+
+  // Reverse if asked
+  if (var_order->reverse) {
+    cmp = -cmp;
+  }
+
+  return cmp;
 }
 
 size_t lp_variable_order_size(const lp_variable_order_t* var_order) {
