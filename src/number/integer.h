@@ -404,3 +404,9 @@ static inline
 void integer_lcm_Z(lp_integer_t* lcm, const lp_integer_t* a, const lp_integer_t* b) {
   mpz_lcm(lcm, a, b);
 }
+
+static inline
+size_t integer_log2(lp_integer_t* a) {
+  assert(integer_sgn(lp_Z, a) > 0);
+  return mpz_sizeinbase(a, 2) - 1;
+}

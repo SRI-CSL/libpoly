@@ -116,7 +116,7 @@ void lp_algebraic_number_refine_with_point(const lp_algebraic_number_t* a_const,
  * reduced to point.
  */
 static inline
-int lp_algebraic_number_refine_const(const lp_algebraic_number_t* a_const) {
+int lp_algebraic_number_refine_const_internal(const lp_algebraic_number_t* a_const) {
 
   if (trace_is_enabled("algebraic_number")) {
     tracef("algebraic_number_refine(");
@@ -167,9 +167,16 @@ int lp_algebraic_number_refine_const(const lp_algebraic_number_t* a_const) {
 
 void lp_algebraic_number_refine(lp_algebraic_number_t* a) {
   if (a->f) {
-    lp_algebraic_number_refine_const(a);
+    lp_algebraic_number_refine_const_internal(a);
   }
 }
+
+void lp_algebraic_number_refine_const(const lp_algebraic_number_t* a) {
+  if (a->f) {
+    lp_algebraic_number_refine_const_internal(a);
+  }
+}
+
 
 /**
  * The "proper" algebraic numberis always a1.
@@ -233,8 +240,8 @@ int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_
       int d1 = 1, d2 = 1;
       while (d1 == d2 && d1 && d2) {
         // They become different when bisection goes different ways
-        d1 = lp_algebraic_number_refine_const(a1);
-        d2 = lp_algebraic_number_refine_const(a2);
+        d1 = lp_algebraic_number_refine_const_internal(a1);
+        d2 = lp_algebraic_number_refine_const_internal(a2);
       }
     }
     lp_upolynomial_delete(gcd);
@@ -296,7 +303,7 @@ int lp_algebraic_number_cmp_integer(const lp_algebraic_number_t* a1, const lp_in
     }
     // Not a zero, so bisect while not outside
     while (cmp == 0) {
-      lp_algebraic_number_refine_const(a1);
+      lp_algebraic_number_refine_const_internal(a1);
       cmp = lp_dyadic_interval_cmp_integer(&a1->I, a2);
     }
     // Return the last compare
@@ -322,7 +329,7 @@ int lp_algebraic_number_cmp_dyadic_rational(const lp_algebraic_number_t* a1, con
     }
     // Not a zero, so bisect while not outside
     while (cmp == 0) {
-      lp_algebraic_number_refine_const(a1);
+      lp_algebraic_number_refine_const_internal(a1);
       cmp = lp_dyadic_interval_cmp_dyadic_rational(&a1->I, a2);
     }
     // Return the last compare
@@ -348,7 +355,7 @@ int lp_algebraic_number_cmp_rational(const lp_algebraic_number_t* a1, const lp_r
     }
     // Not a zero, so bisect while not outside
     while (cmp == 0) {
-      lp_algebraic_number_refine_const(a1);
+      lp_algebraic_number_refine_const_internal(a1);
       cmp = lp_dyadic_interval_cmp_rational(&a1->I, a2);
     }
     // Return the last compare
@@ -400,7 +407,7 @@ double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
   if (interval_size.n < 100) {
     int iterations = 100 - interval_size.n;
     while (a.f && iterations > 0) {
-      lp_algebraic_number_refine_const(&a);
+      lp_algebraic_number_refine_const_internal(&a);
       iterations --;
     }
   }
@@ -564,15 +571,15 @@ void lp_algebraic_number_op(
 
     // If more then one root, we need to refine a and b
     if (f_roots_size > 1) {
-      lp_algebraic_number_refine_const(a);
+      lp_algebraic_number_refine_const_internal(a);
       if (b) {
-        lp_algebraic_number_refine_const(b);
+        lp_algebraic_number_refine_const_internal(b);
       }
       size_t i;
       for (i = 0; i < f_roots_size; ++ i) {
         if ((f_roots + i)->f) {
           // not a point, refine it
-          lp_algebraic_number_refine_const(f_roots + i);
+          lp_algebraic_number_refine_const_internal(f_roots + i);
         }
       }
     }

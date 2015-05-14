@@ -773,6 +773,9 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     return;
   }
 
+  // TODO: normalize A_rat by gcd of coefficients
+  // TODO: factorize
+
   // If univariate, just isolate the univariate roots
   if (coefficient_is_univariate(&A_rat)) {
 
@@ -827,7 +830,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
     // The copy where we compute the resultants
     coefficient_t A_alg;
-    coefficient_construct_copy(A->ctx, &A_alg, A_rat);
+    coefficient_construct_copy(A->ctx, &A_alg, &A_rat);
 
     // Eliminate all variables
     for (;;) {
@@ -883,7 +886,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
       tracef("polynomial_roots_isolate(): A_alg = "); coefficient_print(A->ctx, &A_alg, trace_out); tracef("\n");
     }
 
-    if (coefficient_is_zero(&A_alg)) {
+    if (coefficient_is_zero(A->ctx, &A_alg)) {
       // If A_alg vanished, this might be due to other roots of the defining polynomials.
       // We need to check for this
       if (trace_is_enabled("polynomial")) {
@@ -912,16 +915,16 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
       // Filter any bad roots
       size_t i, to_keep;
       for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
-        if (coefficient_evaluate_sign(A->ctx, &A_rat, M) != 0) {
+        if (coefficient_sgn(A->ctx, &A_rat, M) != 0) {
           if (i != to_keep) {
-            lp_algebraic_number_swap(roots + to_keep, roots + i);
+            lp_algebraic_number_swap(algebraic_roots + to_keep, algebraic_roots + i);
             to_keep ++;
           }
         }
       }
       // Destruct the bad roots
       for (i = to_keep; i < *roots_size; ++ i) {
-        lp_algebraic_number_destruct(roots + i);
+        lp_algebraic_number_destruct(algebraic_roots + i);
       }
       *roots_size = to_keep;
 
@@ -935,8 +938,6 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
       lp_upolynomial_delete(A_alg_u);
 
     }
-
-
 
     // Restore order
     lp_variable_order_reverse(A->ctx->var_order);

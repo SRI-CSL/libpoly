@@ -96,6 +96,11 @@ int lp_interval_contains_zero(const lp_interval_t* I);
 /** Returns the "sign" of the interval: 0 in 0 in I, negative if I < 0, positive if I > 0. */
 int lp_interval_sgn(const lp_interval_t* I);
 
+/** Is this interval a point */
+int lp_interval_is_point(const lp_interval_t* I);
+
+/** Get the point value */
+const lp_rational_t* lp_interval_get_point(const lp_interval_t* I);
 
 
 /** Construct the interval (a, b) */
@@ -189,9 +194,5 @@ int lp_dyadic_interval_is_point(const lp_dyadic_interval_t* I);
 /** Get the point value */
 const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interval_t* I);
 
-/** Is this interval a point */
-int lp_interval_is_point(const lp_interval_t* I);
-
-/** Get the point value */
-const lp_rational_t* lp_interval_get_point(const lp_interval_t* I);
-
+/** Get the size of the interval log value */
+int lp_dyadic_interval_size(const lp_dyadic_interval_t* I);

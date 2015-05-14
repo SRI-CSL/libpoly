@@ -504,54 +504,54 @@ int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rati
 
 
 int lp_interval_contains(const lp_interval_t* I, const lp_rational_t* q) {
-  int cmp_a = rational_cmp(&I->a, q);
+  int cmp_a_q = rational_cmp(&I->a, q);
   if (I->is_point) {
-    return cmp_a == 0;
+    return cmp_a_q == 0;
   }
-  if (I->a_open && !(cmp_a < 0)) return 0;
-  if (!I->a_open && !(cmp_a <= 0)) return 0;
-  int cmp_b = rational_cmp(q, &I->b);
-  if (I->b_open && !(cmp_b < 0)) return 0;
-  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  if (I->a_open && cmp_a_q >= 0) return 0;
+  if (!I->a_open && cmp_a_q > 0) return 0;
+  int cmp_q_b = rational_cmp(q, &I->b);
+  if (I->b_open && cmp_q_b >= 0) return 0;
+  if (!I->b_open && cmp_q_b > 0) return 0;
   return 1;
 }
 
 int lp_dyadic_interval_contains(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
-  int cmp_a = dyadic_rational_cmp(&I->a, q);
+  int cmp_a_q = dyadic_rational_cmp(&I->a, q);
   if (I->is_point) {
-    return cmp_a == 0;
+    return cmp_a_q == 0;
   }
-  if (I->a_open && !(cmp_a < 0)) return 0;
-  if (!I->a_open && !(cmp_a <= 0)) return 0;
-  int cmp_b = dyadic_rational_cmp(q, &I->b);
-  if (I->b_open && !(cmp_b < 0)) return 0;
-  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  if (I->a_open && cmp_a_q >= 0) return 0;
+  if (!I->a_open && cmp_a_q > 0) return 0;
+  int cmp_q_b = dyadic_rational_cmp(q, &I->b);
+  if (I->b_open && cmp_q_b >= 0) return 0;
+  if (!I->b_open && cmp_q_b > 0) return 0;
   return 1;
 }
 
 int lp_interval_contains_zero(const lp_interval_t* I) {
-  int cmp_a = rational_sgn(&I->a);
+  int sgn_a = rational_sgn(&I->a);
   if (I->is_point) {
-    return cmp_a == 0;
+    return sgn_a == 0;
   }
-  if (I->a_open && !(cmp_a < 0)) return 0;
-  if (!I->a_open && !(cmp_a <= 0)) return 0;
-  int cmp_b = rational_sgn(&I->b);
-  if (I->b_open && !(cmp_b < 0)) return 0;
-  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  if (I->a_open && sgn_a >= 0) return 0;
+  if (!I->a_open && sgn_a > 0) return 0;
+  int sgn_b = rational_sgn(&I->b);
+  if (I->b_open && sgn_b <= 0) return 0;
+  if (!I->b_open && sgn_b < 0) return 0;
   return 1;
 }
 
 int lp_dyadic_interval_contains_zero(const lp_dyadic_interval_t* I) {
-  int cmp_a = dyadic_rational_sgn(&I->a);
+  int sgn_a = dyadic_rational_sgn(&I->a);
   if (I->is_point) {
-    return cmp_a == 0;
+    return sgn_a == 0;
   }
-  if (I->a_open && !(cmp_a < 0)) return 0;
-  if (!I->a_open && !(cmp_a <= 0)) return 0;
-  int cmp_b = dyadic_rational_sgn(&I->b);
-  if (I->b_open && !(cmp_b < 0)) return 0;
-  if (!I->b_open && !(cmp_b <= 0)) return 0;
+  if (I->a_open && sgn_a >= 0) return 0;
+  if (!I->a_open && sgn_a > 0) return 0;
+  int sgn_b = dyadic_rational_sgn(&I->b);
+  if (I->b_open && sgn_b < 0) return 0;
+  if (!I->b_open && sgn_b <= 0) return 0;
   return 1;
 }
 
@@ -756,4 +756,13 @@ const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interva
 
 const lp_rational_t* lp_interval_get_point(const lp_interval_t* I) {
   return  &I->a;
+}
+
+int lp_dyadic_interval_size(const lp_dyadic_interval_t* I) {
+  // If point, size is 0
+  if (I->is_point) {
+    return 0;
+  } else {
+    return dyadic_rational_get_distance_size(&I->a, &I->b);
+  }
 }

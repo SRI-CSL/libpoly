@@ -73,6 +73,12 @@ double lp_algebraic_number_to_double(const lp_algebraic_number_t* a);
 /** Refine the number by halfing it's interval. */
 void lp_algebraic_number_refine(lp_algebraic_number_t* a);
 
+/**
+ * Same as above, but const version for convenience: NOT CONST, the number is
+ * the same but internally it might change.
+ */
+void lp_algebraic_number_refine_const(const lp_algebraic_number_t* a);
+
 /** Addition */
 void lp_algebraic_number_add(lp_algebraic_number_t* sum, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 

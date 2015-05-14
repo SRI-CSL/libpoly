@@ -449,27 +449,51 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
   TRACE("coefficient::internal", "coefficient_sgn()\n");
   STAT(coefficient, sgn) ++;
 
+  assert(ctx->K == lp_Z);
+
   int sgn;
 
   if (C->type == COEFFICIENT_NUMERIC) {
-    // For numberic coefficients we're done
-    sgn = integer_sgn(ctx->K, &C->value.num);
+    // For numeric coefficients we're done
+    sgn = integer_sgn(lp_Z, &C->value.num);
   } else {
     assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-    // Approximate the value of C
-    lp_interval_t C_approx;
-    lp_interval_construct_zero(&C_approx);
+    // Try optimisticall to evaluate in the rationals
+    coefficient_t C_rat;
+    coefficient_construct(ctx, &C_rat);
+    lp_integer_t multiplier;
+    integer_construct(&multiplier);
+    coefficient_evaluate_rationals(ctx, C, m, &C_rat, &multiplier);
 
-    // Approximate the value
-    coefficient_value_approx(ctx, C, m, &C_approx);
+    // If constant, we're done
+    if (C_rat.type == COEFFICIENT_NUMERIC) {
+      // val(C) = C_rat/multiplier with multiplier positive
+      sgn = integer_sgn(lp_Z, &C->value.num);
+    } else {
 
-    // Safe to give the sign based on the interval bound
-    assert(C_approx.is_point || !lp_interval_contains_zero(&C_approx));
-    sgn = lp_interval_sgn(&C_approx);
+      // Approximate the value of C_rat
+      lp_interval_t C_rat_approx;
+      lp_interval_construct_zero(&C_rat_approx);
+
+      // Approximate the value by doing interval computation
+      coefficient_value_approx(ctx, C, m, &C_rat_approx);
+
+      if (C_rat_approx.is_point || !lp_interval_contains_zero(&C_rat_approx)) {
+        // Safe to give the sign based on the interval bound
+        sgn = lp_interval_sgn(&C_rat_approx);
+      } else {
+        // We're still not sure, we need to evaluate
+
+      }
+
+      // Destruct temps
+      lp_interval_destruct(&C_rat_approx);
+    }
 
     // Destruct temps
-    lp_interval_destruct(&C_approx);
+    lp_integer_destruct(&multiplier);
+    coefficient_destruct(&C_rat);
   }
 
   return sgn;
@@ -2213,5 +2237,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
     coefficient_swap(&result, C_out);
     coefficient_destruct(&result);
   }
+
+  assert(integer_sgn(lp_Z, multiplier) > 0);
 
 }

@@ -308,3 +308,42 @@ void dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den) {
   integer_assign_int(lp_Z, den, 1);
   integer_mul_pow2(lp_Z, den, den, q->n);
 }
+
+static inline
+int dyadic_rational_get_distance_size(const lp_dyadic_rational_t* lower, const lp_dyadic_rational_t* upper) {
+
+  assert(dyadic_rational_cmp(lower, upper) < 0);
+
+  int size;
+
+  if (lower->n == upper->n) {
+    // size([l/2^n, u/2^n]) = size([l,u]) - n
+    lp_integer_t diff;
+    integer_construct(&diff);
+    integer_sub(lp_Z, &diff, &upper->a, &lower->a);
+    size = integer_log2(&diff);
+    integer_destruct(&diff);
+    size -= lower->n;
+  } else if (lower->n > upper->n) {
+    // n1 > n2
+    // size([l/2^n1, u/2^n2]) = log2( u*2^(n1 - n2) - l) / 2^n1)
+    lp_integer_t diff;
+    integer_construct(&diff);
+    integer_mul_pow2(lp_Z, &diff, &upper->a, lower->n - upper->n);
+    integer_sub(lp_Z, &diff, &diff, &lower->a);
+    size = integer_log2(&diff);
+    size -= lower->n;
+  } else {
+    // n1 < n2
+    // size([l/2^n1, u/2^n2]) = log2( u - l*2^(n2 - n1)) / 2^n2)
+    lp_integer_t diff;
+    integer_construct(&diff);
+    integer_mul_pow2(lp_Z, &diff, &lower->a, upper->n - lower ->n);
+    integer_sub(lp_Z, &diff, &upper->a, &diff);
+    size = integer_log2(&diff);
+    size -= upper->n;
+  }
+
+  return size;
+
+}
