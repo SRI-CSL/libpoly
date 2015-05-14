@@ -806,6 +806,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
       lp_upolynomial_delete(A_rat_u);
     }
   } else {
+
     // Can not evaluate in Q, do the expensive stuff
     if (trace_is_enabled("polynomial")) {
       tracef("polynomial_roots_isolate(): not univariate\n");
@@ -820,24 +821,36 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     lp_variable_t x = VAR(&A_rat);
     assert(x == VAR(&A->data));
 
-    // Rerder A_rat to A_rat(y_n, ..., y0, x), and then restore the order
+    // Rerder to (y_n, ..., y0, x), and then restore the order
     lp_variable_order_reverse(A->ctx->var_order);
     coefficient_order(A->ctx, &A_rat);
+
+    // The copy where we compute the resultants
+    coefficient_t A_alg;
+    coefficient_construct_copy(A->ctx, &A_alg, A_rat);
 
     // Eliminate all variables
     for (;;) {
 
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): A_alg = "); coefficient_print(A->ctx, &A_alg, trace_out); tracef("\n");
+      }
+
       // If no more variables, it either has no zeroes, or it vanished
-      if (A_rat.type == COEFFICIENT_NUMERIC) {
+      if (A_alg.type == COEFFICIENT_NUMERIC) {
         break;
       }
 
       // The variable to eliminate
-      lp_variable_t y = VAR(&A_rat);
+      lp_variable_t y = VAR(&A_alg);
+
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): resolving out %s\n", lp_variable_db_get_name(A->ctx->var_db, y));
+      }
 
       // If x, we're done
       if (y == x) {
-        assert(coefficient_is_univariate(&A_rat));
+        assert(coefficient_is_univariate(&A_alg));
         break;
       }
 
@@ -852,23 +865,86 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
       coefficient_construct_from_univariate(A->ctx, &y_poly, y_upoly, y);
 
       if (trace_is_enabled("polynomial")) {
-        tracef("polynomial_roots_isolate(): A_rat = "); coefficient_print(A->ctx, &A_rat, trace_out); tracef("\n");
-        tracef("polynomial_roots_isolate(): resolving out %s\n", lp_variable_db_get_name(A->ctx->var_db, y));
         tracef("polynomial_roots_isolate(): y_poly = "); coefficient_print(A->ctx, &y_poly, trace_out); tracef("\n");
       }
 
       // Resolve
-      coefficient_resultant(A->ctx, &A_rat, &A_rat, &y_poly);
+      coefficient_resultant(A->ctx, &A_alg, &A_alg, &y_poly);
+
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): resultant done = "); coefficient_print(A->ctx, &A_alg, trace_out); tracef("\n");
+      }
 
       // Destroy temp
       coefficient_destruct(&y_poly);
     }
 
+    if (trace_is_enabled("polynomial")) {
+      tracef("polynomial_roots_isolate(): A_alg = "); coefficient_print(A->ctx, &A_alg, trace_out); tracef("\n");
+    }
+
+    if (coefficient_is_zero(&A_alg)) {
+      // If A_alg vanished, this might be due to other roots of the defining polynomials.
+      // We need to check for this
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): vanished :(\n");
+      }
+    } else if (coefficient_is_constant(&A_alg)) {
+      // If constant, we have no roots
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): no roots, constant\n");
+      }
+      *roots_size = 0;
+    } else {
+
+      // Isolate as univariate, then filter any extra roots obtained from the defining polynomials
+      if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_roots_isolate(): univariate reduct\n");
+      }
+      assert(coefficient_degree(&A_alg) > 1);
+
+      // Get the univariate version
+      lp_upolynomial_t* A_alg_u = coefficient_to_univariate(A->ctx, &A_alg);
+      // Make space for the algebraic numbers
+      lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_alg_u) * sizeof(lp_algebraic_number_t));
+      lp_upolynomial_roots_isolate(A_alg_u, algebraic_roots, roots_size);
+
+      // Filter any bad roots
+      size_t i, to_keep;
+      for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
+        if (coefficient_evaluate_sign(A->ctx, &A_rat, M) != 0) {
+          if (i != to_keep) {
+            lp_algebraic_number_swap(roots + to_keep, roots + i);
+            to_keep ++;
+          }
+        }
+      }
+      // Destruct the bad roots
+      for (i = to_keep; i < *roots_size; ++ i) {
+        lp_algebraic_number_destruct(roots + i);
+      }
+      *roots_size = to_keep;
+
+      // Copy over the roots
+      for (i = 0; i < *roots_size; ++i) {
+        lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
+        lp_algebraic_number_destruct(algebraic_roots + i);
+      }
+      // Free the temps
+      free(algebraic_roots);
+      lp_upolynomial_delete(A_alg_u);
+
+    }
+
+
+
     // Restore order
     lp_variable_order_reverse(A->ctx->var_order);
 
-  }
+    // Remove temps
+    coefficient_destruct(&A_alg);
 
+  }
 
   // Remove temps
   coefficient_destruct(&A_rat);

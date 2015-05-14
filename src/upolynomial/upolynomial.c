@@ -233,6 +233,11 @@ const lp_integer_t* lp_upolynomial_lead_coeff(const lp_upolynomial_t* p) {
   return &p->monomials[p->size-1].coefficient;
 }
 
+const lp_integer_t* lp_upolynomial_const_term(const lp_upolynomial_t* p) {
+  assert(p);
+  return &p->monomials[0].coefficient;
+}
+
 int lp_upolynomial_cmp(const lp_upolynomial_t* p, const lp_upolynomial_t* q) {
   assert(p);
   assert(q);

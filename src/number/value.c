@@ -5,11 +5,12 @@
  *      Author: dejan
  */
 
-#include "number/value.h"
 
 #include <interval.h>
 #include <algebraic_number.h>
+#include <upolynomial.h>
 
+#include "number/value.h"
 #include "number/integer.h"
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
@@ -241,7 +242,16 @@ int lp_value_is_rational(const lp_value_t* v) {
     return 1;
     break;
   case LP_VALUE_ALGEBRAIC:
-    return lp_dyadic_interval_is_point(&v->value.a.I);
+    if (lp_dyadic_interval_is_point(&v->value.a.I)) {
+      // If a point, we're (dyadic) rational
+      return 1;
+    } else if (lp_upolynomial_degree(v->value.a.f) == 1) {
+      // If degree 1, we're directly rational
+      return 1;
+    } else {
+      return 0;
+    }
+    break;
   default:
     return 0;
   }
@@ -260,7 +270,25 @@ void lp_value_get_num(const lp_value_t* v, lp_integer_t* num) {
     rational_get_num(&v->value.q, num);
     break;
   case LP_VALUE_ALGEBRAIC:
-    dyadic_rational_get_num(lp_dyadic_interval_get_point(&v->value.a.I), num);
+    if (lp_dyadic_interval_is_point(&v->value.a.I)) {
+      // It's a point value, so we just get it
+      dyadic_rational_get_num(lp_dyadic_interval_get_point(&v->value.a.I), num);
+    } else {
+      const lp_upolynomial_t* v_poly = v->value.a.f;
+      if (lp_upolynomial_degree(v_poly) == 1) {
+        // p = ax + b = 0 => x = -b/a
+        lp_rational_t value;
+        rational_construct_from_div(&value,
+            /* b */ lp_upolynomial_const_term(v_poly),
+            /* a */ lp_upolynomial_lead_coeff(v_poly)
+            );
+        rational_neg(&value, &value);
+        rational_get_num(&value, num);
+        rational_destruct(&value);
+      } else {
+        assert(0);
+      }
+    }
     break;
   default:
     assert(0);
@@ -280,7 +308,25 @@ void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
     rational_get_den(&v->value.q, den);
     break;
   case LP_VALUE_ALGEBRAIC:
-    dyadic_rational_get_den(lp_dyadic_interval_get_point(&v->value.a.I), den);
+    if (lp_dyadic_interval_is_point(&v->value.a.I)) {
+      // It's a point value, so we just get it
+      dyadic_rational_get_den(lp_dyadic_interval_get_point(&v->value.a.I), den);
+    } else {
+      const lp_upolynomial_t* v_poly = v->value.a.f;
+      if (lp_upolynomial_degree(v_poly) == 1) {
+        // p = ax + b = 0 => x = -b/a
+        lp_rational_t value;
+        rational_construct_from_div(&value,
+            /* b */ lp_upolynomial_const_term(v_poly),
+            /* a */ lp_upolynomial_lead_coeff(v_poly)
+            );
+        rational_neg(&value, &value);
+        rational_get_den(&value, den);
+        rational_destruct(&value);
+      } else {
+        assert(0);
+      }
+    }
     break;
   default:
     assert(0);

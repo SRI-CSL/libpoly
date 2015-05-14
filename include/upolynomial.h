@@ -72,6 +72,12 @@ void lp_upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring_t* K);
 const lp_integer_t* lp_upolynomial_lead_coeff(const lp_upolynomial_t* p);
 
 /**
+ * Returns the constant term of the given polynomial.
+ */
+const lp_integer_t* lp_upolynomial_const_term(const lp_upolynomial_t* p);
+
+
+/**
  * Unpack the polynomial into a dense representation. The out vector is
  * assumed to be large enough, and filled with 0 (only non-zero coefficients
  * will be copied into out).
