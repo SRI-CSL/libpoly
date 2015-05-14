@@ -9,6 +9,7 @@
 #include <upolynomial.h>
 #include <variable_db.h>
 #include <monomial.h>
+#include <variable_list.h>
 
 #include "polynomial/polynomial.h"
 #include "polynomial/coefficient.h"
@@ -18,6 +19,7 @@
 #include "upolynomial/upolynomial.h"
 
 #include "number/integer.h"
+#include "number/rational.h"
 #include "interval/arithmetic.h"
 
 #include <assignment.h>
@@ -442,11 +444,51 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
   }
 }
 
+
+/**
+ * C is an univariate polynomial C(x), we compute a bound L = 1/2^k such that
+ * any root of C(x) that is not zero is outsize of [L, -L].
+ *
+ * If C(x) = c_n x^n + ... + c_1 x + c_0 then the lower bound of on roots is an
+ * upper bound 1/L on roots of C(1/x) = c_n + ... + c0 x^n.
+ *
+ * We compute the upper bound using the Cauchy bound
+ *
+ *   bound = max(|c_0|, ... |c_n|)/c_0
+ *
+ * We take L = 1/bound, and so we compute k = log(max/c0) = log(max) - log(c0)
+ */
+unsigned coefficient_root_lower_bound(const coefficient_t* C) {
+
+  assert(C->type == COEFFICIENT_POLYNOMIAL);
+  assert(coefficient_is_univariate(C));
+
+  unsigned log_c0 = integer_log2_abs(&COEFF(C, 0)->value.num);
+
+  // Get thge max log
+  size_t i;
+  unsigned max_log = log_c0;
+  for (i = 1; i < SIZE(C); ++ i) {
+    assert(COEFF(C, i)->type == COEFFICIENT_NUMERIC);
+    if (!integer_is_zero(lp_Z, &COEFF(C, i)->value.num)) {
+      unsigned current_log = integer_log2_abs(&COEFF(C, i)->value.num);
+      if (current_log > max_log) {
+        max_log = current_log;
+      }
+    }
+  }
+
+  // Return the bound
+  return max_log - log_c0;
+}
+
 STAT_DECLARE(int, coefficient, sgn)
 
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {
 
-  TRACE("coefficient::internal", "coefficient_sgn()\n");
+  if (trace_is_enabled("coefficient::sgn")) {
+    tracef("coefficient_sgn("); coefficient_print(ctx, C, trace_out); tracef("\n");
+  }
   STAT(coefficient, sgn) ++;
 
   assert(ctx->K == lp_Z);
@@ -456,35 +498,212 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
   if (C->type == COEFFICIENT_NUMERIC) {
     // For numeric coefficients we're done
     sgn = integer_sgn(lp_Z, &C->value.num);
+    if (trace_is_enabled("coefficient::sgn")) {
+      tracef("coefficient_sgn(): constant => %d\n", sgn);
+    }
   } else {
     assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-    // Try optimisticall to evaluate in the rationals
+    if (trace_is_enabled("coefficient::sgn")) {
+      tracef("coefficient_sgn(): evaluating in rationals\n");
+    }
+
+    // Try to evaluate in the rationals
     coefficient_t C_rat;
     coefficient_construct(ctx, &C_rat);
     lp_integer_t multiplier;
     integer_construct(&multiplier);
     coefficient_evaluate_rationals(ctx, C, m, &C_rat, &multiplier);
 
+    if (trace_is_enabled("coefficient::sgn")) {
+      tracef("coefficient_sgn(): C_rat = "); coefficient_print(ctx, &C_rat, trace_out); tracef("\n");
+    }
+
     // If constant, we're done
     if (C_rat.type == COEFFICIENT_NUMERIC) {
       // val(C) = C_rat/multiplier with multiplier positive
       sgn = integer_sgn(lp_Z, &C->value.num);
+      if (trace_is_enabled("coefficient::sgn")) {
+        tracef("coefficient_sgn(): constant => %d\n", sgn);
+      }
     } else {
 
       // Approximate the value of C_rat
       lp_interval_t C_rat_approx;
       lp_interval_construct_zero(&C_rat_approx);
 
+      if (trace_is_enabled("coefficient::sgn")) {
+        tracef("coefficient_sgn(): approximating with intervals\n");
+      }
+
       // Approximate the value by doing interval computation
       coefficient_value_approx(ctx, C, m, &C_rat_approx);
+
+      if (trace_is_enabled("coefficient::sgn")) {
+        tracef("coefficient_sgn(): approx => "); lp_interval_print(&C_rat_approx, trace_out); tracef("\n");
+      }
 
       if (C_rat_approx.is_point || !lp_interval_contains_zero(&C_rat_approx)) {
         // Safe to give the sign based on the interval bound
         sgn = lp_interval_sgn(&C_rat_approx);
+        if (trace_is_enabled("coefficient::sgn")) {
+          tracef("coefficient_sgn(): interval is good => %d\n", sgn);
+        }
       } else {
-        // We're still not sure, we need to evaluate
 
+        //
+        // We're still not sure, we need to evaluate the sign using resultants.
+        // We construct the polynomial
+        //
+        //   A(z, x1, ..., xn) = z - C_rat(x1, ..., xn).
+        //
+        // If the value of C_rat is a, and values of x_i is a_i with defining polynomial p_i(x_i)
+        // then we know that
+        //
+        //   B(z) = Resultant(A, p1, ..., pn)
+        //
+        // has a as at least one zero.
+        //
+        // We can estimate the bound L on the smallest root of B, and refine the
+        // evaluation interval until it is either in (-L, L), in which case
+        // it must be 0, or until it doesn't contain 0, in which case we get
+        // the sign.
+        //
+
+        // The temporary variable, we'll be using
+        lp_variable_t z = ctx->var_tmp;
+
+        // A = z - C_rat
+        coefficient_t A;
+        lp_integer_t A_lc;
+        integer_construct_from_int(lp_Z, &A_lc, 1);
+        coefficient_construct_simple(ctx, &A, &A_lc, z, 1);
+        coefficient_sub(ctx, &A, &A, &C_rat);
+        lp_integer_destruct(&A_lc);
+
+        // List of variables in B
+        lp_variable_list_t A_vars;
+        lp_variable_list_construct(&A_vars, 0);
+
+        // Compute B (we keep it in A) by resolving out all the variables except z
+        for (;;) {
+
+          // The variable to resolve
+          lp_variable_t x_i = VAR(&A);
+          if (x_i == z) {
+            // Everything resolved
+            assert(coefficient_is_univariate(&A));
+            break;
+          }
+
+          // Remember the variable
+          lp_variable_list_push(&A_vars, x_i);
+
+          // Get the polynomials
+          const lp_value_t* a_i = lp_assignment_get_value(m, x_i);
+          assert(a_i->type == LP_VALUE_ALGEBRAIC);
+          const lp_upolynomial_t* p_i = a_i->value.a.f;
+          assert(p_i);
+          coefficient_t p_i_multivariate;
+          coefficient_construct_from_univariate(ctx, &p_i_multivariate, p_i, x_i);
+
+          if (trace_is_enabled("coefficient::sgn")) {
+            tracef("coefficient_sgn(): A = "); coefficient_print(ctx, &A, trace_out);
+            tracef("                 : resolving %s with ", lp_variable_db_get_name(ctx->var_db, x_i));
+            coefficient_print(ctx, &p_i_multivariate, trace_out); tracef("\n");
+          }
+
+          // Resolve
+          coefficient_resultant(ctx, &A, &A, &p_i_multivariate);
+
+          if (trace_is_enabled("coefficient::sgn")) {
+            tracef("coefficient_sgn(): A = "); coefficient_print(ctx, &A, trace_out); tracef("\n");
+          }
+
+          // Remove the temp
+          coefficient_destruct(&p_i_multivariate);
+        }
+
+        // Get the lower bound on the roots
+        unsigned k = coefficient_root_lower_bound(&A);
+        // Interval (-L, L)
+        lp_interval_t L_interval;
+        lp_rational_t L, L_neg;
+        rational_construct_from_int(&L, 1, 1);
+        rational_div_2exp(&L, &L, k);
+        rational_construct(&L_neg);
+        rational_neg(&L_neg, &L);
+        lp_interval_construct(&L_interval, &L_neg, 1, &L, 1);
+
+        // Remember the existing intervals so that we can recover later
+        lp_dyadic_interval_t* x_i_intervals = malloc(sizeof(lp_dyadic_interval_t)*A_vars.list_size);
+        size_t i;
+        for (i = 0; i < A_vars.list_size; ++ i) {
+          lp_variable_t x_i = A_vars.list[i];
+          const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
+          if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+            lp_dyadic_interval_construct_copy(x_i_intervals + i, &x_i_value->value.a.I);
+          } else {
+            lp_dyadic_interval_construct_zero(x_i_intervals + i);
+          }
+        }
+
+        // Refine until done, i.e. C_rat_approx = (l, u) not contains 0, or
+        //
+        for (;;) {
+
+          // If a point, we're done
+          if (lp_interval_is_point(&C_rat_approx)) {
+            break;
+          }
+
+          // If no zero in interval, we're done
+          if (!lp_interval_contains_zero(&C_rat_approx)) {
+            break;
+          }
+
+          // If contained in L, or fully out of L, we're also done
+          int contains1 = lp_interval_contains(&L_interval, &C_rat_approx.a);
+          int contains2 = lp_interval_contains(&L_interval, &C_rat_approx.b);
+          if (contains1 && contains1) {
+            assert(lp_interval_contains_zero(&C_rat_approx));
+            break;
+          }
+          if (!contains1 && !contains2) {
+            assert(!lp_interval_contains_zero(&C_rat_approx));
+            break;
+          }
+
+          // Refine the values
+          for (i = 0; i < A_vars.list_size; ++ i) {
+            lp_variable_t x_i = A_vars.list[i];
+            const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
+            if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+              lp_algebraic_number_refine_const(&x_i_value->value.a);
+            }
+          }
+
+          // Approximate the value by doing interval computation
+          coefficient_value_approx(ctx, C, m, &C_rat_approx);
+        }
+
+        // Restore the intervals, and destroy the temps
+        for (i = 0; i < A_vars.list_size; ++ i) {
+          lp_variable_t x_i = A_vars.list[i];
+          const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
+          if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+            lp_algebraic_number_restore_interval_const(&x_i_value->value.a, x_i_intervals + i);
+          }
+          lp_dyadic_interval_destruct(x_i_intervals + i);
+        }
+
+        // Destruct temps
+        free(x_i_intervals);
+        coefficient_destruct(&A);
+        lp_variable_list_destruct(&A_vars);
+        lp_interval_destruct(&L_interval);
+        lp_rational_destruct(&L);
+        lp_rational_destruct(&L_neg);
       }
 
       // Destruct temps

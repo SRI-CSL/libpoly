@@ -25,6 +25,8 @@ struct lp_polynomial_context_struct {
   lp_variable_db_t* var_db;
   /** The order of variables */
   lp_variable_order_t* var_order;
+  /** Temporary variable for internal purposes */
+  lp_variable_t var_tmp;
 };
 
 /** Create a new context and attach. */

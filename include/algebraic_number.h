@@ -79,6 +79,13 @@ void lp_algebraic_number_refine(lp_algebraic_number_t* a);
  */
 void lp_algebraic_number_refine_const(const lp_algebraic_number_t* a);
 
+/** Restore the interval that has been lost due to refinement (be careful) */
+void lp_algebraic_number_restore_interval(lp_algebraic_number_t* a, const lp_dyadic_interval_t* I);
+
+/** Same as above, but const */
+void lp_algebraic_number_restore_interval_const(const lp_algebraic_number_t* a, const lp_dyadic_interval_t* I);
+
+
 /** Addition */
 void lp_algebraic_number_add(lp_algebraic_number_t* sum, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 

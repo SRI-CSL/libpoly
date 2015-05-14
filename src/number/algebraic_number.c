@@ -177,6 +177,13 @@ void lp_algebraic_number_refine_const(const lp_algebraic_number_t* a) {
   }
 }
 
+void lp_algebraic_number_restore_interval(lp_algebraic_number_t* a, const lp_dyadic_interval_t* I) {
+  lp_dyadic_interval_assign(&a->I, I);
+}
+
+void lp_algebraic_number_restore_interval_const(const lp_algebraic_number_t* a_const, const lp_dyadic_interval_t* I) {
+  lp_algebraic_number_restore_interval((lp_algebraic_number_t* ) a_const, I);
+}
 
 /**
  * The "proper" algebraic numberis always a1.

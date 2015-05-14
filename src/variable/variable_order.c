@@ -30,7 +30,7 @@ void lp_variable_order_construct(lp_variable_order_t* var_order) {
   // No-one pointing yet
   var_order->ref_count = 0;
   // The list
-  lp_variable_list_construct(&var_order->list);
+  lp_variable_list_construct(&var_order->list, 1);
   // Do not reverse
   var_order->reverse = 0;
 }

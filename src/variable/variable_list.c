@@ -22,6 +22,7 @@ void lp_variable_list_resize(lp_variable_list_t* list, size_t capacity) {
 static
 void lp_variable_map_resize(lp_variable_list_t* list, size_t capacity) {
   assert(capacity > list->var_to_index_map_capacity);
+  assert(list->keep_var_to_index_map);
   list->var_to_index_map = (int*) realloc(list->var_to_index_map, capacity*sizeof(int));
   size_t i;
   for (i = list->var_to_index_map_capacity; i < capacity; ++ i) {
@@ -30,21 +31,26 @@ void lp_variable_map_resize(lp_variable_list_t* list, size_t capacity) {
   list->var_to_index_map_capacity = capacity;
 }
 
-void lp_variable_list_construct(lp_variable_list_t* list) {
+void lp_variable_list_construct(lp_variable_list_t* list, int keep_var_to_index_map) {
   // The list
   list->list = 0;
   list->list_size = 0;
   list->list_capacity = 0;
   lp_variable_list_resize(list, INITIAL_LIST_SIZE);
   // Map to indices
+  list->keep_var_to_index_map = keep_var_to_index_map;
   list->var_to_index_map = 0;
   list->var_to_index_map_capacity = 0;
-  lp_variable_map_resize(list, INITIAL_MAP_SIZE);
+  if (keep_var_to_index_map) {
+    lp_variable_map_resize(list, INITIAL_MAP_SIZE);
+  }
 }
 
 void lp_variable_list_destruct(lp_variable_list_t* list) {
   free(list->list);
-  free(list->var_to_index_map);
+  if (list->keep_var_to_index_map) {
+    free(list->var_to_index_map);
+  }
 }
 
 size_t lp_variable_list_size(const lp_variable_list_t* list) {
@@ -52,6 +58,7 @@ size_t lp_variable_list_size(const lp_variable_list_t* list) {
 }
 
 int lp_variable_list_index(const lp_variable_list_t* list, lp_variable_t x) {
+  assert(list->keep_var_to_index_map);
   if (x >= list->var_to_index_map_capacity) {
     return -1;
   } else {
@@ -70,18 +77,22 @@ void lp_variable_list_push(lp_variable_list_t* list, lp_variable_t var) {
   if (list->list_size == list->list_capacity) {
     lp_variable_list_resize(list, list->list_capacity*2);
   }
-  if (var >= list->var_to_index_map_capacity) {
+  if (list->keep_var_to_index_map && var >= list->var_to_index_map_capacity) {
     lp_variable_map_resize(list, var+1);
   }
-  assert(list->var_to_index_map[var] == -1);
-  list->var_to_index_map[var] = list->list_size;
+  assert(!list->keep_var_to_index_map || list->var_to_index_map[var] == -1);
+  if (list->keep_var_to_index_map) {
+    list->var_to_index_map[var] = list->list_size;
+  }
   list->list[list->list_size ++] = var;
 }
 
 void lp_variable_list_pop(lp_variable_list_t* list) {
   assert(list->list_size > 0);
   lp_variable_t var = list->list[-- list->list_size];
-  list->var_to_index_map[var] = -1;
+  if (list->keep_var_to_index_map) {
+    list->var_to_index_map[var] = -1;
+  }
 }
 
 lp_variable_t lp_variable_list_top(const lp_variable_list_t* list) {

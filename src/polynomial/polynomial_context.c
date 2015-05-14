@@ -18,6 +18,7 @@ void lp_polynomial_context_construct(lp_polynomial_context_t* ctx, lp_int_ring_t
   ctx->K = K;
   ctx->var_db = var_db;
   ctx->var_order = var_order;
+  ctx->var_tmp = lp_variable_db_new_variable(var_db, "#");
 }
 
 void lp_polynomial_context_attach(lp_polynomial_context_t* ctx) {

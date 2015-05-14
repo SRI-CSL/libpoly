@@ -321,7 +321,7 @@ int dyadic_rational_get_distance_size(const lp_dyadic_rational_t* lower, const l
     lp_integer_t diff;
     integer_construct(&diff);
     integer_sub(lp_Z, &diff, &upper->a, &lower->a);
-    size = integer_log2(&diff);
+    size = integer_log2_abs(&diff);
     integer_destruct(&diff);
     size -= lower->n;
   } else if (lower->n > upper->n) {
@@ -331,7 +331,7 @@ int dyadic_rational_get_distance_size(const lp_dyadic_rational_t* lower, const l
     integer_construct(&diff);
     integer_mul_pow2(lp_Z, &diff, &upper->a, lower->n - upper->n);
     integer_sub(lp_Z, &diff, &diff, &lower->a);
-    size = integer_log2(&diff);
+    size = integer_log2_abs(&diff);
     size -= lower->n;
   } else {
     // n1 < n2
@@ -340,7 +340,7 @@ int dyadic_rational_get_distance_size(const lp_dyadic_rational_t* lower, const l
     integer_construct(&diff);
     integer_mul_pow2(lp_Z, &diff, &lower->a, upper->n - lower ->n);
     integer_sub(lp_Z, &diff, &upper->a, &diff);
-    size = integer_log2(&diff);
+    size = integer_log2_abs(&diff);
     size -= upper->n;
   }
 
