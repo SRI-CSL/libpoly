@@ -160,11 +160,11 @@ int lp_variable_order_contains(lp_variable_order_t* var_order, lp_variable_t x) 
 }
 
 void lp_variable_order_make_top(lp_variable_order_t* var_order, lp_variable_t var) {
-  assert(var_order->top == lp_variable_null);
+  assert(var_order->top == lp_variable_null || var == lp_variable_null);
   var_order->top = var;
 }
 
-void lp_variable_rder_make_bot(lp_variable_order_t* var_order, lp_variable_t var) {
-  assert(var_order->bot == lp_variable_null);
+void lp_variable_order_make_bot(lp_variable_order_t* var_order, lp_variable_t var) {
+  assert(var_order->bot == lp_variable_null || var == lp_variable_null);
   var_order->bot = var;
 }

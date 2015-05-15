@@ -22,6 +22,9 @@
 #include "number/rational.h"
 #include "interval/arithmetic.h"
 
+#include "variable/variable_order.h"
+#include "polynomial/polynomial_context.h"
+
 #include <assignment.h>
 
 #include "utils/debug_trace.h"
@@ -59,20 +62,6 @@ void algebraic_interval_restore(const lp_variable_list_t* var_list, lp_dyadic_in
     lp_dyadic_interval_destruct(cache + i);
   }
   free(cache);
-}
-
-/** Get a temp variable */
-lp_variable_t lp_polynomial_context_get_temp_variable(const lp_polynomial_context_t* ctx_const) {
-  lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
-  return ctx->var_tmp[ctx->var_tmp_size ++];
-}
-
-/** Release the variable (has to be the last one obtained and not released */
-void lp_polynomial_context_release_temp_variable(const lp_polynomial_context_t* ctx_const, lp_variable_t x) {
-  lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
-  assert(ctx->var_tmp_size > 0);
-  ctx->var_tmp_size --;
-  assert(ctx->var_tmp[ctx->var_tmp_size] == x);
 }
 
 
@@ -619,7 +608,6 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
 
         // The temporary variable, we'll be using
         lp_variable_t z = lp_polynomial_context_get_temp_variable(ctx);
-        lp_polynomial_context_release_temp_variable(ctx, z);
 
         // A = z - C_rat
         coefficient_t A;
@@ -727,13 +715,16 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         // Restore the cache (will free the cache)
         algebraic_interval_restore(&C_rat_vars, interval_cache, m);
 
+        // Release the temporary variable
+        lp_polynomial_context_release_temp_variable(ctx, z);
+
         // Destruct temps
         coefficient_destruct(&A);
         lp_variable_list_destruct(&C_rat_vars);
         lp_interval_destruct(&L_interval);
         lp_rational_destruct(&L);
         lp_rational_destruct(&L_neg);
-        lp_polynomial_context_release_temp_variable(ctx, z);
+
       }
 
       // Destruct temps
@@ -2675,12 +2666,12 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
       // The variable
       lp_variable_t x = VAR(&A_rat);
       assert(x == VAR(A));
+
+      // Top variable must be unassigned
       assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
 
-      // Rerder to (y_n, ..., y0, x), and then restore the order
-      if (calls == 1) {
-        lp_variable_order_reverse(ctx->var_order);
-      }
+      // Rerder to (y_n, ..., y0, x) and then restore the order
+      lp_variable_order_make_bot(ctx->var_order, x);
       coefficient_order(ctx, &A_rat);
 
       // The copy where we compute the resultants
@@ -2688,7 +2679,7 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
       coefficient_construct(ctx, &A_alg);
 
       // Resolve algebraic assignments
-      coefficient_resolve_algebraic(ctx, A, M, &A_alg);
+      coefficient_resolve_algebraic(ctx, &A_rat, M, &A_alg);
 
       if (trace_is_enabled("coefficient::roots")) {
         tracef("coefficient_roots_isolate(): A_alg = "); coefficient_print(ctx, &A_alg, trace_out); tracef("\n");
@@ -2736,18 +2727,17 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
           // The new variable
           lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
 
-          // Set the value and add to the order
+          // Set the value
           assert(lp_assignment_get_value(M, y)->type == LP_VALUE_NONE);
           lp_assignment_set_value((lp_assignment_t*) M, y, lc_value);
-          lp_variable_order_push(ctx->var_order, y);
 
-          // Now, do it recursively
+          // Now, do it recursively (restore the order first)
+          lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
+          coefficient_order(ctx, &A_rat);
           coefficient_roots_isolate(ctx, &A_rat, M, roots, roots_size);
 
           // Undo local stuff
           lp_assignment_set_value((lp_assignment_t*) M, y, 0);
-          assert(lp_variable_order_top(ctx->var_order) == y);
-          lp_variable_order_pop(ctx->var_order);
           lp_polynomial_context_release_temp_variable(ctx, y);
           lp_value_delete(lc_value);
         }
@@ -2805,15 +2795,15 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
 
       // Remove temps
       coefficient_destruct(&A_alg);
+
+      // Restore the order (remove x from bottom)
+      lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
     }
   }
 
   // Remove temps
   coefficient_destruct(&A_rat);
   integer_destruct(&multiplier);
-
-  // We're out
-  calls --;
 }
 
 lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {

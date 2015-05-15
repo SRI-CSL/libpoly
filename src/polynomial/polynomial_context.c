@@ -6,8 +6,7 @@
  */
 
 #include <variable_db.h>
-
-#include "polynomial_context.h"
+#include <polynomial_context.h>
 
 #include <stdlib.h>
 #include <assert.h>
@@ -81,4 +80,19 @@ int lp_polynomial_context_equal(const lp_polynomial_context_t* ctx1, const lp_po
   } else {
     return 0;
   }
+}
+
+/** Get a temp variable */
+lp_variable_t lp_polynomial_context_get_temp_variable(const lp_polynomial_context_t* ctx_const) {
+  lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
+  assert(ctx->var_tmp_size < TEMP_VARIABLE_SIZE);
+  return ctx->var_tmp[ctx->var_tmp_size ++];
+}
+
+/** Release the variable (has to be the last one obtained and not released */
+void lp_polynomial_context_release_temp_variable(const lp_polynomial_context_t* ctx_const, lp_variable_t x) {
+  lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
+  assert(ctx->var_tmp_size > 0);
+  ctx->var_tmp_size --;
+  assert(ctx->var_tmp[ctx->var_tmp_size] == x);
 }

@@ -13,4 +13,4 @@
 void lp_variable_order_make_top(lp_variable_order_t* var_order, lp_variable_t var);
 
 /** Make a variable the bottom variable (smaller than anything) */
-void lp_variable_rder_make_bot(lp_variable_order_t* var_order, lp_variable_t var);
+void lp_variable_order_make_bot(lp_variable_order_t* var_order, lp_variable_t var);
