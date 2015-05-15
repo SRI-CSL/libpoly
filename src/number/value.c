@@ -37,14 +37,27 @@ void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   }
 }
 
-void lp_value_assign(lp_value_t* v, lp_value_type_t type, const void* data) {
+void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data) {
   lp_value_destruct(v);
   lp_value_construct(v, type, data);
+}
+
+void lp_value_assign(lp_value_t* v, const lp_value_t* from) {
+  if (v != from) {
+    lp_value_destruct(v);
+    lp_value_construct_copy(v, from);
+  }
 }
 
 lp_value_t* lp_value_new(lp_value_type_t type, const void* data) {
   lp_value_t* result = malloc(sizeof(lp_value_t));
   lp_value_construct(result, type, data);
+  return result;
+}
+
+lp_value_t* lp_value_new_copy(const lp_value_t* from) {
+  lp_value_t* result = malloc(sizeof(lp_value_t));
+  lp_value_construct_copy(result, from);
   return result;
 }
 
@@ -99,21 +112,28 @@ void lp_value_delete(lp_value_t* v) {
 // 1/2^20
 #define LP_VALUE_APPROX_MIN_MAGNITUDE 20
 
-void lp_value_approx(const lp_value_t* v, lp_interval_t* approx) {
+void lp_value_approx(const lp_value_t* v, lp_interval_t* out) {
   int size;
+
+  lp_interval_t approx;
 
   switch (v->type) {
   case LP_VALUE_NONE:
-  case LP_VALUE_INTEGER:
   case LP_VALUE_PLUS_INFINITY:
   case LP_VALUE_MINUS_INFINITY:
     assert(0);
     break;
+  case LP_VALUE_INTEGER: {
+    lp_rational_t point;
+    rational_construct_from_integer(&point, &v->value.z);
+    lp_interval_construct_point(&approx, &point);
+    break;
+  }
   case LP_VALUE_RATIONAL:
-    lp_interval_construct_point(approx, &v->value.q);
+    lp_interval_construct_point(&approx, &v->value.q);
     break;
   case LP_VALUE_DYADIC_RATIONAL:
-    lp_interval_construct_from_dyadic(approx, &v->value.dy_q, 0, &v->value.dy_q, 0);
+    lp_interval_construct_from_dyadic(&approx, &v->value.dy_q, 0, &v->value.dy_q, 0);
     break;
   case LP_VALUE_ALGEBRAIC: {
     // Make sure we're below the given size
@@ -122,10 +142,13 @@ void lp_value_approx(const lp_value_t* v, lp_interval_t* approx) {
       size --;
       lp_algebraic_number_refine_const(&v->value.a);
     }
-    lp_interval_construct_from_dyadic_interval(approx, &v->value.a.I);
+    lp_interval_construct_from_dyadic_interval(&approx, &v->value.a.I);
     break;
   }
   }
+
+  lp_interval_swap(&approx, out);
+  lp_interval_destruct(&approx);
 }
 
 int lp_value_print(const lp_value_t* v, FILE* out) {

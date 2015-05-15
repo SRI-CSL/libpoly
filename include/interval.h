@@ -87,8 +87,20 @@ void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2);
 /** Prints the interval to the given stream. */
 int lp_interval_print(const lp_interval_t* I, FILE* out);
 
-/** Check if the interval contains q */
-int lp_interval_contains(const lp_interval_t* I, const lp_rational_t* q);
+/** Check if the interval contains integer */
+int lp_interval_contains_integer(const lp_interval_t* I, const lp_integer_t* z);
+
+/** Check if the interval contains dyadic rational q */
+int lp_interval_contains_dyadic_rational(const lp_interval_t* I, const lp_dyadic_rational_t* dy_q);
+
+/** Check if the interval contains rational q */
+int lp_interval_contains_rational(const lp_interval_t* I, const lp_rational_t* q);
+
+/** Check if the interval contains the given algebraic */
+int lp_interval_contains_algebraic_number(const lp_interval_t* I, const lp_algebraic_number_t* a);
+
+/** Check if the interval contains the given value */
+int lp_interval_contains_value(const lp_interval_t* I, const lp_value_t* v);
 
 /** Check whether the interval contains 0 */
 int lp_interval_contains_zero(const lp_interval_t* I);
@@ -155,7 +167,7 @@ int lp_dyadic_interval_print(const lp_dyadic_interval_t* I, FILE* out);
 int lp_dyadic_interval_equals(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
 /** Check whether the number q is in the interval I */
-int lp_dyadic_interval_contains(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
+int lp_dyadic_interval_contains_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q);
 
 /** Check whether the interval contains 0 */
 int lp_dyadic_interval_contains_zero(const lp_dyadic_interval_t* I);

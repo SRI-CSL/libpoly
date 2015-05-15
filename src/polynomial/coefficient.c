@@ -40,7 +40,7 @@ lp_dyadic_interval_t* algebraic_interval_remember(const lp_variable_list_t* var_
   for (i = 0; i < var_list->list_size; ++ i) {
     lp_variable_t x_i = var_list->list[i];
     const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
-    if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+    if (!lp_value_is_rational(x_i_value)) {
       lp_dyadic_interval_construct_copy(x_i_intervals + i, &x_i_value->value.a.I);
     } else {
       lp_dyadic_interval_construct_zero(x_i_intervals + i);
@@ -450,7 +450,7 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     lp_interval_construct_zero(&result);
     lp_interval_construct_zero(&tmp1);
     lp_interval_construct_zero(&tmp2);
-    // x_value constructed in get_value_approx
+    lp_interval_construct_zero(&x_value);
 
     // Get the value of x
     lp_assignment_get_value_approx(m, VAR(C), &x_value);
@@ -638,9 +638,8 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
 
           // Get the polynomials
           const lp_value_t* a_i = lp_assignment_get_value(m, x_i);
-          assert(a_i->type == LP_VALUE_ALGEBRAIC);
+          assert(!lp_value_is_rational(a_i));
           const lp_upolynomial_t* p_i = a_i->value.a.f;
-          assert(p_i);
           coefficient_t p_i_multivariate;
           coefficient_construct_from_univariate(ctx, &p_i_multivariate, p_i, x_i);
 
@@ -687,8 +686,8 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           }
 
           // If contained in L, or fully out of L, we're also done
-          int contains_a = lp_interval_contains(&L_interval, &C_rat_approx.a);
-          int contains_b = lp_interval_contains(&L_interval, &C_rat_approx.b);
+          int contains_a = lp_interval_contains_rational(&L_interval, &C_rat_approx.a);
+          int contains_b = lp_interval_contains_rational(&L_interval, &C_rat_approx.b);
           if (contains_a && contains_a) {
             assert(lp_interval_contains_zero(&C_rat_approx));
             break;
@@ -703,7 +702,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           for (i = 0; i < C_rat_vars.list_size; ++ i) {
             lp_variable_t x_i = C_rat_vars.list[i];
             const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
-            if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+            if (!lp_value_is_rational(x_i_value)) {
               lp_algebraic_number_refine_const(&x_i_value->value.a);
             }
           }
@@ -2595,7 +2594,7 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
       break;
     }
 
-    assert(y_value->type == LP_VALUE_ALGEBRAIC);
+    assert(!lp_value_is_rational(y_value));
     const lp_upolynomial_t* y_upoly = y_value->value.a.f;
     assert(y_upoly != 0);
 
@@ -2708,8 +2707,8 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
         //   B = y x^k + ...
         //
         // This polynomial will not vanish by construction since 0 is not a zero
-        // of the polynomial defining a_k (by properties of root isolation, if
-        // its zero, the root is not algebraic).
+        // of the polynomial defining a_k (by properties of root isolation,
+        // defining polynomials are don't have 0 as a root).
         //
 
         // Reduce based on the model
@@ -2808,44 +2807,134 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
 
 lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
 
-  // To evaluate the polynomial C(x1, ..., xn) with values v1, ..., vn
-  // we construct the polynomial
-  //
-  //   A(y, x1, ..., xn) = y - C(x1, ..., xn)
-  //
-  // and resolve out the defining polynomials p1(x1), ..., pn(xn)
+  lp_value_t* result = 0;
 
-  // Get the variable
-  lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
+  // Compute the initial value of the approximation
+  lp_interval_t C_approx;
+  lp_interval_construct_zero(&C_approx);
+  coefficient_value_approx(ctx, C, M, &C_approx);
 
-  coefficient_t A;
-  lp_integer_t one;
-  integer_construct_from_int(lp_Z, &one, 1);
-  coefficient_construct_simple(ctx, &A, &one, y, 1);
-  coefficient_sub(ctx, &A, &A, C);
-  assert(VAR(&A) != y); // y should be the bottom variable
+  if (lp_interval_is_point(&C_approx)) {
+    // If the approximation is a point we're done
+    result = lp_value_new(LP_VALUE_RATIONAL, lp_interval_get_point(&C_approx));
+  } else {
 
-  // Resolve the algebraic numbers
-  coefficient_t A_resolved;
-  coefficient_construct(ctx, &A_resolved);
-  coefficient_resolve_algebraic(ctx, &A, M, &A_resolved);
-  assert(coefficient_is_univariate(&A_resolved));
-  assert(VAR(&A_resolved) == y);
+    //
+    // To evaluate the polynomial C(x1, ..., xn) with values v1, ..., vn
+    // we construct the polynomial
+    //
+    //   A(y, x1, ..., xn) = y - C(x1, ..., xn)
+    //
+    // and resolve out the defining polynomials p1(x1), ..., pn(xn) to get B(y)
+    //
+    // B(y) doesn't  vanish since y has coefficient 1.
+    //
+    // Value of C is one of the roots of B(y). We can isolate the roots and
+    // pick the one that intersects with the approximate value of C.
 
-  size_t A_resolved_deg = coefficient_degree(&A_resolved);
-  lp_value_t* roots = malloc(sizeof(lp_value_t)*A_resolved_deg);
-  size_t roots_size = 0;
+    // Get the variable
+    lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
 
-  // Find the roots of A_resolved
-  coefficient_roots_isolate_univariate(ctx, &A_resolved, roots, &roots_size);
+    coefficient_t A;
+    lp_integer_t one;
+    integer_construct_from_int(lp_Z, &one, 1);
+    coefficient_construct_simple(ctx, &A, &one, y, 1);
+    coefficient_sub(ctx, &A, &A, C);
+    assert(VAR(&A) != y); // y should be the bottom variable
 
-  // Release the variable
-  lp_polynomial_context_release_temp_variable(ctx, y);
+    // Resolve the algebraic numbers
+    coefficient_t B;
+    coefficient_construct(ctx, &B);
+    coefficient_resolve_algebraic(ctx, &A, M, &B);
+    assert(coefficient_is_univariate(&B));
+    assert(VAR(&B) == y);
 
-  // Remove temps
-  integer_destruct(&one);
-  coefficient_destruct(&A);
-  coefficient_destruct(&A_resolved);
+    size_t A_resolved_deg = coefficient_degree(&B);
+    lp_value_t* roots = malloc(sizeof(lp_value_t)*A_resolved_deg);
+    size_t roots_size = 0;
 
-  return 0;
+    // Find the roots of A_resolved
+    coefficient_roots_isolate_univariate(ctx, &B, roots, &roots_size);
+
+    // Cache the variables
+    lp_variable_list_t C_vars;
+    lp_variable_list_construct(&C_vars);
+    coefficient_get_variables(C, &C_vars);
+
+    // Cache the intervals
+    lp_dyadic_interval_t* interval_cache = algebraic_interval_remember(&C_vars, M);
+
+    // Filter the roots until we get only one
+    for (;;) {
+
+      assert(!lp_interval_is_point(&C_approx));
+
+      // Filter
+      size_t i, to_keep;
+      for (i = 0, to_keep = 0; i < roots_size; ++ i) {
+        if (lp_interval_contains_value(&C_approx, roots + i)) {
+          lp_value_assign(roots + to_keep, roots + i);
+          to_keep ++;
+        }
+      }
+      for (i = to_keep; i < roots_size; ++ i) {
+        lp_value_destruct(roots + i);
+      }
+      roots_size = to_keep;
+      assert(roots_size > 0);
+
+      // Did we find it
+      if (roots_size == 1) {
+        break;
+      }
+
+      // Nope, refine
+      for (i = 0; i < C_vars.list_size; ++ i) {
+        lp_variable_t x_i = C_vars.list[i];
+        const lp_value_t* x_i_value = lp_assignment_get_value(M, x_i);
+        if (!lp_value_is_rational(x_i_value)) {
+          lp_algebraic_number_refine_const(&x_i_value->value.a);
+        }
+      }
+
+      // Approximate again
+      coefficient_value_approx(ctx, C, M, &C_approx);
+
+      // If we reduced to a point, we're done
+      if (lp_interval_is_point(&C_approx)) {
+        break;
+      }
+    }
+
+
+    if (lp_interval_is_point(&C_approx)) {
+      // Rational value approximation reduced to
+      result = lp_value_new(LP_VALUE_RATIONAL, &C_approx);
+    } else {
+      // We have the value in roots[0]
+      result = lp_value_new_copy(roots);
+    }
+
+    // Remove the roots
+    assert(roots_size == 1);
+    lp_value_destruct(roots);
+    free(roots);
+
+    // Release the variable
+    lp_polynomial_context_release_temp_variable(ctx, y);
+
+    // Release the cache
+    algebraic_interval_restore(&C_vars, interval_cache, M);
+
+    // Remove temps
+    integer_destruct(&one);
+    coefficient_destruct(&A);
+    coefficient_destruct(&B);
+    lp_variable_list_destruct(&C_vars);
+
+  }
+
+  lp_interval_destruct(&C_approx);
+
+  return result;
 }

@@ -95,7 +95,7 @@ void lp_algebraic_number_collapse_to_point(const lp_algebraic_number_t* a_const,
 static inline
 void lp_algebraic_number_refine_with_point(const lp_algebraic_number_t* a_const, const lp_dyadic_rational_t* q) {
   lp_algebraic_number_t* a = (lp_algebraic_number_t*) a_const;
-  if (a->f && lp_dyadic_interval_contains(&a->I, q)) {
+  if (a->f && lp_dyadic_interval_contains_dyadic_rational(&a->I, q)) {
     // Compute the sign at the left end point
     int a_sgn_at_q = lp_upolynomial_sgn_at_dyadic_rational(a->f, q);
     if (a_sgn_at_q == 0) {

@@ -503,7 +503,35 @@ int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rati
 }
 
 
-int lp_interval_contains(const lp_interval_t* I, const lp_rational_t* q) {
+int lp_interval_contains_integer(const lp_interval_t* I, const lp_integer_t* z) {
+  assert(0);
+  (void)I;
+  (void)z;
+  return 1;
+}
+
+int lp_interval_contains_dyadic_rational(const lp_interval_t* I, const lp_dyadic_rational_t* dy_q) {
+  assert(0);
+  (void)I;
+  (void)dy_q;
+  return 1;
+}
+
+int lp_interval_contains_algebraic_number(const lp_interval_t* I, const lp_algebraic_number_t* a) {
+  assert(0);
+  (void)I;
+  (void)a;
+  return 1;
+}
+
+int lp_interval_contains_value(const lp_interval_t* I, const lp_value_t* v) {
+  assert(0);
+  (void)I;
+  (void)v;
+  return 1;
+}
+
+int lp_interval_contains_rational(const lp_interval_t* I, const lp_rational_t* q) {
   int cmp_a_q = rational_cmp(&I->a, q);
   if (I->is_point) {
     return cmp_a_q == 0;
@@ -516,7 +544,7 @@ int lp_interval_contains(const lp_interval_t* I, const lp_rational_t* q) {
   return 1;
 }
 
-int lp_dyadic_interval_contains(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
+int lp_dyadic_interval_contains_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
   int cmp_a_q = dyadic_rational_cmp(&I->a, q);
   if (I->is_point) {
     return cmp_a_q == 0;
@@ -569,10 +597,10 @@ void lp_dyadic_interval_construct_from_split(lp_dyadic_interval_t* I_left, lp_dy
 
 void lp_dyadic_interval_construct_intersection(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point) {
-    assert(lp_dyadic_interval_contains(I2, &I1->a));
+    assert(lp_dyadic_interval_contains_dyadic_rational(I2, &I1->a));
     lp_dyadic_interval_construct_copy(I, I1);
   } else if (I2->is_point) {
-    assert(lp_dyadic_interval_contains(I1, &I2->a));
+    assert(lp_dyadic_interval_contains_dyadic_rational(I1, &I2->a));
     lp_dyadic_interval_construct_copy(I, I2);
   } else {
     // (   [  )   ]
@@ -658,10 +686,10 @@ int lp_dyadic_interval_equals(const lp_dyadic_interval_t* I1, const lp_dyadic_in
 
 int lp_dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point) {
-    return !lp_dyadic_interval_contains(I2, &I1->a);
+    return !lp_dyadic_interval_contains_dyadic_rational(I2, &I1->a);
   }
   if (I2->is_point) {
-    return !lp_dyadic_interval_contains(I1, &I2->a);
+    return !lp_dyadic_interval_contains_dyadic_rational(I1, &I2->a);
   }
   // ( I1 ) ( I2 ) ?
   int cmp1 = dyadic_rational_cmp(&I1->b, &I2->a);

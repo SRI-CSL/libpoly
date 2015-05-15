@@ -51,11 +51,14 @@ struct lp_value_struct {
 /** Construct a value */
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data);
 
-/** Allocate an construct */
-lp_value_t* lp_value_new(lp_value_type_t type, const void* data);
-
 /** Construct a copy of the given value */
 void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from);
+
+/** Allocate and construct */
+lp_value_t* lp_value_new(lp_value_type_t type, const void* data);
+
+/** Allocate and construc a copy */
+lp_value_t* lp_value_new_copy(const lp_value_t* from);
 
 /** Destruct the value */
 void lp_value_destruct(lp_value_t* v);
@@ -63,8 +66,11 @@ void lp_value_destruct(lp_value_t* v);
 /** Destruct and free the value */
 void lp_value_delete(lp_value_t* v);
 
+/** Assign */
+void lp_value_assign(lp_value_t* v, const lp_value_t* from);
+
 /** Assign a to value */
-void lp_value_assign(lp_value_t* v, lp_value_type_t type, const void* data);
+void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data);
 
 /** Get the approximate value */
 void lp_value_approximate(const lp_value_t* v, lp_interval_t* approx);
