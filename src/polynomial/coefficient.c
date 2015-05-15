@@ -2013,6 +2013,8 @@ STAT_DECLARE(int, coefficient, psc)
 /**
  * (non-optimized) Subresultant algorithm, as described in
  *
+ * TODO: do the optimized version
+ *
  * [2000] Ducos - Optimizations of the subresltant algorithm.
  */
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
