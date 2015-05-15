@@ -18,7 +18,15 @@ void lp_variable_order_attach(lp_variable_order_t* var_order);
 /** Detach an object from this order (frees if refcount = 0) */
 void lp_variable_order_detach(lp_variable_order_t* var_order);
 
-/** Compare two variables */
+/**
+ * Compare two variables:
+ *  * by index in the push order
+ *  * if the variable hasn't been pushed it's index is +inf
+ *  * if indices are the same, compare by variable id
+ *
+ * In polynomial operations, the variables are order so that the highest
+ * variable is the main variable.
+  */
 int lp_variable_order_cmp(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y);
 
 /** Get the size of the order */
@@ -38,9 +46,6 @@ void lp_variable_order_pop(lp_variable_order_t* var_order);
 
 /** Reverse the order. This only affects the compare function, not push and pop */
 void lp_variable_order_reverse(lp_variable_order_t* var_order);
-
-/** Check if the order has been reversed */
-int lp_variable_order_is_reversed(const lp_variable_order_t* var_order);
 
 /** Get the last variable from the list */
 lp_variable_t lp_variable_order_top(const lp_variable_order_t* var_order);

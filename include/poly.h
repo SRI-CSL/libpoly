@@ -29,6 +29,9 @@ typedef __mpz_struct lp_integer_t;
 
 
 typedef size_t lp_variable_t;
+
+#define lp_variable_null ((lp_variable_t)(-1))
+
 typedef struct lp_variable_db_struct lp_variable_db_t;
 typedef struct lp_variable_list_struct lp_variable_list_t;
 typedef struct lp_variable_order_struct lp_variable_order_t;

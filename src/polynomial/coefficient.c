@@ -29,6 +29,38 @@
 
 #include <assert.h>
 
+static
+lp_dyadic_interval_t* algebraic_interval_remember(const lp_variable_list_t* var_list, const lp_assignment_t* m) {
+  // Remember the existing intervals so that we can recover later
+  lp_dyadic_interval_t* x_i_intervals = malloc(sizeof(lp_dyadic_interval_t)*var_list->list_size);
+  size_t i;
+  for (i = 0; i < var_list->list_size; ++ i) {
+    lp_variable_t x_i = var_list->list[i];
+    const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
+    if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+      lp_dyadic_interval_construct_copy(x_i_intervals + i, &x_i_value->value.a.I);
+    } else {
+      lp_dyadic_interval_construct_zero(x_i_intervals + i);
+    }
+  }
+  return x_i_intervals;
+}
+
+static
+void algebraic_interval_restore(const lp_variable_list_t* var_list, lp_dyadic_interval_t* cache, const lp_assignment_t* m) {
+  // Restore the intervals, and destroy the temps
+  size_t i;
+  for (i = 0; i < var_list->list_size; ++ i) {
+    lp_variable_t x_i = var_list->list[i];
+    const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
+    if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
+      lp_algebraic_number_restore_interval_const(&x_i_value->value.a, cache + i);
+    }
+    lp_dyadic_interval_destruct(cache + i);
+  }
+  free(cache);
+}
+
 /** Get a temp variable */
 lp_variable_t lp_polynomial_context_get_temp_variable(const lp_polynomial_context_t* ctx_const) {
   lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
@@ -602,6 +634,9 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         lp_variable_list_construct(&C_rat_vars);
         coefficient_get_variables(&C_rat, &C_rat_vars);
 
+        // Cache the assignment intervals
+        lp_dyadic_interval_t* interval_cache = algebraic_interval_remember(&C_rat_vars, m);
+
         // Compute B (we keep it in A) by resolving out all the variables except z
         for (;;) {
 
@@ -649,19 +684,6 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         rational_neg(&L_neg, &L);
         lp_interval_construct(&L_interval, &L_neg, 1, &L, 1);
 
-        // Remember the existing intervals so that we can recover later
-        lp_dyadic_interval_t* x_i_intervals = malloc(sizeof(lp_dyadic_interval_t)*C_rat_vars.list_size);
-        size_t i;
-        for (i = 0; i < C_rat_vars.list_size; ++ i) {
-          lp_variable_t x_i = C_rat_vars.list[i];
-          const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
-          if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
-            lp_dyadic_interval_construct_copy(x_i_intervals + i, &x_i_value->value.a.I);
-          } else {
-            lp_dyadic_interval_construct_zero(x_i_intervals + i);
-          }
-        }
-
         // Refine until done, i.e. C_rat_approx = (l, u) not contains 0, or
         //
         for (;;) {
@@ -689,6 +711,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           }
 
           // Refine the values
+          size_t i;
           for (i = 0; i < C_rat_vars.list_size; ++ i) {
             lp_variable_t x_i = C_rat_vars.list[i];
             const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
@@ -701,18 +724,10 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           coefficient_value_approx(ctx, C, m, &C_rat_approx);
         }
 
-        // Restore the intervals, and destroy the temps
-        for (i = 0; i < C_rat_vars.list_size; ++ i) {
-          lp_variable_t x_i = C_rat_vars.list[i];
-          const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
-          if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
-            lp_algebraic_number_restore_interval_const(&x_i_value->value.a, x_i_intervals + i);
-          }
-          lp_dyadic_interval_destruct(x_i_intervals + i);
-        }
+        // Restore the cache (will free the cache)
+        algebraic_interval_restore(&C_rat_vars, interval_cache, m);
 
         // Destruct temps
-        free(x_i_intervals);
         coefficient_destruct(&A);
         lp_variable_list_destruct(&C_rat_vars);
         lp_interval_destruct(&L_interval);
@@ -2660,6 +2675,7 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
       // The variable
       lp_variable_t x = VAR(&A_rat);
       assert(x == VAR(A));
+      assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
 
       // Rerder to (y_n, ..., y0, x), and then restore the order
       if (calls == 1) {
@@ -2708,25 +2724,33 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
         // Reduce based on the model
         coefficient_normalize_m(ctx, &A_rat, M);
 
-        // Get the value of the coefficient
-        lp_value_t* lc_value = coefficient_evaluate(ctx, coefficient_lc(&A_rat), M);
-        (void) lc_value;
+        // If A_rat vanishes, there is not zeroes
+        if (coefficient_is_zero(ctx, &A_rat)) {
+          if (trace_is_enabled("coefficient::roots")) {
+            tracef("coefficient_roots_isolate(): truly vanished :)\n");
+          }
+        } else {
+          // Get the value of the coefficient
+          lp_value_t* lc_value = coefficient_evaluate(ctx, coefficient_lc(&A_rat), M);
 
-        // The new variable
-        lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
+          // The new variable
+          lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
 
-        // Set the value of
-        assert(lp_assignment_get_value(M, y)->type == LP_VALUE_NONE);
-        lp_assignment_set_value((lp_assignment_t*) M, y, lc_value);
+          // Set the value and add to the order
+          assert(lp_assignment_get_value(M, y)->type == LP_VALUE_NONE);
+          lp_assignment_set_value((lp_assignment_t*) M, y, lc_value);
+          lp_variable_order_push(ctx->var_order, y);
 
-        // Now, do it recursively
-        coefficient_roots_isolate(ctx, &A_rat, M, roots, roots_size);
+          // Now, do it recursively
+          coefficient_roots_isolate(ctx, &A_rat, M, roots, roots_size);
 
-        // Undo local stuff
-        lp_assignment_set_value((lp_assignment_t*) M, y, 0);
-        lp_polynomial_context_release_temp_variable(ctx, y);
-        lp_value_delete(lc_value);
-
+          // Undo local stuff
+          lp_assignment_set_value((lp_assignment_t*) M, y, 0);
+          assert(lp_variable_order_top(ctx->var_order) == y);
+          lp_variable_order_pop(ctx->var_order);
+          lp_polynomial_context_release_temp_variable(ctx, y);
+          lp_value_delete(lc_value);
+        }
       } else if (coefficient_is_constant(&A_alg)) {
         // If constant, we have no roots
         if (trace_is_enabled("coefficient::roots")) {
@@ -2801,13 +2825,6 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
   //
   // and resolve out the defining polynomials p1(x1), ..., pn(xn)
 
-  // Do we need to reverse the order (unassigned should be bottom)
-  int reverse = !lp_variable_order_is_reversed(ctx->var_order);
-  if (reverse) {
-    lp_variable_order_reverse(ctx->var_order);
-    coefficient_order(ctx, (coefficient_t*) C);
-  }
-
   // Get the variable
   lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
 
@@ -2834,12 +2851,6 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
   // Release the variable
   lp_polynomial_context_release_temp_variable(ctx, y);
-
-  // Undo the reverse, if we didn't do it yet
-  if (reverse) {
-    lp_variable_order_reverse(ctx->var_order);
-    coefficient_order(ctx, (coefficient_t*) C);
-  }
 
   // Remove temps
   integer_destruct(&one);

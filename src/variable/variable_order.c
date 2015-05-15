@@ -5,10 +5,11 @@
  *      Author: dejan
  */
 
-#include <poly.h>
 #include <variable_db.h>
 #include <variable_list.h>
 #include <variable_order.h>
+
+#include "variable/variable_order.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -22,8 +23,10 @@ struct lp_variable_order_struct {
   size_t ref_count;
   /** The actual order */
   lp_variable_list_t list;
-  /** We can reverse the order by setting this flag. */
-  int reverse;
+  /** Special top variable */
+  lp_variable_t top;
+  /** Special bottom variable */
+  lp_variable_t bot;
 };
 
 void lp_variable_order_construct(lp_variable_order_t* var_order) {
@@ -31,16 +34,19 @@ void lp_variable_order_construct(lp_variable_order_t* var_order) {
   var_order->ref_count = 0;
   // The list
   lp_variable_list_construct(&var_order->list);
-  // Do not reverse
-  var_order->reverse = 0;
 }
 
 void lp_variable_order_reverse(lp_variable_order_t* var_order) {
-  var_order->reverse = var_order->reverse ? 0 : 1;
-}
-
-int lp_variable_order_is_reversed(const lp_variable_order_t* var_order) {
-  return var_order->reverse;
+  size_t size = var_order->list.list_size;
+  if (size > 1) {
+    size_t first, last;
+    lp_variable_t* vars = var_order->list.list;
+    for (first = 0, last = size-1; first < last; ++ first, --last) {
+      lp_variable_t tmp = vars[first];
+      vars[first] = vars[last];
+      vars[last] = tmp;
+    }
+  }
 }
 
 void lp_variable_order_destruct(lp_variable_order_t* var_order) {
@@ -72,19 +78,33 @@ lp_variable_order_t* lp_variable_order_new(void) {
 int lp_variable_order_cmp(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y) {
   const lp_variable_order_t* self = (lp_variable_order_t*) var_order;
 
+  if (x == y) {
+    return 0;
+  }
+
+  // if bot is smaller than anything
+  if (x == var_order->bot) { return -1; }
+  if (y == var_order->bot) { return 1;  }
+  if (x == var_order->top) { return 1;  }
+  if (y == var_order->top) { return -1; }
+
+  // Compare indices
   int x_index = lp_variable_list_index(&self->list, x);
   int y_index = lp_variable_list_index(&self->list, y);
 
   int cmp = 0;
   if (x_index == y_index) {
+    // Indices same, just compare the variables
     cmp = ((int) x) - ((int) y);
   } else {
-    cmp = x_index - y_index;
-  }
-
-  // Reverse if asked
-  if (var_order->reverse) {
-    cmp = -cmp;
+    // If a variable doesn't have an index, it's bigger
+    if (x_index == -1) {
+      cmp = 1;
+    } else if (y_index == -1) {
+      cmp = -1;
+    } else {
+      cmp = x_index - y_index;
+    }
   }
 
   return cmp;
@@ -137,4 +157,14 @@ char* lp_variable_order_to_string(const lp_variable_order_t* var_order, const lp
 
 int lp_variable_order_contains(lp_variable_order_t* var_order, lp_variable_t x) {
   return lp_variable_list_index(&var_order->list, x) != -1;
+}
+
+void lp_variable_order_make_top(lp_variable_order_t* var_order, lp_variable_t var) {
+  assert(var_order->top == lp_variable_null);
+  var_order->top = var;
+}
+
+void lp_variable_rder_make_bot(lp_variable_order_t* var_order, lp_variable_t var) {
+  assert(var_order->bot == lp_variable_null);
+  var_order->bot = var;
 }
