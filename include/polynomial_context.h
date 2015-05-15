@@ -25,8 +25,10 @@ struct lp_polynomial_context_struct {
   lp_variable_db_t* var_db;
   /** The order of variables */
   lp_variable_order_t* var_order;
-  /** Temporary variable for internal purposes */
-  lp_variable_t var_tmp;
+  /** Temporary variables for internal purposes */
+  lp_variable_t* var_tmp;
+  /** Size of temporary variables */
+  size_t var_tmp_size;
 };
 
 /** Create a new context and attach. */
@@ -43,3 +45,4 @@ void lp_polynomial_context_detach(lp_polynomial_context_t* ctx);
  * equality and their variable order is identical (pointers)
  */
 int lp_polynomial_context_equal(const lp_polynomial_context_t* ctx1, const lp_polynomial_context_t* ctx2);
+

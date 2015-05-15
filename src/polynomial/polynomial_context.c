@@ -12,13 +12,28 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define TEMP_VARIABLE_SIZE 10
+
+static
 void lp_polynomial_context_construct(lp_polynomial_context_t* ctx, lp_int_ring_t* K, lp_variable_db_t* var_db, lp_variable_order_t* var_order) {
   ctx->ref_count = 0;
   ctx->var_db = var_db;
   ctx->K = K;
   ctx->var_db = var_db;
   ctx->var_order = var_order;
-  ctx->var_tmp = lp_variable_db_new_variable(var_db, "#");
+
+  ctx->var_tmp = malloc(sizeof(lp_variable_t)*TEMP_VARIABLE_SIZE);
+  size_t i;
+  for (i = 0; i < TEMP_VARIABLE_SIZE; ++ i) {
+    char name[10];
+    sprintf(name, "#%zu", i);
+    ctx->var_tmp[i] = lp_variable_db_new_variable(var_db, name);
+  }
+}
+
+static
+void lp_polynomial_context_destruct(lp_polynomial_context_t* ctx) {
+  free(ctx->var_tmp);
 }
 
 void lp_polynomial_context_attach(lp_polynomial_context_t* ctx) {
@@ -47,7 +62,7 @@ void lp_polynomial_context_detach(lp_polynomial_context_t* ctx) {
   assert(ctx->ref_count > 0);
   ctx->ref_count --;
   if (ctx->ref_count == 0) {
-    free(ctx);
+    lp_polynomial_context_destruct(ctx);
   }
 }
 

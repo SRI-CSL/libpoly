@@ -39,6 +39,9 @@ void lp_variable_order_pop(lp_variable_order_t* var_order);
 /** Reverse the order. This only affects the compare function, not push and pop */
 void lp_variable_order_reverse(lp_variable_order_t* var_order);
 
+/** Check if the order has been reversed */
+int lp_variable_order_is_reversed(const lp_variable_order_t* var_order);
+
 /** Get the last variable from the list */
 lp_variable_t lp_variable_order_top(const lp_variable_order_t* var_order);
 

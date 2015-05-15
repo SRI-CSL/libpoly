@@ -134,6 +134,10 @@ void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, 
 /** Get the model-based reductum of the coefficient */
 void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m);
 
+/** Get the model-based reductum of the coefficient */
+void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m);
+
+
 /** Returns true if the coefficient is 0 */
 int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
@@ -148,6 +152,9 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
  * does not contain zero.
  */
 void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_interval_t* value);
+
+/** Evaluates the coefficient in the model. */
+lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M);
 
 /** Returns the sign of the leading coefficient */
 int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C);
@@ -193,7 +200,7 @@ void coefficient_mul_integer(const lp_polynomial_context_t* ctx, coefficient_t* 
 /** Compute P = C * a. */
 void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a);
 
-/** Multiplication with x^n (x should be equal or biggier then top variable of C)  */
+/** Multiplication with x^n (x should be equal or bigger then top variable of C)  */
 void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n);
 
 /** Division with x^n (C should have degree at least n)  */
@@ -289,3 +296,12 @@ void coefficient_add_monomial(const lp_polynomial_context_t* ctx, coefficient_t*
  */
 void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, coefficient_t* C_out, lp_integer_t* multiplier);
 
+/**
+ * Get the variables of the coefficient.
+ */
+void coefficient_get_variables(const coefficient_t* C, lp_variable_list_t* vars);
+
+/**
+ * Isolate the roots.
+ */
+void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size);

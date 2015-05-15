@@ -69,6 +69,9 @@ size_t lp_polynomial_degree(const lp_polynomial_t* A);
 /** Returns the top variable of the polynomial */
 lp_variable_t lp_polynomial_top_variable(const lp_polynomial_t* A);
 
+/** Returns all the variables (it will not clear the output list vars) */
+void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars);
+
 /** Puts the k-th coefficient of A into C */
 void lp_polynomial_get_coefficient(lp_polynomial_t* C, const lp_polynomial_t* A, size_t k);
 

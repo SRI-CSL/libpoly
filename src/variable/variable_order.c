@@ -30,13 +30,17 @@ void lp_variable_order_construct(lp_variable_order_t* var_order) {
   // No-one pointing yet
   var_order->ref_count = 0;
   // The list
-  lp_variable_list_construct(&var_order->list, 1);
+  lp_variable_list_construct(&var_order->list);
   // Do not reverse
   var_order->reverse = 0;
 }
 
 void lp_variable_order_reverse(lp_variable_order_t* var_order) {
   var_order->reverse = var_order->reverse ? 0 : 1;
+}
+
+int lp_variable_order_is_reversed(const lp_variable_order_t* var_order) {
+  return var_order->reverse;
 }
 
 void lp_variable_order_destruct(lp_variable_order_t* var_order) {

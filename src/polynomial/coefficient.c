@@ -29,6 +29,21 @@
 
 #include <assert.h>
 
+/** Get a temp variable */
+lp_variable_t lp_polynomial_context_get_temp_variable(const lp_polynomial_context_t* ctx_const) {
+  lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
+  return ctx->var_tmp[ctx->var_tmp_size ++];
+}
+
+/** Release the variable (has to be the last one obtained and not released */
+void lp_polynomial_context_release_temp_variable(const lp_polynomial_context_t* ctx_const, lp_variable_t x) {
+  lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
+  assert(ctx->var_tmp_size > 0);
+  ctx->var_tmp_size --;
+  assert(ctx->var_tmp[ctx->var_tmp_size] == x);
+}
+
+
 /**
  * Make sure that the coefficient has the given capacity for the given variable.
  * If the polynomial a constant or a polynomial in a smaller variable, we
@@ -571,7 +586,8 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         //
 
         // The temporary variable, we'll be using
-        lp_variable_t z = ctx->var_tmp;
+        lp_variable_t z = lp_polynomial_context_get_temp_variable(ctx);
+        lp_polynomial_context_release_temp_variable(ctx, z);
 
         // A = z - C_rat
         coefficient_t A;
@@ -581,9 +597,10 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         coefficient_sub(ctx, &A, &A, &C_rat);
         lp_integer_destruct(&A_lc);
 
-        // List of variables in B
-        lp_variable_list_t A_vars;
-        lp_variable_list_construct(&A_vars, 0);
+        // List of variables in C_rat;
+        lp_variable_list_t C_rat_vars;
+        lp_variable_list_construct(&C_rat_vars);
+        coefficient_get_variables(&C_rat, &C_rat_vars);
 
         // Compute B (we keep it in A) by resolving out all the variables except z
         for (;;) {
@@ -595,9 +612,6 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
             assert(coefficient_is_univariate(&A));
             break;
           }
-
-          // Remember the variable
-          lp_variable_list_push(&A_vars, x_i);
 
           // Get the polynomials
           const lp_value_t* a_i = lp_assignment_get_value(m, x_i);
@@ -636,10 +650,10 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         lp_interval_construct(&L_interval, &L_neg, 1, &L, 1);
 
         // Remember the existing intervals so that we can recover later
-        lp_dyadic_interval_t* x_i_intervals = malloc(sizeof(lp_dyadic_interval_t)*A_vars.list_size);
+        lp_dyadic_interval_t* x_i_intervals = malloc(sizeof(lp_dyadic_interval_t)*C_rat_vars.list_size);
         size_t i;
-        for (i = 0; i < A_vars.list_size; ++ i) {
-          lp_variable_t x_i = A_vars.list[i];
+        for (i = 0; i < C_rat_vars.list_size; ++ i) {
+          lp_variable_t x_i = C_rat_vars.list[i];
           const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
           if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
             lp_dyadic_interval_construct_copy(x_i_intervals + i, &x_i_value->value.a.I);
@@ -663,20 +677,20 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           }
 
           // If contained in L, or fully out of L, we're also done
-          int contains1 = lp_interval_contains(&L_interval, &C_rat_approx.a);
-          int contains2 = lp_interval_contains(&L_interval, &C_rat_approx.b);
-          if (contains1 && contains1) {
+          int contains_a = lp_interval_contains(&L_interval, &C_rat_approx.a);
+          int contains_b = lp_interval_contains(&L_interval, &C_rat_approx.b);
+          if (contains_a && contains_a) {
             assert(lp_interval_contains_zero(&C_rat_approx));
             break;
           }
-          if (!contains1 && !contains2) {
+          if (!contains_a && !contains_b) {
             assert(!lp_interval_contains_zero(&C_rat_approx));
             break;
           }
 
           // Refine the values
-          for (i = 0; i < A_vars.list_size; ++ i) {
-            lp_variable_t x_i = A_vars.list[i];
+          for (i = 0; i < C_rat_vars.list_size; ++ i) {
+            lp_variable_t x_i = C_rat_vars.list[i];
             const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
             if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
               lp_algebraic_number_refine_const(&x_i_value->value.a);
@@ -688,8 +702,8 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         }
 
         // Restore the intervals, and destroy the temps
-        for (i = 0; i < A_vars.list_size; ++ i) {
-          lp_variable_t x_i = A_vars.list[i];
+        for (i = 0; i < C_rat_vars.list_size; ++ i) {
+          lp_variable_t x_i = C_rat_vars.list[i];
           const lp_value_t* x_i_value = lp_assignment_get_value(m, x_i);
           if (x_i_value->type == LP_VALUE_ALGEBRAIC && !x_i_value->value.a.I.is_point) {
             lp_algebraic_number_restore_interval_const(&x_i_value->value.a, x_i_intervals + i);
@@ -700,10 +714,11 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         // Destruct temps
         free(x_i_intervals);
         coefficient_destruct(&A);
-        lp_variable_list_destruct(&A_vars);
+        lp_variable_list_destruct(&C_rat_vars);
         lp_interval_destruct(&L_interval);
         lp_rational_destruct(&L);
         lp_rational_destruct(&L_neg);
+        lp_polynomial_context_release_temp_variable(ctx, z);
       }
 
       // Destruct temps
@@ -2247,6 +2262,31 @@ coefficient_normalize(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   }
 }
 
+static void
+coefficient_normalize_m(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_assignment_t* m) {
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    assert(C->value.rec.size >= 1);
+    size_t i = C->value.rec.size - 1;
+    // Find the first non-zero coefficient
+    while (i > 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
+      i --;
+      coefficient_assign_int(ctx, COEFF(C, i), 0);
+    }
+    // If a constant, just upgrade it (it could be an actual constant or just
+    // some other polynomial)
+    if (i == 0) {
+      coefficient_t result;
+      coefficient_construct(ctx, &result);
+      coefficient_swap(&result, COEFF(C, 0));
+      coefficient_swap(&result, C);
+      coefficient_destruct(&result);
+    } else {
+      // We are a proper polynomial, set the size
+      C->value.rec.size = i + 1;
+    }
+  }
+}
+
 int
 coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   switch (C->type) {
@@ -2461,4 +2501,350 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
 
   assert(integer_sgn(lp_Z, multiplier) > 0);
 
+}
+
+void coefficient_get_variables(const coefficient_t* C, lp_variable_list_t* vars) {
+  if (C->type != COEFFICIENT_NUMERIC) {
+    // Add the variable, if not already there
+    lp_variable_t x = VAR(C);
+    if (lp_variable_list_index(vars, x) < 0) {
+      lp_variable_list_push(vars, x);
+    }
+    // Add children
+    size_t i;
+    for (i = 0; i < SIZE(C); ++ i) {
+      coefficient_get_variables(COEFF(C, i), vars);
+    }
+  }
+}
+
+/**
+ * Isolate out the roots of a univariate polynomial.
+ */
+static
+void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* A, lp_value_t* roots, size_t* roots_size) {
+
+  if (trace_is_enabled("coefficient::roots")) {
+    tracef("coefficient_roots_isolate(): univariate, root finding\n");
+  }
+
+  // Special case for linear polynomials
+  if (coefficient_degree(A) == 1) {
+    // A_rat = ax + b => root = -b/a
+    *roots_size = 1;
+    lp_rational_t root;
+    rational_construct_from_div(&root, &COEFF(A, 0)->value.num, &COEFF(A, 1)->value.num);
+    rational_neg(&root, &root);
+    lp_value_construct(roots, LP_VALUE_RATIONAL, &root);
+    rational_destruct(&root);
+  } else {
+    // Get the univariate version
+    lp_upolynomial_t* A_u = coefficient_to_univariate(ctx, A);
+    // Make space for the algebraic numbers
+    lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_u) * sizeof(lp_algebraic_number_t));
+    lp_upolynomial_roots_isolate(A_u, algebraic_roots, roots_size);
+    // Copy over the roots
+    size_t i;
+    for (i = 0; i < *roots_size; ++i) {
+      lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
+      lp_algebraic_number_destruct(algebraic_roots + i);
+    }
+    // Free the temps
+    free(algebraic_roots);
+    lp_upolynomial_delete(A_u);
+  }
+}
+
+/**
+ * Resolve out the algebraic numbers assignment.
+ */
+static
+void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* m, coefficient_t* A_alg) {
+
+  coefficient_assign(ctx, A_alg, A);
+
+  // Eliminate all variables
+  for (;;) {
+
+    if (trace_is_enabled("coefficient::roots")) {
+      tracef("coefficient_roots_isolate(): A_alg = "); coefficient_print(ctx, A_alg, trace_out); tracef("\n");
+    }
+
+    // If no more variables, it either has no zeroes, or it vanished
+    if (A_alg->type == COEFFICIENT_NUMERIC) {
+      break;
+    }
+
+    // The variable to eliminate
+    lp_variable_t y = VAR(A_alg);
+
+    if (trace_is_enabled("coefficient::roots")) {
+      tracef("coefficient_roots_isolate(): resolving out %s\n", lp_variable_db_get_name(ctx->var_db, y));
+    }
+
+    // Get the algebraic number of the value of y as a polynomial in y
+    const lp_value_t* y_value = lp_assignment_get_value(m, y);
+    if (y_value->type == LP_VALUE_NONE) {
+      assert(coefficient_is_univariate(A_alg));
+      break;
+    }
+
+    assert(y_value->type == LP_VALUE_ALGEBRAIC);
+    const lp_upolynomial_t* y_upoly = y_value->value.a.f;
+    assert(y_upoly != 0);
+
+    // Make it multivariate
+    coefficient_t y_poly;
+    coefficient_construct_from_univariate(ctx, &y_poly, y_upoly, y);
+
+    if (trace_is_enabled("coefficient::roots")) {
+      tracef("coefficient_roots_isolate(): y_poly = "); coefficient_print(ctx, &y_poly, trace_out); tracef("\n");
+    }
+
+    // Resolve
+    coefficient_resultant(ctx, A_alg, A_alg, &y_poly);
+
+    if (trace_is_enabled("coefficient::roots")) {
+      tracef("coefficient_roots_isolate(): resultant done = "); coefficient_print(ctx, A_alg, trace_out); tracef("\n");
+    }
+
+    // Destroy temp
+    coefficient_destruct(&y_poly);
+  }
+}
+
+
+void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size) {
+
+  // Count recursive calls
+  static int calls = 0;
+  calls ++;
+  assert(calls > 0);
+
+  // Evaluate in the rationals
+  coefficient_t A_rat;
+  lp_integer_t multiplier;
+  integer_construct(&multiplier);
+  coefficient_construct(ctx, &A_rat);
+  coefficient_evaluate_rationals(ctx, A, M, &A_rat, &multiplier);
+
+  if (trace_is_enabled("coefficient::roots")) {
+    tracef("coefficient_roots_isolate(): rational evaluation: "); coefficient_print(ctx, &A_rat, trace_out); tracef("\n");
+  }
+
+  // If this is a constant polynomial, no zeroes
+  if (coefficient_is_constant(&A_rat)) {
+    if (trace_is_enabled("coefficient::roots")) {
+      tracef("coefficient_roots_isolate(): constant, no roots\n");
+    }
+    *roots_size = 0;
+  } else {
+
+    // TODO: normalize A_rat by gcd of coefficients
+
+    // If univariate, just isolate the univariate roots
+    if (coefficient_is_univariate(&A_rat)) {
+      coefficient_roots_isolate_univariate(ctx, &A_rat, roots, roots_size);
+    } else {
+
+      // Can not evaluate in Q, do the expensive stuff
+      if (trace_is_enabled("coefficient::roots")) {
+        tracef("coefficient_roots_isolate(): not univariate\n");
+      }
+
+      // Not univariate, A_rat(x, y0, ..., y_n), with x the top variable. We
+      // eliminate the y variables with resolvents of the algebraic numbers to
+      // obtain a univariate polynomial that includes the zeroes of A_rat.
+      // We reverse the order, and just eliminate one-by one, until we reach x
+
+      // The variable
+      lp_variable_t x = VAR(&A_rat);
+      assert(x == VAR(A));
+
+      // Rerder to (y_n, ..., y0, x), and then restore the order
+      if (calls == 1) {
+        lp_variable_order_reverse(ctx->var_order);
+      }
+      coefficient_order(ctx, &A_rat);
+
+      // The copy where we compute the resultants
+      coefficient_t A_alg;
+      coefficient_construct(ctx, &A_alg);
+
+      // Resolve algebraic assignments
+      coefficient_resolve_algebraic(ctx, A, M, &A_alg);
+
+      if (trace_is_enabled("coefficient::roots")) {
+        tracef("coefficient_roots_isolate(): A_alg = "); coefficient_print(ctx, &A_alg, trace_out); tracef("\n");
+      }
+
+      if (coefficient_is_zero(ctx, &A_alg)) {
+
+        if (trace_is_enabled("coefficient::roots")) {
+          tracef("coefficient_roots_isolate(): vanished :(\n");
+        }
+
+        //
+        // A_alg vanished, but this might be due to other roots of the polynomials
+        // that define the assignment. We will first manually check if the polynomial
+        // A_rat vanishes by trying to evaluate coefficient.
+        //
+        // If A_rat vanishes, we're done, there is no roots.
+        //
+        // If A_rat doesn't vanish, we have that (modulo the assignment)
+        //
+        //    A_rat = c_k x^k + ... + c_0
+        //
+        // If c_k evaluates to a_k, we can extend the assignment with a new
+        // variable y -> a_k and get the roots of the polynomial
+        //
+        //   B = y x^k + ...
+        //
+        // This polynomial will not vanish by construction since 0 is not a zero
+        // of the polynomial defining a_k (by properties of root isolation, if
+        // its zero, the root is not algebraic).
+        //
+
+        // Reduce based on the model
+        coefficient_normalize_m(ctx, &A_rat, M);
+
+        // Get the value of the coefficient
+        lp_value_t* lc_value = coefficient_evaluate(ctx, coefficient_lc(&A_rat), M);
+        (void) lc_value;
+
+        // The new variable
+        lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
+
+        // Set the value of
+        assert(lp_assignment_get_value(M, y)->type == LP_VALUE_NONE);
+        lp_assignment_set_value((lp_assignment_t*) M, y, lc_value);
+
+        // Now, do it recursively
+        coefficient_roots_isolate(ctx, &A_rat, M, roots, roots_size);
+
+        // Undo local stuff
+        lp_assignment_set_value((lp_assignment_t*) M, y, 0);
+        lp_polynomial_context_release_temp_variable(ctx, y);
+        lp_value_delete(lc_value);
+
+      } else if (coefficient_is_constant(&A_alg)) {
+        // If constant, we have no roots
+        if (trace_is_enabled("coefficient::roots")) {
+          tracef("coefficient_roots_isolate(): no roots, constant\n");
+        }
+        *roots_size = 0;
+      } else {
+
+        // Isolate as univariate, then filter any extra roots obtained from the defining polynomials
+        if (trace_is_enabled("coefficient::roots")) {
+          tracef("coefficient_roots_isolate(): univariate reduct\n");
+        }
+        assert(coefficient_degree(&A_alg) > 1);
+
+        // Get the univariate version
+        lp_upolynomial_t* A_alg_u = coefficient_to_univariate(ctx, &A_alg);
+        // Make space for the algebraic numbers
+        lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_alg_u) * sizeof(lp_algebraic_number_t));
+        lp_upolynomial_roots_isolate(A_alg_u, algebraic_roots, roots_size);
+
+        // Filter any bad roots
+        size_t i, to_keep;
+        for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
+          if (coefficient_sgn(ctx, &A_rat, M) != 0) {
+            if (i != to_keep) {
+              lp_algebraic_number_swap(algebraic_roots + to_keep, algebraic_roots + i);
+              to_keep ++;
+            }
+          }
+        }
+        // Destruct the bad roots
+        for (i = to_keep; i < *roots_size; ++ i) {
+          lp_algebraic_number_destruct(algebraic_roots + i);
+        }
+        *roots_size = to_keep;
+
+        // Copy over the roots
+        for (i = 0; i < *roots_size; ++i) {
+          lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
+          lp_algebraic_number_destruct(algebraic_roots + i);
+        }
+        // Free the temps
+        free(algebraic_roots);
+        lp_upolynomial_delete(A_alg_u);
+
+      }
+
+      // Restore order
+      if (calls == 1) {
+        lp_variable_order_reverse(ctx->var_order);
+      }
+
+      // Remove temps
+      coefficient_destruct(&A_alg);
+    }
+  }
+
+  // Remove temps
+  coefficient_destruct(&A_rat);
+  integer_destruct(&multiplier);
+
+  // We're out
+  calls --;
+}
+
+lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
+
+  // To evaluate the polynomial C(x1, ..., xn) with values v1, ..., vn
+  // we construct the polynomial
+  //
+  //   A(y, x1, ..., xn) = y - C(x1, ..., xn)
+  //
+  // and resolve out the defining polynomials p1(x1), ..., pn(xn)
+
+  // Do we need to reverse the order (unassigned should be bottom)
+  int reverse = !lp_variable_order_is_reversed(ctx->var_order);
+  if (reverse) {
+    lp_variable_order_reverse(ctx->var_order);
+    coefficient_order(ctx, (coefficient_t*) C);
+  }
+
+  // Get the variable
+  lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
+
+  coefficient_t A;
+  lp_integer_t one;
+  integer_construct_from_int(lp_Z, &one, 1);
+  coefficient_construct_simple(ctx, &A, &one, y, 1);
+  coefficient_sub(ctx, &A, &A, C);
+  assert(VAR(&A) != y); // y should be the bottom variable
+
+  // Resolve the algebraic numbers
+  coefficient_t A_resolved;
+  coefficient_construct(ctx, &A_resolved);
+  coefficient_resolve_algebraic(ctx, &A, M, &A_resolved);
+  assert(coefficient_is_univariate(&A_resolved));
+  assert(VAR(&A_resolved) == y);
+
+  size_t A_resolved_deg = coefficient_degree(&A_resolved);
+  lp_value_t* roots = malloc(sizeof(lp_value_t)*A_resolved_deg);
+  size_t roots_size = 0;
+
+  // Find the roots of A_resolved
+  coefficient_roots_isolate_univariate(ctx, &A_resolved, roots, &roots_size);
+
+  // Release the variable
+  lp_polynomial_context_release_temp_variable(ctx, y);
+
+  // Undo the reverse, if we didn't do it yet
+  if (reverse) {
+    lp_variable_order_reverse(ctx->var_order);
+    coefficient_order(ctx, (coefficient_t*) C);
+  }
+
+  // Remove temps
+  integer_destruct(&one);
+  coefficient_destruct(&A);
+  coefficient_destruct(&A_resolved);
+
+  return 0;
 }

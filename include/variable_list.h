@@ -9,7 +9,10 @@
 
 #include "poly.h"
 
-/** A list of variable that keeps an index for each variable */
+/**
+ * A list of variable that keeps an index for each variable. We don't expect
+ * too many variables in the database, so we keep a map as an array.
+ */
 struct lp_variable_list_struct {
   /** List of variables in the order */
   lp_variable_t *list;
@@ -21,12 +24,10 @@ struct lp_variable_list_struct {
   int* var_to_index_map;
   /** Size of the variable map */
   size_t var_to_index_map_capacity;
-  /** Do we keep var to index map */
-  int keep_var_to_index_map;
 };
 
 /** Construct a new variable order */
-void lp_variable_list_construct(lp_variable_list_t* list, int keep_var_to_index_map);
+void lp_variable_list_construct(lp_variable_list_t* list);
 
 /** Destruct the variable order */
 void lp_variable_list_destruct(lp_variable_list_t* list);
