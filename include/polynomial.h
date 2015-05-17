@@ -87,8 +87,12 @@ int lp_polynomial_is_constant(const lp_polynomial_t* A);
 /** Returns true if the polynomial is 0 */
 int lp_polynomial_is_zero(const lp_polynomial_t* A);
 
-/** returns the sign of the polynomial in the model */
+/** returns the sign of the polynomial in the model (-1, 0, +1), or -2 if not all variables assigned */
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m);
+
+/** returns the sign of the polynomial in the model */
+lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);
+
 
 /**
  * Compare the two polynomials in the ring. Not necessarily +/- 1, could be

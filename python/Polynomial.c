@@ -13,6 +13,7 @@
 #include "Assignment.h"
 
 #include "utils.h"
+#include "variable_list.h"
 
 #include <structmember.h>
 
@@ -121,6 +122,12 @@ Polynomial_resultant(PyObject* self, PyObject* args);
 static PyObject*
 Polynomial_psc(PyObject* self, PyObject* args);
 
+static PyObject*
+Polynomial_evaluate(PyObject* self, PyObject* args);
+
+static PyObject*
+Polynomial_vars(PyObject* self);
+
 PyMethodDef Polynomial_methods[] = {
     {"degree", (PyCFunction)Polynomial_degree, METH_NOARGS, "Returns the degree of the polynomial in its top variable"},
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
@@ -141,6 +148,8 @@ PyMethodDef Polynomial_methods[] = {
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
     {"psc", (PyCFunction)Polynomial_psc, METH_VARARGS, "Returns the principal subresultant coefficients of the current and given polynomial"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
+    {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
+    {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
     {NULL}  /* Sentinel */
 };
 
@@ -1163,6 +1172,28 @@ Polynomial_coefficients(PyObject* self) {
 }
 
 static PyObject*
+Polynomial_vars(PyObject* self) {
+
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+
+  lp_variable_list_t p_vars;
+  lp_variable_list_construct(&p_vars);
+
+  // Copy the polynomials into a list
+  PyObject* list = PyList_New(p_vars.list_size);
+  size_t i;
+  for (i = 0; i < p_vars.list_size; ++i) {
+    PyObject* c = PyVariable_create(p_vars.list[i]);
+    PyList_SetItem(list, i, c);
+  }
+
+  lp_variable_list_destruct(&p_vars);
+
+  return list;
+}
+
+
+static PyObject*
 Polynomial_reductum(PyObject* self, PyObject* args) {
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   const lp_polynomial_context_t* ctx = lp_polynomial_context(p);
@@ -1211,6 +1242,32 @@ Polynomial_sgn(PyObject* self, PyObject* args) {
 
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+
+  int sgn = lp_polynomial_sgn(p, assignment);
+
+  return PyInt_FromLong(sgn);
+}
+
+
+static PyObject*
+Polynomial_evaluate(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+
+  if (!PyAssignment_CHECK(assignment_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+
+  lp_value_t* value = lp_polynomial_evaluate(p, assignment);
 
   int sgn = lp_polynomial_sgn(p, assignment);
 

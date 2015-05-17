@@ -735,7 +735,10 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
     coefficient_destruct(&C_rat);
   }
 
-  return sgn;
+  if (sgn < 0) { return -1; }
+  if (sgn > 0) { return  1; }
+
+  return 0;
 }
 
 STAT_DECLARE(int, coefficient, lc_sgn)

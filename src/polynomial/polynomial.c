@@ -8,6 +8,7 @@
 #include "upolynomial.h"
 #include "feasibility_set.h"
 #include "variable_db.h"
+#include "variable_list.h"
 
 #include "polynomial/polynomial.h"
 
@@ -168,7 +169,39 @@ int lp_polynomial_is_zero(const lp_polynomial_t* A) {
 }
 
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
+  lp_polynomial_external_clean(A);
+
+  // Check that all variables are assigned
+  lp_variable_list_t A_vars;
+  lp_variable_list_construct(&A_vars);
+  size_t i;
+  for (i = 0; i < A_vars.list_size; ++ i) {
+    lp_variable_t x = A_vars.list[i];
+    if (lp_assignment_get_value(m, x)->type == LP_VALUE_NONE) {
+      return -2;
+    }
+  }
+  lp_variable_list_destruct(&A_vars);
+
   return coefficient_sgn(A->ctx, &A->data, m);
+}
+
+lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m) {
+  lp_polynomial_external_clean(A);
+
+  // Check that all variables are assigned
+  lp_variable_list_t A_vars;
+  lp_variable_list_construct(&A_vars);
+  size_t i;
+  for (i = 0; i < A_vars.list_size; ++ i) {
+    lp_variable_t x = A_vars.list[i];
+    if (lp_assignment_get_value(m, x)->type == LP_VALUE_NONE) {
+      return 0;
+    }
+  }
+  lp_variable_list_destruct(&A_vars);
+
+  return coefficient_evaluate(A->ctx, &A->data, m);
 }
 
 int lp_polynomial_cmp(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {

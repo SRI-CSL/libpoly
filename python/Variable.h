@@ -33,3 +33,6 @@ void Variable_init_default_db(void);
 
 /** Get the variable database */
 lp_variable_db_t* Variable_get_default_db(void);
+
+/** Create a variable object */
+PyObject* PyVariable_create(lp_variable_t x);
