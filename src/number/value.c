@@ -110,7 +110,7 @@ void lp_value_delete(lp_value_t* v) {
 }
 
 // 1/2^20
-#define LP_VALUE_APPROX_MIN_MAGNITUDE 20
+#define LP_VALUE_APPROX_MIN_MAGNITUDE -20
 
 void lp_value_approx(const lp_value_t* v, lp_interval_t* out) {
   int size;

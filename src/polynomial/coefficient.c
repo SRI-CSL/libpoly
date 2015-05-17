@@ -438,6 +438,10 @@ int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* 
 
 void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_interval_t* value) {
 
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_value_approx("); coefficient_print(ctx, C, trace_out); tracef(")\n");
+  }
+
   if (C->type == COEFFICIENT_NUMERIC) {
     lp_interval_t result;
     lp_interval_construct_from_integer(&result, &C->value.num, 0, &C->value.num, 0);
@@ -452,8 +456,18 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     lp_interval_construct_zero(&tmp2);
     lp_interval_construct_zero(&x_value);
 
-    // Get the value of x
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_value_approx(): x = %s\n", lp_variable_db_get_name(ctx->var_db, VAR(C)));
+    }
+
     lp_assignment_get_value_approx(m, VAR(C), &x_value);
+
+    // Get the value of x
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_value_approx(): x_value = ");
+      lp_interval_print(&x_value, trace_out);
+      tracef("\n");
+    }
 
     // We compute using powers, just an attempt to compute better. For example
     // if p = x^2 + x and x = [-1, 1] then
@@ -478,6 +492,11 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     lp_interval_destruct(&tmp2);
     lp_interval_destruct(&result);
   }
+
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_value_approx() => "); lp_interval_print(value, trace_out); tracef("\n");
+  }
+
 }
 
 
@@ -2393,7 +2412,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
       //
       //   C = a_n * x^n + ... + a_1 * x + a_0
       //
-      // We substitutie in all a_n obtaining a_k = b_n / m_k, m = lcm(m_1, ..., m_n)
+      // We substitute in all a_n obtaining a_k = b_n / m_k, m = lcm(m_1, ..., m_n)
       //
       //   m * c = sum     b_k * x^k * m / m_k
 

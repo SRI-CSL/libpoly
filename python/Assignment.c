@@ -8,6 +8,7 @@
 #include "Assignment.h"
 #include "Variable.h"
 #include "utils.h"
+#include "AlgebraicNumber.h"
 
 #include <structmember.h>
 
@@ -196,6 +197,12 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           lp_value_destruct(&value);
           lp_dyadic_rational_destruct(&value_dyrat);
           lp_integer_destruct(&value_int);
+          Py_RETURN_NONE;
+        } else if (PyAlgebraicNumber_CHECK(value_obj)) {
+          lp_value_t value;
+          lp_value_construct(&value, LP_VALUE_ALGEBRAIC, &((AlgebraicNumber*) value_obj)->a);
+          lp_assignment_set_value(a->assignment, var->x, &value);
+          lp_value_destruct(&value);
           Py_RETURN_NONE;
         } else {
           Py_INCREF(Py_NotImplemented);

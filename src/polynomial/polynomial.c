@@ -168,6 +168,19 @@ int lp_polynomial_is_zero(const lp_polynomial_t* A) {
   return coefficient_is_zero(A->ctx, &A->data);
 }
 
+int lp_polynomial_is_univariate(const lp_polynomial_t* A) {
+  return coefficient_is_univariate(&A->data);
+}
+
+lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
+  if (!coefficient_is_univariate(&A->data)) {
+    return 0;
+  } else {
+    return coefficient_to_univariate(A->ctx, &A->data);
+  }
+}
+
+
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
 

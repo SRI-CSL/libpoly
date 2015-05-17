@@ -7,6 +7,7 @@
 
 #include "AlgebraicNumber.h"
 #include "UPolynomial.h"
+#include "Polynomial.h"
 
 #include <structmember.h>
 
@@ -181,7 +182,34 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
   if (PyTuple_Check(args) && PyTuple_Size(args) == 2) {
     PyObject* f_obj = PyTuple_GetItem(args, 0);
     PyObject* root_index_obj = PyTuple_GetItem(args, 1);
-    if (PyUPolynomial_CHECK(f_obj) && PyInt_Check(root_index_obj)) {
+    if (PyPolynomial_CHECK(f_obj) && PyInt_Check(root_index_obj)) {
+      // Get the polynomial
+      lp_polynomial_t* f = ((Polynomial*) f_obj)->p;
+      long root_index = PyInt_AsLong(root_index_obj);
+      // Get the univariate polynomial
+      lp_upolynomial_t* f_u = lp_polynomial_to_univariate(f);
+      if (f_u == 0) {
+        // Not univariate
+        return -1;
+      }
+      // Check the roots
+      size_t roots_count = lp_upolynomial_roots_count(f_u, 0);
+      if (root_index < 0 || root_index >= roots_count) {
+        // Not enough roots
+        lp_upolynomial_delete(f_u);
+        return -1;
+      }
+      lp_algebraic_number_t* roots = malloc(roots_count * sizeof(lp_algebraic_number_t));
+      lp_upolynomial_roots_isolate(f_u, roots, &roots_count);
+      lp_algebraic_number_destruct(&self->a);
+      lp_algebraic_number_construct_copy(&self->a, roots + root_index);
+      int i;
+      for (i = 0; i < roots_count; ++ i) {
+        lp_algebraic_number_destruct(roots + i);
+      }
+      lp_upolynomial_delete(f_u);
+      free(roots);
+    } else if (PyUPolynomial_CHECK(f_obj) && PyInt_Check(root_index_obj)) {
       lp_upolynomial_t* f = ((UPolynomialObject*) f_obj)->p;
       long root_index = PyInt_AsLong(root_index_obj);
       size_t roots_count = lp_upolynomial_roots_count(f, 0);
@@ -194,11 +222,11 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       lp_algebraic_number_destruct(&self->a);
       lp_algebraic_number_construct_copy(&self->a, roots + root_index);
       int i;
-      for (i = 0; i < roots_count; ++ i) {
+      for (i = 0; i < roots_count; ++i) {
         lp_algebraic_number_destruct(roots + i);
       }
       free(roots);
-    } else {
+    } else{
       return -1;
     }
   } else {

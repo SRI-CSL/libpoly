@@ -46,23 +46,25 @@ void interval_add(lp_interval_t* S, const lp_interval_t* I1, const lp_interval_t
     return;
   }
 
+  lp_interval_t result;
+
   if (I1->is_point) {
-    // Just shift by I1->a
-    lp_interval_assign(S, I2);
-    rational_add(&S->a, &S->a, &I1->a);
-    rational_add(&S->b, &S->b, &I1->a);
-    return;
+    // Just shift by I1->a (I2 is not a point)
+    lp_interval_construct_copy(&result, I2);
+    rational_add(&result.a, &result.a, &I1->a);
+    rational_add(&result.b, &result.b, &I1->a);
+  } else {
+    // [a, b] + [c, d] = [a + c, b + d]
+    lp_interval_t result;
+    rational_construct(&result.a);
+    rational_construct(&result.b);
+    rational_add(&result.a, &I1->a, &I2->a);
+    rational_add(&result.b, &I1->b, &I2->b);
+    result.a_open = I1->a_open || I2->a_open;
+    result.b_open = I1->b_open || I2->b_open;
+    result.is_point = 0;
   }
 
-  // [a, b] + [c, d] = [a + c, b + d]
-  lp_interval_t result;
-  rational_construct(&result.a);
-  rational_construct(&result.b);
-  rational_add(&result.a, &I1->a, &I2->a);
-  rational_add(&result.b, &I1->b, &I2->b);
-  result.a_open = I1->a_open || I2->a_open;
-  result.b_open = I1->b_open || I2->b_open;
-  result.is_point = 0;
   lp_interval_swap(&result, S);
   lp_interval_destruct(&result);
 }
@@ -85,24 +87,26 @@ void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1
     return;
   }
 
+  lp_dyadic_interval_t result;
+
   if (I1->is_point) {
     // Just shift by I1->a
-    lp_dyadic_interval_assign(S, I2);
-    dyadic_rational_add(&S->a, &S->a, &I1->a);
-    dyadic_rational_add(&S->b, &S->b, &I1->a);
+    lp_dyadic_interval_construct_copy(&result, I2);
+    dyadic_rational_add(&result.a, &result.a, &I1->a);
+    dyadic_rational_add(&result.b, &result.b, &I1->a);
     return;
+  } else {
+    // Both non-points
+    // [a, b] + [c, d] = [a + c, b + d]
+    dyadic_rational_construct(&result.a);
+    dyadic_rational_construct(&result.b);
+    dyadic_rational_add(&result.a, &I1->a, &I2->a);
+    dyadic_rational_add(&result.b, &I1->b, &I2->b);
+    result.a_open = I1->a_open || I2->a_open;
+    result.b_open = I1->b_open || I2->b_open;
+    result.is_point = 0;
   }
 
-  // Both non-points
-  // [a, b] + [c, d] = [a + c, b + d]
-  lp_dyadic_interval_t result;
-  dyadic_rational_construct(&result.a);
-  dyadic_rational_construct(&result.b);
-  dyadic_rational_add(&result.a, &I1->a, &I2->a);
-  dyadic_rational_add(&result.b, &I1->b, &I2->b);
-  result.a_open = I1->a_open || I2->a_open;
-  result.b_open = I1->b_open || I2->b_open;
-  result.is_point = 0;
   lp_dyadic_interval_swap(&result, S);
   lp_dyadic_interval_destruct(&result);
 }

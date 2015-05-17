@@ -22,9 +22,28 @@ polypy_test.start("Sign Determination")
 
 # polypy.trace_enable("polynomial")
 # polypy.trace_enable("factorization")
+# polypy.trace_enable("algebraic_number")
 # polypy.trace_enable("coefficient")
 # polypy.trace_enable("coefficient::sgn")
 # polypy.trace_enable("coefficient::arith")
+
+sqrt2 = polypy.AlgebraicNumber(x**2 - 2, 1)
+
+assignment = polypy.Assignment()
+assignment.set_value(x, sqrt2)
+assignment.set_value(y, 1)
+assignment.set_value(z, -1)
+
+# print assignment
+
+p = x + y + z
+check_sgn(p, assignment, 1)
+
+p = x + y + z + 1
+check_sgn(p, assignment, 1)
+
+p = x + y + z - 2
+check_sgn(p, assignment, -1)
 
 assignment = polypy.Assignment()
 assignment.set_value(x, 0)
@@ -39,7 +58,7 @@ check_sgn(p, assignment, 0)
 p = x + y + z + 1
 check_sgn(p, assignment, 1)
 
-p = x + y + z - 1
+p = x + y + z - 2
 check_sgn(p, assignment, -1)
 
 assignment.set_value(x, -1)
