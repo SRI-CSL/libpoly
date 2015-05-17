@@ -481,8 +481,13 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         coefficient_value_approx(ctx, COEFF(C, i), m, &tmp1);
         interval_pow(&tmp2, &x_value, i);
+        // tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+        // tracef("tmp1 = "); lp_interval_print(&tmp1, trace_out); tracef("\n");
         interval_mul(&tmp2, &tmp2, &tmp1);
+        // tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+        // tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
         interval_add(&result, &result, &tmp2);
+        // tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
       }
     }
 
@@ -592,7 +597,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
       }
 
       // Approximate the value by doing interval computation
-      coefficient_value_approx(ctx, C, m, &C_rat_approx);
+      coefficient_value_approx(ctx, &C_rat, m, &C_rat_approx);
 
       if (trace_is_enabled("coefficient::sgn")) {
         tracef("coefficient_sgn(): approx => "); lp_interval_print(&C_rat_approx, trace_out); tracef("\n");

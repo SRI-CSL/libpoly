@@ -34,6 +34,8 @@ void lp_variable_order_construct(lp_variable_order_t* var_order) {
   var_order->ref_count = 0;
   // The list
   lp_variable_list_construct(&var_order->list);
+  var_order->bot = lp_variable_null;
+  var_order->top = lp_variable_null;
 }
 
 void lp_variable_order_reverse(lp_variable_order_t* var_order) {
