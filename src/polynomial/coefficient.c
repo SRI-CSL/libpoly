@@ -33,6 +33,9 @@
 #include <assert.h>
 
 static
+void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* m, coefficient_t* A_alg);
+
+static
 lp_dyadic_interval_t* algebraic_interval_remember(const lp_variable_list_t* var_list, const lp_assignment_t* m) {
   // Remember the existing intervals so that we can recover later
   lp_dyadic_interval_t* x_i_intervals = malloc(sizeof(lp_dyadic_interval_t)*var_list->list_size);
@@ -523,12 +526,20 @@ unsigned coefficient_root_lower_bound(const coefficient_t* C) {
   assert(C->type == COEFFICIENT_POLYNOMIAL);
   assert(coefficient_is_univariate(C));
 
-  unsigned log_c0 = integer_log2_abs(&COEFF(C, 0)->value.num);
+  size_t i = 0;
+
+  // Find the first non-zero coefficient
+  while (integer_is_zero(lp_Z, &COEFF(C, i)->value.num)) {
+    ++ i;
+    assert(i < SIZE(C));
+  }
+
+  // First one (modulo the intial zeroes
+  unsigned log_c0 = integer_log2_abs(&COEFF(C, i)->value.num);
 
   // Get thge max log
-  size_t i;
   unsigned max_log = log_c0;
-  for (i = 1; i < SIZE(C); ++ i) {
+  for (++ i; i < SIZE(C); ++ i) {
     assert(COEFF(C, i)->type == COEFFICIENT_NUMERIC);
     if (!integer_is_zero(lp_Z, &COEFF(C, i)->value.num)) {
       unsigned current_log = integer_log2_abs(&COEFF(C, i)->value.num);
@@ -650,39 +661,10 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         lp_dyadic_interval_t* interval_cache = algebraic_interval_remember(&C_rat_vars, m);
 
         // Compute B (we keep it in A) by resolving out all the variables except z
-        for (;;) {
-
-          // The variable to resolve
-          lp_variable_t x_i = VAR(&A);
-          if (x_i == z) {
-            // Everything resolved
-            assert(coefficient_is_univariate(&A));
-            break;
-          }
-
-          // Get the polynomials
-          const lp_value_t* a_i = lp_assignment_get_value(m, x_i);
-          assert(!lp_value_is_rational(a_i));
-          const lp_upolynomial_t* p_i = a_i->value.a.f;
-          coefficient_t p_i_multivariate;
-          coefficient_construct_from_univariate(ctx, &p_i_multivariate, p_i, x_i);
-
-          if (trace_is_enabled("coefficient::sgn")) {
-            tracef("coefficient_sgn(): A = "); coefficient_print(ctx, &A, trace_out);
-            tracef("                 : resolving %s with ", lp_variable_db_get_name(ctx->var_db, x_i));
-            coefficient_print(ctx, &p_i_multivariate, trace_out); tracef("\n");
-          }
-
-          // Resolve
-          coefficient_resultant(ctx, &A, &A, &p_i_multivariate);
-
-          if (trace_is_enabled("coefficient::sgn")) {
-            tracef("coefficient_sgn(): A = "); coefficient_print(ctx, &A, trace_out); tracef("\n");
-          }
-
-          // Remove the temp
-          coefficient_destruct(&p_i_multivariate);
-        }
+        lp_variable_order_make_bot(ctx->var_order, z);
+        coefficient_order(ctx, &A);
+        coefficient_resolve_algebraic(ctx, &A, m, &A);
+        lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
 
         // Get the lower bound on the roots
         unsigned k = coefficient_root_lower_bound(&A);
@@ -698,6 +680,11 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         // Refine until done, i.e. C_rat_approx = (l, u) not contains 0, or
         //
         for (;;) {
+
+          if (trace_is_enabled("coefficient::sgn")) {
+            tracef("coefficient_sgn(): C_rat_approx = "); lp_interval_print(&C_rat_approx, trace_out); tracef("\n");
+            tracef("coefficient_sgn(): L_interval = "); lp_interval_print(&L_interval, trace_out); tracef("\n");
+          }
 
           // If a point, we're done
           if (lp_interval_is_point(&C_rat_approx)) {
@@ -748,6 +735,11 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         lp_rational_destruct(&L);
         lp_rational_destruct(&L_neg);
 
+        // Safe to give the sign based on the interval bound
+        sgn = lp_interval_sgn(&C_rat_approx);
+        if (trace_is_enabled("coefficient::sgn")) {
+          tracef("coefficient_sgn(): interval is good => %d\n", sgn);
+        }
       }
 
       // Destruct temps
@@ -2609,8 +2601,8 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
   // Eliminate all variables
   for (;;) {
 
-    if (trace_is_enabled("coefficient::roots")) {
-      tracef("coefficient_roots_isolate(): A_alg = "); coefficient_print(ctx, A_alg, trace_out); tracef("\n");
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_resolve_algebraic(): A_alg = "); coefficient_print(ctx, A_alg, trace_out); tracef("\n");
     }
 
     // If no more variables, it either has no zeroes, or it vanished
@@ -2621,8 +2613,8 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
     // The variable to eliminate
     lp_variable_t y = VAR(A_alg);
 
-    if (trace_is_enabled("coefficient::roots")) {
-      tracef("coefficient_roots_isolate(): resolving out %s\n", lp_variable_db_get_name(ctx->var_db, y));
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_resolve_algebraic(): resolving out %s\n", lp_variable_db_get_name(ctx->var_db, y));
     }
 
     // Get the algebraic number of the value of y as a polynomial in y
@@ -2640,15 +2632,15 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
     coefficient_t y_poly;
     coefficient_construct_from_univariate(ctx, &y_poly, y_upoly, y);
 
-    if (trace_is_enabled("coefficient::roots")) {
-      tracef("coefficient_roots_isolate(): y_poly = "); coefficient_print(ctx, &y_poly, trace_out); tracef("\n");
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_resolve_algebraic(): y_poly = "); coefficient_print(ctx, &y_poly, trace_out); tracef("\n");
     }
 
     // Resolve
     coefficient_resultant(ctx, A_alg, A_alg, &y_poly);
 
-    if (trace_is_enabled("coefficient::roots")) {
-      tracef("coefficient_roots_isolate(): resultant done = "); coefficient_print(ctx, A_alg, trace_out); tracef("\n");
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_resolve_algebraic(): resultant done = "); coefficient_print(ctx, A_alg, trace_out); tracef("\n");
     }
 
     // Destroy temp
