@@ -60,9 +60,9 @@ void lp_assignment_delete(lp_assignment_t* m) {
 }
 
 int lp_assignment_print(const lp_assignment_t* m, FILE* out) {
-  int i, j, ret = 0;
+  size_t i, j, ret = 0;
   ret += fprintf(out, "[");
-  for (i = 0, j = 0; i < ret; ++ i) {
+  for (i = 0, j = 0; i < m->size; ++ i) {
     if (m->values[i].type != LP_VALUE_NONE) {
       if (j ++) {
         ret += fprintf(out, ", ");

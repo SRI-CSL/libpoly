@@ -558,7 +558,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
     // If constant, we're done
     if (C_rat.type == COEFFICIENT_NUMERIC) {
       // val(C) = C_rat/multiplier with multiplier positive
-      sgn = integer_sgn(lp_Z, &C->value.num);
+      sgn = integer_sgn(lp_Z, &C_rat.value.num);
       if (trace_is_enabled("coefficient::sgn")) {
         tracef("coefficient_sgn(): constant => %d\n", sgn);
       }
@@ -733,6 +733,10 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
     // Destruct temps
     lp_integer_destruct(&multiplier);
     coefficient_destruct(&C_rat);
+  }
+
+  if (trace_is_enabled("coefficient::sgn")) {
+    tracef("coefficient_sgn() => %d\n", sgn);
   }
 
   if (sgn < 0) { return -1; }
@@ -1247,7 +1251,7 @@ void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, c
   if (trace_is_enabled("coefficient::arith")) {
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
-    tracef("n  = %ld", a);
+    tracef("n  = %ld\n", a);
   }
 
   size_t i;
@@ -1272,6 +1276,10 @@ void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, c
     coefficient_normalize(ctx, &result);
     coefficient_swap(&result, P);
     coefficient_destruct(&result);
+  }
+
+  if (trace_is_enabled("coefficient::arith")) {
+    tracef("mul = "); coefficient_print(ctx, P, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, P));
@@ -2359,8 +2367,6 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
   size_t i;
   lp_variable_t x;
 
-  coefficient_t result;
-
   // Start wit multiplier 1
   integer_assign_int(lp_Z, multiplier, 1);
 
@@ -2369,6 +2375,9 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
     coefficient_assign(ctx, C_out, C);
   } else {
     assert(C->type == COEFFICIENT_POLYNOMIAL);
+
+    // Temp for the result
+    coefficient_t result;
 
     // Get the variable and it's value, if any
     x = VAR(C);
@@ -2422,6 +2431,8 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
 
     } else {
 
+      coefficient_construct(ctx, &result);
+
       // We have a value value = p/q
       lp_integer_t p, q;
       integer_construct(&p);
@@ -2433,7 +2444,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
       //
       //   C = a_n * (p/q)^n + ... + a_1 * (p/q) + a_0
       //
-      // We substitutie in all a_n obtaining a_k = b_n / m_k and get
+      // We substitute in all a_n obtaining a_k = b_n / m_k and get
       //
       //   q^n * C = b_n * (p^n/m_n) + ... + b_1 * (p*q^n-1/m_1) + b_0 * q^n/m_0
       //
@@ -2444,7 +2455,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
 
       // Compute the evaluation of the coefficients
       coefficient_t* b = malloc(sizeof(coefficient_t)*size);
-      lp_integer_t* m = malloc(sizeof(coefficient_t)*size);
+      lp_integer_t* m = malloc(sizeof(lp_integer_t)*size);
       for (i = 0; i < size; ++ i) {
         coefficient_construct(ctx, b + i);
         integer_construct(m + i);

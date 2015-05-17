@@ -307,7 +307,6 @@ void integer_mul_int(lp_int_ring_t* K, lp_integer_t* product, const lp_integer_t
 static inline
 void integer_mul_pow2(lp_int_ring_t* K, lp_integer_t* power, const lp_integer_t* a, unsigned n) {
   assert(integer_in_ring(K, a));
-  assert(n > 0);
   mpz_mul_2exp(power, a, n);
   integer_ring_normalize(K, power);
 }

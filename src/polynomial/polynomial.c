@@ -174,6 +174,7 @@ int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
   // Check that all variables are assigned
   lp_variable_list_t A_vars;
   lp_variable_list_construct(&A_vars);
+  coefficient_get_variables(&A->data, &A_vars);
   size_t i;
   for (i = 0; i < A_vars.list_size; ++ i) {
     lp_variable_t x = A_vars.list[i];
@@ -192,6 +193,7 @@ lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment
   // Check that all variables are assigned
   lp_variable_list_t A_vars;
   lp_variable_list_construct(&A_vars);
+  coefficient_get_variables(&A->data, &A_vars);
   size_t i;
   for (i = 0; i < A_vars.list_size; ++ i) {
     lp_variable_t x = A_vars.list[i];
