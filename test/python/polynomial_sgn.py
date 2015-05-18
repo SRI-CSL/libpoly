@@ -28,6 +28,27 @@ polypy_test.start("Sign Determination")
 # polypy.trace_enable("coefficient::arith")
 
 sqrt2 = polypy.AlgebraicNumber(x**2 - 2, 1)
+sqrt2_4 = polypy.AlgebraicNumber(x**4 - 2, 1)
+sqrt3 = polypy.AlgebraicNumber(x**2 - 3, 1)
+
+assignment = polypy.Assignment()
+assignment.set_value(x, sqrt2_4)
+assignment.set_value(y, sqrt2)
+assignment.set_value(z, sqrt3)
+
+# print assignment
+
+p = (x**2 - y)*z
+check_sgn(p, assignment, 0)
+
+p = (x**2 - y + z)*x 
+check_sgn(p, assignment, 1)
+
+p = (x**2 - y + 1)*x + z 
+check_sgn(p, assignment, 1)
+
+p = (x**2 - y + 1)*x - z 
+check_sgn(p, assignment, -1)
 
 assignment = polypy.Assignment()
 assignment.set_value(x, sqrt2)

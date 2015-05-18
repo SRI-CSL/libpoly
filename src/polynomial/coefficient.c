@@ -1239,7 +1239,7 @@ void coefficient_mul(const lp_polynomial_context_t* ctx, coefficient_t* P, const
     coefficient_swap(&result, P);
     coefficient_destruct(&result);
   } else {
-    // C1 < C2, multuply each coefficient of C2 with C1
+    // C1 < C2, multiply each coefficient of C2 with C1
     coefficient_construct_rec(ctx, &result, VAR(C2), SIZE(C2));
     for (i = 0; i < SIZE(C2); ++ i) {
       if (!coefficient_is_zero(ctx, COEFF(C2, i))) {
