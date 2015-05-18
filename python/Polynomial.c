@@ -82,7 +82,7 @@ static PyObject*
 Polynomial_roots_count(PyObject* self, PyObject* args);
 
 static PyObject*
-Polynomial_roots_isolate(PyObject* self);
+Polynomial_roots_isolate(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_sturm_sequence(PyObject* self);
@@ -143,7 +143,7 @@ PyMethodDef Polynomial_methods[] = {
     {"factor", (PyCFunction)Polynomial_factor, METH_NOARGS, "Returns the factorization of the polynomial"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"roots_count", (PyCFunction)Polynomial_roots_count, METH_VARARGS, "Returns the number of real roots in the given interval"},
-    {"roots_isolate", (PyCFunction)Polynomial_roots_isolate, METH_NOARGS, "Returns the list of real roots"},
+    {"roots_isolate", (PyCFunction)Polynomial_roots_isolate, METH_VARARGS, "Returns the list of real roots"},
     {"sturm_sequence", (PyCFunction)Polynomial_sturm_sequence, METH_NOARGS, "Returns the Sturm sequence"},
     {"derivative", (PyCFunction)Polynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
@@ -1127,8 +1127,54 @@ Polynomial_roots_count(PyObject* self, PyObject* args) {
 }
 
 static PyObject*
-Polynomial_roots_isolate(PyObject* self) {
-  return 0;
+Polynomial_roots_isolate(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+
+  if (!PyAssignment_CHECK(assignment_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+
+  // Check that the top variable is unassigned
+  lp_variable_t x = lp_polynomial_top_variable(p);
+  if (lp_assignment_get_value(assignment, x)->type != LP_VALUE_NONE) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  // Get the degree of the polynomial and allocate the values
+  lp_value_t* roots = malloc(sizeof(lp_value_t)*lp_polynomial_degree(p));
+  size_t roots_size = 0;
+
+  // Get the roots
+  lp_polynomial_roots_isolate(p, assignment, roots, &roots_size);
+
+  // Generate a list of roots
+  PyObject* list = PyList_New(roots_size);
+
+  int i;
+  for (i = 0; i < roots_size; ++ i) {
+    PyObject* c = PyValue_create(roots + i);
+    PyList_SetItem(list, i, c);
+  }
+
+  // Get rid of the temporaries
+  for (i = 0; i < roots_size; ++ i) {
+    lp_value_destruct(roots + i);
+  }
+  free(roots);
+
+  // Return the list
+  return list;
 }
 
 static PyObject*

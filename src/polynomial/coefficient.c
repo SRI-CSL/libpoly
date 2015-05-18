@@ -2666,10 +2666,9 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
 
 void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size) {
 
-  // Count recursive calls
-  static int calls = 0;
-  calls ++;
-  assert(calls > 0);
+  if (trace_is_enabled("coefficient::roots")) {
+    tracef("coefficient_roots_isolate("); coefficient_print(ctx, A, trace_out); tracef("\n");
+  }
 
   // Evaluate in the rationals
   coefficient_t A_rat;
@@ -2830,11 +2829,6 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
         free(algebraic_roots);
         lp_upolynomial_delete(A_alg_u);
 
-      }
-
-      // Restore order
-      if (calls == 1) {
-        lp_variable_order_reverse(ctx->var_order);
       }
 
       // Remove temps

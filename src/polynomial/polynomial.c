@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 
@@ -801,10 +802,90 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
   lp_polynomial_external_clean(A);
 
-  // TODO: factorize
+  size_t i;
 
-  // Isolate the roots
-  coefficient_roots_isolate(A->ctx, &A->data, M, roots, roots_size);
+  lp_polynomial_t** factors = 0;
+  size_t* multiplicities = 0;
+  size_t factors_size = 0;
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_roots_isolate(): factoring\n");
+  }
+
+  // Get the square-free factorization
+  lp_polynomial_factor_square_free(A, &factors, &multiplicities, &factors_size);
+
+  // Count the max number of roots
+  size_t total_degree = 0;
+  size_t factor_i;
+  for (factor_i = 0; factor_i < factors_size; ++ factor_i) {
+    total_degree += multiplicities[factor_i];
+  }
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_roots_isolate(): factors = %zu, total_degree = %zi\n", factors_size, total_degree);
+  }
+
+  // Allocate enough space for the roots
+  lp_value_t* roots_tmp = malloc(sizeof(lp_value_t)*total_degree);
+  size_t roots_tmp_size = 0;
+
+  for (factor_i = 0; factor_i < factors_size; ++ factor_i) {
+    // The factor we are working with
+    const lp_polynomial_t* factor = factors[factor_i];
+    // Get the roots
+    lp_value_t* current_roots = roots_tmp + roots_tmp_size;
+    size_t current_roots_size;
+    coefficient_roots_isolate(A->ctx, &factor->data, M, current_roots, &current_roots_size);
+    roots_tmp_size += current_roots_size;
+  }
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): unsorted roots\n")
+    for (i = 0; i < roots_tmp_size; ++ i) {
+      tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
+    }
+  }
+
+  // Sort the roots
+  qsort(roots_tmp, roots_tmp_size, sizeof(lp_value_t), lp_value_cmp_void);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n")
+    for (i = 0; i < roots_tmp_size; ++ i) {
+      tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
+    }
+  }
+
+  // Remove any duplicates
+  size_t to_keep;
+  for (to_keep = 1, i = 1; i < roots_tmp_size; ++ i) {
+    if (lp_value_cmp(roots_tmp + i, roots_tmp  + to_keep-1) != 0) {
+      // If different copy over
+      if (i != to_keep) {
+        lp_value_assign(roots_tmp + to_keep, roots_tmp + i);
+      }
+      // This one is a keeper
+      to_keep ++;
+    }
+  }
+  for (i = to_keep; i < roots_tmp_size; ++ i) {
+    lp_value_destruct(roots_tmp + i);
+  }
+  roots_tmp_size = to_keep;
+
+  // Copy over the roots
+  memcpy(roots, roots_tmp, roots_tmp_size*sizeof(lp_value_t));
+  *roots_size = roots_tmp_size;
+
+  // Destroy the temps
+  for (i = 0; i < factors_size; ++ i) {
+    lp_polynomial_destruct(factors[i]);
+    free(factors[i]);
+  }
+  free(factors);
+  free(multiplicities);
+  free(roots_tmp);
 }
 
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
