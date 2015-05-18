@@ -24,6 +24,10 @@ assignment.set_value(z, 0)
 
 print assignment
 
+p = 10*(x-1)*(x**2 - y - z - 1)
+roots = p.roots_isolate(assignment)
+print "p_roots =", roots
+
 p = x**2 - y - z - 1
 roots = p.roots_isolate(assignment)
 print "p_roots =", roots

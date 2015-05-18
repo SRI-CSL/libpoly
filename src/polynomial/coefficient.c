@@ -2667,7 +2667,7 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
 void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size) {
 
   if (trace_is_enabled("coefficient::roots")) {
-    tracef("coefficient_roots_isolate("); coefficient_print(ctx, A, trace_out); tracef("\n");
+    tracef("coefficient_roots_isolate("); coefficient_print(ctx, A, trace_out); tracef(")\n");
   }
 
   // Evaluate in the rationals
