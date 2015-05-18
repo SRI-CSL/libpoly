@@ -265,8 +265,7 @@ int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
 }
 
 int lp_value_cmp_void(const void* v1, const void* v2) {
-  assert(0);
-  return v1 == v2;
+  return lp_value_cmp(v1, v2);
 }
 
 int lp_value_cmp_rational(const lp_value_t* v, const lp_rational_t* q) {

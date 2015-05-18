@@ -819,7 +819,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   size_t total_degree = 0;
   size_t factor_i;
   for (factor_i = 0; factor_i < factors_size; ++ factor_i) {
-    total_degree += multiplicities[factor_i];
+    total_degree += coefficient_degree(&factors[factor_i]->data);
   }
 
   if (trace_is_enabled("polynomial")) {

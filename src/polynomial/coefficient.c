@@ -2595,7 +2595,7 @@ void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, co
 
     // Copy over the roots
     size_t i;
-    for (i = 0; i < *roots_size; ++i) {
+    for (i = 0; i < *roots_size; ++ i) {
       lp_value_construct(roots + i, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
       lp_algebraic_number_destruct(algebraic_roots + i);
     }
