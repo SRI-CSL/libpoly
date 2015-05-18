@@ -2838,7 +2838,7 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
 lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_evaluate(): full evaluation"); coefficient_print(ctx, C, trace_out); tracef("\n");
+    tracef("coefficient_evaluate("); coefficient_print(ctx, C, trace_out); tracef(")\n");
   }
 
   lp_value_t* result = 0;
@@ -2883,6 +2883,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
     // Get the variable
     lp_variable_t y = lp_polynomial_context_get_temp_variable(ctx);
+    lp_variable_order_make_bot(ctx->var_order, y);
 
     coefficient_t A;
     lp_integer_t one;
@@ -2893,6 +2894,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
     if (trace_is_enabled("coefficient")) {
       tracef("coefficient_evaluate(): resolving algebraic numbers\n");
+      tracef("coefficient_evaluate(): start = "); coefficient_print(ctx, &A, trace_out), tracef("\n");
     }
 
     // Resolve the algebraic numbers
@@ -2920,6 +2922,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
       for (i = 0; i < roots_size; ++ i) {
         tracef("%zu: ", i);
         lp_value_print(roots + i, trace_out);
+        tracef("\n");
       }
     }
 
@@ -2956,6 +2959,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
         for (i = 0; i < roots_size; ++ i) {
           tracef("%zu: ", i);
           lp_value_print(roots + i, trace_out);
+          tracef("\n");
         }
       }
 
@@ -2997,6 +3001,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
     // Release the variable
     lp_polynomial_context_release_temp_variable(ctx, y);
+    lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
 
     // Release the cache
     algebraic_interval_restore(&C_vars, interval_cache, M);

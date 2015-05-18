@@ -269,6 +269,36 @@ int lp_value_cmp_void(const void* v1, const void* v2) {
   return v1 == v2;
 }
 
+int lp_value_cmp_rational(const lp_value_t* v, const lp_rational_t* q) {
+
+  int cmp  = 0;
+
+  switch (v->type) {
+  case LP_VALUE_PLUS_INFINITY:
+    cmp = 1;
+    break;
+  case LP_VALUE_MINUS_INFINITY:
+    cmp = -1;
+    break;
+  case LP_VALUE_INTEGER:
+    cmp = -lp_rational_cmp_integer(q, &v->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    cmp = -lp_rational_cmp_dyadic_rational(q, &v->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    cmp = lp_rational_cmp(&v->value.q, q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    cmp = lp_algebraic_number_cmp_rational(&v->value.a, q);
+    break;
+  default:
+    assert(0);
+  }
+
+  return cmp;
+}
+
 int lp_value_is_rational(const lp_value_t* v) {
   switch (v->type) {
   case LP_VALUE_INTEGER:

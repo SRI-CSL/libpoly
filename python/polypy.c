@@ -5,6 +5,7 @@
 #include "AlgebraicNumber.h"
 #include "Polynomial.h"
 #include "Assignment.h"
+#include "Value.h"
 
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {
@@ -65,6 +66,8 @@ initpolypy(void)
     return;
   if (PyType_Ready(&AlgebraicNumberType) < 0)
     return;
+  if (PyType_Ready(&ValueType) < 0)
+    return;
 
   m = Py_InitModule3("polypy", polypy_methods, "PolyPy Libarary.");
 
@@ -106,6 +109,9 @@ initpolypy(void)
 
   Py_INCREF(&AlgebraicNumberType);
   PyModule_AddObject(m, "AlgebraicNumber", (PyObject*)&AlgebraicNumberType);
+
+  Py_INCREF(&ValueType);
+  PyModule_AddObject(m, "Value", (PyObject*)&AlgebraicNumberType);
 
 }
 

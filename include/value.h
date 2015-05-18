@@ -84,6 +84,9 @@ int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2);
 /** Void version of the comparison, use with care. */
 int lp_value_cmp_void(const void* v1, const void* v2);
 
+/** Compare to a rational */
+int lp_value_cmp_rational(const lp_value_t* v, const lp_rational_t* q);
+
 /** Print the value */
 int lp_value_print(const lp_value_t* v, FILE* out);
 
