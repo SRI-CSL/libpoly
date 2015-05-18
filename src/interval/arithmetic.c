@@ -210,28 +210,27 @@ void interval_mul(lp_interval_t* P, const lp_interval_t* I1, const lp_interval_t
         P->a_open = P->b_open = 0;
         rational_assign_int(&P->a, 0, 1);
       } else if (a_sgn > 0) {
-         // Regular multiplication
-        if (P->is_point) {
-          // P != I2 since I2 is not point, I1 is point, so this is safe
-          rational_construct(&P->b);
-          P->is_point = 0;
-        }
-        P->a_open = I2->a_open;
-        P->b_open = I2->b_open;
-        // I1 might be P, so order matters
-        rational_mul(&P->b, &I1->a, &I2->b);
-        rational_mul(&P->a, &I1->a, &I2->a);
+        lp_interval_t result;
+        rational_construct(&result.a);
+        rational_construct(&result.b);
+        result.is_point = 0;
+        result.a_open = I2->a_open;
+        result.b_open = I2->b_open;
+        rational_mul(&result.a, &I1->a, &I2->a);
+        rational_mul(&result.b, &I1->a, &I2->b);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
       } else {
-        // Multiplying with a negative, flip the edges
-        if (P->is_point) {
-          rational_construct(&P->b);
-          P->is_point = 0;
-        }
-        P->a_open = I2->b_open;
-        P->b_open = I2->a_open;
-        // I1 might be P, so order matters
-        rational_mul(&P->b, &I1->a, &I2->a);
-        rational_mul(&P->a, &I1->a, &I2->b);
+        lp_interval_t result;
+        rational_construct(&result.a);
+        rational_construct(&result.b);
+        result.is_point = 0;
+        result.a_open = I2->a_open;
+        result.b_open = I2->b_open;
+        rational_mul(&result.b, &I1->a, &I2->a);
+        rational_mul(&result.a, &I1->a, &I2->b);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
       }
     }
   } else if (I2->is_point) {
@@ -321,26 +320,27 @@ void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1
         dyadic_rational_assign_int(&P->a, 0, 1);
       } else if (a_sgn > 0) {
         // Regular multiplication
-        if (P->is_point) {
-          dyadic_rational_construct(&P->b);
-          P->is_point = 0;
-        }
-        P->a_open = I2->a_open;
-        P->b_open = I2->b_open;
-        // I1 might be P, so order matters
-        dyadic_rational_mul(&P->b, &I1->a, &I2->b);
-        dyadic_rational_mul(&P->a, &I1->a, &I2->a);
+        lp_dyadic_interval_t result;
+        dyadic_rational_construct(&result.a);
+        dyadic_rational_construct(&result.b);
+        result.is_point = 0;
+        result.a_open = I2->a_open;
+        result.b_open = I2->b_open;
+        dyadic_rational_mul(&result.a, &I1->a, &I2->a);
+        dyadic_rational_mul(&result.b, &I1->a, &I2->b);
+        lp_dyadic_interval_swap(&result, P);
+        lp_dyadic_interval_destruct(&result);
       } else {
-        // Multiplying with a negative, flip the edges
-        if (P->is_point) {
-          dyadic_rational_construct(&P->b);
-          P->is_point = 0;
-        }
-        P->a_open = I2->b_open;
-        P->b_open = I2->a_open;
-        // I1 might be P, so order matters
-        dyadic_rational_mul(&P->b, &I1->a, &I2->a);
-        dyadic_rational_mul(&P->a, &I1->a, &I2->b);
+        lp_dyadic_interval_t result;
+        dyadic_rational_construct(&result.a);
+        dyadic_rational_construct(&result.b);
+        result.is_point = 0;
+        result.a_open = I2->b_open;
+        result.b_open = I2->a_open;
+        dyadic_rational_mul(&result.a, &I1->a, &I2->b);
+        dyadic_rational_mul(&result.b, &I1->a, &I2->a);
+        lp_dyadic_interval_swap(&result, P);
+        lp_dyadic_interval_destruct(&result);
       }
     }
   } else if (I2->is_point) {

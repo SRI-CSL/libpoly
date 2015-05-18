@@ -31,6 +31,24 @@ sqrt2 = polypy.AlgebraicNumber(x**2 - 2, 1)
 
 assignment = polypy.Assignment()
 assignment.set_value(x, sqrt2)
+assignment.set_value(y, sqrt2)
+
+# print assignment
+
+p = (x**2 - 2)*y
+check_sgn(p, assignment, 0)
+
+p = x*(y**2 - 2)
+check_sgn(p, assignment, 0)
+
+p = (x**2 - 2) + (y**2 - 2)
+check_sgn(p, assignment, 0)
+
+p = (x**2 - 2)*(y**2 - 2)
+check_sgn(p, assignment, 0)
+
+assignment = polypy.Assignment()
+assignment.set_value(x, sqrt2)
 assignment.set_value(y, -sqrt2)
 assignment.set_value(z, 0)
 
