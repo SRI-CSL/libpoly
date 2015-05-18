@@ -699,7 +699,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           // If contained in L, or fully out of L, we're also done
           int contains_a = lp_interval_contains_rational(&L_interval, &C_rat_approx.a);
           int contains_b = lp_interval_contains_rational(&L_interval, &C_rat_approx.b);
-          if (contains_a && contains_a) {
+          if (contains_a && contains_b) {
             assert(lp_interval_contains_zero(&C_rat_approx));
             break;
           }
@@ -2804,15 +2804,36 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
         lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_alg_u) * sizeof(lp_algebraic_number_t));
         lp_upolynomial_roots_isolate(A_alg_u, algebraic_roots, roots_size);
 
+        // We'll assigned x, so remove from bot
+        lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
+        coefficient_order(ctx, &A_rat);
+
+        if (trace_is_enabled("coefficient::roots")) {
+          tracef("coefficient_roots_isolate(): filtering roots\n");
+        }
+
         // Filter any bad roots
         size_t i, to_keep;
         for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
-          if (coefficient_sgn(ctx, &A_rat, M) != 0) {
+          // Set the value of the variable
+          assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
+          lp_value_t x_value;
+          lp_value_construct(&x_value, LP_VALUE_ALGEBRAIC, algebraic_roots + i);
+          lp_assignment_set_value((lp_assignment_t*) M, x, &x_value);
+
+          if (trace_is_enabled("coefficient::roots")) {
+            tracef("coefficient_roots_isolate(): checking root: "); lp_value_print(&x_value, trace_out); tracef("\n");
+          }
+
+          if (coefficient_sgn(ctx, &A_rat, M) == 0) {
             if (i != to_keep) {
               lp_algebraic_number_swap(algebraic_roots + to_keep, algebraic_roots + i);
-              to_keep ++;
             }
+            to_keep ++;
           }
+          // Remove the value
+          lp_assignment_set_value((lp_assignment_t*) M, x, 0);
+          lp_value_destruct(&x_value);
         }
         // Destruct the bad roots
         for (i = to_keep; i < *roots_size; ++ i) {
