@@ -2837,17 +2837,36 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
 
 lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
 
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_evaluate(): full evaluation"); coefficient_print(ctx, C, trace_out); tracef("\n");
+  }
+
   lp_value_t* result = 0;
+
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_evaluate(): approximating\n");
+  }
 
   // Compute the initial value of the approximation
   lp_interval_t C_approx;
   lp_interval_construct_zero(&C_approx);
   coefficient_value_approx(ctx, C, M, &C_approx);
 
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_evaluate(): approximation = >"); lp_interval_print(&C_approx, trace_out); tracef("\n");
+  }
+
   if (lp_interval_is_point(&C_approx)) {
     // If the approximation is a point we're done
     result = lp_value_new(LP_VALUE_RATIONAL, lp_interval_get_point(&C_approx));
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_evaluate(): approximation is rational = >"); lp_value_print(result, trace_out); tracef("\n");
+    }
   } else {
+
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_evaluate(): approximation is not rational\n");
+    }
 
     //
     // To evaluate the polynomial C(x1, ..., xn) with values v1, ..., vn
@@ -2872,6 +2891,10 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
     coefficient_sub(ctx, &A, &A, C);
     assert(VAR(&A) != y); // y should be the bottom variable
 
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_evaluate(): resolving algebraic numbers\n");
+    }
+
     // Resolve the algebraic numbers
     coefficient_t B;
     coefficient_construct(ctx, &B);
@@ -2879,12 +2902,26 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
     assert(coefficient_is_univariate(&B));
     assert(VAR(&B) == y);
 
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_evaluate(): resolved = "); coefficient_print(ctx, &B, trace_out), tracef("\n");
+      tracef("coefficient_evaluate(): univariate root isolation\n");
+    }
+
     size_t A_resolved_deg = coefficient_degree(&B);
     lp_value_t* roots = malloc(sizeof(lp_value_t)*A_resolved_deg);
     size_t roots_size = 0;
 
     // Find the roots of A_resolved
     coefficient_roots_isolate_univariate(ctx, &B, roots, &roots_size);
+
+    if (trace_is_enabled("coefficient")) {
+      tracef("coefficient_evaluate(): roots:\n");
+      size_t i = 0;
+      for (i = 0; i < roots_size; ++ i) {
+        tracef("%zu: ", i);
+        lp_value_print(roots + i, trace_out);
+      }
+    }
 
     // Cache the variables
     lp_variable_list_t C_vars;
@@ -2913,6 +2950,15 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
       roots_size = to_keep;
       assert(roots_size > 0);
 
+      if (trace_is_enabled("coefficient")) {
+        tracef("coefficient_evaluate(): filtered roots:\n");
+        size_t i = 0;
+        for (i = 0; i < roots_size; ++ i) {
+          tracef("%zu: ", i);
+          lp_value_print(roots + i, trace_out);
+        }
+      }
+
       // Did we find it
       if (roots_size == 1) {
         break;
@@ -2936,10 +2982,9 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
       }
     }
 
-
     if (lp_interval_is_point(&C_approx)) {
       // Rational value approximation reduced to
-      result = lp_value_new(LP_VALUE_RATIONAL, &C_approx);
+      result = lp_value_new(LP_VALUE_RATIONAL, lp_interval_get_point(&C_approx));
     } else {
       // We have the value in roots[0]
       result = lp_value_new_copy(roots);
