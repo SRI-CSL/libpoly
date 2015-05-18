@@ -2223,7 +2223,10 @@ void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const
 STAT_DECLARE(int, coefficient, resultant)
 
 void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* A, const coefficient_t* B) {
-  TRACE("coefficient", "coefficient_resultant()\n");
+
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_resultant("); coefficient_print(ctx, A, trace_out); tracef(", "); coefficient_print(ctx, B, trace_out); tracef(")\n");
+  }
   STAT(coefficient, resultant) ++;
 
   if (trace_is_enabled("coefficient")) {
@@ -2264,6 +2267,11 @@ void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* re
     coefficient_destruct(psc + i);
   }
   free(psc);
+
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_resultant() => "); coefficient_print(ctx, res, trace_out); tracef("\n");
+  }
+
 }
 
 ///
@@ -2561,6 +2569,7 @@ void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, co
 
   if (trace_is_enabled("coefficient::roots")) {
     tracef("coefficient_roots_isolate(): univariate, root finding\n");
+    tracef("coefficient_roots_isolate(): A = "); coefficient_print(ctx, A, trace_out); tracef("\n");
   }
 
   // Special case for linear polynomials
@@ -2577,7 +2586,13 @@ void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, co
     lp_upolynomial_t* A_u = coefficient_to_univariate(ctx, A);
     // Make space for the algebraic numbers
     lp_algebraic_number_t* algebraic_roots = malloc(lp_upolynomial_degree(A_u) * sizeof(lp_algebraic_number_t));
+
+    if (trace_is_enabled("coefficient::roots")) {
+      tracef("coefficient_roots_isolate(): A_u = "); lp_upolynomial_print(A_u, trace_out); tracef("\n");
+    }
+    // Isolate
     lp_upolynomial_roots_isolate(A_u, algebraic_roots, roots_size);
+
     // Copy over the roots
     size_t i;
     for (i = 0; i < *roots_size; ++i) {
