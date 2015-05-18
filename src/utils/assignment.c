@@ -7,9 +7,10 @@
 
 #include <assignment.h>
 #include <variable_db.h>
+#include <value.h>
 
-#include "number/value.h"
 #include "polynomial/polynomial.h"
+#include "number/value.h"
 
 #include <stdlib.h>
 

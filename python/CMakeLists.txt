@@ -8,6 +8,7 @@ set(polypy_SOURCES
     utils.c
     Variable.c
     VariableOrder.c
+    Value.c
 )
 
 find_package(PythonInterp)

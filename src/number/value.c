@@ -37,6 +37,11 @@ void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   }
 }
 
+void lp_value_construct_zero(lp_value_t* v) {
+  v->type = LP_VALUE_INTEGER;
+  integer_construct(&v->value.z);
+}
+
 void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data) {
   lp_value_destruct(v);
   lp_value_construct(v, type, data);
@@ -361,4 +366,13 @@ void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
   default:
     assert(0);
   }
+}
+
+char* lp_value_to_string(const lp_value_t* v) {
+  char* str = 0;
+  size_t size = 0;
+  FILE* f = open_memstream(&str, &size);
+  lp_value_print(v, f);
+  fclose(f);
+  return str;
 }

@@ -11,6 +11,7 @@
 #include "Variable.h"
 #include "VariableOrder.h"
 #include "Assignment.h"
+#include "Value.h"
 
 #include "utils.h"
 #include "variable_list.h"
@@ -1268,8 +1269,8 @@ Polynomial_evaluate(PyObject* self, PyObject* args) {
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
 
   lp_value_t* value = lp_polynomial_evaluate(p, assignment);
+  PyObject* value_obj = PyValue_create(value);
+  lp_value_delete(value);
 
-  int sgn = lp_polynomial_sgn(p, assignment);
-
-  return PyInt_FromLong(sgn);
+  return value_obj;
 }

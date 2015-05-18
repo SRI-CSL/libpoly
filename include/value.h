@@ -51,6 +51,9 @@ struct lp_value_struct {
 /** Construct a value */
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data);
 
+/** Construct a zero value */
+void lp_value_construct_zero(lp_value_t* v);
+
 /** Construct a copy of the given value */
 void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from);
 
@@ -83,6 +86,9 @@ int lp_value_cmp_void(const void* v1, const void* v2);
 
 /** Print the value */
 int lp_value_print(const lp_value_t* v, FILE* out);
+
+/** Return a string representation */
+char* lp_value_to_string(const lp_value_t* v);
 
 /**
  * Check if the value is a rational number: either an integer, dyadic rational,
