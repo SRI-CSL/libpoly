@@ -6,7 +6,7 @@
  */
 
 
-#include <interval.h>
+#include <rational_interval.h>
 #include <algebraic_number.h>
 #include <upolynomial.h>
 

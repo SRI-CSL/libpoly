@@ -5,6 +5,8 @@
  *      Author: dejan
  */
 
+#include <rational_interval.h>
+#include <dyadic_interval.h>
 #include <interval.h>
 #include <value.h>
 

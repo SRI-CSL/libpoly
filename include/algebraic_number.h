@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-#include "interval.h"
+#include "dyadic_interval.h"
 
 /**
  * Algebraic number represented as the only root of the polynomial f in the

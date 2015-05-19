@@ -5,7 +5,8 @@
  *      Author: dejan
  */
 
-#include <interval.h>
+#include <rational_interval.h>
+#include <dyadic_interval.h>
 
 void rational_interval_add(lp_rational_interval_t* S, const lp_rational_interval_t* I1, const lp_rational_interval_t* I2);
 

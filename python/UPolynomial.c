@@ -11,6 +11,8 @@
 
 #include "utils.h"
 
+#include "rational_interval.h"
+
 #include <structmember.h>
 
 static void

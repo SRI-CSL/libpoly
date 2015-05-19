@@ -5,6 +5,9 @@
  *      Author: dejan
  */
 
+#include <rational_interval.h>
+#include <dyadic_interval.h>
+
 #include "upolynomial/upolynomial.h"
 #include "upolynomial/factors.h"
 #include "upolynomial/root_finding.h"

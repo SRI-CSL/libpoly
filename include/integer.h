@@ -8,7 +8,6 @@
 #pragma once
 
 #include "poly.h"
-#include "rational.h"
 
 #include <stdint.h>
 #include <stdio.h>

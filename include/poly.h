@@ -47,6 +47,10 @@ typedef struct lp_algebraic_number_struct lp_algebraic_number_t;
 typedef struct lp_value_struct lp_value_t;
 typedef struct lp_assignment_struct lp_assignment_t;
 
+typedef struct lp_rational_interval_struct lp_rational_interval_t;
+typedef struct lp_dyadic_interval_struct lp_dyadic_interval_t;
+typedef struct lp_interval_struct lp_interval_t;
+
 typedef struct lp_feasibility_set_struct lp_feasibility_set_t;
 
 /**
