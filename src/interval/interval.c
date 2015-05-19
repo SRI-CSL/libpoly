@@ -146,6 +146,14 @@ void lp_interval_construct_copy(lp_interval_t* I, const lp_interval_t* from) {
   I->is_point = from->is_point;
 }
 
+void lp_interval_construct_full(lp_interval_t* I) {
+  lp_value_construct(&I->a, LP_VALUE_MINUS_INFINITY, 0);
+  lp_value_construct(&I->b, LP_VALUE_PLUS_INFINITY, 0);
+  I->a_open = 1;
+  I->b_open = 1;
+  I->is_point = 0;
+}
+
 void lp_rational_interval_construct_from_dyadic(lp_rational_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
   assert(cmp <= 0);
@@ -919,4 +927,13 @@ int lp_dyadic_interval_size(const lp_dyadic_interval_t* I) {
   } else {
     return dyadic_rational_get_distance_size(&I->a, &I->b);
   }
+}
+
+char* lp_interval_to_string(const lp_interval_t* I) {
+  char* str = 0;
+  size_t size = 0;
+  FILE* f = open_memstream(&str, &size);
+  lp_interval_print(I, f);
+  fclose(f);
+  return str;
 }

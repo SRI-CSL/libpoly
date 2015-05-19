@@ -13,6 +13,7 @@
 #include "rational.h"
 #include "dyadic_rational.h"
 #include "algebraic_number.h"
+#include "value.h"
 
 /**
  * Check if o is long or int.
@@ -43,3 +44,13 @@ PyObject* dyadic_rational_to_PyFloat(const lp_dyadic_rational_t* x);
  * Get a python float from our algebraic number
  */
 PyObject* algebraic_number_to_PyFloat(const lp_algebraic_number_t* x);
+
+/**
+ * Check if a python number.
+ */
+int PyLong_or_Int_or_Float_Check(PyObject* o);
+
+/**
+ * Construct a value from a python number.
+ */
+void PyLong_or_Int_or_float_to_value(PyObject* o, lp_value_t* v);

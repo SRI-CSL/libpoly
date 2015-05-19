@@ -39,6 +39,9 @@ void lp_interval_construct_point(lp_interval_t* I, const lp_value_t* a);
 /** Construct the interval (a, b) */
 void lp_interval_construct_copy(lp_interval_t* I, const lp_interval_t* from);
 
+/** Construct the interval (-inf, +inf) */
+void lp_interval_construct_full(lp_interval_t* I);
+
 /** Assign from another interval */
 void lp_interval_assign(lp_interval_t* I, const lp_interval_t* from);
 
@@ -50,6 +53,9 @@ void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2);
 
 /** Prints the interval to the given stream. */
 int lp_interval_print(const lp_interval_t* I, FILE* out);
+
+/** Returns the string representation of the interval */
+char* lp_interval_to_string(const lp_interval_t* I);
 
 /** Is this interval a point */
 int lp_interval_is_point(const lp_interval_t* I);

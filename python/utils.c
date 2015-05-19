@@ -7,6 +7,8 @@
 
 #include "utils.h"
 
+
+
 int PyLong_or_Int_Check(PyObject* o) {
   if (PyInt_Check(o)) {
     return 1;
@@ -53,3 +55,33 @@ PyObject* algebraic_number_to_PyFloat(const lp_algebraic_number_t* x) {
   double x_double = lp_algebraic_number_to_double(x);
   return PyFloat_FromDouble(x_double);
 }
+
+int PyLong_or_Int_or_Float_Check(PyObject* o) {
+  if (PyInt_Check(o)) {
+    return 1;
+  }
+  if (PyLong_Check(o)) {
+    return 1;
+  }
+  if (PyFloat_Check(o)) {
+    return 1;
+  }
+  return 0;
+}
+
+void PyLong_or_Int_or_float_to_value(PyObject* o, lp_value_t* v) {
+  if (PyLong_or_Int_Check(o)) {
+    lp_integer_t v_int;
+    PyLong_or_Int_to_integer(o, lp_Z, &v_int);
+    lp_value_construct(v, LP_VALUE_INTEGER, &v_int);
+    lp_integer_destruct(&v_int);
+  } else if (PyFloat_Check(o)) {
+    lp_dyadic_rational_t v_dy_q;
+    PyFloat_to_dyadic_rational(o, &v_dy_q);
+    lp_value_construct(v, LP_VALUE_INTEGER, &v_dy_q);
+    lp_dyadic_rational_destruct(&v_dy_q);
+  } else {
+    lp_value_construct(v, LP_VALUE_NONE, 0);
+  }
+}
+

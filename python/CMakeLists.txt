@@ -9,6 +9,7 @@ set(polypy_SOURCES
     Variable.c
     VariableOrder.c
     Value.c
+    Interval.c
 )
 
 find_package(PythonInterp)

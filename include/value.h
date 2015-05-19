@@ -13,6 +13,7 @@
 #include "rational.h"
 #include "dyadic_rational.h"
 #include "algebraic_number.h"
+#include "value.h"
 
 #include <stdio.h>
 
