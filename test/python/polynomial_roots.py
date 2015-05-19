@@ -29,12 +29,12 @@ polypy.variable_order.set([z, y, x])
 
 polypy_test.start("Polynomial Root Isolation")
 
-polypy.trace_enable("polynomial")
+# polypy.trace_enable("polynomial")
 # polypy.trace_enable("factorization")
 # polypy.trace_enable("algebraic_number")
-polypy.trace_enable("coefficient")
-polypy.trace_enable("coefficient::sgn")
-polypy.trace_enable("coefficient::roots")
+# polypy.trace_enable("coefficient")
+# polypy.trace_enable("coefficient::sgn")
+# polypy.trace_enable("coefficient::roots")
 # polypy.trace_enable("coefficient::arith")
 
 sqrt2 = polypy.AlgebraicNumber(x**2 - 2, 1)
@@ -44,15 +44,17 @@ assignment = polypy.Assignment()
 assignment.set_value(y, sqrt2)
 assignment.set_value(z, sqrt3)
 
+# print assignment
+
 p = (x**2 - y**2)*(x**2 - z**2)
 roots = p.roots_isolate(assignment);
-check_roots(p, assignment, roots,[-3, -2, 2, 3])
+check_roots(p, assignment, roots,[-1.732050808, -1.414213562, 1.414213562, 1.732050808])
 
 assignment = polypy.Assignment()
 assignment.set_value(y, 0)
 assignment.set_value(z, 0)
 
-print assignment
+# print assignment
 
 p = 10*(x-1)*(x**2 - y - z - 1)
 roots = p.roots_isolate(assignment)

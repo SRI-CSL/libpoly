@@ -93,7 +93,7 @@ void lp_assignment_set_value(lp_assignment_t* m, lp_variable_t x, const lp_value
     lp_value_construct_copy(m->values + x, value);
   } else {
     if (m->size > x) {
-      if (m->values->type != LP_VALUE_NONE) {
+      if ((m->values + x)->type != LP_VALUE_NONE) {
         lp_value_destruct(m->values + x);
         lp_value_construct(m->values + x, LP_VALUE_NONE, 0);
       }

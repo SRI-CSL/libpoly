@@ -18,7 +18,9 @@ tests = ["python/upolynomial_gcd.py",
          "python/polynomial_arithmetic.py",
          "python/polynomial_sgn.py",
          "python/polynomial_gcd.py",
-         "python/polynomial_factorization.py"]
+         "python/polynomial_factorization.py",
+         "python/polynomial_eval.py",
+         "python/polynomial_roots.py"]
 
 if (args.sympy):
     print "Sympy checking enabled"

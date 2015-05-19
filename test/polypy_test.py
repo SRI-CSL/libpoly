@@ -136,5 +136,20 @@ def init():
     FAIL = 0
     random.seed(0)
 
+import sys
+
+"""
+ Disable output buffering.
+"""
+class NoBufferWrapper(object):
+   def __init__(self, stream):
+       self.stream = stream
+   def write(self, data):
+       self.stream.write(data)
+       self.stream.flush()
+   def __getattr__(self, attr):
+       return getattr(self.stream, attr)
+
+sys.stdout = NoBufferWrapper(sys.stdout)
 
 
