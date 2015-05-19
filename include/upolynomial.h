@@ -317,7 +317,7 @@ void lp_upolynomial_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t**
  * Counts the number of real roots in the given interval. If the interval is
  * 0, it counts through (-inf, inf).
  */
-int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_interval_t* ab);
+int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_rational_interval_t* ab);
 
 /**
  * Isolate the distinct real roots of the given polynomial. Roots should be

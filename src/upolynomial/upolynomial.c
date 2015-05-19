@@ -1091,7 +1091,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor(const lp_upolynomial_t* p) {
   return factors;
 }
 
-int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_interval_t* ab) {
+int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_rational_interval_t* ab) {
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_real_roots_count("); lp_upolynomial_print(p, trace_out); tracef(")\n");
   }

@@ -32,7 +32,7 @@ void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_d
  * Count the number of real roots that the polynomial f has in the given open
  * interval. The polynomial f should be square-free.
  */
-int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_interval_t* interval);
+int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_rational_interval_t* interval);
 
 /**
  * Isolate the root intervals of the polynomial f and construct the resulting

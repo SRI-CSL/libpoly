@@ -439,25 +439,25 @@ int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* 
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, 1) == 0;
 }
 
-void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_interval_t* value) {
+void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_rational_interval_t* value) {
 
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_value_approx("); coefficient_print(ctx, C, trace_out); tracef(")\n");
   }
 
   if (C->type == COEFFICIENT_NUMERIC) {
-    lp_interval_t result;
-    lp_interval_construct_from_integer(&result, &C->value.num, 0, &C->value.num, 0);
-    lp_interval_swap(value, &result);
-    lp_interval_destruct(&result);
+    lp_rational_interval_t result;
+    lp_rational_interval_construct_from_integer(&result, &C->value.num, 0, &C->value.num, 0);
+    lp_rational_interval_swap(value, &result);
+    lp_rational_interval_destruct(&result);
   } else {
 
-    lp_interval_t result, tmp1, tmp2, x_value;
+    lp_rational_interval_t result, tmp1, tmp2, x_value;
 
-    lp_interval_construct_zero(&result);
-    lp_interval_construct_zero(&tmp1);
-    lp_interval_construct_zero(&tmp2);
-    lp_interval_construct_zero(&x_value);
+    lp_rational_interval_construct_zero(&result);
+    lp_rational_interval_construct_zero(&tmp1);
+    lp_rational_interval_construct_zero(&tmp2);
+    lp_rational_interval_construct_zero(&x_value);
 
     if (trace_is_enabled("coefficient")) {
       tracef("coefficient_value_approx(): x = %s\n", lp_variable_db_get_name(ctx->var_db, VAR(C)));
@@ -468,7 +468,7 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     // Get the value of x
     if (trace_is_enabled("coefficient")) {
       tracef("coefficient_value_approx(): x_value = ");
-      lp_interval_print(&x_value, trace_out);
+      lp_rational_interval_print(&x_value, trace_out);
       tracef("\n");
     }
 
@@ -483,26 +483,26 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
     for (i = 0; i < SIZE(C); ++ i) {
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         coefficient_value_approx(ctx, COEFF(C, i), m, &tmp1);
-        interval_pow(&tmp2, &x_value, i);
-        // tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
-        // tracef("tmp1 = "); lp_interval_print(&tmp1, trace_out); tracef("\n");
-        interval_mul(&tmp2, &tmp2, &tmp1);
-        // tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
-        // tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
-        interval_add(&result, &result, &tmp2);
-        // tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
+        rational_interval_pow(&tmp2, &x_value, i);
+        // tracef("tmp2 = "); lp_rational_interval_print(&tmp2, trace_out); tracef("\n");
+        // tracef("tmp1 = "); lp_rational_interval_print(&tmp1, trace_out); tracef("\n");
+        rational_interval_mul(&tmp2, &tmp2, &tmp1);
+        // tracef("tmp2 = "); lp_rational_interval_print(&tmp2, trace_out); tracef("\n");
+        // tracef("result = "); lp_rational_interval_print(&result, trace_out); tracef("\n");
+        rational_interval_add(&result, &result, &tmp2);
+        // tracef("result = "); lp_rational_interval_print(&result, trace_out); tracef("\n");
       }
     }
 
-    lp_interval_swap(&result, value);
-    lp_interval_destruct(&x_value);
-    lp_interval_destruct(&tmp1);
-    lp_interval_destruct(&tmp2);
-    lp_interval_destruct(&result);
+    lp_rational_interval_swap(&result, value);
+    lp_rational_interval_destruct(&x_value);
+    lp_rational_interval_destruct(&tmp1);
+    lp_rational_interval_destruct(&tmp2);
+    lp_rational_interval_destruct(&result);
   }
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_value_approx() => "); lp_interval_print(value, trace_out); tracef("\n");
+    tracef("coefficient_value_approx() => "); lp_rational_interval_print(value, trace_out); tracef("\n");
   }
 
 }
@@ -600,8 +600,8 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
     } else {
 
       // Approximate the value of C_rat
-      lp_interval_t C_rat_approx;
-      lp_interval_construct_zero(&C_rat_approx);
+      lp_rational_interval_t C_rat_approx;
+      lp_rational_interval_construct_zero(&C_rat_approx);
 
       if (trace_is_enabled("coefficient::sgn")) {
         tracef("coefficient_sgn(): approximating with intervals\n");
@@ -611,12 +611,12 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
       coefficient_value_approx(ctx, &C_rat, m, &C_rat_approx);
 
       if (trace_is_enabled("coefficient::sgn")) {
-        tracef("coefficient_sgn(): approx => "); lp_interval_print(&C_rat_approx, trace_out); tracef("\n");
+        tracef("coefficient_sgn(): approx => "); lp_rational_interval_print(&C_rat_approx, trace_out); tracef("\n");
       }
 
-      if (C_rat_approx.is_point || !lp_interval_contains_zero(&C_rat_approx)) {
+      if (C_rat_approx.is_point || !lp_rational_interval_contains_zero(&C_rat_approx)) {
         // Safe to give the sign based on the interval bound
-        sgn = lp_interval_sgn(&C_rat_approx);
+        sgn = lp_rational_interval_sgn(&C_rat_approx);
         if (trace_is_enabled("coefficient::sgn")) {
           tracef("coefficient_sgn(): interval is good => %d\n", sgn);
         }
@@ -658,7 +658,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         coefficient_get_variables(&C_rat, &C_rat_vars);
 
         // Cache the assignment intervals
-        lp_dyadic_interval_t* interval_cache = algebraic_interval_remember(&C_rat_vars, m);
+        lp_dyadic_interval_t* rational_interval_cache = algebraic_interval_remember(&C_rat_vars, m);
 
         // Compute B (we keep it in A) by resolving out all the variables except z
         lp_variable_order_make_bot(ctx->var_order, z);
@@ -669,42 +669,42 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         // Get the lower bound on the roots
         unsigned k = coefficient_root_lower_bound(&A);
         // Interval (-L, L)
-        lp_interval_t L_interval;
+        lp_rational_interval_t L_interval;
         lp_rational_t L, L_neg;
         rational_construct_from_int(&L, 1, 1);
         rational_div_2exp(&L, &L, k);
         rational_construct(&L_neg);
         rational_neg(&L_neg, &L);
-        lp_interval_construct(&L_interval, &L_neg, 1, &L, 1);
+        lp_rational_interval_construct(&L_interval, &L_neg, 1, &L, 1);
 
         // Refine until done, i.e. C_rat_approx = (l, u) not contains 0, or
         //
         for (;;) {
 
           if (trace_is_enabled("coefficient::sgn")) {
-            tracef("coefficient_sgn(): C_rat_approx = "); lp_interval_print(&C_rat_approx, trace_out); tracef("\n");
-            tracef("coefficient_sgn(): L_interval = "); lp_interval_print(&L_interval, trace_out); tracef("\n");
+            tracef("coefficient_sgn(): C_rat_approx = "); lp_rational_interval_print(&C_rat_approx, trace_out); tracef("\n");
+            tracef("coefficient_sgn(): L_interval = "); lp_rational_interval_print(&L_interval, trace_out); tracef("\n");
           }
 
           // If a point, we're done
-          if (lp_interval_is_point(&C_rat_approx)) {
+          if (lp_rational_interval_is_point(&C_rat_approx)) {
             break;
           }
 
           // If no zero in interval, we're done
-          if (!lp_interval_contains_zero(&C_rat_approx)) {
+          if (!lp_rational_interval_contains_zero(&C_rat_approx)) {
             break;
           }
 
           // If contained in L, or fully out of L, we're also done
-          int contains_a = lp_interval_contains_rational(&L_interval, &C_rat_approx.a);
-          int contains_b = lp_interval_contains_rational(&L_interval, &C_rat_approx.b);
+          int contains_a = lp_rational_interval_contains_rational(&L_interval, &C_rat_approx.a);
+          int contains_b = lp_rational_interval_contains_rational(&L_interval, &C_rat_approx.b);
           if (contains_a && contains_b) {
-            assert(lp_interval_contains_zero(&C_rat_approx));
+            assert(lp_rational_interval_contains_zero(&C_rat_approx));
             break;
           }
           if (!contains_a && !contains_b) {
-            assert(!lp_interval_contains_zero(&C_rat_approx));
+            assert(!lp_rational_interval_contains_zero(&C_rat_approx));
             break;
           }
 
@@ -723,7 +723,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         }
 
         // Restore the cache (will free the cache)
-        algebraic_interval_restore(&C_rat_vars, interval_cache, m);
+        algebraic_interval_restore(&C_rat_vars, rational_interval_cache, m);
 
         // Release the temporary variable
         lp_polynomial_context_release_temp_variable(ctx, z);
@@ -731,19 +731,19 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         // Destruct temps
         coefficient_destruct(&A);
         lp_variable_list_destruct(&C_rat_vars);
-        lp_interval_destruct(&L_interval);
+        lp_rational_interval_destruct(&L_interval);
         lp_rational_destruct(&L);
         lp_rational_destruct(&L_neg);
 
         // Safe to give the sign based on the interval bound
-        sgn = lp_interval_sgn(&C_rat_approx);
+        sgn = lp_rational_interval_sgn(&C_rat_approx);
         if (trace_is_enabled("coefficient::sgn")) {
           tracef("coefficient_sgn(): interval is good => %d\n", sgn);
         }
       }
 
       // Destruct temps
-      lp_interval_destruct(&C_rat_approx);
+      lp_rational_interval_destruct(&C_rat_approx);
     }
 
     // Destruct temps
@@ -2878,17 +2878,17 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
   }
 
   // Compute the initial value of the approximation
-  lp_interval_t C_approx;
-  lp_interval_construct_zero(&C_approx);
+  lp_rational_interval_t C_approx;
+  lp_rational_interval_construct_zero(&C_approx);
   coefficient_value_approx(ctx, C, M, &C_approx);
 
   if (trace_is_enabled("coefficient")) {
-    tracef("coefficient_evaluate(): approximation = >"); lp_interval_print(&C_approx, trace_out); tracef("\n");
+    tracef("coefficient_evaluate(): approximation = >"); lp_rational_interval_print(&C_approx, trace_out); tracef("\n");
   }
 
-  if (lp_interval_is_point(&C_approx)) {
+  if (lp_rational_interval_is_point(&C_approx)) {
     // If the approximation is a point we're done
-    result = lp_value_new(LP_VALUE_RATIONAL, lp_interval_get_point(&C_approx));
+    result = lp_value_new(LP_VALUE_RATIONAL, lp_rational_interval_get_point(&C_approx));
     if (trace_is_enabled("coefficient")) {
       tracef("coefficient_evaluate(): approximation is rational = >"); lp_value_print(result, trace_out); tracef("\n");
     }
@@ -2962,17 +2962,17 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
     coefficient_get_variables(C, &C_vars);
 
     // Cache the intervals
-    lp_dyadic_interval_t* interval_cache = algebraic_interval_remember(&C_vars, M);
+    lp_dyadic_interval_t* rational_interval_cache = algebraic_interval_remember(&C_vars, M);
 
     // Filter the roots until we get only one
     for (;;) {
 
-      assert(!lp_interval_is_point(&C_approx));
+      assert(!lp_rational_interval_is_point(&C_approx));
 
       // Filter
       size_t i, to_keep;
       for (i = 0, to_keep = 0; i < roots_size; ++ i) {
-        if (lp_interval_contains_value(&C_approx, roots + i)) {
+        if (lp_rational_interval_contains_value(&C_approx, roots + i)) {
           lp_value_assign(roots + to_keep, roots + i);
           to_keep ++;
         }
@@ -3011,14 +3011,14 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
       coefficient_value_approx(ctx, C, M, &C_approx);
 
       // If we reduced to a point, we're done
-      if (lp_interval_is_point(&C_approx)) {
+      if (lp_rational_interval_is_point(&C_approx)) {
         break;
       }
     }
 
-    if (lp_interval_is_point(&C_approx)) {
+    if (lp_rational_interval_is_point(&C_approx)) {
       // Rational value approximation reduced to
-      result = lp_value_new(LP_VALUE_RATIONAL, lp_interval_get_point(&C_approx));
+      result = lp_value_new(LP_VALUE_RATIONAL, lp_rational_interval_get_point(&C_approx));
     } else {
       // We have the value in roots[0]
       result = lp_value_new_copy(roots);
@@ -3034,7 +3034,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
     lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
 
     // Release the cache
-    algebraic_interval_restore(&C_vars, interval_cache, M);
+    algebraic_interval_restore(&C_vars, rational_interval_cache, M);
 
     // Remove temps
     integer_destruct(&one);
@@ -3044,7 +3044,7 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
   }
 
-  lp_interval_destruct(&C_approx);
+  lp_rational_interval_destruct(&C_approx);
 
   return result;
 }

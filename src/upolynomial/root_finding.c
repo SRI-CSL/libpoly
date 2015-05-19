@@ -137,7 +137,7 @@ int sturm_seqence_count_sign_changes_dyadic(
 /** Count roots in the given interval */
 int sturm_seqence_count_roots(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
-    const lp_interval_t* interval)
+    const lp_rational_interval_t* interval)
 {
   // Sign changes at a (or -inf)
   int a_sgn_changes =
@@ -196,14 +196,14 @@ int sturm_seqence_count_roots_dyadic(
  * interval (a, b]. We therefore do a square-free decomposition, check if b is
  * a zero and then count the roots in (a, b].
  */
-int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_interval_t* interval) {
+int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_rational_interval_t* interval) {
 
   assert(f->K == lp_Z);
 
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_root_count_sturm(");
     lp_upolynomial_print(f, trace_out); tracef(", ");
-    lp_interval_print(interval, trace_out); tracef("\n");
+    lp_rational_interval_print(interval, trace_out); tracef("\n");
   }
 
   int total_count = 0;

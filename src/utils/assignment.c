@@ -106,7 +106,7 @@ const lp_value_t* lp_assignment_get_value(const lp_assignment_t* m, lp_variable_
   return m->values + x;
 }
 
-void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, lp_interval_t* approx) {
+void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, lp_rational_interval_t* approx) {
   assert(lp_assignment_get_value(m, x)->type != LP_VALUE_NONE);
   const lp_value_t* x_value = lp_assignment_get_value(m, x);
   lp_value_approx(x_value, approx);

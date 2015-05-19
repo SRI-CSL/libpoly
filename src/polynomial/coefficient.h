@@ -151,7 +151,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
  * Returns the approximation of value of the coefficient (is either zero or
  * does not contain zero.
  */
-void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_interval_t* value);
+void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_rational_interval_t* value);
 
 /** Evaluates the coefficient in the model. */
 lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M);

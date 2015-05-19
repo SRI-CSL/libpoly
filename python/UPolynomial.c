@@ -775,14 +775,14 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
     }
 
     // The interval
-    lp_interval_t ab;
-    lp_interval_construct_from_dyadic(&ab, &a_rat, 1, &b_rat, 1);
+    lp_rational_interval_t ab;
+    lp_rational_interval_construct_from_dyadic(&ab, &a_rat, 1, &b_rat, 1);
 
     // Count
     roots = lp_upolynomial_roots_count(p->p, &ab);
 
     // Remove the temporaries
-    lp_interval_destruct(&ab);
+    lp_rational_interval_destruct(&ab);
     lp_dyadic_rational_destruct(&a_rat);
     lp_dyadic_rational_destruct(&b_rat);
 

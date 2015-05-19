@@ -76,7 +76,7 @@ void lp_value_assign(lp_value_t* v, const lp_value_t* from);
 void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data);
 
 /** Get the approximate value */
-void lp_value_approximate(const lp_value_t* v, lp_interval_t* approx);
+void lp_value_approximate(const lp_value_t* v, lp_rational_interval_t* approx);
 
 /** Compare two values. */
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2);
