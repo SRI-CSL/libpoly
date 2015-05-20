@@ -51,6 +51,9 @@ void lp_interval_destruct(lp_interval_t* I);
 /** Swap the two intervals */
 void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2);
 
+/** Check if the value is contained in the interval */
+int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v);
+
 /** Prints the interval to the given stream. */
 int lp_interval_print(const lp_interval_t* I, FILE* out);
 

@@ -11,6 +11,23 @@
 #include "sign_condition.h"
 
 /**
+ * Set of disjoint intervals representing an algebraic set, ordered from
+ * left to right (-inf to +inf).
+ */
+struct lp_feasibility_set_struct {
+
+  /** Number of intervals */
+  size_t size;
+
+  /** Capacity of the intervals table */
+  size_t capacity;
+
+  /** Vector feasibility intervals */
+  lp_interval_t* intervals;
+
+};
+
+/**
  * Create a new feasibility set [-inf, inf].
  */
 lp_feasibility_set_t* lp_feasibility_set_new();

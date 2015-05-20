@@ -17,6 +17,7 @@
 #include "utils.h"
 #include "variable_list.h"
 #include "sign_condition.h"
+#include "feasibility_set.h"
 
 #include <structmember.h>
 
@@ -1342,7 +1343,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   }
 
   PyObject* sgn_condition_obj = PyTuple_GetItem(args, 0);
-  if (!PyInt_CHECK(sgn_condition_obj)) {
+  if (!PyInt_Check(sgn_condition_obj)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
