@@ -12,9 +12,11 @@
 #include "VariableOrder.h"
 #include "Assignment.h"
 #include "Value.h"
+#include "Interval.h"
 
 #include "utils.h"
 #include "variable_list.h"
+#include "sign_condition.h"
 
 #include <structmember.h>
 
@@ -129,6 +131,9 @@ Polynomial_evaluate(PyObject* self, PyObject* args);
 static PyObject*
 Polynomial_vars(PyObject* self);
 
+static PyObject*
+Polynomial_feasible_intervals(PyObject* self, PyObject* args);
+
 PyMethodDef Polynomial_methods[] = {
     {"degree", (PyCFunction)Polynomial_degree, METH_NOARGS, "Returns the degree of the polynomial in its top variable"},
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
@@ -143,7 +148,7 @@ PyMethodDef Polynomial_methods[] = {
     {"factor", (PyCFunction)Polynomial_factor, METH_NOARGS, "Returns the factorization of the polynomial"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"roots_count", (PyCFunction)Polynomial_roots_count, METH_VARARGS, "Returns the number of real roots in the given interval"},
-    {"roots_isolate", (PyCFunction)Polynomial_roots_isolate, METH_VARARGS, "Returns the list of real roots"},
+    {"roots_isolate", (PyCFunction)Polynomial_roots_isolate, METH_VARARGS, "Returns the list of real roots (has to be univariate modulo the assignment)"},
     {"sturm_sequence", (PyCFunction)Polynomial_sturm_sequence, METH_NOARGS, "Returns the Sturm sequence"},
     {"derivative", (PyCFunction)Polynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
@@ -151,6 +156,7 @@ PyMethodDef Polynomial_methods[] = {
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
     {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
+    {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals of the polynomial (has to be univariate modulo the assignment)"},
     {NULL}  /* Sentinel */
 };
 
@@ -1319,4 +1325,46 @@ Polynomial_evaluate(PyObject* self, PyObject* args) {
   lp_value_delete(value);
 
   return value_obj;
+}
+
+static PyObject*
+Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 2) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+  if (!PyAssignment_CHECK(assignment_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* sgn_condition_obj = PyTuple_GetItem(args, 0);
+  if (!PyInt_CHECK(sgn_condition_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  // Get the arguments
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+  lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+
+  // Get the feasible intervals
+  lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, assignment);
+
+  // The list where we return the arguments
+  PyObject* list = PyList_New(feasible->size);
+  // Copy over to the list
+  size_t i;
+  for (i = 0; i < feasible->size; ++i) {
+    PyObject* p = PyInterval_create(feasible->intervals + i);
+    PyList_SetItem(list, i, p);
+  }
+  // Remove temp
+  lp_feasibility_set_delete(feasible);
+  // Return the list
+  return list;
 }
