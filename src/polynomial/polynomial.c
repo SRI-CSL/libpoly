@@ -916,7 +916,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
   // Get the derivative of the polynomial
   coefficient_t dA;
-  coefficient_construct(&dA);
+  coefficient_construct(A->ctx, &dA);
   coefficient_derivative(A->ctx, &dA, &A->data);
 
   //
@@ -929,52 +929,54 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   // is not 0.
   //
 
-  // Compute the sign at -inf = sgn(lc)*-1^n, +inf = sgn(lc)*1
-  int sgn_lc = coefficient_sgn(A->ctx, coefficient_lc(&A->data), M);
-  int sgn_first = degree % 2 ? -sgn_lc : sgn_lc;
-  int sgn_last = sgn_lc;
+  (void)sgn_condition;
 
-  // Current lower bound we are looking atLower and upper bound on the current interval
-  lp_value_t inf_neg, inf_pos;
-  lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
-  lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
-
-  // We start from (-inf and try to extend
-
-  size_t i;
-  for (i = 0; i < roots_size; ++ i){
-
-    // The next root we are considering
-    const lp_value_t* next = roots + i;
-
-    // Set the value into the model
-    lp_assignment_set_value((lp_assignment_t*) M, x, next);
-    int sgn = coefficient_sgn(A->ctx, &dA, M);
-    lp_assignment_set_value((lp_assignment_t*) M, x, 0);
-
-    switch (sgn_condition) {
-    case LP_SGN_LT_0:
-    case LP_SGN_LE_0:
-    case LP_SGN_EQ_0:
-    case LP_SGN_NE_0:
-    case LP_SGN_GT_0:
-    case LP_SGN_GE_0:
-    default:
-      assert(0);
-    }
-
-  }
-
-  // Free the roots
-  for (i = 0; i < roots_size; ++ i) {
-    lp_value_destruct(roots + i);
-  }
-  free(roots);
-
-  // Remove the temps
-  coefficient_destruct(&dA);
-  lp_value_destruct(&inf_neg);
-  lp_value_destruct(&inf_pos);
+//  // Compute the sign at -inf = sgn(lc)*-1^n, +inf = sgn(lc)*1
+//  int sgn_lc = coefficient_sgn(A->ctx, coefficient_lc(&A->data), M);
+//  int sgn_first = degree % 2 ? -sgn_lc : sgn_lc;
+//  int sgn_last = sgn_lc;
+//
+//  // Current lower bound we are looking atLower and upper bound on the current interval
+//  lp_value_t inf_neg, inf_pos;
+//  lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
+//  lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
+//
+//  // We start from (-inf and try to extend
+//
+//  size_t i;
+//  for (i = 0; i < roots_size; ++ i){
+//
+//    // The next root we are considering
+//    const lp_value_t* next = roots + i;
+//
+//    // Set the value into the model
+//    lp_assignment_set_value((lp_assignment_t*) M, x, next);
+//    int sgn = coefficient_sgn(A->ctx, &dA, M);
+//    lp_assignment_set_value((lp_assignment_t*) M, x, 0);
+//
+//    switch (sgn_condition) {
+//    case LP_SGN_LT_0:
+//    case LP_SGN_LE_0:
+//    case LP_SGN_EQ_0:
+//    case LP_SGN_NE_0:
+//    case LP_SGN_GT_0:
+//    case LP_SGN_GE_0:
+//    default:
+//      assert(0);
+//    }
+//
+//  }
+//
+//  // Free the roots
+//  for (i = 0; i < roots_size; ++ i) {
+//    lp_value_destruct(roots + i);
+//  }
+//  free(roots);
+//
+//  // Remove the temps
+//  coefficient_destruct(&dA);
+//  lp_value_destruct(&inf_neg);
+//  lp_value_destruct(&inf_pos);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set() => "); lp_feasibility_set_print(result, trace_out); tracef("\n");

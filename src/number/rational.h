@@ -200,3 +200,12 @@ void rational_get_den(const lp_rational_t* q, lp_integer_t* den) {
   mpq_get_den(den, q);
 }
 
+static inline
+void rational_floor(const lp_rational_t* q, lp_integer_t* q_floor) {
+  mpz_fdiv_q(q_floor, mpq_numref(q), mpq_denref(q));
+}
+
+static inline
+void rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling) {
+  mpz_cdiv_q(q_ceiling, mpq_numref(q), mpq_denref(q));
+}

@@ -105,3 +105,7 @@ void lp_value_get_num(const lp_value_t* v, lp_integer_t* num);
 
 /** Get the denominator (only if integer, dyadic rational, or rational) */
 void lp_value_get_den(const lp_value_t* v, lp_integer_t* den);
+
+/** Get a value in the interval [a, b] with strictness of the interval given by a_strict and b_strict. */
+void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_value_t* b, int b_strict, lp_value_t* v);
+

@@ -186,6 +186,10 @@ int lp_value_print(const lp_value_t* v, FILE* out) {
 
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
 
+  if (v1 == v2) {
+    return 0;
+  }
+
   if (v1->type == v2->type) {
     lp_value_type_t type = v1->type;
     switch (type) {
@@ -404,4 +408,142 @@ char* lp_value_to_string(const lp_value_t* v) {
   lp_value_print(v, f);
   fclose(f);
   return str;
+}
+
+
+
+void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_value_t* b, int b_strict, lp_value_t* v) {
+
+  int cmp = lp_value_cmp(a, b);
+  if (cmp == 0) {
+    // Same, we're done
+    assert(!a_strict && !b_strict);
+    lp_value_assign(v, a);
+    return;
+  } else if (cmp > 0) {
+    const lp_value_t* tmp = a; a = b; b = tmp;
+  }
+
+  lp_rational_t result;
+
+  // We have a < b, and comparison ensures that the algebraic intervals will be
+  // disjoint
+
+  // Get the values a_ub and b_lb such that a <= a_ub < b_lb <= b
+  lp_rational_t a_ub, b_lb;
+
+  switch (a->type) {
+  case LP_VALUE_INTEGER:
+    rational_construct_from_integer(&a_ub, &a->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    rational_construct_from_dyadic(&a_ub, &a->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    rational_construct_copy(&a_ub, &a->value.q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    if (a->value.a.I.is_point) {
+      rational_construct_from_dyadic(&a_ub, lp_dyadic_interval_get_point(&a->value.a.I));
+    } else {
+      rational_construct_from_dyadic(&a_ub, &a->value.a.I.b);
+      // if a is in (lb, ub) and we're looking for strict bigger, then we can
+      // pick ub
+      a_strict = 0;
+    }
+    break;
+  default:
+    assert(0);
+  }
+
+  switch (b->type) {
+  case LP_VALUE_INTEGER:
+    rational_construct_from_integer(&b_lb, &b->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    rational_construct_from_dyadic(&b_lb, &b->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    rational_construct_copy(&b_lb, &b->value.q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    if (b->value.a.I.is_point) {
+      rational_construct_from_dyadic(&b_lb, lp_dyadic_interval_get_point(&b->value.a.I));
+    } else {
+      rational_construct_from_dyadic(&b_lb, &b->value.a.I.a);
+      // if b is in (lb, ub) and we're looking for strict bigger, then we can
+      // pick lb
+      b_strict = 0;
+    }
+    break;
+  default:
+    assert(0);
+  }
+
+  // Get the smallest integer interval around [a_ub, b_lb] and refine
+  lp_rational_t m;
+  rational_construct(&m);
+  rational_add(&m, &a_ub, &b_lb);
+  rational_div_2exp(&m, &m, 1);
+
+  lp_integer_t m_floor, m_ceil;
+  integer_construct(&m_floor);
+  rational_floor(&m, &m_floor);
+  integer_construct_copy(lp_Z, &m_ceil, &m_floor);
+  integer_inc(lp_Z, &m_ceil);
+
+  // If a_ub < m_floor, we can take this value
+  cmp = lp_rational_cmp_integer(&a_ub, &m_floor);
+  if ((a_strict && cmp > 0) || (!a_strict && cmp >= 0)) {
+    lp_rational_construct_from_integer(&result, &m_floor);
+  } else {
+    // If m_ceil < b_lb, we can take this value
+    cmp = lp_rational_cmp_integer(&b_lb, &m_ceil);
+    if ((b_strict&& cmp > 0) || (!b_strict && cmp <= 0)) {
+      lp_rational_construct_from_integer(&result, &m_ceil);
+    } else {
+
+      lp_rational_t lb, ub;
+      rational_construct_from_integer(&lb, &m_floor);
+      rational_construct_from_integer(&ub, &m_ceil);
+
+      // We have to do the search
+      for (;;) {
+
+        // always: lb < a_ub <= b_lb < ub
+        rational_add(&m, &lb, &ub);
+        rational_div_2exp(&m, &m, 1);
+
+        // lb < m < a_ub => move lb to m
+        cmp = rational_cmp(&a_ub, &m);
+        if ((a_strict && cmp >= 0) || (!a_strict && cmp > 0)) {
+          rational_swap(&m, &lb);
+          continue;
+        }
+
+        // b_lb < m < ub => move ub to m
+        cmp = rational_cmp(&m, &b_lb);
+        if ((b_strict && cmp >= 0) || (!b_strict && cmp > 0)) {
+          rational_swap(&ub, &m);
+          continue;
+        }
+
+        // Got it l <= m <= u
+        rational_swap(&m, &result);
+        break;
+      }
+
+      rational_destruct(&lb);
+      rational_destruct(&ub);
+    }
+  }
+
+  lp_value_assign_raw(v, LP_VALUE_RATIONAL, &result);
+
+  integer_destruct(&m_ceil);
+  integer_destruct(&m_floor);
+  rational_destruct(&m);
+  rational_destruct(&a_ub);
+  rational_destruct(&b_lb);
+  rational_destruct(&result);
 }
