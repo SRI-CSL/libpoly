@@ -849,35 +849,39 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     }
   }
 
-  // Sort the roots
-  qsort(roots_tmp, roots_tmp_size, sizeof(lp_value_t), lp_value_cmp_void);
+  if (roots_tmp_size > 0) {
+    // Sort the roots
+    qsort(roots_tmp, roots_tmp_size, sizeof(lp_value_t), lp_value_cmp_void);
 
-  if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n")
-    for (i = 0; i < roots_tmp_size; ++ i) {
-      tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
-    }
-  }
-
-  // Remove any duplicates
-  size_t to_keep;
-  for (to_keep = 1, i = 1; i < roots_tmp_size; ++ i) {
-    if (lp_value_cmp(roots_tmp + i, roots_tmp  + to_keep-1) != 0) {
-      // If different copy over
-      if (i != to_keep) {
-        lp_value_assign(roots_tmp + to_keep, roots_tmp + i);
+    if (trace_is_enabled("polynomial")) {
+      tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n")
+      for (i = 0; i < roots_tmp_size; ++ i) {
+        tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
       }
-      // This one is a keeper
-      to_keep ++;
     }
-  }
-  for (i = to_keep; i < roots_tmp_size; ++ i) {
-    lp_value_destruct(roots_tmp + i);
-  }
-  roots_tmp_size = to_keep;
 
-  // Copy over the roots
-  memcpy(roots, roots_tmp, roots_tmp_size*sizeof(lp_value_t));
+    // Remove any duplicates
+    size_t to_keep;
+    for (to_keep = 1, i = 1; i < roots_tmp_size; ++ i) {
+      if (lp_value_cmp(roots_tmp + i, roots_tmp  + to_keep-1) != 0) {
+        // If different copy over
+        if (i != to_keep) {
+          lp_value_assign(roots_tmp + to_keep, roots_tmp + i);
+        }
+        // This one is a keeper
+        to_keep ++;
+      }
+    }
+    for (i = to_keep; i < roots_tmp_size; ++ i) {
+      lp_value_destruct(roots_tmp + i);
+    }
+    roots_tmp_size = to_keep;
+
+    // Copy over the roots
+    memcpy(roots, roots_tmp, roots_tmp_size*sizeof(lp_value_t));
+  }
+
+  // Set the new size
   *roots_size = roots_tmp_size;
 
   // Destroy the temps

@@ -56,4 +56,4 @@ lp_sign_condition_t lp_sign_condition_negate(lp_sign_condition_t sgn_condition) 
   return LP_SGN_EQ_0;
 }
 
-
+int lp_sign_condition_print(const lp_polynomial_t* A, FILE* out);

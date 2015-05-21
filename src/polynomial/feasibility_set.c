@@ -20,7 +20,11 @@
 void lp_feasibility_set_construct(lp_feasibility_set_t* s, size_t size) {
   s->size = 0;
   s->capacity = size;
-  s->intervals = malloc(s->capacity * sizeof(lp_interval_t));
+  if (size) {
+    s->intervals = malloc(s->capacity * sizeof(lp_interval_t));
+  } else {
+    s->intervals = 0;
+  }
 }
 
 lp_feasibility_set_t* lp_feasibility_set_new_internal(size_t size) {

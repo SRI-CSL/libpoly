@@ -1342,7 +1342,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
     return Py_NotImplemented;
   }
 
-  PyObject* sgn_condition_obj = PyTuple_GetItem(args, 0);
+  PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
   if (!PyInt_Check(sgn_condition_obj)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
