@@ -23,6 +23,12 @@ void lp_feasibility_set_construct(lp_feasibility_set_t* s, size_t size) {
   s->intervals = malloc(s->capacity * sizeof(lp_interval_t));
 }
 
+lp_feasibility_set_t* lp_feasibility_set_new_internal(size_t size) {
+  lp_feasibility_set_t* result = malloc(sizeof(lp_feasibility_set_t));
+  lp_feasibility_set_construct(result, size);
+  return result;
+}
+
 void lp_feasibility_set_destruct(lp_feasibility_set_t* s) {
   size_t i;
   for (i = 0; i < s->size; ++ i) {
@@ -32,12 +38,12 @@ void lp_feasibility_set_destruct(lp_feasibility_set_t* s) {
 }
 
 lp_feasibility_set_t* lp_feasibility_set_new() {
-  lp_feasibility_set_t* result = malloc(sizeof(lp_feasibility_set_t));
-  lp_feasibility_set_construct(result, 1);
+  lp_feasibility_set_t* result = lp_feasibility_set_new_internal(1);
   lp_value_t inf_neg, inf_pos;
   lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
   lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
   lp_interval_construct(result->intervals, &inf_neg, 1, &inf_pos, 1);
+  result->size = 1;
   return result;
 }
 
