@@ -424,6 +424,16 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     const lp_value_t* tmp = a; a = b; b = tmp;
   }
 
+  // If the whole R we're done
+  if (a->type == LP_VALUE_MINUS_INFINITY && b->type == LP_VALUE_PLUS_INFINITY) {
+     // (-inf, +inf), just pick 0
+     lp_rational_t zero;
+     lp_rational_construct(&zero);
+     lp_value_assign_raw(v, LP_VALUE_RATIONAL, &zero);
+     lp_rational_destruct(&zero);
+     return;
+   }
+
   lp_rational_t result;
 
   // We have a < b, and comparison ensures that the algebraic intervals will be
@@ -431,8 +441,12 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
 
   // Get the values a_ub and b_lb such that a <= a_ub < b_lb <= b
   lp_rational_t a_ub, b_lb;
+  int a_inf = 0, b_inf = 0;
 
   switch (a->type) {
+  case LP_VALUE_MINUS_INFINITY:
+    a_inf = 1;
+    break;
   case LP_VALUE_INTEGER:
     rational_construct_from_integer(&a_ub, &a->value.z);
     break;
@@ -457,6 +471,9 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
   }
 
   switch (b->type) {
+  case LP_VALUE_PLUS_INFINITY:
+    b_inf = 1;
+    break;
   case LP_VALUE_INTEGER:
     rational_construct_from_integer(&b_lb, &b->value.z);
     break;
@@ -478,6 +495,27 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     break;
   default:
     assert(0);
+  }
+
+  assert(!a_inf || !b_inf);
+
+  if (a_inf) {
+    // If a is infinity, just take it to be [b-1
+    lp_rational_t one;
+    lp_rational_construct(&one);
+    rational_construct(&a_ub);
+    rational_sub(&a_ub, &b_lb, &one);
+    lp_rational_destruct(&one);
+    a_strict = 0;
+  }
+
+  if (b_inf) {
+    // If b is infinity, just take it to be a + 1]
+    lp_rational_t one;
+    lp_rational_construct(&one);
+    rational_construct(&b_lb);
+    rational_add(&b_lb, &a_ub, &one);
+    lp_rational_destruct(&one);
   }
 
   // Get the smallest integer interval around [a_ub, b_lb] and refine

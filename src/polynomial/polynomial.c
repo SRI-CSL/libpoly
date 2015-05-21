@@ -5,10 +5,10 @@
  *      Author: dejan
  */
 
-#include "upolynomial.h"
-#include "feasibility_set.h"
-#include "variable_db.h"
-#include "variable_list.h"
+#include <upolynomial.h>
+#include <feasibility_set.h>
+#include <variable_db.h>
+#include <variable_list.h>
 
 #include "polynomial/polynomial.h"
 
@@ -18,6 +18,8 @@
 
 #include "number/rational.h"
 #include "number/integer.h"
+
+#include "polynomial/feasibility_set.h"
 
 #include "utils/debug_trace.h"
 
@@ -888,6 +890,28 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   free(roots_tmp);
 }
 
+static
+int sign_consistent(int sign, lp_sign_condition_t sgn_condition) {
+  switch (sgn_condition) {
+  case LP_SGN_LT_0:
+    return sign < 0;
+  case LP_SGN_LE_0:
+    return sign <= 0;
+  case LP_SGN_EQ_0:
+    return sign == 0;
+  case LP_SGN_NE_0:
+    return sign != 0;
+  case LP_SGN_GT_0:
+    return sign > 0;
+  case LP_SGN_GE_0:
+    return sign >= 0;
+  default:
+    assert(0);
+  }
+
+  return 0;
+}
+
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
@@ -902,9 +926,6 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   // Make sure that the top variable is unassigned
   lp_variable_t x = coefficient_top_variable(&A->data);
   assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
-
-  // The result
-  lp_feasibility_set_t* result = 0;
 
   // The degree of the polynomial
   size_t degree = coefficient_degree(&A->data);
@@ -925,64 +946,89 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   //   r0   r1   ...   r_n
   //
   // We start at -inf and go to -inf, where we can compute the sign of the
-  // polynomial. At roots, the sign is 0, and the sign changes if the derivative
-  // is not 0.
+  // polynomial.
   //
 
-  (void)sgn_condition;
+  size_t signs_size = 2*roots_size + 1;
+  int* signs = malloc(sizeof(int)*signs_size);
 
-//  // Compute the sign at -inf = sgn(lc)*-1^n, +inf = sgn(lc)*1
-//  int sgn_lc = coefficient_sgn(A->ctx, coefficient_lc(&A->data), M);
-//  int sgn_first = degree % 2 ? -sgn_lc : sgn_lc;
-//  int sgn_last = sgn_lc;
-//
-//  // Current lower bound we are looking atLower and upper bound on the current interval
-//  lp_value_t inf_neg, inf_pos;
-//  lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
-//  lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
-//
-//  // We start from (-inf and try to extend
-//
-//  size_t i;
-//  for (i = 0; i < roots_size; ++ i){
-//
-//    // The next root we are considering
-//    const lp_value_t* next = roots + i;
-//
-//    // Set the value into the model
-//    lp_assignment_set_value((lp_assignment_t*) M, x, next);
-//    int sgn = coefficient_sgn(A->ctx, &dA, M);
-//    lp_assignment_set_value((lp_assignment_t*) M, x, 0);
-//
-//    switch (sgn_condition) {
-//    case LP_SGN_LT_0:
-//    case LP_SGN_LE_0:
-//    case LP_SGN_EQ_0:
-//    case LP_SGN_NE_0:
-//    case LP_SGN_GT_0:
-//    case LP_SGN_GE_0:
-//    default:
-//      assert(0);
-//    }
-//
-//  }
-//
-//  // Free the roots
-//  for (i = 0; i < roots_size; ++ i) {
-//    lp_value_destruct(roots + i);
-//  }
-//  free(roots);
-//
-//  // Remove the temps
-//  coefficient_destruct(&dA);
-//  lp_value_destruct(&inf_neg);
-//  lp_value_destruct(&inf_pos);
+  int sgn_lc = coefficient_sgn(A->ctx, coefficient_lc(&A->data), M);
 
-  if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_get_feasible_set() => "); lp_feasibility_set_print(result, trace_out); tracef("\n");
+  // Signs at -inf and +inf
+  signs[0] = degree % 2 ? -sgn_lc : sgn_lc;
+  signs[signs_size-1] = sgn_lc;
+
+  // Signs at root
+  size_t i;
+  lp_value_t m;
+  for (i = 0; i < roots_size; ++ i) {
+    signs[2*i+1] = 0;
+    if (i+1<roots_size) {
+      lp_value_get_value_between(roots + i, 1, roots + i + 1, 1, &m);
+      lp_assignment_set_value((lp_assignment_t*) M, x, &m);
+      signs[2*i+2] = coefficient_sgn(A->ctx, &A->data, M);
+      lp_assignment_set_value((lp_assignment_t*) M, x, 0);
+    }
+  }
+  lp_value_destruct(&m);
+
+  // Count the number of intervals
+  size_t intervals_size = 0, lb, ub;
+  for (lb = 0; lb < signs_size;) {
+    // Find lower bound
+    while (!sign_consistent(signs[lb], sgn_condition) && lb < signs_size) { lb ++; }
+    if (lb < signs_size) {
+      // Find the upoer bound
+      ub = lb;
+      while (sign_consistent(signs[ub], sgn_condition) && ub < signs_size) { ub ++; }
+      if (ub < signs_size) {
+        intervals_size ++;
+      }
+      // Try the next one
+      lb = ub + 1;
+    }
   }
 
-  return result;
+
+  lp_feasibility_set_t result;
+  lp_feasibility_set_construct(&result, intervals_size);
+
+  lp_value_t inf_neg, inf_pos;
+  lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
+  lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
+
+  // Go through signs and collect the largest intervals
+  size_t interval = 0;
+  for (lb = 0; lb < signs_size;) {
+    // find lower bound
+    while (!sign_consistent(signs[lb], sgn_condition) && lb < signs_size) { lb ++; }
+    if (lb < signs_size) {
+      // find uppoer bound
+      ub = lb;
+      while (sign_consistent(signs[ub], sgn_condition) && ub < signs_size) { ub ++; }
+      if (ub < signs_size) {
+        // Found the interval
+        if (lb == ub) {
+          // it's a point
+          assert(lb % 2);
+          lp_interval_construct_point(result.intervals + interval, roots + (lb / 2));
+        } else {
+          // It's an interval
+        }
+
+        interval ++;
+      }
+      // Try the next one
+      lb = ub + 1;
+    }
+  }
+  assert(interval == intervals_size);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_get_feasible_set() => "); lp_feasibility_set_print(&result, trace_out); tracef("\n");
+  }
+
+  return 0;
 }
 
 void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars) {

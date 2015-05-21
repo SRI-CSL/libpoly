@@ -15,17 +15,14 @@
 
 #include "polynomial/polynomial.h"
 #include "utils/debug_trace.h"
+#include "polynomial/feasibility_set.h"
 
-#define FEASIBILITY_SET_INITIAL_CAPACITY 10
-
-static
-void lp_feasibility_set_construct(lp_feasibility_set_t* s) {
+void lp_feasibility_set_construct(lp_feasibility_set_t* s, size_t size) {
   s->size = 0;
-  s->capacity = FEASIBILITY_SET_INITIAL_CAPACITY;
+  s->capacity = size;
   s->intervals = malloc(s->capacity * sizeof(lp_interval_t));
 }
 
-static
 void lp_feasibility_set_destruct(lp_feasibility_set_t* s) {
   size_t i;
   for (i = 0; i < s->size; ++ i) {
@@ -36,7 +33,11 @@ void lp_feasibility_set_destruct(lp_feasibility_set_t* s) {
 
 lp_feasibility_set_t* lp_feasibility_set_new() {
   lp_feasibility_set_t* result = malloc(sizeof(lp_feasibility_set_t));
-  lp_feasibility_set_construct(result);
+  lp_feasibility_set_construct(result, 1);
+  lp_value_t inf_neg, inf_pos;
+  lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
+  lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
+  lp_interval_construct(result->intervals, &inf_neg, 1, &inf_pos, 1);
   return result;
 }
 
