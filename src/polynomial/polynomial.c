@@ -919,7 +919,7 @@ int sign_consistent(int sign, lp_sign_condition_t sgn_condition) {
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef("\n");
+    tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", "); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
   }
 
   assert(!lp_polynomial_is_constant(A));
@@ -973,18 +973,14 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
   // Count the number of intervals
   size_t intervals_size = 0, lb, ub;
-  for (lb = 0; lb < signs_size;) {
+  for (lb = 0; lb < signs_size; lb = ub) {
     // Find lower bound
-    while (!sign_consistent(signs[lb], sgn_condition) && lb < signs_size) { lb ++; }
+    for (; lb < signs_size && !sign_consistent(signs[lb], sgn_condition); lb ++) {}
     if (lb < signs_size) {
-      // Find the upoer bound
-      ub = lb;
-      while (sign_consistent(signs[ub], sgn_condition) && ub < signs_size) { ub ++; }
-      if (ub < signs_size) {
-        intervals_size ++;
-      }
-      // Try the next one
-      lb = ub + 1;
+      // Found one
+      intervals_size ++;
+      // Find the upper bound
+      for (ub = lb + 1; ub < signs_size && sign_consistent(signs[ub], sgn_condition); ub ++) {}
     }
   }
 
@@ -997,66 +993,66 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
   // Go through signs and collect the contiguous intervals
   size_t interval = 0;
-  for (lb = 0; lb < signs_size;) {
+  for (lb = 0; lb < signs_size; lb = ub) {
     // find lower bound
-    while (!sign_consistent(signs[lb], sgn_condition) && lb < signs_size) { lb ++; }
+    for (; lb < signs_size && !sign_consistent(signs[lb], sgn_condition); lb ++) {}
     if (lb < signs_size) {
       // find upper bound
-      ub = lb;
-      while (sign_consistent(signs[ub], sgn_condition) && ub < signs_size) { ub ++; }
-      if (ub < signs_size) {
-        // Found the interval
-        if (lb == ub && lb % 2) {
-          // it's a point
-          lp_interval_construct_point(result->intervals + interval, roots + (lb / 2));
+      for (ub = lb + 1; ub < signs_size && sign_consistent(signs[ub], sgn_condition); ub ++) {}
+
+      // Found the interval
+      if (lb == (ub + 1) && lb % 2) {
+        // it's a point
+        lp_interval_construct_point(result->intervals + interval, roots + (lb / 2));
+      } else {
+        // It's an interval
+        const lp_value_t* lb_value;
+        const lp_value_t* ub_value;
+        int lb_strict, ub_strict;
+
+        // lb point to the first satisfied
+        // ub is last satisfied +1
+
+        // Lower bound
+        if (lb % 2 == 1) {
+          // Root
+          lb_value = roots + (lb/2);
+          lb_strict = 0;
         } else {
-          // It's an interval
-          const lp_value_t* lb_value;
-          const lp_value_t* ub_value;
-          int lb_strict, ub_strict;
-
-          // Lower bound
-          if (lb % 2) {
-            // Root
-            lb_value = roots + (lb / 2);
-            lb_strict = 0;
+          // Interval
+          if (lb == 0) {
+            // -inf
+            lb_value = &inf_neg;
           } else {
-            // Interval
-            if (lb == 0) {
-              // -inf
-              lb_value = &inf_neg;
-            } else {
-              // Root bounding the interval
-              lb_value = roots + ((lb - 1)/2);
-            }
-            lb_strict = 1;
+            // Root bounding the interval
+            lb_value = roots + ((lb-1)/2);
           }
-
-          // Upper bound
-          if (ub % 2) {
-            // Root
-            ub_value = roots + (ub / 2);
-            ub_strict = 0;
-          } else {
-            // Interval
-            if (ub == signs_size - 1) {
-              // +inf
-              ub_value = &inf_pos;
-            } else {
-              ub_value = roots + (ub/2);
-            }
-            ub_strict = 1;
-          }
-
-          // Construct the interval
-          lp_interval_construct(result->intervals + interval, lb_value, lb_strict, ub_value, ub_strict);
+          lb_strict = 1;
         }
 
-        // Done with this interval
-        interval ++;
+        // Upper bound
+        if (ub % 2 == 0) {
+          // Root
+          ub_value = roots + ((ub-1)/2);
+          ub_strict = 0;
+        } else {
+          // Interval
+          if (ub == signs_size) {
+            // +inf
+            ub_value = &inf_pos;
+          } else {
+            // Root bounding the interval
+            ub_value = roots + (ub/2);
+          }
+          ub_strict = 1;
+        }
+
+        // Construct the interval
+        lp_interval_construct(result->intervals + interval, lb_value, lb_strict, ub_value, ub_strict);
       }
-      // Try the next one
-      lb = ub + 1;
+
+      // Done with this interval
+      interval ++;
     }
   }
 
@@ -1068,7 +1064,10 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   free(signs);
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_get_feasible_set() => "); lp_feasibility_set_print(result, trace_out); tracef("\n");
+    tracef("polynomial_get_feasible_set(");
+    lp_polynomial_print(A, trace_out);
+    tracef(", "); lp_sign_condition_print(sgn_condition, trace_out);
+    tracef(") => "); lp_feasibility_set_print(result, trace_out); tracef("\n");
   }
 
   return result;

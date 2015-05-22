@@ -39,7 +39,7 @@ PyTypeObject IntervalType = {
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
     0                    ,      /*tp_compare*/
-    0,                          /*tp_repr*/
+    Interval_str,               /*tp_repr*/
     0,                          /*tp_as_number*/
     0,                          /*tp_as_sequence*/
     0,                          /*tp_as_mapping*/
