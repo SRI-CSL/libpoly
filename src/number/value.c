@@ -441,9 +441,6 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
      return;
    }
 
-  // To be constructed to the value
-  lp_rational_t result;
-
   // We have a < b, and comparison ensures that the algebraic intervals will be
   // disjoint
 
@@ -527,82 +524,103 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     b_strict = 0;
   }
 
-  // Get the smallest integer interval around [a_ub, b_lb] and refine
-  lp_rational_t m;
-  rational_construct(&m);
-  rational_add(&m, &a_ub, &b_lb);
-  rational_div_2exp(&m, &m, 1);
+  // To be constructed to the value
+  lp_rational_t result;
 
-  lp_integer_t m_floor, m_ceil;
-  integer_construct(&m_floor);
-  rational_floor(&m, &m_floor);
-  integer_construct_copy(lp_Z, &m_ceil, &m_floor);
-  integer_inc(lp_Z, &m_ceil);
-
-  if (trace_is_enabled("value::pick")) {
-    tracef("a_ub = "); lp_rational_print(&a_ub, trace_out); tracef("\n");
-    tracef("b_ub = "); lp_rational_print(&b_lb, trace_out); tracef("\n");
-    tracef("m = "); lp_rational_print(&m, trace_out); tracef("\n");
-    tracef("m_floor = "); lp_integer_print(&m_floor, trace_out); tracef("\n");
-    tracef("m_ceil = "); lp_integer_print(&m_ceil, trace_out); tracef("\n");
-  }
-
-  // If a_ub < m_floor, we can take this value
-  cmp = lp_rational_cmp_integer(&a_ub, &m_floor);
-  // if ((cmp > 0) || (!a_strict && cmp >= 0)) {
-  if (cmp > 0) {
-    lp_rational_construct_from_integer(&result, &m_floor);
+  // If a_ub == b_lb, this is due to algebraic number intervals, so just return a_ub
+  cmp = rational_cmp(&a_ub, &b_lb);
+  if (cmp == 0) {
+    lp_rational_construct_copy(&result, &a_ub);
   } else {
-    // If m_ceil < b_lb, we can take this value
-    cmp = lp_rational_cmp_integer(&b_lb, &m_ceil);
-    // if ((b_strict&& cmp > 0) || (!b_strict && cmp <= 0)) {
-    if (cmp > 0) {
-      lp_rational_construct_from_integer(&result, &m_ceil);
-    } else {
 
-      lp_rational_t lb, ub;
-      rational_construct_from_integer(&lb, &m_floor);
-      rational_construct_from_integer(&ub, &m_ceil);
+    // Get the smallest integer interval around [a_ub, b_lb] and refine
+    lp_rational_t m;
+    rational_construct(&m);
+    rational_add(&m, &a_ub, &b_lb);
+    rational_div_2exp(&m, &m, 1);
 
-      // We have to do the search
-      for (;;) {
+    lp_integer_t m_floor, m_ceil;
+    integer_construct(&m_floor);
+    rational_floor(&m, &m_floor);
+    integer_construct_copy(lp_Z, &m_ceil, &m_floor);
+    integer_inc(lp_Z, &m_ceil);
 
-        // always: lb < a_ub <= b_lb < ub
-        rational_add(&m, &lb, &ub);
-        rational_div_2exp(&m, &m, 1);
-
-        // lb < m < a_ub => move lb to m
-        cmp = rational_cmp(&a_ub, &m);
-        // if ((a_strict && cmp >= 0) || (!a_strict && cmp > 0)) {
-        if (cmp > 0) {
-          rational_swap(&m, &lb);
-          continue;
-        }
-
-        // b_lb < m < ub => move ub to m
-        cmp = rational_cmp(&m, &b_lb);
-        // if ((b_strict && cmp >= 0) || (!b_strict && cmp > 0)) {
-        if (cmp >= 0) {
-          rational_swap(&ub, &m);
-          continue;
-        }
-
-        // Got it l <= m <= u
-        rational_construct_copy(&result, &m);
-        break;
-      }
-
-      rational_destruct(&lb);
-      rational_destruct(&ub);
+    if (trace_is_enabled("value::pick")) {
+      tracef("a_ub = ");
+      lp_rational_print(&a_ub, trace_out);
+      tracef("\n");
+      tracef("b_ub = ");
+      lp_rational_print(&b_lb, trace_out);
+      tracef("\n");
+      tracef("m = ");
+      lp_rational_print(&m, trace_out);
+      tracef("\n");
+      tracef("m_floor = ");
+      lp_integer_print(&m_floor, trace_out);
+      tracef("\n");
+      tracef("m_ceil = ");
+      lp_integer_print(&m_ceil, trace_out);
+      tracef("\n");
     }
+
+    // If a_ub < m_floor, we can take this value
+    cmp = lp_rational_cmp_integer(&a_ub, &m_floor);
+    // if ((cmp > 0) || (!a_strict && cmp >= 0)) {
+    if (cmp > 0) {
+      lp_rational_construct_from_integer(&result, &m_floor);
+    } else {
+      // If m_ceil < b_lb, we can take this value
+      cmp = lp_rational_cmp_integer(&b_lb, &m_ceil);
+      // if ((b_strict&& cmp > 0) || (!b_strict && cmp <= 0)) {
+      if (cmp > 0) {
+        lp_rational_construct_from_integer(&result, &m_ceil);
+      } else {
+
+        lp_rational_t lb, ub;
+        rational_construct_from_integer(&lb, &m_floor);
+        rational_construct_from_integer(&ub, &m_ceil);
+
+        // We have to do the search
+        for (;;) {
+
+          // always: lb < a_ub <= b_lb < ub
+          rational_add(&m, &lb, &ub);
+          rational_div_2exp(&m, &m, 1);
+
+          // lb < m < a_ub => move lb to m
+          cmp = rational_cmp(&a_ub, &m);
+          // if ((a_strict && cmp >= 0) || (!a_strict && cmp > 0)) {
+          if (cmp > 0) {
+            rational_swap(&m, &lb);
+            continue;
+          }
+
+          // b_lb < m < ub => move ub to m
+          cmp = rational_cmp(&m, &b_lb);
+          // if ((b_strict && cmp >= 0) || (!b_strict && cmp > 0)) {
+          if (cmp >= 0) {
+            rational_swap(&ub, &m);
+            continue;
+          }
+
+          // Got it l <= m <= u
+          rational_construct_copy(&result, &m);
+          break;
+        }
+
+        rational_destruct(&lb);
+        rational_destruct(&ub);
+      }
+    }
+
+    integer_destruct(&m_ceil);
+    integer_destruct(&m_floor);
+    rational_destruct(&m);
+    rational_destruct(&a_ub);
+    rational_destruct(&b_lb);
   }
 
   lp_value_assign_raw(v, LP_VALUE_RATIONAL, &result);
 
-  integer_destruct(&m_ceil);
-  integer_destruct(&m_floor);
-  rational_destruct(&m);
-  rational_destruct(&a_ub);
-  rational_destruct(&b_lb);
   rational_destruct(&result);
 }

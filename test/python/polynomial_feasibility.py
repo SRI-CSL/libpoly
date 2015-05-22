@@ -30,6 +30,15 @@ def get_feasible(p, var, assignment, sgn):
 sgns = [polypy.SGN_LT_0, polypy.SGN_LE_0, polypy.SGN_EQ_0, polypy.SGN_NE_0, polypy.SGN_GT_0, polypy.SGN_GE_0]
 
 assignment = polypy.Assignment()
+assignment.set_value(y, 1)
+assignment.set_value(z, 1)
+
+p = x**2 - y - z
+for sgn in sgns:
+    get_feasible(p, x, assignment, sgn)
+
+
+assignment = polypy.Assignment()
 assignment.set_value(y, 0)
 assignment.set_value(z, 1)
 
