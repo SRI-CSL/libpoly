@@ -960,6 +960,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   // Signs at root
   size_t i;
   lp_value_t m;
+  lp_value_construct_none(&m);
   for (i = 0; i < roots_size; ++ i) {
     signs[2*i+1] = 0;
     if (i+1<roots_size) {
@@ -973,7 +974,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
   // Count the number of intervals
   size_t intervals_size = 0, lb, ub;
-  for (lb = 0; lb < signs_size; lb = ub) {
+  for (lb = 0; lb < signs_size; ) {
     // Find lower bound
     for (; lb < signs_size && !sign_consistent(signs[lb], sgn_condition); lb ++) {}
     if (lb < signs_size) {
@@ -981,6 +982,8 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
       intervals_size ++;
       // Find the upper bound
       for (ub = lb + 1; ub < signs_size && sign_consistent(signs[ub], sgn_condition); ub ++) {}
+      // Continue with the next one
+      lb = ub;
     }
   }
 
@@ -993,7 +996,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
   // Go through signs and collect the contiguous intervals
   size_t interval = 0;
-  for (lb = 0; lb < signs_size; lb = ub) {
+  for (lb = 0; lb < signs_size; ) {
     // find lower bound
     for (; lb < signs_size && !sign_consistent(signs[lb], sgn_condition); lb ++) {}
     if (lb < signs_size) {
@@ -1051,8 +1054,9 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
         lp_interval_construct(result->intervals + interval, lb_value, lb_strict, ub_value, ub_strict);
       }
 
-      // Done with this interval
+      // Done with this interval, continue with the next
       interval ++;
+      lb = ub;
     }
   }
 

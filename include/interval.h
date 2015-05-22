@@ -63,5 +63,8 @@ char* lp_interval_to_string(const lp_interval_t* I);
 /** Is this interval a point */
 int lp_interval_is_point(const lp_interval_t* I);
 
-/** Get the point value */
+/** Get the point value (it has to be a point) */
 const lp_value_t* lp_interval_get_point(const lp_interval_t* I);
+
+/** Returns a value in the interval */
+void lp_interval_pick_value(const lp_interval_t* I, lp_value_t* );

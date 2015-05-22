@@ -934,6 +934,14 @@ const lp_value_t* lp_interval_get_point(const lp_interval_t* I) {
   return &I->a;
 }
 
+void lp_interval_pick_value(const lp_interval_t* I, lp_value_t* v) {
+  if (I->is_point) {
+    lp_value_assign(v, &I->a);
+  } else {
+    lp_value_get_value_between(&I->a, I->a_open, &I->b, I->b_open, v);
+  }
+}
+
 int lp_dyadic_interval_size(const lp_dyadic_interval_t* I) {
   // If point, size is 0
   if (I->is_point) {

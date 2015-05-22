@@ -6,6 +6,7 @@
  */
 
 #include "Interval.h"
+#include "Value.h"
 
 #include <structmember.h>
 
@@ -18,13 +19,14 @@ Interval_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int
 Interval_init(Interval* self, PyObject* args);
 
-static int
-Interval_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 Interval_str(PyObject* self);
 
+static PyObject*
+Interval_pick_value(PyObject* self);
+
 PyMethodDef Interval_methods[] = {
+    {"pick_value", (PyCFunction)Interval_pick_value, METH_NOARGS, "Returns a value from the interval."},
     {NULL}  /* Sentinel */
 };
 
@@ -112,3 +114,13 @@ static PyObject* Interval_str(PyObject* self) {
   return str;
 }
 
+static PyObject*
+Interval_pick_value(PyObject* self) {
+  Interval* I = (Interval*) self;
+  lp_value_t v;
+  lp_value_construct_none(&v);
+  lp_interval_pick_value(&I->I, &v);
+  PyObject* result = PyValue_create(&v);
+  lp_value_destruct(&v);
+  return result;
+}

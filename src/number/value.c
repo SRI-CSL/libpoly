@@ -15,6 +15,8 @@
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
 
+#include "utils/debug_trace.h"
+
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   v->type = type;
   switch(type) {
@@ -40,6 +42,10 @@ void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
 void lp_value_construct_zero(lp_value_t* v) {
   v->type = LP_VALUE_INTEGER;
   integer_construct(&v->value.z);
+}
+
+void lp_value_construct_none(lp_value_t* v) {
+  lp_value_construct(v, LP_VALUE_NONE, 0);
 }
 
 void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data) {
@@ -422,6 +428,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     return;
   } else if (cmp > 0) {
     const lp_value_t* tmp = a; a = b; b = tmp;
+    int strict_tmp = a_strict; a_strict = b_strict; b_strict = strict_tmp;
   }
 
   // If the whole R we're done
@@ -434,6 +441,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
      return;
    }
 
+  // To be constructed to the value
   lp_rational_t result;
 
   // We have a < b, and comparison ensures that the algebraic intervals will be
@@ -502,7 +510,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
   if (a_inf) {
     // If a is infinity, just take it to be [b-1
     lp_rational_t one;
-    lp_rational_construct(&one);
+    lp_rational_construct_from_int(&one, 1, 1);
     rational_construct(&a_ub);
     rational_sub(&a_ub, &b_lb, &one);
     lp_rational_destruct(&one);
@@ -512,10 +520,11 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
   if (b_inf) {
     // If b is infinity, just take it to be a + 1]
     lp_rational_t one;
-    lp_rational_construct(&one);
+    lp_rational_construct_from_int(&one, 1, 1);
     rational_construct(&b_lb);
     rational_add(&b_lb, &a_ub, &one);
     lp_rational_destruct(&one);
+    b_strict = 0;
   }
 
   // Get the smallest integer interval around [a_ub, b_lb] and refine
@@ -530,14 +539,24 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
   integer_construct_copy(lp_Z, &m_ceil, &m_floor);
   integer_inc(lp_Z, &m_ceil);
 
+  if (trace_is_enabled("value::pick")) {
+    tracef("a_ub = "); lp_rational_print(&a_ub, trace_out); tracef("\n");
+    tracef("b_ub = "); lp_rational_print(&b_lb, trace_out); tracef("\n");
+    tracef("m = "); lp_rational_print(&m, trace_out); tracef("\n");
+    tracef("m_floor = "); lp_integer_print(&m_floor, trace_out); tracef("\n");
+    tracef("m_ceil = "); lp_integer_print(&m_ceil, trace_out); tracef("\n");
+  }
+
   // If a_ub < m_floor, we can take this value
   cmp = lp_rational_cmp_integer(&a_ub, &m_floor);
-  if ((a_strict && cmp > 0) || (!a_strict && cmp >= 0)) {
+  // if ((cmp > 0) || (!a_strict && cmp >= 0)) {
+  if (cmp > 0) {
     lp_rational_construct_from_integer(&result, &m_floor);
   } else {
     // If m_ceil < b_lb, we can take this value
     cmp = lp_rational_cmp_integer(&b_lb, &m_ceil);
-    if ((b_strict&& cmp > 0) || (!b_strict && cmp <= 0)) {
+    // if ((b_strict&& cmp > 0) || (!b_strict && cmp <= 0)) {
+    if (cmp > 0) {
       lp_rational_construct_from_integer(&result, &m_ceil);
     } else {
 
@@ -554,20 +573,22 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
 
         // lb < m < a_ub => move lb to m
         cmp = rational_cmp(&a_ub, &m);
-        if ((a_strict && cmp >= 0) || (!a_strict && cmp > 0)) {
+        // if ((a_strict && cmp >= 0) || (!a_strict && cmp > 0)) {
+        if (cmp > 0) {
           rational_swap(&m, &lb);
           continue;
         }
 
         // b_lb < m < ub => move ub to m
         cmp = rational_cmp(&m, &b_lb);
-        if ((b_strict && cmp >= 0) || (!b_strict && cmp > 0)) {
+        // if ((b_strict && cmp >= 0) || (!b_strict && cmp > 0)) {
+        if (cmp >= 0) {
           rational_swap(&ub, &m);
           continue;
         }
 
         // Got it l <= m <= u
-        rational_swap(&m, &result);
+        rational_construct_copy(&result, &m);
         break;
       }
 
