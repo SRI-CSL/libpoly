@@ -17,6 +17,8 @@ polypy_test.start("Polynomial Feasibility Intervals")
 # polypy.trace_enable("coefficient::sgn")
 # polypy.trace_enable("coefficient::roots")
 # polypy.trace_enable("value::pick");
+# polypy.trace_enable("value::cmp");
+# polypy.trace_enable("value::get_value_between")
 # polypy.trace_enable("coefficient::arith")
 
 def get_feasible(p, var, assignment, sgn):
@@ -28,6 +30,14 @@ def get_feasible(p, var, assignment, sgn):
         print v
 
 sgns = [polypy.SGN_LT_0, polypy.SGN_LE_0, polypy.SGN_EQ_0, polypy.SGN_NE_0, polypy.SGN_GT_0, polypy.SGN_GE_0]
+
+assignment = polypy.Assignment()
+assignment.set_value(y, 1)
+assignment.set_value(z, 1)
+
+p = (x**2 - y - z)*(x**2)
+for sgn in sgns:
+    get_feasible(p, x, assignment, sgn)
 
 assignment = polypy.Assignment()
 assignment.set_value(y, 1)

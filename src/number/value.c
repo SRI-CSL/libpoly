@@ -192,6 +192,12 @@ int lp_value_print(const lp_value_t* v, FILE* out) {
 
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
 
+  if (trace_is_enabled("value::cmp")) {
+    tracef("lp_value_cmp()\n")
+    tracef("v1 = "); lp_value_print(v1, trace_out); tracef("\n");
+    tracef("v2 = "); lp_value_print(v2, trace_out); tracef("\n");
+  }
+
   if (v1 == v2) {
     return 0;
   }
@@ -231,7 +237,7 @@ int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
 
   // Make sure that the first one is bigger in the order int < dy_rat < rat < algebraic
   if (v1->type < v2->type) {
-    return -lp_value_cmp(v1, v2);
+    return -lp_value_cmp(v2, v1);
   }
 
   switch (v1->type) {
@@ -331,6 +337,44 @@ int lp_value_is_rational(const lp_value_t* v) {
   }
 }
 
+void lp_value_get_rational(const lp_value_t* v, lp_rational_t* q) {
+  lp_rational_t result;
+
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    rational_construct_from_integer(&result, &v->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    rational_construct_from_dyadic(&result, &v->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    rational_assign(q, &v->value.q);
+    return;
+  case LP_VALUE_ALGEBRAIC:
+    if (lp_dyadic_interval_is_point(&v->value.a.I)) {
+      // It's a point value, so we just get it
+      lp_rational_construct_from_dyadic(&result, lp_dyadic_interval_get_point(&v->value.a.I));
+    } else {
+      const lp_upolynomial_t* v_poly = v->value.a.f;
+      if (lp_upolynomial_degree(v_poly) == 1) {
+        // p = ax + b = 0 => x = -b/a
+        rational_construct_from_div(&result,
+            /* b */ lp_upolynomial_const_term(v_poly),
+            /* a */ lp_upolynomial_lead_coeff(v_poly)
+            );
+      } else {
+        assert(0);
+      }
+    }
+    break;
+  default:
+    assert(0);
+  }
+
+  rational_swap(&result, q);
+  rational_destruct(&result);
+}
+
 void lp_value_get_num(const lp_value_t* v, lp_integer_t* num) {
   assert(lp_value_is_rational(v));
   switch (v->type) {
@@ -420,6 +464,12 @@ char* lp_value_to_string(const lp_value_t* v) {
 
 void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_value_t* b, int b_strict, lp_value_t* v) {
 
+  if (trace_is_enabled("value::get_value_between")) {
+    tracef("lp_value_get_value_between()\n")
+    tracef("a = "); lp_value_print(a, trace_out); tracef(", a_strict = %d\n", a_strict);
+    tracef("b = "); lp_value_print(b, trace_out); tracef(", b_strict = %d\n", b_strict);
+  }
+
   int cmp = lp_value_cmp(a, b);
   if (cmp == 0) {
     // Same, we're done
@@ -462,13 +512,11 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     rational_construct_copy(&a_ub, &a->value.q);
     break;
   case LP_VALUE_ALGEBRAIC:
-    if (a->value.a.I.is_point) {
-      rational_construct_from_dyadic(&a_ub, lp_dyadic_interval_get_point(&a->value.a.I));
+    if (lp_value_is_rational(a)) {
+      rational_construct(&a_ub);
+      lp_value_get_rational(a, &a_ub);
     } else {
       rational_construct_from_dyadic(&a_ub, &a->value.a.I.b);
-      // if a is in (lb, ub) and we're looking for strict bigger, then we can
-      // pick ub
-      a_strict = 0;
     }
     break;
   default:
@@ -489,13 +537,11 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     rational_construct_copy(&b_lb, &b->value.q);
     break;
   case LP_VALUE_ALGEBRAIC:
-    if (b->value.a.I.is_point) {
-      rational_construct_from_dyadic(&b_lb, lp_dyadic_interval_get_point(&b->value.a.I));
+    if (lp_value_is_rational(b)) {
+      rational_construct(&b_lb);
+      lp_value_get_rational(b, &b_lb);
     } else {
       rational_construct_from_dyadic(&b_lb, &b->value.a.I.a);
-      // if b is in (lb, ub) and we're looking for strict bigger, then we can
-      // pick lb
-      b_strict = 0;
     }
     break;
   default:
@@ -524,14 +570,23 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     b_strict = 0;
   }
 
-  // To be constructed to the value
-  lp_rational_t result;
-
   // If a_ub == b_lb, this is due to algebraic number intervals, so just return a_ub
   cmp = rational_cmp(&a_ub, &b_lb);
   if (cmp == 0) {
-    lp_rational_construct_copy(&result, &a_ub);
+    assert(!lp_value_is_rational(a) || !lp_value_is_rational(b));
+    if (!lp_value_is_rational(a)) {
+      assert(a->type == LP_VALUE_ALGEBRAIC);
+      lp_algebraic_number_refine_const(&a->value.a);
+    }
+    if (!lp_value_is_rational(b)) {
+      assert(b->type == LP_VALUE_ALGEBRAIC);
+      lp_algebraic_number_refine_const(&b->value.a);
+    }
+    lp_value_get_value_between(a, a_strict, b, b_strict, v);
   } else {
+
+    // To be constructed to the value
+    lp_rational_t result;
 
     // Get the smallest integer interval around [a_ub, b_lb] and refine
     lp_rational_t m;
@@ -590,7 +645,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
           // lb < m < a_ub => move lb to m
           cmp = rational_cmp(&a_ub, &m);
           // if ((a_strict && cmp >= 0) || (!a_strict && cmp > 0)) {
-          if (cmp > 0) {
+          if (cmp >= 0) {
             rational_swap(&m, &lb);
             continue;
           }
@@ -613,14 +668,19 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
       }
     }
 
+    lp_value_assign_raw(v, LP_VALUE_RATIONAL, &result);
+
+    rational_destruct(&result);
     integer_destruct(&m_ceil);
     integer_destruct(&m_floor);
     rational_destruct(&m);
-    rational_destruct(&a_ub);
-    rational_destruct(&b_lb);
   }
 
-  lp_value_assign_raw(v, LP_VALUE_RATIONAL, &result);
+  rational_destruct(&a_ub);
+  rational_destruct(&b_lb);
 
-  rational_destruct(&result);
+  if (trace_is_enabled("value::get_value_between")) {
+    tracef("lp_value_get_value_between() =>"); lp_value_print(v, trace_out); tracef("\n");
+  }
+
 }

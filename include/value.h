@@ -103,6 +103,11 @@ char* lp_value_to_string(const lp_value_t* v);
  */
 int lp_value_is_rational(const lp_value_t* v);
 
+/**
+ * Get the rational if is_rational is true.
+ */
+void lp_value_get_rational(const lp_value_t* v, lp_rational_t* q);
+
 /** Get the numerator (only if integer, dyadic rational, or rational) */
 void lp_value_get_num(const lp_value_t* v, lp_integer_t* num);
 

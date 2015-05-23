@@ -560,32 +560,32 @@ int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rati
 
   // I = [a, b]
 
-  int cmp_lower = -rational_cmp_dyadic_rational(q, &I->a);
-  if (cmp_lower > 0) {
-    // a > z => [a, b] > z
+  int cmp_a_q = -rational_cmp_dyadic_rational(q, &I->a);
+  if (cmp_a_q > 0) {
+    // a > q => [a, b] > q
     return 1;
   }
-  if (cmp_lower == 0) {
+  if (cmp_a_q == 0) {
     if (I->a_open) {
-      // a == z => (a, b] > z
+      // a == q => (a, b] > q
       return 1;
     } else {
-      // a == z => [a, b] == z
+      // a == q => [a, b] == q
       return 0;
     }
   }
 
-  int cmp_upper = -rational_cmp_dyadic_rational(q, &I->b);
-  if (cmp_upper < 0) {
-    // [a, b] < z
+  int cmp_b_q = -rational_cmp_dyadic_rational(q, &I->b);
+  if (cmp_b_q < 0) {
+    // b < q => [a, b] < q
     return -1;
   }
-  if (cmp_upper == 0) {
+  if (cmp_b_q == 0) {
     if (I->b_open) {
-      // [a, b) < z
+      // b == q => [a, b) < q
       return -1;
     } else {
-      // [a, b] == z
+      // b == q => [a, b] == q
       return 0;
     }
   }

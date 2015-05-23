@@ -972,6 +972,16 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   }
   lp_value_destruct(&m);
 
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_get_feasible_set():");
+    for (i = 0; i < signs_size; ++ i) {
+      if (signs[i] < 0) { tracef(" -"); }
+      else if (signs[i] == 0) { tracef(" 0"); }
+      else { tracef(" +"); }
+    }
+    tracef("\n");
+  }
+
   // Count the number of intervals
   size_t intervals_size = 0, lb, ub;
   for (lb = 0; lb < signs_size; ) {
