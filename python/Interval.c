@@ -25,8 +25,12 @@ Interval_str(PyObject* self);
 static PyObject*
 Interval_pick_value(PyObject* self);
 
+static PyObject*
+Interval_contains_value(PyObject* self, PyObject* args);
+
 PyMethodDef Interval_methods[] = {
     {"pick_value", (PyCFunction)Interval_pick_value, METH_NOARGS, "Returns a value from the interval."},
+    {"contains", (PyCFunction)Interval_contains_value, METH_VARARGS, "Returns true if the value is in the interval."},
     {NULL}  /* Sentinel */
 };
 
@@ -123,4 +127,30 @@ Interval_pick_value(PyObject* self) {
   PyObject* result = PyValue_create(&v);
   lp_value_destruct(&v);
   return result;
+}
+
+static PyObject*
+Interval_contains_value(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* value_obj = PyTuple_GetItem(args, 0);
+
+  if (!PyValue_CHECK(value_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  lp_interval_t* I = &((Interval*) self)->I;
+  lp_value_t* v = &((Value*) value_obj)->v;
+
+  int result = lp_interval_contains(I, v);
+
+  PyObject* result_object = result ? Py_True : Py_False;
+  Py_INCREF(result_object);
+
+  return result_object;
 }

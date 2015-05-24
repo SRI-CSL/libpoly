@@ -289,6 +289,9 @@ void sturm_seqence_isolate_roots(
         // Copy out the open interval (a, b)
         I.b_open = 1;
         lp_upolynomial_t* f = upolynomial_dense_to_upolynomial(&S[0], lp_Z);
+        if (trace_is_enabled("roots")) {
+          tracef("f = "); lp_upolynomial_print(f, trace_out); tracef("\n");
+        }
         lp_algebraic_number_construct(&roots[*roots_size], f, &I);
         lp_dyadic_interval_destruct(&I);
         (*roots_size) ++;
@@ -355,9 +358,23 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
 
   size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
+
     // The factor we are working with
     const lp_upolynomial_t* factor = square_free_factors->factors[factor_i];
     int factor_deg = lp_upolynomial_degree(factor);
+
+    if (trace_is_enabled("roots")) {
+      tracef("upolynomial_root_isolate_sturm(): factor = "); lp_upolynomial_print(factor, trace_out); tracef(")\n");
+    }
+
+    // Check if it's a power of x
+    if (!lp_upolynomial_const_term(factor)) {
+      assert(factor_deg == 1);
+      // Add 0 as a root
+      lp_algebraic_number_construct_zero(roots + *roots_size);
+      (*roots_size) ++;
+      continue;
+    }
 
     // Compute the Sturm sequence for the factor
     size_t sturm_sequence_size;

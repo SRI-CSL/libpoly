@@ -315,6 +315,26 @@ const coefficient_t* coefficient_lc(const coefficient_t* C) {
   return 0;
 }
 
+const coefficient_t* coefficient_lc_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
+  switch (C->type) {
+  case COEFFICIENT_NUMERIC:
+    return C;
+    break;
+  case COEFFICIENT_POLYNOMIAL: {
+    // Locate the first non-zero coefficient past the top one
+    int i = SIZE(C) - 1;
+    while (i > 0 && coefficient_sgn(ctx, COEFF(C, i), M) == 0) {
+      -- i;
+    }
+    return COEFF(C, i);
+    break;
+  }
+  }
+  assert(0);
+  return 0;
+}
+
+
 void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C) {
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
@@ -347,7 +367,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
 
   // Locate the first non-zero ceofficient past the top one
   int i = SIZE(C) - 2;
-  while (coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
+  while (i > 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
     -- i;
   }
 
@@ -382,6 +402,26 @@ size_t coefficient_degree(const coefficient_t* C) {
   }
   assert(0);
   return 0;
+}
+
+size_t coefficient_degree_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
+  switch (C->type) {
+  case COEFFICIENT_NUMERIC:
+    return 0;
+    break;
+  case COEFFICIENT_POLYNOMIAL: {
+    // Locate the first non-zero coefficient past the top one
+    size_t i = SIZE(C) - 1;
+    while (i > 0 && coefficient_sgn(ctx, COEFF(C, i), M) == 0) {
+      -- i;
+    }
+    return i;
+    break;
+  }
+  }
+  assert(0);
+  return 0;
+
 }
 
 size_t coefficient_degree_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_variable_t x) {

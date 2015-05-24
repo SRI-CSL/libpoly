@@ -119,6 +119,9 @@ const lp_integer_t* coefficient_get_constant(const coefficient_t* C);
 /** The degree of the coefficient */
 size_t coefficient_degree(const coefficient_t* C);
 
+/** The degree of the coefficient in the model */
+size_t coefficient_degree_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M);
+
 /** The top variable of the coefficient */
 lp_variable_t coefficient_top_variable(const coefficient_t* C);
 
@@ -127,6 +130,9 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
 
 /** Get the leading coefficient of this coefficient */
 const coefficient_t* coefficient_lc(const coefficient_t* C);
+
+/** Get the model-based leading coefficient */
+const coefficient_t* coefficient_lc_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M);
 
 /** Get the reductum of the coefficient */
 void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C);

@@ -235,7 +235,11 @@ const lp_integer_t* lp_upolynomial_lead_coeff(const lp_upolynomial_t* p) {
 
 const lp_integer_t* lp_upolynomial_const_term(const lp_upolynomial_t* p) {
   assert(p);
-  return &p->monomials[0].coefficient;
+  if (p->monomials[0].degree == 0) {
+    return &p->monomials[0].coefficient;
+  } else {
+    return 0;
+  }
 }
 
 int lp_upolynomial_cmp(const lp_upolynomial_t* p, const lp_upolynomial_t* q) {
@@ -1108,7 +1112,7 @@ void lp_upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number
   }
   upolynomial_roots_isolate_sturm(p, roots, roots_size);
   if (trace_is_enabled("roots")) {
-    tracef("upolynomial_real_roots_count("); lp_upolynomial_print(p, trace_out); tracef(") => %zu\n", *roots_size);
+    tracef("upolynomial_roots_isolate("); lp_upolynomial_print(p, trace_out); tracef(") => %zu\n", *roots_size);
   }
 }
 

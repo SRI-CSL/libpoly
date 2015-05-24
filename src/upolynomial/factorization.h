@@ -31,3 +31,8 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f);
  * Factors the given polynomial using Hansel lifting.
  */
 lp_upolynomial_factors_t* upolynomial_factor_Z(const lp_upolynomial_t* f);
+
+/**
+ * Factors a primitive polynomial into its square-free factors.
+ */
+lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_upolynomial_t* f);

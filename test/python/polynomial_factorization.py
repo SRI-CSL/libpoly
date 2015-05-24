@@ -18,7 +18,7 @@ def check_factorization(p, p_factors, expected_size):
     ok = (p == mul) and (expected_size == len(p_factors))
     if (not ok):
         print "p =", p
-        print "p_factors =", q
+        print "p_factors =", p_factors
         print "expected_size =", expected_size
         print "mul =", mul
     polypy_test.check(ok)

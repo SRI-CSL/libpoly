@@ -72,10 +72,9 @@ void lp_upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring_t* K);
 const lp_integer_t* lp_upolynomial_lead_coeff(const lp_upolynomial_t* p);
 
 /**
- * Returns the constant term of the given polynomial.
+ * Returns the constant term of the given polynomial, or 0 if no constant factor.
  */
 const lp_integer_t* lp_upolynomial_const_term(const lp_upolynomial_t* p);
-
 
 /**
  * Unpack the polynomial into a dense representation. The out vector is
@@ -252,7 +251,7 @@ void lp_upolynomial_div_pseudo(lp_upolynomial_t** div, lp_upolynomial_t** rem, c
 /**
  * Compute the content of the polynomial. Content of the polynomial is the
  * gcd of the coefficients, of the same sign as the leading coefficient.
- * NOTE: The gcd is computed in Z so p must be in p
+ * NOTE: The gcd is computed in Z so p must be in Z
  */
 void lp_upolynomial_content_Z(const lp_upolynomial_t* p, lp_integer_t* content);
 

@@ -931,8 +931,8 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   lp_variable_t x = coefficient_top_variable(&A->data);
   assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
 
-  // The degree of the polynomial
-  size_t degree = coefficient_degree(&A->data);
+  // Get the degree of the polynomial, respecting the model
+  size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
 
   // Get the roots of the polynomial
   size_t roots_size;
@@ -951,7 +951,8 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   size_t signs_size = 2*roots_size + 1;
   int* signs = malloc(sizeof(int)*signs_size);
 
-  int sgn_lc = coefficient_sgn(A->ctx, coefficient_lc(&A->data), M);
+  // Get the first non-vanishing coefficient, or constant otherwise
+  int sgn_lc = coefficient_sgn(A->ctx, coefficient_get_coefficient(&A->data, degree), M);
 
   // Signs at -inf and +inf
   signs[0] = degree % 2 ? -sgn_lc : sgn_lc;

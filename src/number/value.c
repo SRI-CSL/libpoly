@@ -358,10 +358,14 @@ void lp_value_get_rational(const lp_value_t* v, lp_rational_t* q) {
       const lp_upolynomial_t* v_poly = v->value.a.f;
       if (lp_upolynomial_degree(v_poly) == 1) {
         // p = ax + b = 0 => x = -b/a
-        rational_construct_from_div(&result,
-            /* b */ lp_upolynomial_const_term(v_poly),
-            /* a */ lp_upolynomial_lead_coeff(v_poly)
-            );
+        const lp_integer_t* b = lp_upolynomial_const_term(v_poly);
+        const lp_integer_t* a = lp_upolynomial_lead_coeff(v_poly);
+        if (b) {
+          rational_construct_from_div(&result, b, a);
+          rational_neg(&result, &result);
+        } else {
+          rational_construct(&result);
+        }
       } else {
         assert(0);
       }
@@ -396,11 +400,14 @@ void lp_value_get_num(const lp_value_t* v, lp_integer_t* num) {
       if (lp_upolynomial_degree(v_poly) == 1) {
         // p = ax + b = 0 => x = -b/a
         lp_rational_t value;
-        rational_construct_from_div(&value,
-            /* b */ lp_upolynomial_const_term(v_poly),
-            /* a */ lp_upolynomial_lead_coeff(v_poly)
-            );
-        rational_neg(&value, &value);
+        const lp_integer_t* b = lp_upolynomial_const_term(v_poly);
+        const lp_integer_t* a = lp_upolynomial_lead_coeff(v_poly);
+        if (b) {
+          rational_construct_from_div(&value, b, a);
+          rational_neg(&value, &value);
+        } else {
+          rational_construct(&value);
+        }
         rational_get_num(&value, num);
         rational_destruct(&value);
       } else {
@@ -434,11 +441,14 @@ void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
       if (lp_upolynomial_degree(v_poly) == 1) {
         // p = ax + b = 0 => x = -b/a
         lp_rational_t value;
-        rational_construct_from_div(&value,
-            /* b */ lp_upolynomial_const_term(v_poly),
-            /* a */ lp_upolynomial_lead_coeff(v_poly)
-            );
-        rational_neg(&value, &value);
+        const lp_integer_t* b = lp_upolynomial_const_term(v_poly);
+        const lp_integer_t* a = lp_upolynomial_lead_coeff(v_poly);
+        if (b) {
+          rational_construct_from_div(&value, b, a);
+          rational_neg(&value, &value);
+        } else {
+          rational_construct(&value);
+        }
         rational_get_den(&value, den);
         rational_destruct(&value);
       } else {

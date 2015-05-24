@@ -23,6 +23,8 @@
 
 void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f, const lp_dyadic_interval_t* lr) {
   assert(f);
+  // Zero should be divisible by 0
+  assert(lp_upolynomial_const_term(f));
   assert(lr->a_open && lr->b_open);
   assert(lp_upolynomial_is_primitive(f));
   a->f = f;

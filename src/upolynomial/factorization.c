@@ -65,7 +65,7 @@ STAT_DECLARE(int, upolynomial, factor_berlekamp_square_free)
  * The loop ends when L = 1 and then we know that P = \prod_{p \div k} f_k^k
  * which we know how to special case (if P != 1).
  */
-lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial_t* f) {
+lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_upolynomial_t* f) {
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_square_free("); lp_upolynomial_print(f, trace_out); tracef(")\n");
@@ -75,6 +75,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
   assert(!f->K || !f->K->is_prime || lp_upolynomial_is_monic(f));
   assert(f->K || lp_upolynomial_is_primitive(f));
   assert(lp_upolynomial_degree(f) > 0);
+  assert(lp_upolynomial_const_term(f));
 
   lp_upolynomial_factors_t* factors = 0;
 
@@ -88,7 +89,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
     // we factor f_p and then return f_p(x^p)=(f_p)^p
     int p = integer_to_int(&f->K->M);
     lp_upolynomial_t* f_p = lp_upolynomial_div_degrees(f, p);
-    factors = lp_upolynomial_factor_square_free(f_p);
+    factors = lp_upolynomial_factor_square_free_primitive(f_p);
     size_t i;
     for (i = 0; i < factors->size; ++ i) {
       factors->multiplicities[i] *= p;
@@ -148,7 +149,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
     if (lp_upolynomial_degree(P) > 0) {
       int p = integer_to_int(&f->K->M);
       lp_upolynomial_t* P_p = lp_upolynomial_div_degrees(P, p);
-      lp_upolynomial_factors_t* sub_factors = lp_upolynomial_factor_square_free(P_p);
+      lp_upolynomial_factors_t* sub_factors = lp_upolynomial_factor_square_free_primitive(P_p);
       size_t i;
       for (i = 0; i < sub_factors->size; ++ i) {
         lp_upolynomial_factors_add(factors, sub_factors->factors[i], sub_factors->multiplicities[i] * p);
@@ -171,6 +172,58 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
 
   return factors;
 }
+
+/**
+ * Make sure its primitive and then discharge.
+ */
+lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial_t* f) {
+
+  lp_integer_t content;
+  lp_integer_construct(&content);
+
+  // We factor the primitive part
+  lp_upolynomial_t* f_pp = 0;
+
+  if (f->K == lp_Z) {
+    // The content of the polynomial (constant of the factorization)
+    lp_upolynomial_content_Z(f, &content);
+    f_pp = lp_upolynomial_primitive_part_Z(f);
+  } else {
+    assert(f->K->is_prime);
+    // Make monic
+    integer_assign(lp_Z, &content, lp_upolynomial_lead_coeff(f));
+    f_pp = lp_upolynomial_div_exact_c(f, &content);
+  }
+
+  lp_upolynomial_factors_t* sq_free_factors = 0;
+
+  // Take out the power of x^k
+  if (lp_upolynomial_const_term(f_pp)) {
+    // Get a square-free decomposition of f
+    sq_free_factors = lp_upolynomial_factor_square_free_primitive(f_pp);
+  } else {
+    // Get a copy without the power of x
+    lp_upolynomial_t* f_pp_nonzero = lp_upolynomial_construct_copy(f_pp);
+    size_t x_degree = f_pp_nonzero->monomials[0].degree;
+    size_t i = 0;
+    for (i = 0; i < f_pp_nonzero->size; ++ i) {
+      f_pp_nonzero->monomials[i].degree -= x_degree;
+    }
+    // Get a square-free decomposition of f
+    sq_free_factors = lp_upolynomial_factor_square_free_primitive(f_pp_nonzero);
+    // Add x^k to the factorization
+    lp_upolynomial_t* x_upoly = lp_upolynomial_construct_power(f->K, 1, 1);
+    lp_upolynomial_factors_add(sq_free_factors, x_upoly, x_degree);
+  }
+
+  // Add the constant
+  integer_mul(f->K, &sq_free_factors->constant, &sq_free_factors->constant, &content);
+
+  integer_destruct(&content);
+
+  return sq_free_factors;
+}
+
 
 /**
  * We are given a monic, square-free polynomial f in Z_p and we will return
@@ -661,7 +714,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
   }
 
   // Compute the square-free factors of f
-  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free(to_factor);
+  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free_primitive(to_factor);
 
   // Go through the square-free factors break them apart
   int i, i_end;
@@ -1502,7 +1555,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Z(const lp_upolynomial_t* f) {
   lp_upolynomial_t* f_pp = lp_upolynomial_primitive_part_Z(f);
 
   // Get a square-free decomposition of f
-  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free(f_pp);
+  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free_primitive(f_pp);
   assert(integer_cmp_int(lp_Z, &sq_free_factors->constant, 1) == 0);
 
   // Factor individuals
@@ -1547,3 +1600,4 @@ lp_upolynomial_factors_t* upolynomial_factor_Z(const lp_upolynomial_t* f) {
   // Done
   return factors;
 }
+
