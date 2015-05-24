@@ -6,8 +6,9 @@ import polypy_test
 x = polypy.Variable("x");
 y = polypy.Variable("y");
 z = polypy.Variable("z"); 
+w = polypy.Variable("w");
 
-polypy.variable_order.set([z, y, x]);
+polypy.variable_order.set([w, z, y, x]);
 
 def check_psc(p, q, expected):
     psc = p.psc(q)
@@ -30,10 +31,19 @@ def check_resultant(p, q, expected):
 
 polypy_test.init()
 
+polypy_test.start("Speed")
+
+A = w - 2*x**3*y**2*z - x**2*y*z**3 - x*y**3*z**2 - z - 4
+B = 2304*x**12 - 5184*x**10 + 2304*x**9 - 3996*x**8 - 2592*x**7 + 5376*x**6 - 3456*x**5 + 3132*x**4 + 2832*x**3 - 2736*x**2 + 169
+resultant = A.resultant(B)
+
 polypy_test.start("Resultants")
 
 p_sqrt2 = x**2 - 2
 p_sqrt3 = y**2 - 3
+
+# polypy.trace_enable("polynomial")
+# polypy.trace_enable("coefficient::resultant")
 
 add = z - (x + y)
 res1 = add.resultant(p_sqrt2)
@@ -46,7 +56,6 @@ check_resultant(res1, p_sqrt3, 1*z**4 - 10*z**2 + 1)
 mul = z - x*y
 res1 = mul.resultant(p_sqrt2)
 check_resultant(res1, p_sqrt3, 1*z**4 - 12*z**2 + 36)
-
 
 polypy_test.start("Principal Sub-resultant Coefficients")
 

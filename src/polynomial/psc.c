@@ -178,24 +178,24 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
 }
 
 static
-void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d, const coefficient_t* S_d_1, coefficient_t* S_e, lp_variable_t top_var) {
+void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d, const coefficient_t* S_d_1, coefficient_t* S_e, lp_variable_t X) {
   // n = deg(S_d) - deg(S_d_1) - 1
-  size_t n = coefficient_degree_safe(ctx, S_d, top_var) - coefficient_degree_safe(ctx, S_d_1, top_var) - 1;
+  assert(coefficient_degree_safe(ctx, S_d, X) > coefficient_degree_safe(ctx, S_d_1, X));
+  size_t n = coefficient_degree_safe(ctx, S_d, X) - coefficient_degree_safe(ctx, S_d_1, X) - 1;
   // if n == 0 then return S_d_1
   if (n == 0) {
     coefficient_assign(ctx, S_e, S_d_1);
     return;
   }
   // (x, y) = (lc(S_d-1), lc(S_d))
-  coefficient_t x, y;
-  coefficient_construct_copy(ctx, &x, S_d_1);
-  coefficient_construct_copy(ctx, &y, S_d);
+  const coefficient_t* x = coefficient_lc_safe(ctx, S_d_1, X);
+  const coefficient_t* y = coefficient_lc_safe(ctx, S_d, X);
   // a = 2^floor(log2(n)), a <= n < 2*a
   size_t a = 1;
-  while ((a >> 1) < n) { a >>= 1; }
+  while ((a << 1) < n) { a <<= 1; }
   // c = x
   coefficient_t c;
-  coefficient_construct_copy(ctx, &c, &x);
+  coefficient_construct_copy(ctx, &c, x);
   // n = n - a
   n = n - a;
   // loop
@@ -205,46 +205,44 @@ void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d,
     // a = a/2, c = c^2/y
     a = a / 2;
     coefficient_mul(ctx, &c, &c, &c);
-    coefficient_div(ctx, &c, &c, &y);
+    coefficient_div(ctx, &c, &c, y);
     // if n >= a then c = (c*x)/y; n = n - a
     if (n >= a) {
-      coefficient_mul(ctx, &c, &c, &x);
-      coefficient_div(ctx, &c, &c, &y);
+      coefficient_mul(ctx, &c, &c, x);
+      coefficient_div(ctx, &c, &c, y);
       n = n - a;
     }
   }
   // Return (c*S_d-1)/y
   coefficient_mul(ctx, &c, &c, S_d_1);
-  coefficient_div(ctx, S_e, &c, &y);
+  coefficient_div(ctx, S_e, &c, y);
   // Remove temps
   coefficient_destruct(&c);
-  coefficient_destruct(&x);
-  coefficient_destruct(&y);
 }
 
 static
-void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A, const coefficient_t* S_d_1, const coefficient_t* S_e, const coefficient_t* s_d, coefficient_t* S_e_1, lp_variable_t top_var) {
+void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A, const coefficient_t* S_d_1, const coefficient_t* S_e, const coefficient_t* s_d, coefficient_t* S_e_1, lp_variable_t X) {
   // (d, e) = (deg(A), deg(S_d-1))
-  size_t d = coefficient_degree_safe(ctx, A, top_var);
-  size_t e = coefficient_degree_safe(ctx, S_d_1, top_var);
+  size_t d = coefficient_degree_safe(ctx, A, X);
+  size_t e = coefficient_degree_safe(ctx, S_d_1, X);
   // (c_d-1, s_e) = (lc(S_d-1), lc(S_e)
   const coefficient_t* c_d_1;
   const coefficient_t* s_e;
-  c_d_1 = coefficient_lc_safe(ctx, S_d_1, top_var);
-  s_e = coefficient_lc_safe(ctx, S_e, top_var);
+  c_d_1 = coefficient_lc_safe(ctx, S_d_1, X);
+  s_e = coefficient_lc_safe(ctx, S_e, X);
   // for j in 0...e-1 loop
   //   H_j = s_e X^j
   assert(e > 0);
   size_t j;
   coefficient_t* H = malloc(sizeof(coefficient_t)*d);
-  assert(e < d);
+  assert(e <= d);
   for (j = 0; j < e; j ++) {
     coefficient_construct_copy(ctx, H + j, s_e);
-    coefficient_shl(ctx, H + j, H + j, top_var, j);
+    coefficient_shl(ctx, H + j, H + j, X, j);
   }
   // H_e  = s_e * X^e - S_e
   coefficient_construct_copy(ctx, H + e, s_e);
-  coefficient_shl(ctx, H + e, H + e, top_var, e);
+  coefficient_shl(ctx, H + e, H + e, X, e);
   coefficient_sub(ctx, H + e, H + e, S_e);
   // for j in e + 1 ... d - 1
   //    H_j = x*H_j-1 - pi_e(X*H_j-1)*S_d-1/c_d-1
@@ -253,9 +251,9 @@ void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A,
   for (j = e + 1; j < d; ++ j) {
     // H_j = x*H_j-1
     coefficient_construct_copy(ctx, H + j, H + j - 1);
-    coefficient_shl(ctx, H + j, H + j, top_var, 1);
+    coefficient_shl(ctx, H + j, H + j, X, 1);
     // pi_e = e-th coefficient
-    const coefficient_t* pi_e = coefficient_get_coefficient_safe(ctx, H + j, e, top_var);
+    const coefficient_t* pi_e = coefficient_get_coefficient_safe(ctx, H + j, e, X);
     // second term
     coefficient_mul(ctx, &tmp, pi_e, S_d_1);
     coefficient_div(ctx, &tmp, &tmp, c_d_1);
@@ -266,18 +264,25 @@ void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A,
   coefficient_t D;
   coefficient_construct(ctx, &D);
   for (j = 0; j < d; ++ j) {
-    coefficient_add_mul(ctx, &D, coefficient_get_coefficient_safe(ctx, A, j, top_var), H + j);
+    coefficient_add_mul(ctx, &D, coefficient_get_coefficient_safe(ctx, A, j, X), H + j);
   }
-  coefficient_div(ctx, &D, &D, coefficient_lc_safe(ctx, A, top_var));
+  coefficient_div(ctx, &D, &D, coefficient_lc_safe(ctx, A, X));
   // Finial result = (-1)^(d-e+1) * (c_d-1)(x*H_d-1+D)-pi_e(x*H_d-1)S_d-1)/s_d
   coefficient_t result;
   coefficient_construct(ctx, &result);
-  coefficient_shl(ctx, &tmp, H + d - 1, top_var, 1);
-  coefficient_mul(ctx, &result, coefficient_get_coefficient_safe(ctx, &tmp, e, top_var), S_d_1);
+  // tmp = X*H_d-1
+  coefficient_shl(ctx, &tmp, H + d - 1, X, 1);
+  // result = pi_e(X*H_d-1)*S_d-1
+  coefficient_mul(ctx, &result, coefficient_get_coefficient_safe(ctx, &tmp, e, X), S_d_1);
+  // tmp = X*H_d-1+D
   coefficient_add(ctx, &tmp, &tmp, &D);
+  // tmp = (c_d-1)*(X*H_d-1+D)
   coefficient_mul(ctx, &tmp, &tmp, c_d_1);
+  // result = (c_d-1)(x*H_d-1+D)-pi_e(x*H_d-1)S_d-1)
   coefficient_sub(ctx, &result, &tmp, &result);
+  // result = (c_d-1)(x*H_d-1+D)-pi_e(x*H_d-1)S_d-1)/s_d
   coefficient_div(ctx, &result, &result, s_d);
+  // negate, i.e. (-1)^(d-e+1)
   if ((d - e + 1) % 2) {
     coefficient_neg(ctx, &result, &result);
   }
@@ -374,10 +379,20 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
     // Holds:
     //   S = [S_d-1, S_d, ...]
 
+    assert(d >= e);
     int delta = d - e;
     if (delta > 1) {
-      // Optimized calculation of S_e into C
-      S_e_optimized(ctx, S+d, S+d-1, &C, x);
+      if (d < Q_deg) {
+        // Optimized calculation of S_e into C
+        // S_e_optimized(ctx, S_d, S_d_1, S_e, X)
+        S_e_optimized(ctx, &A, &B, &C, x);
+      } else {
+        // C = (lc(B)^(delta-1)*B)/(s^(delta-1))
+        coefficient_pow(ctx, &pow, coefficient_lc_safe(ctx, &B, x), delta-1);
+        coefficient_mul(ctx, &C, &pow, &B);
+        coefficient_pow(ctx, &pow, &s, delta-1);
+        coefficient_div(ctx, &C, &C, &pow);
+      }
       // S = [C; S]
       if (coefficient_degree_safe(ctx, &C, x) == e) {
         coefficient_assign(ctx, S + S_size, coefficient_lc_safe(ctx, &C, x));
@@ -449,6 +464,6 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
 }
 
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
-  coefficient_psc_unoptimized(ctx, S, P, Q);
+  coefficient_psc_optimized(ctx, S, P, Q);
 }
 

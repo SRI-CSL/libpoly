@@ -468,9 +468,24 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
   return 0;
 }
 
+static coefficient_t zero;
+static int zero_initialized = 0;
+
+static const coefficient_t* get_zero() {
+  if (!zero_initialized) {
+    zero_initialized = 1;
+    zero.type = COEFFICIENT_NUMERIC;
+    integer_construct(&zero.value.num);
+  }
+  return &zero;
+}
+
 const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, size_t d, lp_variable_t x) {
   __unused(ctx);
-  assert(d <= coefficient_degree_safe(ctx, C, x));
+
+  if (d > coefficient_degree_safe(ctx, C, x)) {
+    return get_zero();
+  }
 
   switch(C->type) {
   case COEFFICIENT_NUMERIC:
