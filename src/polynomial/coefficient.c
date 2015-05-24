@@ -20,6 +20,7 @@
 
 #include "number/integer.h"
 #include "number/rational.h"
+#include "number/value.h"
 #include "interval/arithmetic.h"
 
 #include "variable/variable_order.h"
@@ -2728,6 +2729,7 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
         // Filter any bad roots
         size_t i, to_keep;
         for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
+
           // Set the value of the variable
           assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
           lp_value_t x_value;
@@ -2738,7 +2740,62 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
             tracef("coefficient_roots_isolate(): checking root: "); lp_value_print(&x_value, trace_out); tracef("\n");
           }
 
-          if (coefficient_sgn(ctx, &A_rat, M) == 0) {
+          // A_rat has at most one zero at each of root intervals and it
+          // evaluates to opposite signs there. As a first check we approximate
+          // at the borders to see if it evaluates to opposite signs.
+          int zero_by_border_evaluation = 0;
+//          if (!lp_value_is_rational(&x_value)) {
+//            // Remember the old interval of x
+//            lp_dyadic_interval_t x_old;
+//            lp_dyadic_interval_construct_copy(&x_old, &x_value.value.a.I);
+//            // Approximate the interval
+//            lp_rational_interval_t x_interval;
+//            lp_rational_interval_construct_zero(&x_interval);
+//            lp_value_approx(&x_value, &x_interval);
+//            // If still an interval, evaluate
+//            if (!x_interval.is_point) {
+//              lp_rational_interval_t lb_value, ub_value;
+//              lp_rational_interval_construct_zero(&lb_value);
+//              lp_rational_interval_construct_zero(&ub_value);
+//              lp_value_t x_value_at_bound;
+//              // Do at lower bound
+//              lp_value_construct(&x_value_at_bound, LP_VALUE_DYADIC_RATIONAL, &x_value.value.a.I.a);
+//              lp_assignment_set_value((lp_assignment_t*) M, x, &x_value_at_bound);
+//              coefficient_value_approx(ctx, &A_rat, M, &lb_value);
+//              lp_value_destruct(&x_value_at_bound);
+//              // Do at upper bound
+//              lp_value_construct(&x_value_at_bound, LP_VALUE_DYADIC_RATIONAL, &x_value.value.a.I.b);
+//              lp_assignment_set_value((lp_assignment_t*) M, x, &x_value_at_bound);
+//              coefficient_value_approx(ctx, &A_rat, M, &ub_value);
+//              lp_value_destruct(&x_value_at_bound);
+//              if (trace_is_enabled("coefficient::roots")) {
+//                tracef("coefficient_roots_isolate(): lb_value = "); lp_rational_interval_print(&lb_value, trace_out); tracef("\n");
+//                tracef("coefficient_roots_isolate(): ub_value = "); lp_rational_interval_print(&ub_value, trace_out); tracef("\n");
+//              }
+//              // Compare signs
+//              int ub_sgn = lp_rational_interval_sgn(&lb_value);
+//              int lb_sgn = lp_rational_interval_sgn(&ub_value);
+//              if (ub_sgn*lb_sgn < 0) {
+//                // Definite zero
+//                zero_by_border_evaluation = 1;
+//              }
+//              // Restore true value
+//              lp_assignment_set_value((lp_assignment_t*) M, x, &x_value);
+//              // Remove temp
+//              lp_rational_interval_destruct(&lb_value);
+//              lp_rational_interval_destruct(&ub_value);
+//            }
+//            // Restore interval if not a point
+//            if (!lp_value_is_rational(&x_value)) {
+//              lp_dyadic_interval_swap(&x_value.value.a.I, &x_old);
+//            }
+//            // Remove temps
+//            lp_rational_interval_destruct(&x_interval);
+//            lp_dyadic_interval_destruct(&x_old);
+//          }
+
+          // If zero by border or full sign is 0 then keep it
+          if (zero_by_border_evaluation || coefficient_sgn(ctx, &A_rat, M) == 0) {
             if (i != to_keep) {
               lp_algebraic_number_swap(algebraic_roots + to_keep, algebraic_roots + i);
             }
