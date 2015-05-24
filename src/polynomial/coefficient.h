@@ -131,6 +131,9 @@ lp_variable_t coefficient_top_variable(const coefficient_t* C);
 /** Get the k-th coefficient of this coefficient */
 const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t k);
 
+/** Get the k-th coefficient of this coefficient */
+const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, size_t k, lp_variable_t x);
+
 /** Get the leading coefficient of this coefficient */
 const coefficient_t* coefficient_lc(const coefficient_t* C);
 

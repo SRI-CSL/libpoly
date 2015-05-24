@@ -468,6 +468,29 @@ const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t 
   return 0;
 }
 
+const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, size_t d, lp_variable_t x) {
+  __unused(ctx);
+  assert(d <= coefficient_degree_safe(ctx, C, x));
+
+  switch(C->type) {
+  case COEFFICIENT_NUMERIC:
+    return C;
+    break;
+  case COEFFICIENT_POLYNOMIAL:
+    if (VAR(C) == x) {
+      return COEFF(C, d);
+    } else {
+      assert(d == 0);
+      return C;
+    }
+    break;
+  }
+
+  assert(0);
+  return 0;
+}
+
+
 STAT_DECLARE(int, coefficient, is_zero)
 
 int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
@@ -1600,12 +1623,6 @@ void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* 
     coefficient_normalize(ctx, C);
   }
 }
-
-///
-/// Forward declarations of division/reduction/gcd stuff
-///
-
-void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
 
 //
 // Implementation of the division/reduction/gcd stuff
