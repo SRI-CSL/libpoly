@@ -736,15 +736,11 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
             break;
           }
 
-          // If contained in L, or fully out of L, we're also done
+          // If contained in L, we're also done
           int contains_a = lp_rational_interval_contains_rational(&L_interval, &C_rat_approx.a);
           int contains_b = lp_rational_interval_contains_rational(&L_interval, &C_rat_approx.b);
           if (contains_a && contains_b) {
             assert(lp_rational_interval_contains_zero(&C_rat_approx));
-            break;
-          }
-          if (!contains_a && !contains_b) {
-            assert(!lp_rational_interval_contains_zero(&C_rat_approx));
             break;
           }
 

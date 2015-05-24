@@ -18,6 +18,7 @@
 #include "variable_list.h"
 #include "sign_condition.h"
 #include "feasibility_set.h"
+#include "value.h"
 
 #include <structmember.h>
 
@@ -1348,10 +1349,37 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
     return Py_NotImplemented;
   }
 
-  // Get the arguments
+    // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
   lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+
+  // Check if all but the top variable are unassigned
+  if (lp_polynomial_is_constant(p)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  lp_variable_t top = lp_polynomial_top_variable(p);
+  if (lp_assignment_get_value(assignment, top)->type != LP_VALUE_NONE) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  lp_variable_list_t vars;
+  lp_variable_list_construct(&vars);
+  lp_polynomial_get_variables(p, &vars);
+  size_t i;
+  for (i = 0; i < vars.list_size; ++ i) {
+    lp_variable_t x = vars.list[i];
+    if (x != top && lp_assignment_get_value(assignment, x)->type == LP_VALUE_NONE) {
+      break;
+    }
+  }
+  lp_variable_list_destruct(&vars);
+  if (i < vars.list_size) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
 
   // Get the feasible intervals
   lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, assignment);
@@ -1359,7 +1387,6 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   // The list where we return the arguments
   PyObject* list = PyList_New(feasible->size);
   // Copy over to the list
-  size_t i;
   for (i = 0; i < feasible->size; ++i) {
     PyObject* p = PyInterval_create(feasible->intervals + i);
     PyList_SetItem(list, i, p);

@@ -41,13 +41,15 @@ def random_upolynomial(K, degree, M, lc = None):
 """
 def random_polynomial(degree, M, p_vars, trials):
     # Generate monomials
-    m = random.randint(-M, M)
+    p = random.randint(-M, M)
     for _ in xrange(trials):
+        m = random.randint(-M, M)
         m_vars = [p_vars[i] for i in sorted(random.sample(xrange(len(p_vars)), random.randint(0, len(p_vars))))]
         for var in m_vars:
             deg = random.randint(1, degree)
-            m = m + random.randint(-M, M)*(var**deg)
-    return m
+            m = m*(var**deg)
+        p = p + m
+    return p
 
 class SympyWrapper:
     
