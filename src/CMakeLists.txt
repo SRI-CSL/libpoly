@@ -26,6 +26,7 @@ set(poly_SOURCES
     polynomial/coefficient.c
     polynomial/output.c
     polynomial/gcd.c
+    polynomial/psc.c
     polynomial/factorization.c
     polynomial/polynomial.c
     polynomial/polynomial_context.c
