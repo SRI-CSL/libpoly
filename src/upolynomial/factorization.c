@@ -74,10 +74,18 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_u
 
   assert(!f->K || !f->K->is_prime || lp_upolynomial_is_monic(f));
   assert(f->K || lp_upolynomial_is_primitive(f));
-  assert(lp_upolynomial_degree(f) > 0);
   assert(lp_upolynomial_const_term(f));
 
   lp_upolynomial_factors_t* factors = 0;
+
+  // Special case for constants
+  if (lp_upolynomial_degree(f) == 0) {
+    const lp_integer_t* c = lp_upolynomial_const_term(f);
+    assert(c);
+    factors = lp_upolynomial_factors_construct();
+    integer_assign(f->K, &factors->constant, c);
+    return factors;
+  }
 
   // Derivative
   lp_upolynomial_t* d_f = lp_upolynomial_derivative(f);
@@ -714,7 +722,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
   }
 
   // Compute the square-free factors of f
-  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free_primitive(to_factor);
+  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free(to_factor);
 
   // Go through the square-free factors break them apart
   int i, i_end;
