@@ -2,6 +2,8 @@
 
 import polypy
 import polypy_test
+
+import time
  
 polypy_test.init()
 
@@ -66,13 +68,24 @@ assignment = polypy.Assignment()
 assignment.set_value(y, polypy.AlgebraicNumber(x**2 - 2, 1))
 assignment.set_value(z, polypy.AlgebraicNumber(x**2 - 3, 1))
 
-# for random in xrange(100):
-#     p = polypy_test.random_polynomial(2, 1, [x, y, z], 3)
-#     print p
-#     for sgn in sgns:
-#         p_feasible = p.feasible_intervals(assignment, sgn)        
-#         print p_feasible
-    
+# [-0.809841]
+# -1 0 1
+p_slow = ((2*z)*y**2)*x**3 + ((1*z**3)*y)*x**2 + ((1*z**2)*y**3)*x + (1*z + 4)
+p_expected = [1, 1, 1, 2, 1, 1] 
+check_feasible(p_slow, x, assignment, p_expected)
+
+p_slow = (1*y**3 + (2*z**3)*y)*x**3 + ((2*z)*y**3)*x**2 + ((2*z**2)*y**2 + 3)
+
+for random in xrange(1000):
+    start = time.time()
+    p = polypy_test.random_polynomial(3, 2, [x, y, z], 5)
+    print p
+    for sgn in sgns:
+        p_feasible = p.feasible_intervals(assignment, sgn)        
+        # print p_feasible
+    end = time.time()
+    print end - start
+
 # + 0 - 0 +
 p = ((1*z)*y**2 + (1*z**2)*y)*x**2 + ((1*z**2)*y**2)*x + 1
 p_expected = [1, 1, 2, 3, 2, 2] 
