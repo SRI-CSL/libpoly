@@ -36,6 +36,18 @@ def random_upolynomial(K, degree, M, lc = None):
     p = polypy.UPolynomial(K, coeff)
     return p
 
+"""
+ Make a random polynomial (degree bound and M bound on the coefficients).
+"""
+def random_polynomial(degree, M, p_vars, trials):
+    # Generate monomials
+    m = random.randint(-M, M)
+    for _ in xrange(trials):
+        m_vars = [p_vars[i] for i in sorted(random.sample(xrange(len(p_vars)), random.randint(0, len(p_vars))))]
+        for var in m_vars:
+            deg = random.randint(1, degree)
+            m = m + random.randint(-M, M)*(var**deg)
+    return m
 
 class SympyWrapper:
     
@@ -142,13 +154,13 @@ import sys
  Disable output buffering.
 """
 class NoBufferWrapper(object):
-   def __init__(self, stream):
-       self.stream = stream
-   def write(self, data):
-       self.stream.write(data)
-       self.stream.flush()
-   def __getattr__(self, attr):
-       return getattr(self.stream, attr)
+    def __init__(self, stream):
+        self.stream = stream
+    def write(self, data):
+        self.stream.write(data)
+        self.stream.flush()
+    def __getattr__(self, attr):
+        return getattr(self.stream, attr)
 
 sys.stdout = NoBufferWrapper(sys.stdout)
 

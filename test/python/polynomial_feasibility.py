@@ -66,6 +66,17 @@ def check_feasible(p, var, assignment, expected):
 
 assignment = polypy.Assignment()
 assignment.set_value(y, polypy.AlgebraicNumber(x**2 - 2, 1))
+assignment.set_value(z, polypy.AlgebraicNumber(x**2 - 3, 1))
+
+for random in xrange(100):
+    p = polypy_test.random_polynomial(3, 10, [x, y, z], 5)
+    print p
+    for sgn in sgns:
+        p_feasible = p.feasible_intervals(assignment, sgn)        
+        print p_feasible
+    
+assignment = polypy.Assignment()
+assignment.set_value(y, polypy.AlgebraicNumber(x**2 - 2, 1))
 assignment.set_value(z, polypy.AlgebraicNumber(x**2 - 2, 1))
 
 # + 0 + 
