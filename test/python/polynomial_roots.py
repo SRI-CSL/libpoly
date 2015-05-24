@@ -44,11 +44,15 @@ assignment = polypy.Assignment()
 assignment.set_value(y, sqrt2)
 assignment.set_value(z, sqrt3)
 
+p = ((1*z)*y**2 + (1*z**2)*y)*x**2 + ((1*z**2)*y**2)*x + 1
+roots = p.roots_isolate(assignment)
+check_roots(p, assignment, roots, [-0.536830573034912, -0.241708498946619])
+
 # print assignment
 
 p = (x**2 - y**2)*(x**2 - z**2)
 roots = p.roots_isolate(assignment);
-check_roots(p, assignment, roots,[-1.732050808, -1.414213562, 1.414213562, 1.732050808])
+check_roots(p, assignment, roots, [-1.732050808, -1.414213562, 1.414213562, 1.732050808])
 
 assignment = polypy.Assignment()
 assignment.set_value(y, 0)

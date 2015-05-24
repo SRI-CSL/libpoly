@@ -444,8 +444,11 @@ size_t coefficient_degree_safe(const lp_polynomial_context_t* ctx, const coeffic
 }
 
 lp_variable_t coefficient_top_variable(const coefficient_t* C) {
-  assert(C->type == COEFFICIENT_POLYNOMIAL);
-  return VAR(C);
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    return VAR(C);
+  } else {
+    return lp_variable_null;
+  }
 }
 
 const coefficient_t* coefficient_get_coefficient(const coefficient_t* C, size_t d) {
@@ -2705,6 +2708,9 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
   if (trace_is_enabled("coefficient::roots")) {
     tracef("coefficient_roots_isolate("); coefficient_print(ctx, A, trace_out); tracef(")\n");
   }
+
+  assert(A->type == COEFFICIENT_POLYNOMIAL);
+  assert(lp_assignment_get_value(M, coefficient_top_variable(A))->type == LP_VALUE_NONE);
 
   // Evaluate in the rationals
   coefficient_t A_rat;

@@ -36,19 +36,25 @@ def random_upolynomial(K, degree, M, lc = None):
     p = polypy.UPolynomial(K, coeff)
     return p
 
+def random_monomial(degree, M, p_vars):
+    m = random.randint(1, M)
+    if random.randint(0, 1):
+        m_vars = [p_vars[i] for i in sorted(random.sample(xrange(len(p_vars)), random.randint(0, len(p_vars))))]
+        for var in m_vars:
+            deg = random.randint(1, degree)
+            m = m*(var**deg)
+    return m
+
 """
  Make a random polynomial (degree bound and M bound on the coefficients).
 """
 def random_polynomial(degree, M, p_vars, trials):
     # Generate monomials
-    p = random.randint(-M, M)
+    p = random.randint(1, M)
     for _ in xrange(trials):
-        m = random.randint(-M, M)
-        m_vars = [p_vars[i] for i in sorted(random.sample(xrange(len(p_vars)), random.randint(0, len(p_vars))))]
-        for var in m_vars:
-            deg = random.randint(1, degree)
-            m = m*(var**deg)
-        p = p + m
+        p = p + random_monomial(degree, M, p_vars)
+    while (not isinstance(p, polypy.Polynomial)) or (p.degree() == 0):
+        p = p + random_monomial(degree, M, p_vars)
     return p
 
 class SympyWrapper:

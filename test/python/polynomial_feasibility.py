@@ -10,13 +10,13 @@ polypy.variable_order.set([z, y, x])
 
 polypy_test.start("Polynomial Feasibility Intervals")
 
-polypy.trace_enable("polynomial")
-polypy.trace_enable("coefficient")
-polypy.trace_enable("coefficient::sgn")
-polypy.trace_enable("coefficient::roots")
-polypy.trace_enable("value::pick");
-polypy.trace_enable("value::cmp");
-polypy.trace_enable("value::get_value_between")
+# polypy.trace_enable("polynomial")
+# polypy.trace_enable("coefficient")
+# polypy.trace_enable("coefficient::sgn")
+# polypy.trace_enable("coefficient::roots")
+# polypy.trace_enable("value::pick");
+# polypy.trace_enable("value::cmp");
+# polypy.trace_enable("value::get_value_between")
 
 # All signs
 sgns = [polypy.SGN_LT_0, 
@@ -66,18 +66,24 @@ assignment = polypy.Assignment()
 assignment.set_value(y, polypy.AlgebraicNumber(x**2 - 2, 1))
 assignment.set_value(z, polypy.AlgebraicNumber(x**2 - 3, 1))
 
+# for random in xrange(100):
+#     p = polypy_test.random_polynomial(2, 1, [x, y, z], 3)
+#     print p
+#     for sgn in sgns:
+#         p_feasible = p.feasible_intervals(assignment, sgn)        
+#         print p_feasible
+    
 # + 0 - 0 +
 p = ((1*z)*y**2 + (1*z**2)*y)*x**2 + ((1*z**2)*y**2)*x + 1
 p_expected = [1, 1, 2, 3, 2, 2] 
 check_feasible(p, x, assignment, p_expected)
 
-for random in xrange(100):
-    p = polypy_test.random_polynomial(2, 1, [x, y, z], 3)
-    print p
-    for sgn in sgns:
-        p_feasible = p.feasible_intervals(assignment, sgn)        
-        print p_feasible
-    
+# [-0.686589047969039, 0.686589047969039]
+# + 0 - 0 +
+p = ((1*z**2)*y)*x**2 + (-1*y**2)
+p_expected = [1, 1, 2, 3, 2, 2]
+check_feasible(p, x, assignment, p_expected)
+
 assignment = polypy.Assignment()
 assignment.set_value(y, polypy.AlgebraicNumber(x**2 - 2, 1))
 assignment.set_value(z, polypy.AlgebraicNumber(x**2 - 2, 1))

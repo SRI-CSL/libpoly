@@ -631,7 +631,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     // If a_ub < m_floor, we can take this value
     cmp = lp_rational_cmp_integer(&a_ub, &m_floor);
     // if ((cmp > 0) || (!a_strict && cmp >= 0)) {
-    if (cmp > 0) {
+    if (cmp < 0) {
       lp_rational_construct_from_integer(&result, &m_floor);
     } else {
       // If m_ceil < b_lb, we can take this value

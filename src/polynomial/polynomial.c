@@ -804,6 +804,10 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
   lp_polynomial_external_clean(A);
 
+  lp_variable_t x = lp_polynomial_top_variable(A);
+  assert(x != lp_variable_null);
+  assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
+
   size_t i;
 
   lp_polynomial_t** factors = 0;
@@ -821,7 +825,10 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   size_t total_degree = 0;
   size_t factor_i;
   for (factor_i = 0; factor_i < factors_size; ++ factor_i) {
-    total_degree += coefficient_degree(&factors[factor_i]->data);
+    // Add the degree of the polynomial if in top variable
+    if (lp_polynomial_top_variable(factors[factor_i]) == x) {
+      total_degree += lp_polynomial_degree(factors[factor_i]);
+    }
   }
 
   if (trace_is_enabled("polynomial")) {
@@ -835,11 +842,25 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   for (factor_i = 0; factor_i < factors_size; ++ factor_i) {
     // The factor we are working with
     const lp_polynomial_t* factor = factors[factor_i];
-    // Get the roots
-    lp_value_t* current_roots = roots_tmp + roots_tmp_size;
-    size_t current_roots_size;
-    coefficient_roots_isolate(A->ctx, &factor->data, M, current_roots, &current_roots_size);
-    roots_tmp_size += current_roots_size;
+    // Get the roots if not a constant
+    if (x == lp_polynomial_top_variable(factor)) {
+      // Proper polynomial in x
+      lp_value_t* current_roots = roots_tmp + roots_tmp_size;
+      size_t current_roots_size;
+      coefficient_roots_isolate(A->ctx, &factor->data, M, current_roots, &current_roots_size);
+      roots_tmp_size += current_roots_size;
+    } else {
+      // Polynomial in some other variable -- we need to check the sign: if 0
+      // then there is no roots all together
+      int sgn = lp_polynomial_sgn(factor, M);
+      if (sgn == 0) {
+        for (i = 0; i < roots_tmp_size; ++ i) {
+          lp_value_destruct(roots_tmp + i);
+        }
+        roots_tmp_size = 0;
+        break;
+      }
+    }
   }
 
   if (trace_is_enabled("polynomial")) {
