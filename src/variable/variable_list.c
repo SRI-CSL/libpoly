@@ -45,6 +45,9 @@ void lp_variable_list_construct(lp_variable_list_t* list) {
 void lp_variable_list_destruct(lp_variable_list_t* list) {
   free(list->list);
   free(list->var_to_index_map);
+  list->list = 0;
+  list->list_size = 0;
+  list->list_capacity = 0;
 }
 
 size_t lp_variable_list_size(const lp_variable_list_t* list) {

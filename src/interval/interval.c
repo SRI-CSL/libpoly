@@ -976,7 +976,7 @@ char* lp_interval_to_string(const lp_interval_t* I) {
 
 int lp_interval_cmp_lower_bounds(const lp_interval_t* I1, const lp_interval_t* I2) {
   const lp_value_t* I1_lb = lp_interval_get_lower_bound(I1);
-  const lp_value_t* I2_lb = lp_interval_get_upper_bound(I2);
+  const lp_value_t* I2_lb = lp_interval_get_lower_bound(I2);
 
   int cmp = lp_value_cmp(I1_lb, I2_lb);
   if (cmp != 0) {
@@ -999,7 +999,7 @@ int lp_interval_cmp_lower_bounds(const lp_interval_t* I1, const lp_interval_t* I
 
 int lp_interval_cmp_upper_bounds(const lp_interval_t* I1, const lp_interval_t* I2) {
   const lp_value_t* I1_ub = lp_interval_get_upper_bound(I1);
-  const lp_value_t* I2_ub = lp_interval_get_lower_bound(I2);
+  const lp_value_t* I2_ub = lp_interval_get_upper_bound(I2);
 
   int cmp = lp_value_cmp(I1_ub, I2_ub);
   if (cmp != 0) {

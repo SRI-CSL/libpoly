@@ -10,8 +10,6 @@ polypy_test.init()
 [x, y, z] = [polypy.Variable(name) for name in ['x', 'y', 'z']]
 polypy.variable_order.set([z, y, x])
 
-polypy_test.start("Polynomial Feasibility Intervals")
-
 # polypy.trace_enable("polynomial")
 # polypy.trace_enable("coefficient")
 # polypy.trace_enable("coefficient::sgn")
@@ -19,6 +17,7 @@ polypy_test.start("Polynomial Feasibility Intervals")
 # polypy.trace_enable("value::pick");
 # polypy.trace_enable("value::cmp");
 # polypy.trace_enable("value::get_value_between")
+# polypy.trace_enable("feasibility_set")
 
 # All signs
 sgns = [polypy.SGN_LT_0, 
@@ -37,6 +36,44 @@ sgn_name = {
             polypy.SGN_GT_0 : ">  0",
             polypy.SGN_GE_0 : ">= 0"
 }
+
+polypy_test.start("Feasibility Intervals Intersection")
+
+assignment = polypy.Assignment()
+assignment.set_value(y, 0)
+assignment.set_value(z, 1)
+
+p1 = (x**2 - y)*(x**2 - 2*z)
+p2 = (x**2 - y)*(x**2 - 3*z)
+
+S1 = p1.feasible_set(assignment, polypy.SGN_NE_0);
+S2 = p2.feasible_set(assignment, polypy.SGN_LE_0);
+P = S1.intersect(S2);
+polypy_test.check(True)
+
+S2 = p2.feasible_set(assignment, polypy.SGN_LT_0);
+P = S1.intersect(S2);
+polypy_test.check(True)
+
+assignment = polypy.Assignment()
+assignment.set_value(y, 0)
+assignment.set_value(z, 1)
+
+p = (x - y)*(x - z)
+
+S1 = p.feasible_set(assignment, polypy.SGN_GE_0);
+S2 = p.feasible_set(assignment, polypy.SGN_EQ_0);
+
+P = S1.intersect(S2);
+polypy_test.check(True)
+
+S1 = p.feasible_set(assignment, polypy.SGN_GT_0);
+S2 = p.feasible_set(assignment, polypy.SGN_GE_0);
+
+P = S1.intersect(S2);
+polypy_test.check(True)
+
+polypy_test.start("Polynomial Feasibility Intervals")
 
 def check_feasible(p, var, assignment, expected):
     ok = True

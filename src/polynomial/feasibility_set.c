@@ -36,7 +36,7 @@ lp_feasibility_set_t* lp_feasibility_set_new_internal(size_t size) {
 
 lp_feasibility_set_t* lp_feasibility_set_new_from_intervals(lp_interval_t* intervals, size_t intervals_size) {
   lp_feasibility_set_t* result = lp_feasibility_set_new_internal(intervals_size);
-  memcpy(result->intervals, intervals, sizeof(intervals)*intervals_size);
+  memcpy(result->intervals, intervals, sizeof(lp_interval_t)*intervals_size);
   result->size = intervals_size;
   return result;
 }
@@ -142,7 +142,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   intervals_capacity ++;
   lp_interval_t* intervals = malloc(sizeof(lp_interval_t)*intervals_capacity);
   size_t intervals_size = 0;
-  lp_interval_construct_zero(intervals);
 
   // Construct the intervals
   size_t i;
@@ -161,82 +160,95 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
 
     lp_interval_t* P = intervals + intervals_size;
 
-    // Stop at the first interval where the two have an intersect
-    for (;;) {
+    if (trace_is_enabled("feasibility_set")) {
+      tracef("s1[%zu] = ", s1_i); lp_interval_print(s1->intervals + s1_i, trace_out); tracef("\n");
+      tracef("s2[%zu] = ", s2_i); lp_interval_print(s2->intervals + s2_i, trace_out); tracef("\n");
+    }
 
-      // Compare the current intervals
-      lp_interval_cmp_t cmp = lp_interval_cmp_with_intersect(s1->intervals + s1_i, s2->intervals + s2_i, P);
+    // Compare the current intervals
+    lp_interval_cmp_t cmp = lp_interval_cmp_with_intersect(s1->intervals + s1_i, s2->intervals + s2_i, P);
 
-      // Advance in at least one interval and take in the intersect if any
+    if (trace_is_enabled("feasibility_set")) {
       switch (cmp) {
       case LP_INTERVAL_CMP_LT_NO_INTERSECT:
-        /* I1: (  )
-         * I2:      (   ) */
-        s1_i ++;
-        all_s1 = 0;
-        break;
-      case LP_INTERVAL_CMP_LT_WITH_INTERSECT:
-        /* I1: (   )
-         * I2:   (   )    */
-        s1_i ++;
-        all_s1 = 0;
-        all_s2 = 0;
-        intervals_size ++;
-        break;
-      case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
-        /* I1: (   )
-         * I2: (     )    */
-        s1_i ++;
-        all_s2 = 0;
-        intervals_size ++;
-        break;
-      case LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2:
-        /* I1: (     ]
-         * I2:   (   ]    */
-        s1_i ++;
-        s2_i ++;
-        all_s1 = 0;
-        intervals_size ++;
-        break;
-      case LP_INTERVAL_CMP_EQ:
-        /* I1: (   ]
-         * I2: (   ]      */
-        s1_i ++;
-        s2_i ++;
-        intervals_size ++;
-        break;
-      case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
-        /* I1:   (   ]
-         * I2: (     ]    */
-        s1_i ++;
-        s2_i ++;
-        all_s2 = 0;
-        intervals_size ++;
-        break;
-      case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
-        /* I1: (       )
-         * I2: (    )     */
-        s2_i ++;
-        all_s1 = 0;
-        intervals_size ++;
-        break;
-      case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
-        /* I1:   (    )
-         * I2: (    )     */
-        s2_i ++;
-        all_s1 = 0;
-        all_s2 = 0;
-        intervals_size ++;
-        break;
       case LP_INTERVAL_CMP_GT_NO_INTERSECT:
-        /* I1:      (   )
-         * I2: (  )       */
-        s2_i ++;
-        all_s2 = 0;
+        tracef("no intersect\n");
         break;
       default:
-        assert(0);
+        tracef("intersect P = "); lp_interval_print(P, trace_out); tracef("\n");
+        break;
       }
+    }
+
+    // Advance in at least one interval and take in the intersect if any
+    switch (cmp) {
+    case LP_INTERVAL_CMP_LT_NO_INTERSECT:
+      /* I1: (  )
+       * I2:      (   ) */
+      s1_i ++;
+      all_s1 = 0;
+      break;
+    case LP_INTERVAL_CMP_LT_WITH_INTERSECT:
+      /* I1: (   )
+       * I2:   (   )    */
+      s1_i ++;
+      all_s1 = 0;
+      all_s2 = 0;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
+      /* I1: (   )
+       * I2: (     )    */
+      s1_i ++;
+      all_s2 = 0;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2:
+      /* I1: (     ]
+       * I2:   (   ]    */
+      s1_i ++;
+      s2_i ++;
+      all_s1 = 0;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_EQ:
+      /* I1: (   ]
+       * I2: (   ]      */
+      s1_i ++;
+      s2_i ++;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
+      /* I1:   (   ]
+       * I2: (     ]    */
+      s1_i ++;
+      s2_i ++;
+      all_s2 = 0;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
+      /* I1: (       )
+       * I2: (    )     */
+      s2_i ++;
+      all_s1 = 0;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
+      /* I1:   (    )
+       * I2: (    )     */
+      s2_i ++;
+      all_s1 = 0;
+      all_s2 = 0;
+      intervals_size ++;
+      break;
+    case LP_INTERVAL_CMP_GT_NO_INTERSECT:
+      /* I1:      (   )
+       * I2: (  )       */
+      s2_i ++;
+      all_s2 = 0;
+      break;
+    default:
+      assert(0);
     }
   }
 

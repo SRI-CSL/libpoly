@@ -193,10 +193,10 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
       break;
     }
   }
-  lp_variable_list_destruct(&vars);
   if (i < vars.list_size) {
     return 0;
   }
+  lp_variable_list_destruct(&vars);
   return 1;
 }
 

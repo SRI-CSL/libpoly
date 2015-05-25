@@ -26,10 +26,11 @@ static PyObject*
 FeasibilitySet_pick_value(PyObject* self);
 
 static PyObject*
-FeasibilitySet_intersect(PyObject* self);
+FeasibilitySet_intersect(PyObject* self, PyObject* args);
 
 PyMethodDef FeasibilitySet_methods[] = {
     {"pick_value", (PyCFunction)FeasibilitySet_pick_value, METH_NOARGS, "Returns a value from the interval."},
+    {"intersect", (PyCFunction)FeasibilitySet_intersect, METH_VARARGS, "Returns the intersection of the interval with another one."},
     {NULL}  /* Sentinel */
 };
 
@@ -78,7 +79,7 @@ PyTypeObject FeasibilitySetType = {
 static void
 FeasibilitySet_dealloc(FeasibilitySet* self)
 {
-  lp_feasibility_set_destruct(&self->S);
+  lp_feasibility_set_delete(self->S);
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -126,4 +127,30 @@ FeasibilitySet_pick_value(PyObject* self) {
   PyObject* result = PyValue_create(&v);
   lp_value_destruct(&v);
   return result;
+}
+
+static PyObject*
+FeasibilitySet_intersect(PyObject* self, PyObject* args) {
+  FeasibilitySet* S = (FeasibilitySet*) self;
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* feasibility_set_obj = PyTuple_GetItem(args, 0);
+  if (!PyFeasibilitySet_CHECK(feasibility_set_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  // Get the arguments
+  lp_feasibility_set_t* S1 = ((FeasibilitySet*) self)->S;
+  lp_feasibility_set_t* S2 = ((FeasibilitySet*) feasibility_set_obj)->S;
+
+  // The intersect
+  lp_feasibility_set_t* P = lp_feasibility_set_intersect(S1, S2);
+  PyObject* P_obj = PyFeasibilitySet_create(P);
+
+  return P_obj;
 }
