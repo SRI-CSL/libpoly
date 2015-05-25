@@ -934,6 +934,14 @@ const lp_value_t* lp_interval_get_point(const lp_interval_t* I) {
   return &I->a;
 }
 
+const lp_value_t* lp_interval_get_lower_bound(const lp_interval_t* I) {
+  return &I->a;
+}
+
+const lp_value_t* lp_interval_get_upper_bound(const lp_interval_t* I) {
+  return I->is_point ? &I->a : &I->b;
+}
+
 void lp_interval_pick_value(const lp_interval_t* I, lp_value_t* v) {
   if (I->is_point) {
     lp_value_assign(v, &I->a);
@@ -958,4 +966,225 @@ char* lp_interval_to_string(const lp_interval_t* I) {
   lp_interval_print(I, f);
   fclose(f);
   return str;
+}
+
+int lp_interval_cmp_lower_bounds(const lp_interval_t* I1, const lp_interval_t* I2) {
+  const lp_value_t* I1_lb = lp_interval_get_lower_bound(I1);
+  const lp_value_t* I2_lb = lp_interval_get_upper_bound(I2);
+
+  int cmp = lp_value_cmp(I1_lb, I2_lb);
+  if (cmp != 0) {
+    return cmp;
+  } else {
+    // Equal, so we check if they are strict
+    if (I1->a_open == I2->a_open) {
+      return 0;
+    } else {
+      if (I1->a_open) {
+        // (a, b) > [a, b)
+        return 1;
+      } else {
+        // [a, b) < (a, b)
+        return -1;
+      }
+    }
+  }
+}
+
+int lp_interval_cmp_upper_bounds(const lp_interval_t* I1, const lp_interval_t* I2) {
+  const lp_value_t* I1_ub = lp_interval_get_upper_bound(I1);
+  const lp_value_t* I2_ub = lp_interval_get_lower_bound(I2);
+
+  int cmp = lp_value_cmp(I1_ub, I2_ub);
+  if (cmp != 0) {
+    return cmp;
+  } else {
+    // Equal, so we check if they are strict
+    if (I1->b_open == I2->b_open) {
+      return 0;
+    } else {
+      if (I1->b_open) {
+        // (a, b) < (a, b]
+        return -1;
+      } else {
+        // (a, b] > (a, b)
+        return 1;
+      }
+    }
+  }
+}
+
+lp_interval_cmp_t lp_interval_cmp(const lp_interval_t* I1, const lp_interval_t* I2) {
+  return lp_interval_cmp_with_intersect(I1, I2, 0);
+}
+
+lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const lp_interval_t* I2, lp_interval_t* P) {
+
+  int cmp_ub = lp_interval_cmp_upper_bounds(I1, I2);
+  int cmp_lb = lp_interval_cmp_lower_bounds(I1, I2);
+
+  if (cmp_ub == 0 && cmp_lb == 0) {
+    if (P) {
+      lp_interval_t result;
+      lp_interval_construct_copy(&result, I1);
+      lp_interval_swap(&result, P);
+      lp_interval_destruct(&result);
+    }
+    return LP_INTERVAL_CMP_EQ;
+  }
+
+  if (cmp_ub < 0 && cmp_lb > 0) {
+    //   ( )
+    // (      )
+    if (P) {
+      lp_interval_t result;
+      lp_interval_construct_copy(&result, I1);
+      lp_interval_swap(&result, P);
+      lp_interval_destruct(&result);
+    }
+    return LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1;
+  }
+
+  if (cmp_ub > 0 && cmp_lb < 0) {
+    // (       )
+    //    ( )
+    if (P) {
+      lp_interval_t result;
+      lp_interval_construct_copy(&result, I2);
+      lp_interval_swap(&result, P);
+      lp_interval_destruct(&result);
+    }
+    return LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2;
+  }
+
+  if (cmp_ub == 0) {
+    if (cmp_lb > 0) {
+      //   (    )
+      // (      )
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct_copy(&result, I1);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1;
+    }
+    if (cmp_lb < 0) {
+      // (    )
+      //    ( )
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct_copy(&result, I2);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2;
+    }
+  }
+
+  if (cmp_lb == 0) {
+    if (cmp_ub > 0) {
+      // (     )
+      // (   )
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct_copy(&result, I2);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2;
+    }
+    if (cmp_ub < 0) {
+      // (  )
+      // (     )
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct_copy(&result, I1);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1;
+    }
+  }
+
+  /**
+   * Here we know that both comparisons go the same way
+   *
+   *  (   )        (    )
+   *    (   )    (    )
+   *
+   *  ( )            ( )
+   *      ( )    ( )
+   */
+
+  if (cmp_ub < 0) {
+    assert(cmp_lb < 0);
+    const lp_value_t* I1_ub = lp_interval_get_upper_bound(I1);
+    const lp_value_t* I2_lb = lp_interval_get_lower_bound(I2);
+    int cmp_I1_ub_I2_lb = lp_value_cmp(I1_ub, I2_lb);
+    if (cmp_I1_ub_I2_lb == 0 && (I1->b_open || I2->a_open)) {
+      cmp_I1_ub_I2_lb = -1;
+    }
+    if (cmp_I1_ub_I2_lb == 0) {
+      // I1: (  ]
+      // I2:    [  )
+      assert(!I1->b_open && !I2->a_open);
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct_point(&result, &I2->a);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_LT_WITH_INTERSECT;
+    } else if (cmp_I1_ub_I2_lb < 0) {
+      // I1: (  )
+      // I2      (  )
+      return LP_INTERVAL_CMP_LT_NO_INTERSECT;
+    } else {
+      // I1: (   )
+      // I2:   (   )
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct(&result, I2_lb, I2->a_open, I1_ub, I1->b_open);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_LT_WITH_INTERSECT;
+    }
+  } else {
+    assert(cmp_ub > 0);
+    assert(cmp_lb > 0);
+    const lp_value_t* I1_lb = lp_interval_get_lower_bound(I1);
+    const lp_value_t* I2_ub = lp_interval_get_upper_bound(I2);
+    int cmp_I1_lb_I2_ub = lp_value_cmp(I1_lb, I2_ub);
+    if (cmp_I1_lb_I2_ub == 0 && (I1->a_open || I2->b_open)) {
+      cmp_I1_lb_I2_ub = -1;
+    }
+    if (cmp_I1_lb_I2_ub == 0) {
+      // I1:    [  )
+      // I2: (  ]
+      assert(!I1->a_open && !I2->b_open);
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct_point(&result, &I1->a);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_GT_WITH_INTERSECT;
+    } else if (cmp_I1_lb_I2_ub < 0) {
+      // I1:   (   )
+      // I2: (   )
+      if (P) {
+        lp_interval_t result;
+        lp_interval_construct(&result, I1_lb, I1->a_open, I2_ub, I2->b_open);
+        lp_interval_swap(&result, P);
+        lp_interval_destruct(&result);
+      }
+      return LP_INTERVAL_CMP_GT_WITH_INTERSECT;
+    } else {
+      // I1:     (  )
+      // I2: (  )
+      return LP_INTERVAL_CMP_GT_NO_INTERSECT;
+    }
+  }
 }

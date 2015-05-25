@@ -33,9 +33,20 @@ struct lp_feasibility_set_struct {
 lp_feasibility_set_t* lp_feasibility_set_new();
 
 /**
+ * Construct a copy.
+ */
+lp_feasibility_set_t* lp_feasibility_set_new_copy(const lp_feasibility_set_t* set);
+
+/**
  * Delete the given feasibility set.
  */
 void lp_feasibility_set_delete(lp_feasibility_set_t* set);
+
+/**
+ * Assignment.
+ */
+void lp_feasibiliy_set_assign(lp_feasibility_set_t* set, const lp_feasibility_set_t* from);
+
 
 /**
  * Check if the given set is empty.
@@ -51,6 +62,23 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
  * Pick a value from the feasible set (must be non-empty).
  */
 lp_value_t* lp_feasibility_set_pick_value(const lp_feasibility_set_t* set);
+
+/**
+ * Get intersection of the two sets, returns the status in the given variable.
+ */
+lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2);
+
+typedef enum {
+  LP_FEASIBILITY_SET_INTERSECT_S1,
+  LP_FEASIBILITY_SET_INTERSECT_S2,
+  LP_FEASIBILITY_SET_NEW,
+  LP_FEASIBILITY_SET_EMPTY
+} lp_feasibility_set_intersect_status_t;
+
+/**
+ * Get intersection of the two sets, returns the status in the given variable.
+ */
+lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2, lp_feasibility_set_intersect_status_t* status);
 
 /**
  * Print the set.
