@@ -175,6 +175,31 @@ int lp_polynomial_is_univariate(const lp_polynomial_t* A) {
   return coefficient_is_univariate(&A->data);
 }
 
+int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m) {
+  if (lp_polynomial_is_constant(A)) {
+    return 0;
+  }
+  lp_variable_t top = lp_polynomial_top_variable(A);
+  if (lp_assignment_get_value(m, top)->type != LP_VALUE_NONE) {
+    return 0;
+  }
+  lp_variable_list_t vars;
+  lp_variable_list_construct(&vars);
+  lp_polynomial_get_variables(A, &vars);
+  size_t i;
+  for (i = 0; i < vars.list_size; ++ i) {
+    lp_variable_t x = vars.list[i];
+    if (x != top && lp_assignment_get_value(m, x)->type == LP_VALUE_NONE) {
+      break;
+    }
+  }
+  lp_variable_list_destruct(&vars);
+  if (i < vars.list_size) {
+    return 0;
+  }
+  return 1;
+}
+
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
   if (!coefficient_is_univariate(&A->data)) {
     return 0;

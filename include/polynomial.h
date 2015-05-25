@@ -90,6 +90,12 @@ int lp_polynomial_is_zero(const lp_polynomial_t* A);
 /** Returns true if the polynomial is univariate */
 int lp_polynomial_is_univariate(const lp_polynomial_t* A);
 
+/**
+ * Returns true if polynomial is univariate, i.e. has one variable unassigned,
+ * and the unassigned variable is the top variable.
+ */
+int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m);
+
 /** Returns the univariate polynomial (if univariate, or 0 otherwise) */
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A);
 

@@ -13,6 +13,7 @@
 #include "Assignment.h"
 #include "Value.h"
 #include "Interval.h"
+#include "FeasibilitySet.h"
 
 #include "utils.h"
 #include "variable_list.h"
@@ -136,6 +137,9 @@ Polynomial_vars(PyObject* self);
 static PyObject*
 Polynomial_feasible_intervals(PyObject* self, PyObject* args);
 
+static PyObject*
+Polynomial_feasible_set(PyObject* self, PyObject* args);
+
 PyMethodDef Polynomial_methods[] = {
     {"degree", (PyCFunction)Polynomial_degree, METH_NOARGS, "Returns the degree of the polynomial in its top variable"},
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
@@ -159,6 +163,7 @@ PyMethodDef Polynomial_methods[] = {
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
     {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
     {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals of the polynomial (has to be univariate modulo the assignment)"},
+    {"feasible_set", (PyCFunction)Polynomial_feasible_set, METH_VARARGS, "Returns feasible set of the polynomial (has to be univariate modulo the assignment)"},
     {NULL}  /* Sentinel */
 };
 
@@ -1355,31 +1360,10 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
 
   // Check if all but the top variable are unassigned
-  if (lp_polynomial_is_constant(p)) {
-    Py_INCREF(Py_NotImplemented);
+  if (!lp_polynomial_is_univariate_m(p, assignment)) {
+    Py_IncRef(Py_NotImplemented);
     return Py_NotImplemented;
   }
-  lp_variable_t top = lp_polynomial_top_variable(p);
-  if (lp_assignment_get_value(assignment, top)->type != LP_VALUE_NONE) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
-  }
-  lp_variable_list_t vars;
-  lp_variable_list_construct(&vars);
-  lp_polynomial_get_variables(p, &vars);
-  size_t i;
-  for (i = 0; i < vars.list_size; ++ i) {
-    lp_variable_t x = vars.list[i];
-    if (x != top && lp_assignment_get_value(assignment, x)->type == LP_VALUE_NONE) {
-      break;
-    }
-  }
-  lp_variable_list_destruct(&vars);
-  if (i < vars.list_size) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
-  }
-
 
   // Get the feasible intervals
   lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, assignment);
@@ -1387,6 +1371,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   // The list where we return the arguments
   PyObject* list = PyList_New(feasible->size);
   // Copy over to the list
+  size_t i;
   for (i = 0; i < feasible->size; ++i) {
     PyObject* p = PyInterval_create(feasible->intervals + i);
     PyList_SetItem(list, i, p);
@@ -1395,4 +1380,42 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   lp_feasibility_set_delete(feasible);
   // Return the list
   return list;
+}
+
+static PyObject*
+Polynomial_feasible_set(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 2) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+  if (!PyAssignment_CHECK(assignment_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
+  if (!PyInt_Check(sgn_condition_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+    // Get the arguments
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+  lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+
+  // Check if all but the top variable are unassigned
+  if (!lp_polynomial_is_univariate_m(p, assignment)) {
+    Py_IncRef(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  // Get the feasible intervals
+  lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, assignment);
+
+  // Return the list
+  return PyFeasibilitySet_create(feasible);
 }
