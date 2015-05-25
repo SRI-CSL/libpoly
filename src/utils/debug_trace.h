@@ -15,15 +15,16 @@ extern FILE* trace_out;
 /** Print to the debug trace printf style */
 #define tracef(...) fprintf(trace_out, __VA_ARGS__);
 
-#ifndef NDEBUG
+/** Set the output file for tracing */
+void trace_set_output(FILE* file);
 
 void trace_enable(const char* tag);
 
 void trace_disable(const char* tag);
 
-int trace_is_enabled(const char* tag);
+#ifndef NDEBUG
 
-void trace_set_output(FILE* file);
+int trace_is_enabled(const char* tag);
 
 #define TRACE(tag, ...) { \
   if (trace_is_enabled(tag)) { \

@@ -92,6 +92,7 @@ lp_variable_t lp_polynomial_context_get_temp_variable(const lp_polynomial_contex
 
 /** Release the variable (has to be the last one obtained and not released */
 void lp_polynomial_context_release_temp_variable(const lp_polynomial_context_t* ctx_const, lp_variable_t x) {
+  (void)x;
   lp_polynomial_context_t* ctx = (lp_polynomial_context_t*) ctx_const;
   assert(ctx->var_tmp_size > 0);
   ctx->var_tmp_size --;
