@@ -61,7 +61,7 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
 /**
  * Pick a value from the feasible set (must be non-empty).
  */
-lp_value_t* lp_feasibility_set_pick_value(const lp_feasibility_set_t* set);
+void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* v);
 
 /**
  * Get intersection of the two sets, returns the status in the given variable.
@@ -85,3 +85,7 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
  */
 int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out);
 
+/**
+ * Return the string representation of the set.
+ */
+char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set);

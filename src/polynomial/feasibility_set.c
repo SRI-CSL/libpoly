@@ -104,6 +104,15 @@ int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   return ret;
 }
 
+char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
+  char* str = 0;
+  size_t size = 0;
+  FILE* f = open_memstream(&str, &size);
+  lp_feasibility_set_print(set, f);
+  fclose(f);
+  return str;
+}
+
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value) {
   // TODO: binary search
   for (size_t i = 0; i < set->size; ++ i) {
@@ -114,10 +123,10 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
   return 0;
 }
 
-lp_value_t* lp_feasibility_set_pick_value(const lp_feasibility_set_t* set) {
+void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* value) {
   (void)set;
+  (void)value;
   assert(0);
-  return 0;
 }
 
 lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2) {

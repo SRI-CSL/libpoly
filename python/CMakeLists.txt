@@ -10,6 +10,7 @@ set(polypy_SOURCES
     VariableOrder.c
     Value.c
     Interval.c
+    FeasibilitySet.c
 )
 
 find_package(PythonInterp)

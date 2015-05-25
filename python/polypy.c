@@ -7,6 +7,7 @@
 #include "Assignment.h"
 #include "Value.h"
 #include "Interval.h"
+#include "FeasibilitySet.h"
 
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {
@@ -71,6 +72,8 @@ initpolypy(void)
     return;
   if (PyType_Ready(&IntervalType) < 0)
     return;
+  if (PyType_Ready(&FeasibilitySetType) < 0)
+    return;
 
   m = Py_InitModule3("polypy", polypy_methods, "PolyPy Libarary.");
 
@@ -128,9 +131,12 @@ initpolypy(void)
   PyModule_AddObject(m, "AlgebraicNumber", (PyObject*)&AlgebraicNumberType);
 
   Py_INCREF(&ValueType);
-  PyModule_AddObject(m, "Value", (PyObject*)&AlgebraicNumberType);
+  PyModule_AddObject(m, "Value", (PyObject*)&ValueType);
 
   Py_INCREF(&IntervalType);
-  PyModule_AddObject(m, "Interval", (PyObject*)&AlgebraicNumberType);
+  PyModule_AddObject(m, "Interval", (PyObject*)&IntervalType);
+
+  Py_INCREF(&FeasibilitySetType);
+  PyModule_AddObject(m, "FeasibilitySet", (PyObject*)&FeasibilitySetType);
 }
 
