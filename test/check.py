@@ -21,6 +21,7 @@ tests = ["python/upolynomial_gcd.py",
          "python/polynomial_factorization.py",
          "python/polynomial_eval.py",
          "python/polynomial_roots.py",
+         "python/polynomial_resultants.py",
          "python/polynomial_feasibility.py"]
 
 if (args.sympy):

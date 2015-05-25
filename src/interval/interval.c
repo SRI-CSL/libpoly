@@ -394,6 +394,12 @@ void lp_dyadic_interval_swap(lp_dyadic_interval_t* I1, lp_dyadic_interval_t* I2)
   *I2 = tmp;
 }
 
+void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2) {
+  lp_interval_t tmp = *I1;
+  *I1 = *I2;
+  *I2 = tmp;
+}
+
 int lp_rational_interval_sgn(const lp_rational_interval_t* I) {
   int a_sgn = rational_sgn(&I->a);
   if (I->is_point) {
