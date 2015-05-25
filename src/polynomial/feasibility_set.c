@@ -130,9 +130,16 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   // Size of the result is at most max of the sizes
   size_t intervals_capacity = s1->size > s2->size ? s1->size : s2->size;
   // one extra for the working copy
-  lp_interval_t* intervals = malloc(sizeof(lp_interval_t)*(intervals_capacity+1));
+  intervals_capacity ++;
+  lp_interval_t* intervals = malloc(sizeof(lp_interval_t)*intervals_capacity);
   size_t intervals_size = 0;
   lp_interval_construct_zero(intervals);
+
+  // Construct the intervals
+  size_t i;
+  for (i = 0; i < intervals_capacity; ++ i) {
+    lp_interval_construct_zero(intervals + i);
+  }
 
   int all_s1 = 1; // Result is s1
   int all_s2 = 1; // Result is s2
@@ -166,7 +173,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         all_s1 = 0;
         all_s2 = 0;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
         /* I1: (   )
@@ -174,7 +180,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         s1_i ++;
         all_s2 = 0;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2:
         /* I1: (     ]
@@ -183,7 +188,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         s2_i ++;
         all_s1 = 0;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_EQ:
         /* I1: (   ]
@@ -191,7 +195,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         s1_i ++;
         s2_i ++;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
         /* I1:   (   ]
@@ -200,7 +203,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         s2_i ++;
         all_s2 = 0;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
         /* I1: (       )
@@ -208,7 +210,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         s2_i ++;
         all_s1 = 0;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
         /* I1:   (    )
@@ -217,7 +218,6 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
         all_s1 = 0;
         all_s2 = 0;
         intervals_size ++;
-        lp_interval_construct_zero(intervals + intervals_size);
         break;
       case LP_INTERVAL_CMP_GT_NO_INTERSECT:
         /* I1:      (   )
@@ -232,6 +232,7 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   }
 
   assert(intervals_size < intervals_capacity);
+
   lp_feasibility_set_t* result = lp_feasibility_set_new_from_intervals(intervals, intervals_size);
 
   // Construct the status
@@ -245,7 +246,9 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
     *status = LP_FEASIBILITY_SET_NEW;
   }
 
-  lp_interval_destruct(intervals + intervals_size);
+  for (i = intervals_size; i < intervals_capacity; ++ i) {
+    lp_interval_destruct(intervals + i);
+  }
   free(intervals);
 
   return result;
