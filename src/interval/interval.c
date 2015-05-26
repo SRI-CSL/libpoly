@@ -965,6 +965,14 @@ int lp_dyadic_interval_size(const lp_dyadic_interval_t* I) {
   }
 }
 
+int lp_interval_size_approx(const lp_interval_t* I) {
+  if (I->is_point) {
+    return 0;
+  } else {
+    return lp_value_get_distance_size_approx(&I->a, &I->b);
+  }
+}
+
 char* lp_interval_to_string(const lp_interval_t* I) {
   char* str = 0;
   size_t size = 0;

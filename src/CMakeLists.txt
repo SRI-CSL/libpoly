@@ -3,6 +3,7 @@ set(poly_SOURCES
     utils/assignment.c
     utils/statistics.c
     utils/output.c
+    utils/sign_condition.c
     number/integer.c
     number/rational.c
     number/dyadic_rational.c

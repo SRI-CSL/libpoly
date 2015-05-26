@@ -173,10 +173,10 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/polylib"/>
 		</configuration>
-		<configuration configurationName="Debug (dynamic)">
+		<configuration configurationName="debug-dynamic">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
-		<configuration configurationName="debug-dynamic">
+		<configuration configurationName="Debug (dynamic)">
 			<resource resourceType="PROJECT" workspacePath="/libpoly"/>
 		</configuration>
 		<configuration configurationName="Multiple configurations">

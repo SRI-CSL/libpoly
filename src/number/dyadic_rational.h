@@ -294,7 +294,7 @@ static inline
 void dyadic_rational_div_2exp(lp_dyadic_rational_t* div, const lp_dyadic_rational_t* a, unsigned long n) {
   assert(dyadic_rational_is_normalized(a));
   mpz_set(&div->a, &a->a);
-  div->n += n;
+  div->n = a->n + n;
   dyadic_rational_normalize(div);
 }
 

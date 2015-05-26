@@ -743,3 +743,24 @@ void lp_algebraic_number_pow_interval_op(lp_dyadic_interval_t* I, const lp_dyadi
 void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n) {
   lp_algebraic_number_op(pow, a, 0, lp_algebraic_number_pow_construct_op, lp_algebraic_number_pow_interval_op, &n);
 }
+
+void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_dyadic_rational_t* q) {
+  if (a->I.is_point) {
+    lp_dyadic_rational_assign(q, &a->I.a);
+  } else {
+    lp_dyadic_rational_add(q, &a->I.a, &a->I.b);
+    lp_dyadic_rational_div_2exp(q, q, 1);
+  }
+}
+
+void lp_algebraic_number_get_rational_midpoint(const lp_algebraic_number_t* a, lp_rational_t* q) {
+  lp_rational_t tmp_q;
+  lp_rational_construct(&tmp_q);
+  lp_dyadic_rational_t tmp_dy;
+  lp_dyadic_rational_construct(&tmp_dy);
+  lp_algebraic_number_get_dyadic_midpoint(a, &tmp_dy);
+  lp_rational_construct_from_dyadic(&tmp_q, &tmp_dy);
+  lp_rational_swap(&tmp_q, q);
+  lp_rational_destruct(&tmp_q);
+  lp_dyadic_rational_destruct(&tmp_dy);
+}

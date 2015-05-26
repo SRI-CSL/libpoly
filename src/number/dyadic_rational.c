@@ -111,7 +111,6 @@ void lp_dyadic_rational_pow(lp_dyadic_rational_t* pow, const lp_dyadic_rational_
   dyadic_rational_pow(pow, a, n);
 }
 
-
 void lp_dyadic_rational_div_2exp(lp_dyadic_rational_t* div, const lp_dyadic_rational_t* a, unsigned long n) {
   dyadic_rational_div_2exp(div, a, n);
 }

@@ -70,6 +70,12 @@ char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a);
 /** Convert to double */
 double lp_algebraic_number_to_double(const lp_algebraic_number_t* a);
 
+/** Get the midpoint of the defining interval */
+void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_dyadic_rational_t* q);
+
+/** Get the midpoint of the defining interval */
+void lp_algebraic_number_get_rational_midpoint(const lp_algebraic_number_t* a, lp_rational_t* q);
+
 /** Refine the number by halfing it's interval. */
 void lp_algebraic_number_refine(lp_algebraic_number_t* a);
 

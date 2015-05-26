@@ -17,6 +17,8 @@
 
 #include "utils/debug_trace.h"
 
+#include <limits.h>
+
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   v->type = type;
   switch(type) {
@@ -699,4 +701,59 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     tracef("lp_value_get_value_between() =>"); lp_value_print(v, trace_out); tracef("\n");
   }
 
+}
+
+int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t* upper) {
+
+  assert(lp_value_cmp(lower, upper) < 0);
+
+  if (lower->type == LP_VALUE_MINUS_INFINITY) {
+    return INT_MAX;
+  }
+
+  if (upper->type == LP_VALUE_PLUS_INFINITY) {
+    return INT_MAX;
+  }
+
+  lp_rational_t lower_approx, upper_approx;
+  rational_construct(&lower_approx);
+  rational_construct(&upper_approx);
+
+  // Get lower bound approximation
+  if (lp_value_is_rational(lower)) {
+    lp_value_get_rational(lower, &lower_approx);
+  } else {
+    assert(lower->type == LP_VALUE_ALGEBRAIC);
+    assert(!lower->value.a.I.is_point);
+    lp_algebraic_number_get_rational_midpoint(&lower->value.a, &lower_approx);
+  }
+
+  if (lp_value_is_rational(upper)) {
+    lp_value_get_rational(upper, &upper_approx);
+  } else {
+    assert(upper->type == LP_VALUE_ALGEBRAIC);
+    assert(!upper->value.a.I.is_point);
+    lp_algebraic_number_get_rational_midpoint(&upper->value.a, &upper_approx);
+  }
+
+  // Get the distance
+  lp_rational_t* m = &lower_approx;
+  lp_rational_sub(m, &upper_approx, &lower_approx);
+
+  // The denominator and numerator
+  lp_integer_t num, den;
+  integer_construct(&num);
+  integer_construct(&den);
+  rational_get_num(m, &num);
+  rational_get_den(m, &den);
+
+  // Size = log(num/den) = log(num) - log(den)
+  int size = ((int)integer_log2_abs(&num)) - ((int)integer_log2_abs(&den));
+
+  integer_destruct(&num);
+  integer_destruct(&den);
+  rational_destruct(&lower_approx);
+  rational_destruct(&upper_approx);
+
+  return size;
 }

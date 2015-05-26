@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <limits.h>
 
 #include "poly.h"
 #include "value.h"
@@ -124,9 +125,37 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
 }
 
 void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* value) {
-  (void)set;
-  (void)value;
-  assert(0);
+  size_t i;
+
+  assert(!lp_feasibility_set_is_empty(set));
+
+  int max_size = 0;
+  size_t max_i = 0;
+
+  for (i = 0; i < set->size; ++ i) {
+    int current_size = lp_interval_size_approx(set->intervals + i);
+    if (current_size > max_size) {
+      max_size = current_size;
+      max_i = i;
+    }
+  }
+
+  if (max_size > INT_MIN) {
+    // Found an interval, pick value
+    lp_interval_pick_value(set->intervals + max_i, value);
+  } else {
+    lp_value_type_t min = LP_VALUE_MINUS_INFINITY;
+    size_t min_i = 0;
+    // All points, find a simple value
+    for (i = 0; i < set->size; ++ i) {
+      const lp_value_t* point = lp_interval_get_point(set->intervals + i);
+      if (point->type < min) {
+        min = point->type;
+        min_i = i;
+      }
+    }
+    lp_value_assign(value, lp_interval_get_point(set->intervals + min_i));
+  }
 }
 
 lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2) {
