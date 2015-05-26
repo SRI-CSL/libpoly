@@ -34,8 +34,16 @@ enum lp_sign_condition_enum {
 typedef enum lp_sign_condition_enum lp_sign_condition_t;
 
 /**
+ * Check if the sign condition is consistent with the given sign.
+ */
+int lp_sign_condition_consistent(lp_sign_condition_t sgn_condition, int sign);
+
+/**
  * Negate the sign condition.
  */
 lp_sign_condition_t lp_sign_condition_negate(lp_sign_condition_t sgn_condition);
 
+/**
+ * Print the sign condition.
+ */
 int lp_sign_condition_print(lp_sign_condition_t sgn_condition, FILE* out);

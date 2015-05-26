@@ -87,6 +87,11 @@ void lp_polynomial_destruct(lp_polynomial_t* A) {
   }
 }
 
+void lp_polynomial_delete(lp_polynomial_t* A) {
+  lp_polynomial_destruct(A);
+  free(A);
+}
+
 lp_polynomial_t* lp_polynomial_alloc(void) {
   lp_polynomial_t* new = malloc(sizeof(lp_polynomial_t));
   return new;
@@ -940,28 +945,6 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   free(roots_tmp);
 }
 
-static
-int sign_consistent(int sign, lp_sign_condition_t sgn_condition) {
-  switch (sgn_condition) {
-  case LP_SGN_LT_0:
-    return sign < 0;
-  case LP_SGN_LE_0:
-    return sign <= 0;
-  case LP_SGN_EQ_0:
-    return sign == 0;
-  case LP_SGN_NE_0:
-    return sign != 0;
-  case LP_SGN_GT_0:
-    return sign > 0;
-  case LP_SGN_GE_0:
-    return sign >= 0;
-  default:
-    assert(0);
-  }
-
-  return 0;
-}
-
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
@@ -1033,12 +1016,12 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   size_t intervals_size = 0, lb, ub;
   for (lb = 0; lb < signs_size; ) {
     // Find lower bound
-    for (; lb < signs_size && !sign_consistent(signs[lb], sgn_condition); lb ++) {}
+    for (; lb < signs_size && !lp_sign_condition_consistent(sgn_condition, signs[lb]); lb ++) {}
     if (lb < signs_size) {
       // Found one
       intervals_size ++;
       // Find the upper bound
-      for (ub = lb + 1; ub < signs_size && sign_consistent(signs[ub], sgn_condition); ub ++) {}
+      for (ub = lb + 1; ub < signs_size && lp_sign_condition_consistent(sgn_condition, signs[ub]); ub ++) {}
       // Continue with the next one
       lb = ub;
     }
@@ -1055,10 +1038,10 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   size_t interval = 0;
   for (lb = 0; lb < signs_size; ) {
     // find lower bound
-    for (; lb < signs_size && !sign_consistent(signs[lb], sgn_condition); lb ++) {}
+    for (; lb < signs_size && !lp_sign_condition_consistent(sgn_condition, signs[lb]); lb ++) {}
     if (lb < signs_size) {
       // find upper bound
-      for (ub = lb + 1; ub < signs_size && sign_consistent(signs[ub], sgn_condition); ub ++) {}
+      for (ub = lb + 1; ub < signs_size && lp_sign_condition_consistent(sgn_condition, signs[ub]); ub ++) {}
 
       // Found the interval
       if (lb == (ub + 1) && lb % 2) {

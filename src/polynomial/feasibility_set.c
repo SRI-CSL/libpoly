@@ -129,7 +129,7 @@ void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* 
 
   assert(!lp_feasibility_set_is_empty(set));
 
-  int max_size = 0;
+  int max_size = INT_MIN;
   size_t max_i = 0;
 
   for (i = 0; i < set->size; ++ i) {

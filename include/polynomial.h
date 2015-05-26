@@ -45,13 +45,16 @@ void lp_polynomial_construct_copy(lp_polynomial_t* A, const lp_polynomial_t* fro
 /** Destruct the polynomial. */
 void lp_polynomial_destruct(lp_polynomial_t* A);
 
+/** Delete the polynomial (destrcuct and free) */
+void lp_polynomial_delete(lp_polynomial_t* A);
+
 /** Allocate a new polynomial (unconstructed) */
 lp_polynomial_t* lp_polynomial_alloc(void);
 
 /** Allocate and construct a new polynomial */
 lp_polynomial_t* lp_polynomial_new(const lp_polynomial_context_t* ctx);
 
-/** Makr the polynomial as external */
+/** Make the polynomial as external */
 void lp_polynomial_set_external(lp_polynomial_t* A);
 
 /** Swap two polynomials. */
