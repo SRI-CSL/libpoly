@@ -274,3 +274,7 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
 
   return result;
 }
+
+int lp_feasibility_set_empty(const lp_feasibility_set_t* set) {
+  return set->size == 0;
+}

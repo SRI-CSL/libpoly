@@ -77,6 +77,8 @@ typedef enum {
 
 /**
  * Get intersection of the two sets, returns the status in the given variable.
+ * The set s1 is given precedence so LP_FEASIBILITY_SET_INTERSECT_S2 is the
+ * status only if the intersect is not s1.
  */
 lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2, lp_feasibility_set_intersect_status_t* status);
 
