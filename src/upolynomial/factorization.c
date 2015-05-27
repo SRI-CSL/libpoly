@@ -222,13 +222,18 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
     // Add x^k to the factorization
     lp_upolynomial_t* x_upoly = lp_upolynomial_construct_power(f->K, 1, 1);
     lp_upolynomial_factors_add(sq_free_factors, x_upoly, x_degree);
+    // Delete the temp
+    lp_upolynomial_delete(f_pp_nonzero);
   }
 
   // Add the constant
   integer_mul(f->K, &sq_free_factors->constant, &sq_free_factors->constant, &content);
 
+  // Remove the temps
   integer_destruct(&content);
+  lp_upolynomial_delete(f_pp);
 
+  // Return the result
   return sq_free_factors;
 }
 

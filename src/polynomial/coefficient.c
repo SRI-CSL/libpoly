@@ -2342,7 +2342,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
       }
 
       // Compute the lcm of the m's
-      lp_integer_construct_copy(lp_Z, multiplier, m);
+      lp_integer_assign(lp_Z, multiplier, m);
       for (i = 1; i < size; ++ i) {
         integer_lcm_Z(multiplier, multiplier, m + i);
       }

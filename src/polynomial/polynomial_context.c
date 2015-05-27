@@ -63,6 +63,7 @@ void lp_polynomial_context_detach(lp_polynomial_context_t* ctx) {
   ctx->ref_count --;
   if (ctx->ref_count == 0) {
     lp_polynomial_context_destruct(ctx);
+    free(ctx);
   }
 }
 

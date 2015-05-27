@@ -754,11 +754,12 @@ void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_
 }
 
 void lp_algebraic_number_get_rational_midpoint(const lp_algebraic_number_t* a, lp_rational_t* q) {
-  lp_rational_t tmp_q;
-  lp_rational_construct(&tmp_q);
+  // Get the dyadic midpoint
   lp_dyadic_rational_t tmp_dy;
   lp_dyadic_rational_construct(&tmp_dy);
   lp_algebraic_number_get_dyadic_midpoint(a, &tmp_dy);
+  lp_rational_t tmp_q;
+  // Now, convert to rational
   lp_rational_construct_from_dyadic(&tmp_q, &tmp_dy);
   lp_rational_swap(&tmp_q, q);
   lp_rational_destruct(&tmp_q);

@@ -1107,6 +1107,12 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   // Remove the signs array
   free(signs);
 
+  // Remove the roots
+  for (i = 0; i < roots_size; ++ i) {
+    lp_value_destruct(roots + i);
+  }
+  free(roots);
+
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set(");
     lp_polynomial_print(A, trace_out);

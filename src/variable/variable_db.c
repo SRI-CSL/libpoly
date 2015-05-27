@@ -73,6 +73,7 @@ void lp_variable_db_destruct(lp_variable_db_t* var_db) {
       free(var_db->variable_names[i]);
     }
   }
+  free(var_db->variable_names);
 }
 
 void lp_variable_db_attach(lp_variable_db_t* var_db) {
