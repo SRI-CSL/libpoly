@@ -281,6 +281,14 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
     }
   }
 
+  // Whoever didn't run out is not all in
+  if (s1_i < s1->size) {
+    all_s1 = 0;
+  }
+  if (s2_i < s2->size) {
+    all_s2 = 0;
+  }
+
   assert(intervals_size < intervals_capacity);
 
   lp_feasibility_set_t* result = lp_feasibility_set_new_from_intervals(intervals, intervals_size);
