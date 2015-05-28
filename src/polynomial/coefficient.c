@@ -3027,10 +3027,10 @@ size_t hash_pair(size_t a, size_t b) {
 void coefficient_hash_traverse(const lp_polynomial_context_t* ctx, lp_monomial_t* p, void* hash_void) {
   (void)(ctx);
   size_t* hash = (size_t*)(hash_void);
-  *hash += integer_hash(&p->a);
+  *hash ^= integer_hash(&p->a);
   size_t i;
   for (i = 0; i < p->n; ++ i) {
-    *hash += hash_pair(p->p[i].x, p->p[i].d);
+    *hash ^= hash_pair(p->p[i].x, p->p[i].d);
   }
 }
 
