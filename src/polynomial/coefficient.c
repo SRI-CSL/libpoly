@@ -342,7 +342,7 @@ void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, 
 
   // Locate the first non-zero ceofficient past the top one
   int i = SIZE(C) - 2;
-  while (coefficient_is_zero(ctx, COEFF(C, i))) {
+  while (i >= 0 && coefficient_is_zero(ctx, COEFF(C, i))) {
     -- i;
   }
 
@@ -366,9 +366,9 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-  // Locate the first non-zero ceofficient past the top one
-  int i = SIZE(C) - 2;
-  while (i > 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
+  // Locate the first non-zero ceofficient (normal reductum is the next nonzero)
+  int i = SIZE(C) - 1;
+  while (i >= 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
     -- i;
   }
 

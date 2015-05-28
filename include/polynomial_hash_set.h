@@ -20,6 +20,8 @@ struct lp_polynomial_hash_set_struct {
   size_t size;
   /** Treshold for resize */
   size_t resize_threshold;
+  /** Has the set been closed */
+  int closed;
 };
 
 /** Construct a new set */
@@ -31,10 +33,10 @@ void lp_polynomial_hash_set_destruct(lp_polynomial_hash_set_t* set);
 /** Returns true if empty */
 int lp_polynomial_hash_set_is_empty(lp_polynomial_hash_set_t* set);
 
-/** Check whether p is in set. */
+/** Check whether p is in set. The set must not be closed). */
 int lp_polynomial_hash_set_contains(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
-/** Add polynomial p to set. Returns true if p was added (not already in the set). */
+/** Add polynomial p to set. Returns true if p was added (not already in the set).  */
 int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
 /** Close the set: compact the data so that all elements get stored in data[0..size]. No addition after close! */

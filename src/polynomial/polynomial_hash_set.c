@@ -24,6 +24,7 @@ void lp_polynomial_hash_set_construct(lp_polynomial_hash_set_t* set) {
   set->data_size = LP_POLYNOMIAL_HASH_SET_DEFAULT_SIZE;
   set->size = 0;
   set->resize_threshold = LP_POLYNOMIAL_HASH_SET_DEFAULT_SIZE*LP_POLYNOMIAL_HASH_SET_RESIZE_RATIO;
+  set->closed = 0;
 }
 
 void lp_polynomial_hash_set_destruct(lp_polynomial_hash_set_t* set) {
@@ -37,6 +38,10 @@ void lp_polynomial_hash_set_destruct(lp_polynomial_hash_set_t* set) {
   // Free the data
   free(set->data);
   set->data = NULL;
+}
+
+int lp_polynomial_hash_set_is_empty(lp_polynomial_hash_set_t* set) {
+  return set->size == 0;
 }
 
 static
@@ -100,12 +105,14 @@ void lp_polynomial_hash_set_extend(lp_polynomial_hash_set_t* set) {
 
 int lp_polynomial_hash_set_contains(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p) {
   assert(p);
+  assert(!set->closed);
   return lp_polynomial_hash_set_search(set->data, set->data_size-1, p);
 }
 
 int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p) {
   assert(p);
   assert(set->data_size > set->size);
+  assert(!set->closed);
 
   int result = lp_polynomial_hash_set_insert_copy(set->data, set->data_size-1, p);
   if (result) {
@@ -119,6 +126,11 @@ int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polyno
 }
 
 void lp_polynomial_hash_set_close(lp_polynomial_hash_set_t* set) {
+
+  if (set->closed) {
+    return;
+  }
+
   size_t data_size = set->data_size;
   lp_polynomial_t** data = set->data;
 
@@ -131,6 +143,8 @@ void lp_polynomial_hash_set_close(lp_polynomial_hash_set_t* set) {
     }
   }
 
+  set->closed = 1;
+
   assert(i == set->size && i < data_size);
 }
 
@@ -142,13 +156,13 @@ void lp_polynomial_hash_set_clear(lp_polynomial_hash_set_t* set) {
 int lp_polynomial_hash_set_print(const lp_polynomial_hash_set_t* set, FILE* out) {
 
   int ret = 0;
-  size_t data_size = set->data_size;
+  size_t size = set->closed ? set->size : set->data_size;
   lp_polynomial_t** data = set->data;
 
-  ret += fprintf(out, "]");
+  ret += fprintf(out, "[");
 
   size_t i, first;
-  for (i = 0, first = 1; i < data_size; ++ i) {
+  for (i = 0, first = 1; i < size; ++ i) {
     lp_polynomial_t* p = data[i];
     if (p != 0) {
       if (first) {
