@@ -138,3 +138,29 @@ void lp_polynomial_hash_set_clear(lp_polynomial_hash_set_t* set) {
   lp_polynomial_hash_set_destruct(set);
   lp_polynomial_hash_set_construct(set);
 }
+
+int lp_polynomial_hash_set_print(const lp_polynomial_hash_set_t* set, FILE* out) {
+
+  int ret = 0;
+  size_t data_size = set->data_size;
+  lp_polynomial_t** data = set->data;
+
+  ret += fprintf(out, "]");
+
+  size_t i, first;
+  for (i = 0, first = 1; i < data_size; ++ i) {
+    lp_polynomial_t* p = data[i];
+    if (p != 0) {
+      if (first) {
+        first = 0;
+      } else {
+        ret += fprintf(out, ", ");
+      }
+      ret += lp_polynomial_print(p, out);
+    }
+  }
+
+  ret += fprintf(out, "]");
+
+  return ret;
+}

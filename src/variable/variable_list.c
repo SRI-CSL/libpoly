@@ -8,6 +8,7 @@
 #include <variable_list.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <variable_order.h>
 
 #define INITIAL_LIST_SIZE 100
 #define INITIAL_MAP_SIZE 100
@@ -62,6 +63,18 @@ int lp_variable_list_index(const lp_variable_list_t* list, lp_variable_t x) {
   }
 }
 
+int lp_variable_list_contains(const lp_variable_list_t* list, lp_variable_t x) {
+  return lp_variable_list_index(list, x) != -1;
+}
+
+void lp_variable_list_remove(lp_variable_list_t* list, lp_variable_t x) {
+  int index = lp_variable_list_index(list, x);
+  if (index != -1) {
+    list->list[index] = lp_variable_null;
+    list->var_to_index_map[x] = -1;
+  }
+}
+
 void lp_variable_list_copy_into(const lp_variable_list_t* list, lp_variable_t* vars) {
   size_t i;
   for (i = 0; i < list->list_size; ++ i) {
@@ -90,4 +103,32 @@ void lp_variable_list_pop(lp_variable_list_t* list) {
 lp_variable_t lp_variable_list_top(const lp_variable_list_t* list) {
   assert(list->list_size > 0);
   return list->list[list->list_size-1];
+}
+
+static
+const lp_variable_order_t* lp_variable_list_cmp_order = 0;
+
+int lp_variable_list_cmp(const void* x, const void* y) {
+  lp_variable_t x_var = *(lp_variable_t*)x;
+  lp_variable_t y_var = *(lp_variable_t*)y;
+  return lp_variable_order_cmp(lp_variable_list_cmp_order, x_var, y_var);
+}
+
+void lp_variable_list_order(lp_variable_list_t* list, const lp_variable_order_t* order) {
+  // Compact
+  size_t i, to_keep;
+  for (i = 0, to_keep = 0; i < list->list_size; ++ i) {
+    lp_variable_t x = list->list[i];
+    if (x != lp_variable_null) {
+      to_keep ++;
+    }
+  }
+  list->list_size = to_keep;
+  // Sort the list
+  lp_variable_list_cmp_order = order;
+  qsort(list->list, list->list_size,  sizeof(lp_variable_t), lp_variable_list_cmp);
+  // Reconstruct indices
+  for (i = 0; i < list->list_size; ++ i) {
+    list->var_to_index_map[list->list[i]] = i;
+  }
 }

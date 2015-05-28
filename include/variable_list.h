@@ -49,3 +49,12 @@ void lp_variable_list_pop(lp_variable_list_t* list);
 
 /** Get the last variable from the list */
 lp_variable_t lp_variable_list_top(const lp_variable_list_t* list);
+
+/** Returns 1 if the list contains the given variable */
+int lp_variable_list_contains(const lp_variable_list_t* list, lp_variable_t x);
+
+/** Removes a variable from the list, i.e. replace with lp_variable_null */
+void lp_variable_list_remove(lp_variable_list_t* list, lp_variable_t x);
+
+/** Order the list based on the given order */
+void lp_variable_list_order(lp_variable_list_t* list, const lp_variable_order_t* order);

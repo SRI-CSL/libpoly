@@ -7,7 +7,9 @@
 
 #pragma once
 
-#include <poly.h>
+#include "poly.h"
+
+#include <stdio.h>
 
 struct lp_polynomial_hash_set_struct {
   /** The data */
@@ -41,3 +43,5 @@ void lp_polynomial_hash_set_close(lp_polynomial_hash_set_t* set);
 /** Clear the set. */
 void lp_polynomial_hash_set_clear(lp_polynomial_hash_set_t* set);
 
+/** Print the set. */
+int lp_polynomial_hash_set_print(const lp_polynomial_hash_set_t* set, FILE* out);
