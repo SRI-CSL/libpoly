@@ -320,3 +320,9 @@ void coefficient_get_variables(const coefficient_t* C, lp_variable_list_t* vars)
  * Isolate the roots.
  */
 void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size);
+
+/**
+ * Get the hash of the polynomial. The hash is simple to ensure we keep the hash across different
+ * orders.
+ */
+size_t coefficient_hash(const lp_polynomial_context_t* ctx, const coefficient_t* A);

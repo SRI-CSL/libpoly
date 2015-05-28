@@ -87,6 +87,12 @@ void lp_feasibiliy_set_assign(lp_feasibility_set_t* set, const lp_feasibility_se
   }
 }
 
+void lp_feasibility_set_swap(lp_feasibility_set_t* s1, lp_feasibility_set_t* s2) {
+  lp_feasibility_set_t tmp = *s1;
+  *s1 = *s2;
+  *s2 = tmp;
+}
+
 int lp_feasibility_set_is_empty(const lp_feasibility_set_t* set) {
   return set->size == 0;
 }
@@ -310,8 +316,4 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   free(intervals);
 
   return result;
-}
-
-int lp_feasibility_set_empty(const lp_feasibility_set_t* set) {
-  return set->size == 0;
 }

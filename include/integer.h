@@ -281,3 +281,8 @@ void lp_integer_gcd_Z(lp_integer_t* gcd, const lp_integer_t* a, const lp_integer
  * Compute the least common multiple (positive) in Z.
  */
 void lp_integer_lcm_Z(lp_integer_t* lcm, const lp_integer_t* a, const lp_integer_t* b);
+
+/**
+ * Returns the hash of the integer.
+ */
+size_t lp_integer_hash(const lp_integer_t* a);

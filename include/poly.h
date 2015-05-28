@@ -52,6 +52,7 @@ typedef struct lp_dyadic_interval_struct lp_dyadic_interval_t;
 typedef struct lp_interval_struct lp_interval_t;
 
 typedef struct lp_feasibility_set_struct lp_feasibility_set_t;
+typedef struct lp_polynomial_hash_set_struct lp_polynomial_hash_set_t;
 
 /**
  * Function to initialize the library (statistics, logging). Should be called

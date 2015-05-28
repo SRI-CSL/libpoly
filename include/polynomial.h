@@ -54,6 +54,9 @@ lp_polynomial_t* lp_polynomial_alloc(void);
 /** Allocate and construct a new polynomial */
 lp_polynomial_t* lp_polynomial_new(const lp_polynomial_context_t* ctx);
 
+/** Allocate and construct a copy of the given polynomial */
+lp_polynomial_t* lp_polynomial_new_copy(const lp_polynomial_t* A);
+
 /** Make the polynomial as external */
 void lp_polynomial_set_external(lp_polynomial_t* A);
 
@@ -122,6 +125,12 @@ int lp_polynomial_cmp(const lp_polynomial_t* A1, const lp_polynomial_t* A2);
  * ORDER.
  */
 int lp_polynomial_cmp_type(const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
+/** Returns the hash of the polynomial */
+size_t lp_polynomial_hash(const lp_polynomial_t* A);
+
+/** Compares two polynomials for equality. */
+int lp_polynomial_eq(const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /** Returns true if A1 divides A2. */
 int lp_polynomial_divides(const lp_polynomial_t* A1, const lp_polynomial_t* A2);

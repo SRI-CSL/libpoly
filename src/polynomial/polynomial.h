@@ -14,6 +14,8 @@
 struct lp_polynomial_struct {
   /** The actual polynomial representation (so we can use it as a coefficient) */
   coefficient_t data;
+  /** Hash */
+  size_t hash;
   /** Is this an external polynomial (needs checks on function entry) */
   char external;
   /** Context of the polynomial */

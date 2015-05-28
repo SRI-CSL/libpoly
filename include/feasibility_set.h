@@ -47,6 +47,10 @@ void lp_feasibility_set_delete(lp_feasibility_set_t* set);
  */
 void lp_feasibiliy_set_assign(lp_feasibility_set_t* set, const lp_feasibility_set_t* from);
 
+/**
+ * Swap.
+ */
+void lp_feasibility_set_swap(lp_feasibility_set_t* s1, lp_feasibility_set_t* s2);
 
 /**
  * Check if the given set is empty.

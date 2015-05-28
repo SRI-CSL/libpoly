@@ -409,3 +409,18 @@ static inline
 unsigned integer_log2_abs(lp_integer_t* a) {
   return mpz_sizeinbase(a, 2) - 1;
 }
+
+static inline
+size_t hash_combine(size_t seed, size_t h) {
+  return h + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+static inline
+size_t integer_hash(const lp_integer_t* a) {
+  size_t i, hash = 0, size = mpz_size(a);
+  for (i = 0; i < size; ++ i) {
+    mp_limb_t limb = mpz_getlimbn(a, i);
+    hash = hash_combine(hash, limb);
+  }
+  return hash;
+}

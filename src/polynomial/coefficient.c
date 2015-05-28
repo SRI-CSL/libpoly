@@ -3018,3 +3018,30 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
   return result;
 }
+
+static
+size_t hash_pair(size_t a, size_t b) {
+  return a + 0x9e3779b9 + (b << 6) + (b >> 2);
+}
+
+void coefficient_hash_traverse(const lp_polynomial_context_t* ctx, lp_monomial_t* p, void* hash_void) {
+  (void)(ctx);
+  size_t* hash = (size_t*)(hash_void);
+  *hash += integer_hash(&p->a);
+  size_t i;
+  for (i = 0; i < p->n; ++ i) {
+    *hash += hash_pair(p->p[i].x, p->p[i].d);
+  }
+}
+
+size_t coefficient_hash(const lp_polynomial_context_t* ctx, const coefficient_t* A) {
+  size_t hash = 0;
+
+  // Traverse the polynomial and hash each of the monomials
+  lp_monomial_t m_tmp;
+  lp_monomial_construct(ctx, &m_tmp);
+  coefficient_traverse(ctx, A, coefficient_hash_traverse, &m_tmp, &hash);
+  lp_monomial_destruct(&m_tmp);
+
+  return hash;
+}

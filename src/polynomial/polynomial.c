@@ -51,6 +51,7 @@ void lp_polynomial_set_context(lp_polynomial_t* A, const lp_polynomial_context_t
 void lp_polynomial_construct(lp_polynomial_t* A, const lp_polynomial_context_t* ctx) {
   A->ctx = 0;
   A->external = 0;
+  A->hash = 0;
   lp_polynomial_set_context(A, ctx);
   coefficient_construct(ctx, &A->data);
 }
@@ -58,6 +59,7 @@ void lp_polynomial_construct(lp_polynomial_t* A, const lp_polynomial_context_t* 
 void lp_polynomial_construct_from_coefficient(lp_polynomial_t* A, const lp_polynomial_context_t* ctx, const coefficient_t* from) {
   A->ctx = 0;
   A->external = 0;
+  A->hash = 0;
   lp_polynomial_set_context(A, ctx);
   coefficient_construct_copy(A->ctx, &A->data, from);
 }
@@ -65,6 +67,7 @@ void lp_polynomial_construct_from_coefficient(lp_polynomial_t* A, const lp_polyn
 void lp_polynomial_construct_copy(lp_polynomial_t* A, const lp_polynomial_t* from) {
   A->ctx = 0;
   A->external = 0;
+  A->hash = from->hash;
   lp_polynomial_set_context(A, from->ctx);
   coefficient_construct_copy(A->ctx, &A->data, &from->data);
 }
@@ -76,6 +79,7 @@ void lp_polynomial_construct_simple(
 {
   A->ctx = 0;
   A->external = 0;
+  A->hash = 0;
   lp_polynomial_set_context(A, ctx);
   coefficient_construct_simple(ctx, &A->data, c, x, n);
 }
@@ -100,6 +104,12 @@ lp_polynomial_t* lp_polynomial_alloc(void) {
 lp_polynomial_t* lp_polynomial_new(const lp_polynomial_context_t* ctx) {
   lp_polynomial_t* new = lp_polynomial_alloc();
   lp_polynomial_construct(new, ctx);
+  return new;
+}
+
+lp_polynomial_t* lp_polynomial_new_copy(const lp_polynomial_t* A) {
+  lp_polynomial_t* new = lp_polynomial_alloc();
+  lp_polynomial_construct_copy(new, A);
   return new;
 }
 
@@ -212,7 +222,6 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
     return coefficient_to_univariate(A->ctx, &A->data);
   }
 }
-
 
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
@@ -1125,4 +1134,29 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
 void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars) {
   coefficient_get_variables(&A->data, vars);
+}
+
+size_t lp_polynomial_hash(const lp_polynomial_t* A_const) {
+  if (!A_const->hash) {
+    size_t hash = coefficient_hash(A_const->ctx, &A_const->data);
+    if (hash == 0) {
+      hash ++;
+    }
+    ((lp_polynomial_t*)A_const)->hash = hash;
+  }
+  return A_const->hash;
+}
+
+int lp_polynomial_eq(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
+
+  size_t A1_hash = lp_polynomial_hash(A1);
+  size_t A2_hash = lp_polynomial_hash(A2);
+
+  if (A1_hash != A2_hash) {
+    // Different hashes => different
+    return 0;
+  }
+
+  // Compare
+  return lp_polynomial_cmp(A1, A2) == 0;
 }

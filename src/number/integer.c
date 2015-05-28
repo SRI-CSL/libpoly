@@ -262,3 +262,7 @@ void lp_integer_gcd_Z(lp_integer_t* gcd, const lp_integer_t* a, const lp_integer
 void lp_integer_lcm_Z(lp_integer_t* lcm, const lp_integer_t* a, const lp_integer_t* b) {
   integer_lcm_Z(lcm, a, b);
 }
+
+size_t lp_integer_hash(const lp_integer_t* a) {
+  return integer_hash(a);
+}
