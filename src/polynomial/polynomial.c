@@ -798,9 +798,9 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
     tracef("polynomial_factor_square_free("); lp_polynomial_print(A, trace_out); tracef(")\n");
   }
 
-  assert(*factors == 0);
-  assert(*multiplicities == 0);
-  assert(*size == 0);
+//  assert(*factors == 0);
+//  assert(*multiplicities == 0);
+//  assert(*size == 0);
 
   const lp_polynomial_context_t* ctx = A->ctx;
 
