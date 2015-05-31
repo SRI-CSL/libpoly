@@ -252,3 +252,15 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
  * a subset of R where the constraint sgn(p(M(x1), ..., M(xn), y)) = sgn_condition.
  */
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
+
+/**
+ * Function type called on polynomial traversal. It will be called on all monomials.
+ */
+typedef void (*lp_polynomial_traverse_f) (const lp_polynomial_context_t* ctx, lp_monomial_t* m, void* data);
+
+/**
+ * Run on the polynomial to traverse all monomials. The traverse_f function will be called on the monomial with
+ * the associated data.
+ */
+void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f, void* data);
+

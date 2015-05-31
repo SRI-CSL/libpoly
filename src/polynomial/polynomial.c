@@ -1164,3 +1164,13 @@ int lp_polynomial_eq(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
   // Compare
   return lp_polynomial_cmp(A1, A2) == 0;
 }
+
+void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f, void* data) {
+
+  lp_polynomial_external_clean(A);
+
+  lp_monomial_t m;
+  lp_monomial_construct(A->ctx, &m);
+  coefficient_traverse(A->ctx, &A->data, f, &m, data);
+  lp_monomial_destruct(&m);
+}
