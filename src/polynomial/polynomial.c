@@ -149,6 +149,10 @@ size_t lp_polynomial_degree(const lp_polynomial_t* A) {
   return coefficient_degree(&A->data);
 }
 
+const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A) {
+  return A->ctx;
+}
+
 void lp_polynomial_get_coefficient(lp_polynomial_t* C_p, const lp_polynomial_t* A, size_t k) {
   lp_polynomial_external_clean(A);
 

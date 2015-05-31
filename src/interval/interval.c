@@ -758,6 +758,16 @@ void lp_dyadic_interval_collapse_to(lp_dyadic_interval_t* I, const lp_dyadic_rat
   I->is_point = 1;
 }
 
+void lp_interval_collapse_to(lp_interval_t* I, const lp_value_t* v) {
+  lp_value_assign(&I->a, v);
+  if (!I->is_point) {
+    lp_value_destruct(&I->b);
+  }
+  I->a_open = 0;
+  I->b_open = 0;
+  I->is_point = 1;
+}
+
 void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open) {
   assert(!I->is_point);
   int cmp = dyadic_rational_cmp(a, &I->b);
@@ -768,6 +778,19 @@ void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_
   } else {
     assert(!a_open && !I->b_open);
     lp_dyadic_interval_collapse_to(I, a);
+  }
+}
+
+void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open) {
+  assert(!I->is_point);
+  int cmp = lp_value_cmp(a, &I->b);
+  assert(cmp <= 0);
+  if (cmp != 0) {
+    lp_value_assign(&I->a, a);
+    I->a_open = a_open;
+  } else {
+    assert(!a_open && !I->b_open);
+    lp_interval_collapse_to(I, a);
   }
 }
 
@@ -783,6 +806,20 @@ void lp_dyadic_interval_set_b(lp_dyadic_interval_t* I, const lp_dyadic_rational_
     lp_dyadic_interval_collapse_to(I, b);
   }
 }
+
+void lp_interval_set_b(lp_interval_t* I, const lp_value_t* b, int b_open) {
+  assert(!I->is_point);
+  int cmp = lp_value_cmp(&I->a, b);
+  assert(cmp <= 0);
+  if (cmp != 0) {
+    lp_value_assign(&I->b, b);
+    I->b_open = b_open;
+  } else {
+    assert(!I->a_open && !b_open);
+    lp_interval_collapse_to(I, b);
+  }
+}
+
 
 int lp_dyadic_interval_equals(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point && !I2->is_point) {

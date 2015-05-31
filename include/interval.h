@@ -45,6 +45,15 @@ void lp_interval_construct_full(lp_interval_t* I);
 /** Assign from another interval */
 void lp_interval_assign(lp_interval_t* I, const lp_interval_t* from);
 
+/** Set the lower bound */
+void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open);
+
+/** Set the upper bound */
+void lp_interval_set_b(lp_interval_t* I, const lp_value_t* b, int b_open);
+
+/** Set the upper bound */
+
+
 /** Destroy the interval */
 void lp_interval_destruct(lp_interval_t* I);
 
