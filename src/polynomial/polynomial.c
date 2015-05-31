@@ -135,10 +135,6 @@ void lp_polynomial_assign(lp_polynomial_t* A, const lp_polynomial_t* from) {
   }
 }
 
-const lp_polynomial_context_t* lp_polynomial_context(const lp_polynomial_t* A) {
-  return A->ctx;
-}
-
 lp_variable_t lp_polynomial_top_variable(const lp_polynomial_t* A) {
   lp_polynomial_external_clean(A);
   return coefficient_top_variable(&A->data);
@@ -1134,6 +1130,95 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   }
 
   return result;
+}
+
+lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_get_feasible_set_root("); lp_polynomial_print(A, trace_out); tracef(", %zu, ", root_index); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
+  }
+
+  assert(!lp_polynomial_is_constant(A));
+
+  // Make sure we're in the right order
+  lp_polynomial_external_clean(A);
+
+  // Make sure that the top variable is unassigned
+  lp_variable_t x = coefficient_top_variable(&A->data);
+  assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
+
+  // Get the degree of the polynomial, respecting the model
+  size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
+
+  // Get the roots of the polynomial
+  size_t roots_size;
+  lp_value_t* roots = malloc(sizeof(lp_value_t)*degree);
+  lp_polynomial_roots_isolate(A, M, roots, &roots_size);
+
+  lp_feasibility_set_t* result = 0;
+  if (root_index < roots_size) {
+    // Just empty
+    result = lp_feasibility_set_new_internal(0);
+  } else {
+
+    lp_value_t inf_pos, inf_neg;
+    lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
+    lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
+
+    switch (sgn_condition) {
+    case LP_SGN_LT_0:
+      // (-inf, root)
+      result = lp_feasibility_set_new_internal(1);
+      lp_interval_construct(result->intervals, &inf_neg, 1, roots + root_index, 1);
+      break;
+    case LP_SGN_LE_0:
+      // (-inf, root]
+      result = lp_feasibility_set_new_internal(1);
+      lp_interval_construct(result->intervals, &inf_neg, 1, roots + root_index, 0);
+      break;
+    case LP_SGN_EQ_0:
+      // [root, root]
+      result = lp_feasibility_set_new_internal(1);
+      lp_interval_construct_point(result->intervals, roots + root_index);
+      break;
+    case LP_SGN_NE_0:
+      // (-inf, root) (root, +inf)
+      result = lp_feasibility_set_new_internal(2);
+      lp_interval_construct(result->intervals, &inf_neg, 1, roots + root_index, 1);
+      lp_interval_construct(result->intervals + 1, roots + root_index, 1, &inf_pos, 1);
+      break;
+    case LP_SGN_GT_0:
+      // (root, +inf)
+      result = lp_feasibility_set_new_internal(1);
+      lp_interval_construct(result->intervals, roots + root_index, 1, &inf_pos, 1);
+      break;
+    case LP_SGN_GE_0:
+      // [root, +inf)
+      result = lp_feasibility_set_new_internal(1);
+      lp_interval_construct(result->intervals, roots + root_index, 0, &inf_pos, 1);
+      break;
+    }
+
+    lp_value_destruct(&inf_neg);
+    lp_value_destruct(&inf_pos);
+  }
+
+  // Remove the roots
+  size_t i;
+  for (i = 0; i < roots_size; ++ i) {
+    lp_value_destruct(roots + i);
+  }
+  free(roots);
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_get_feasible_set(");
+    lp_polynomial_print(A, trace_out);
+    tracef(", "); lp_sign_condition_print(sgn_condition, trace_out);
+    tracef(") => "); lp_feasibility_set_print(result, trace_out); tracef("\n");
+  }
+
+  return result;
+
 }
 
 void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars) {

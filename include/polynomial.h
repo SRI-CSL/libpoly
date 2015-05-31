@@ -249,9 +249,20 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 /**
  * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a sign
  * condition, and an assignment M that assigns x1, ..., xn, the function returns
- * a subset of R where the constraint sgn(p(M(x1), ..., M(xn), y)) = sgn_condition.
+ * a subset of R where
+ *
+ *   sgn(A(M(x1), ..., M(xn), y)) = sgn_condition .
  */
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
+
+/**
+ * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a root index,
+ * a sign condition, and an assignment M that assigns x1, ..., xn, the function
+ * returns a subset or R where
+ *
+ * root_index < root_cound(A, M) && sgn(x - root(k, A(M(x1, ..., M(xn), y)) == sgn_condition
+ */
+lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
 
 /**
  * Function type called on polynomial traversal. It will be called on all monomials.
