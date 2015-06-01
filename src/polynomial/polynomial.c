@@ -845,7 +845,14 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
   lp_variable_t x = lp_polynomial_top_variable(A);
   assert(x != lp_variable_null);
-  assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
+
+  lp_value_t x_value_backup;
+  if (lp_assignment_get_value(M, x)->type != LP_VALUE_NONE) {
+    lp_value_construct_copy(&x_value_backup, lp_assignment_get_value(M, x));
+    lp_assignment_set_value((lp_assignment_t*) M, x, 0);
+  } else {
+    lp_value_construct_none(&x_value_backup);
+  }
 
   size_t i;
 
@@ -944,6 +951,11 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   // Set the new size
   *roots_size = roots_tmp_size;
 
+  // Reset the value
+  if (x_value_backup.type != LP_VALUE_NONE) {
+    lp_assignment_set_value((lp_assignment_t*) M, x, &x_value_backup);
+  }
+
   // Destroy the temps
   for (i = 0; i < factors_size; ++ i) {
     lp_polynomial_destruct(factors[i]);
@@ -952,6 +964,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   free(factors);
   free(multiplicities);
   free(roots_tmp);
+  lp_value_destruct(&x_value_backup);
 }
 
 lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {

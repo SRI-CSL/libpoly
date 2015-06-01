@@ -51,8 +51,8 @@ void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open);
 /** Set the upper bound */
 void lp_interval_set_b(lp_interval_t* I, const lp_value_t* b, int b_open);
 
-/** Set the upper bound */
-
+/** Collapse to a point v in the interval */
+void lp_interval_collapse_to(lp_interval_t* I, const lp_value_t* v);
 
 /** Destroy the interval */
 void lp_interval_destruct(lp_interval_t* I);
