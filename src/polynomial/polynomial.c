@@ -1158,7 +1158,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t*
 
   // Make sure that the top variable is unassigned
   lp_variable_t x = coefficient_top_variable(&A->data);
-  assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
+  assert(x != lp_variable_null);
 
   // Get the degree of the polynomial, respecting the model
   size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
@@ -1169,7 +1169,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t*
   lp_polynomial_roots_isolate(A, M, roots, &roots_size);
 
   lp_feasibility_set_t* result = 0;
-  if (root_index < roots_size) {
+  if (root_index >= roots_size) {
     // Just empty
     result = lp_feasibility_set_new_internal(0);
   } else {
@@ -1183,32 +1183,38 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t*
       // (-inf, root)
       result = lp_feasibility_set_new_internal(1);
       lp_interval_construct(result->intervals, &inf_neg, 1, roots + root_index, 1);
+      result->size = 1;
       break;
     case LP_SGN_LE_0:
       // (-inf, root]
       result = lp_feasibility_set_new_internal(1);
       lp_interval_construct(result->intervals, &inf_neg, 1, roots + root_index, 0);
+      result->size = 1;
       break;
     case LP_SGN_EQ_0:
       // [root, root]
       result = lp_feasibility_set_new_internal(1);
       lp_interval_construct_point(result->intervals, roots + root_index);
+      result->size = 1;
       break;
     case LP_SGN_NE_0:
       // (-inf, root) (root, +inf)
       result = lp_feasibility_set_new_internal(2);
       lp_interval_construct(result->intervals, &inf_neg, 1, roots + root_index, 1);
       lp_interval_construct(result->intervals + 1, roots + root_index, 1, &inf_pos, 1);
+      result->size = 2;
       break;
     case LP_SGN_GT_0:
       // (root, +inf)
       result = lp_feasibility_set_new_internal(1);
       lp_interval_construct(result->intervals, roots + root_index, 1, &inf_pos, 1);
+      result->size = 1;
       break;
     case LP_SGN_GE_0:
       // [root, +inf)
       result = lp_feasibility_set_new_internal(1);
       lp_interval_construct(result->intervals, roots + root_index, 0, &inf_pos, 1);
+      result->size = 1;
       break;
     }
 
