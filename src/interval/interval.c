@@ -1209,7 +1209,7 @@ lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const 
     const lp_value_t* I2_ub = lp_interval_get_upper_bound(I2);
     int cmp_I1_lb_I2_ub = lp_value_cmp(I1_lb, I2_ub);
     if (cmp_I1_lb_I2_ub == 0 && (I1->a_open || I2->b_open)) {
-      cmp_I1_lb_I2_ub = -1;
+      cmp_I1_lb_I2_ub = 1;
     }
     if (cmp_I1_lb_I2_ub == 0) {
       // I1:    [  )
