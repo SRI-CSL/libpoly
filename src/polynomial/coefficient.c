@@ -1436,7 +1436,7 @@ void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const
   }
 
   coefficient_assign(ctx, S, C);
-  if (n > 0) {
+  if (!coefficient_is_zero(ctx, C) && n > 0) {
     int old_size = (S->type == COEFFICIENT_NUMERIC || VAR(S) != x) ? 1 : SIZE(S);
     coefficient_ensure_capacity(ctx, S, x, old_size + n);
     int i;

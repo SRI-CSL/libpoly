@@ -20,6 +20,7 @@ void rational_construct_from_div(lp_rational_t* q, const lp_integer_t* num, cons
   mpq_init(q);
   mpq_set_num(q, num);
   mpq_set_den(q, den);
+  mpq_canonicalize(q);
 }
 
 static inline

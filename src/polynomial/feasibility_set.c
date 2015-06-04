@@ -171,6 +171,12 @@ lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s
 
 lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2, lp_feasibility_set_intersect_status_t* status) {
 
+  // Corner cases
+  if (s1->size == 0 || s2->size == 0) {
+    *status = LP_FEASIBILITY_SET_EMPTY;
+    return lp_feasibility_set_new_internal(0);
+  }
+
   // Size of the result is at most max of the sizes
   size_t intervals_capacity = s1->size > s2->size ? s1->size : s2->size;
   // one extra for the working copy
