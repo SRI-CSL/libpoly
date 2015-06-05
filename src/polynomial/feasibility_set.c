@@ -178,7 +178,7 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   }
 
   // Size of the result is at most max of the sizes
-  size_t intervals_capacity = s1->size > s2->size ? s1->size : s2->size;
+  size_t intervals_capacity = s1->size + s2->size;
   // one extra for the working copy
   intervals_capacity ++;
   lp_interval_t* intervals = malloc(sizeof(lp_interval_t)*intervals_capacity);
