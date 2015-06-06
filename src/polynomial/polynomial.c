@@ -967,7 +967,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   lp_value_destruct(&x_value_backup);
 }
 
-lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
+lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", "); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
@@ -1150,7 +1150,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   return result;
 }
 
-lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
+lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set_root("); lp_polynomial_print(A, trace_out); tracef(", %zu, ", root_index); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
@@ -1311,4 +1311,47 @@ void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f
   lp_monomial_construct(A->ctx, &m);
   coefficient_traverse(A->ctx, &A->data, f, &m, data);
   lp_monomial_destruct(&m);
+}
+
+int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+
+  lp_polynomial_external_clean(A);
+
+  // Evaluate the sign and check
+  int p_sign = lp_polynomial_sgn(A, M);
+  return lp_sign_condition_consistent(sgn_condition, p_sign);
+}
+
+int lp_polynomial_root_constraint_evaluate(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+
+  int eval;
+
+  lp_polynomial_external_clean(A);
+
+  lp_variable_t x = lp_polynomial_top_variable(A);
+  assert(x != lp_variable_null);
+
+  size_t degree = lp_polynomial_degree(A);
+  lp_value_t* roots = malloc(sizeof(lp_value_t)*degree);
+  size_t roots_size = 0;
+
+  // Get the root we're interested in
+  lp_polynomial_roots_isolate(A, M, roots, &roots_size);
+  if (root_index < roots_size) {
+    // Compare
+    const lp_value_t* x_value = lp_assignment_get_value(M, x);
+    int cmp = lp_value_cmp(x_value, roots + root_index);
+    eval = lp_sign_condition_consistent(sgn_condition, cmp);
+  } else {
+    // false, not enough roots
+    eval = 0;
+  }
+
+  size_t i;
+  for (i = 0; i < roots_size; ++ i) {
+    lp_value_destruct(roots + i);
+  }
+  free(roots);
+
+  return eval;
 }

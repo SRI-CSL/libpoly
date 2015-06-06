@@ -255,7 +255,12 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
  *
  * If negated is true, the constraint is considered negated.
  */
-lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M);
+lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M);
+
+/**
+ * Given a polynomial constraint, as above, evaluate its truth value.
+ */
+int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
 
 /**
  * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a root index,
@@ -266,7 +271,12 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
  *
  * If negated is true, the constraint is considered negated.
  */
-lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M);
+lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M);
+
+/**
+ * Given a root constraint as above, evaluate its truth value.
+ */
+int lp_polynomial_root_constraint_evaluate(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
 
 /**
  * Function type called on polynomial traversal. It will be called on all monomials.
