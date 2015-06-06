@@ -1366,7 +1366,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   }
 
   // Get the feasible intervals
-  lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, assignment);
+  lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, 0, assignment);
 
   // The list where we return the arguments
   PyObject* list = PyList_New(feasible->size);
@@ -1414,7 +1414,7 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
   }
 
   // Get the feasible intervals
-  lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, assignment);
+  lp_feasibility_set_t* feasible = lp_polynomial_get_feasible_set(p, sgn_condition, 0, assignment);
 
   // Return the list
   return PyFeasibilitySet_create(feasible);

@@ -967,7 +967,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   lp_value_destruct(&x_value_backup);
 }
 
-lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", "); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
@@ -984,6 +984,11 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
 
   // Get the degree of the polynomial, respecting the model
   size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
+
+  // Negate the constraint if negated
+  if (negated) {
+    sgn_condition = lp_sign_condition_negate(sgn_condition);
+  }
 
   // Get the roots of the polynomial
   size_t roots_size;
@@ -1145,7 +1150,7 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set(const lp_polynomial_t* A, l
   return result;
 }
 
-lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
+lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set_root("); lp_polynomial_print(A, trace_out); tracef(", %zu, ", root_index); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
@@ -1168,11 +1173,40 @@ lp_feasibility_set_t* lp_polynomial_get_feasible_set_root(const lp_polynomial_t*
   lp_value_t* roots = malloc(sizeof(lp_value_t)*degree);
   lp_polynomial_roots_isolate(A, M, roots, &roots_size);
 
+  /**
+   * Example:
+   *
+   *   x <_r root(k, p(x, y))
+   *
+   * not negated:
+   *
+   *   k < rootcount(x, p(x, y)) && x < root(k, p(x, y))
+   *
+   *   if (k < rootcount): x \in (-inf, root(k, p(x, y)))
+   *   else              : x \in {}
+   *
+   * negated:
+   *
+   *   k >= rootcount(x, p(x, y)) || x >= root(k, p(x, y))
+   *
+   *   if (k >= rootcount): x in (-inf, +inf)
+   *   else               : x in (root(k, p(x, y), +inf)
+   *
+   */
+
   lp_feasibility_set_t* result = 0;
   if (root_index >= roots_size) {
     // Just empty
-    result = lp_feasibility_set_new_internal(0);
+    if (!negated) {
+      result = lp_feasibility_set_new_internal(0);
+    } else {
+      result = lp_feasibility_set_new();
+    }
   } else {
+
+    if (negated) {
+      sgn_condition = lp_sign_condition_negate(sgn_condition);
+    }
 
     lp_value_t inf_pos, inf_neg;
     lp_value_construct(&inf_pos, LP_VALUE_PLUS_INFINITY, 0);
