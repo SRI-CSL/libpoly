@@ -151,9 +151,10 @@ void lp_value_approx(const lp_value_t* v, lp_rational_interval_t* out) {
   case LP_VALUE_ALGEBRAIC:
     if (lp_value_is_rational(v)) {
       lp_rational_t v_rat;
+      rational_construct(&v_rat);
       lp_value_get_rational(v, &v_rat);
       lp_rational_interval_construct_point(&approx, &v_rat);
-      lp_rational_destruct(&v_rat);
+      rational_destruct(&v_rat);
     } else {
       // Make sure we're below the given size
       size = lp_dyadic_interval_size(&v->value.a.I);
