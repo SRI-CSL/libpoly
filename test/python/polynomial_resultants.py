@@ -31,6 +31,18 @@ def check_resultant(p, q, expected):
 
 polypy_test.init()
 
+polypy_test.start("Bugs")
+
+p = 7*x**6 + 14*x**5 + (7*y - 1)
+q = 42*x**5 + 70*x**4
+expected = [92254156521408*y**5-461361174686720+y**4+244807578081920+y**3-51113953954560+y**2+4803956911040+y-170197631744, 
+            174327582240+y**3-74711820960+y**2+10673117280+y-508243680, 
+            0, 
+            0, 
+            -6860, 
+            42]
+check_psc(p, q, expected)
+
 polypy_test.start("Speed")
 
 A = w - 2*x**3*y**2*z - x**2*y*z**3 - x*y**3*z**2 - z - 4
