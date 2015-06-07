@@ -79,7 +79,7 @@ initpolypy(void)
 
   // Initialize the library
   lp_init();
-  lp_set_output_language(LP_OUTPUT_PYTHON);
+  lp_set_output_language(LP_OUTPUT_LATEX);
 
   Py_INCREF(&CoefficientRingType);
   PyModule_AddObject(m, "CoefficientRing", (PyObject*)&CoefficientRingType);

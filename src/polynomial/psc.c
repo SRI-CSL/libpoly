@@ -26,7 +26,8 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
   TRACE("coefficient", "coefficient_psc()\n");
   STAT(coefficient, psc) ++;
 
-  if (trace_is_enabled("coefficient")) {
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("coefficient_psc()\n");
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
@@ -41,13 +42,14 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
   size_t Q_deg = coefficient_degree(Q);
   assert(P_deg >= Q_deg);
 
-  // S = []
-  int S_size = 0;
-
   // s = lc(Q)^(deg(P) - deg(Q)
   coefficient_t s;
   coefficient_construct(ctx, &s);
   coefficient_pow(ctx, &s, coefficient_lc(Q), P_deg - Q_deg);
+
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("s = "); coefficient_print(ctx, &s, trace_out); tracef("\n");
+  }
 
   // Set the final position
   coefficient_assign(ctx, S + Q_deg, &s);
@@ -58,6 +60,11 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
   coefficient_construct_copy(ctx, &B, Q);
   coefficient_neg(ctx, &B, &B);
   coefficient_prem(ctx, &B, P, &B);
+
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("A = "); coefficient_print(ctx, &A, trace_out); tracef("\n");
+    tracef("B = "); coefficient_print(ctx, &B, trace_out); tracef("\n");
+  }
 
   // Some temporaries
   coefficient_t C, pow;
@@ -72,8 +79,8 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
     }
 
     // d = deg(A); e = deg(B)
-    size_t d = coefficient_degree_safe(ctx, &A, x);
-    size_t e = coefficient_degree_safe(ctx, &B, x);
+    int d = coefficient_degree_safe(ctx, &A, x);
+    int e = coefficient_degree_safe(ctx, &B, x);
     assert(d > e);
 
     // Holds:
@@ -86,12 +93,11 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
     }
 
     // S = [B; S]
-    if (coefficient_degree_safe(ctx, &B, x) == d - 1) {
-      coefficient_assign(ctx, S + S_size, coefficient_lc_safe(ctx, &B, x));
-    }
-    S_size ++;
+    // we only collect the principal coefficients
+    assert(d > 0);
+    coefficient_assign(ctx, S + (d-1), coefficient_get_coefficient_safe(ctx, &B, d-1, x));
     if (trace_is_enabled("coefficient::resultant")) {
-      tracef("S[%d] = ", S_size - 1); coefficient_print(ctx, S + S_size - 1, trace_out); tracef("\n");
+      tracef("S[%d] = ", d-1); coefficient_print(ctx, S + (d-1), trace_out); tracef("\n");
     }
 
     // Holds:
@@ -105,12 +111,10 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
       coefficient_pow(ctx, &pow, &s, delta-1);
       coefficient_div(ctx, &C, &C, &pow);
       // S = [C; S]
-      if (coefficient_degree_safe(ctx, &C, x) == e) {
-        coefficient_assign(ctx, S + S_size, coefficient_lc_safe(ctx, &C, x));
-      }
-      S_size ++;
+      coefficient_assign(ctx, S + e, coefficient_get_coefficient_safe(ctx, &C, e, x));
       if (trace_is_enabled("coefficient::resultant")) {
-        tracef("S[%d] = ", S_size - 1); coefficient_print(ctx, S + S_size - 1, trace_out); tracef("\n");
+        tracef("C = "); coefficient_print(ctx, &C, trace_out); tracef("\n");
+        tracef("S[%d] = ", e); coefficient_print(ctx, S + e, trace_out); tracef("\n");
       }
     } else {
       // C = B
@@ -159,14 +163,6 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
       tracef("A = "); coefficient_print(ctx, &A, trace_out); tracef("\n");
       tracef("s = "); coefficient_print(ctx, &s, trace_out); tracef("\n");
     }
-  }
-
-  // Reverse S
-  int i = 0, j = S_size - 1;
-  while (i < j) {
-    coefficient_swap(S + i, S + j);
-    i ++;
-    j --;
   }
 
   // Remove temps
@@ -305,13 +301,12 @@ void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A,
  */
 void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
 
-  TRACE("coefficient", "coefficient_psc()\n");
-  STAT(coefficient, psc) ++;
-
-  if (trace_is_enabled("coefficient")) {
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("coefficient_psc()\n");
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
+  STAT(coefficient, psc) ++;
 
   assert(P->type == COEFFICIENT_POLYNOMIAL);
   assert(Q->type == COEFFICIENT_POLYNOMIAL);
@@ -323,13 +318,19 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
   size_t Q_deg = coefficient_degree(Q);
   assert(P_deg >= Q_deg);
 
-  // S = []
-  int S_size = 0;
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("P_deg = %zu\n", P_deg);
+    tracef("Q_deg = %zu\n", Q_deg);
+  }
 
   // s = lc(Q)^(deg(P) - deg(Q)
   coefficient_t s;
   coefficient_construct(ctx, &s);
   coefficient_pow(ctx, &s, coefficient_lc(Q), P_deg - Q_deg);
+
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("s = "); coefficient_print(ctx, &s, trace_out); tracef("\n")
+  }
 
   // Set the final position
   coefficient_assign(ctx, S + Q_deg, &s);
@@ -340,6 +341,11 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
   coefficient_construct_copy(ctx, &B, Q);
   coefficient_neg(ctx, &B, &B);
   coefficient_prem(ctx, &B, P, &B);
+
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("A = "); coefficient_print(ctx, &A, trace_out); tracef("\n");
+    tracef("B = "); coefficient_print(ctx, &B, trace_out); tracef("\n");
+  }
 
   // Some temporaries
   coefficient_t C, pow;
@@ -354,9 +360,14 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
     }
 
     // d = deg(A); e = deg(B)
-    size_t d = coefficient_degree_safe(ctx, &A, x);
-    size_t e = coefficient_degree_safe(ctx, &B, x);
+    int d = coefficient_degree_safe(ctx, &A, x);
+    int e = coefficient_degree_safe(ctx, &B, x);
     assert(d > e);
+
+    if (trace_is_enabled("coefficient::resultant")) {
+      tracef("d = %d\n", d);
+      tracef("e = %d\n", e);
+    }
 
     // Holds:
     //   A ~ S_d   if d = deg(Q)
@@ -368,12 +379,10 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
     }
 
     // S = [B; S]
-    if (coefficient_degree_safe(ctx, &B, x) == d - 1) {
-      coefficient_assign(ctx, S + S_size, coefficient_lc_safe(ctx, &B, x));
-    }
-    S_size ++;
+    assert(d > 0);
+    coefficient_assign(ctx, S + (d-1), coefficient_get_coefficient_safe(ctx, &B, d-1, x));
     if (trace_is_enabled("coefficient::resultant")) {
-      tracef("S[%d] = ", S_size - 1); coefficient_print(ctx, S + S_size - 1, trace_out); tracef("\n");
+      tracef("S[%d] = ", d-1); coefficient_print(ctx, S + (d-1), trace_out); tracef("\n");
     }
 
     // Holds:
@@ -382,7 +391,7 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
     assert(d >= e);
     int delta = d - e;
     if (delta > 1) {
-      if (d < Q_deg) {
+      if (d < (int) Q_deg) {
         // Optimized calculation of S_e into C
         // S_e_optimized(ctx, S_d, S_d_1, S_e, X)
         S_e_optimized(ctx, &A, &B, &C, x);
@@ -394,12 +403,9 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
         coefficient_div(ctx, &C, &C, &pow);
       }
       // S = [C; S]
-      if (coefficient_degree_safe(ctx, &C, x) == e) {
-        coefficient_assign(ctx, S + S_size, coefficient_lc_safe(ctx, &C, x));
-      }
-      S_size ++;
+      coefficient_assign(ctx, S + e, coefficient_get_coefficient_safe(ctx, &C, e, x));
       if (trace_is_enabled("coefficient::resultant")) {
-        tracef("S[%d] = ", S_size - 1); coefficient_print(ctx, S + S_size - 1, trace_out); tracef("\n");
+        tracef("S[%d] = ", e); coefficient_print(ctx, S + e, trace_out); tracef("\n");
       }
     } else {
       // C = B
@@ -447,14 +453,6 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
     }
   }
 
-  // Reverse S
-  int i = 0, j = S_size - 1;
-  while (i < j) {
-    coefficient_swap(S + i, S + j);
-    i ++;
-    j --;
-  }
-
   // Remove temps
   coefficient_destruct(&A);
   coefficient_destruct(&B);
@@ -464,6 +462,7 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
 }
 
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
+  // coefficient_psc_unoptimized(ctx, S, P, Q);
   coefficient_psc_optimized(ctx, S, P, Q);
 }
 
