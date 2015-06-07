@@ -966,14 +966,17 @@ int lp_interval_is_point(const lp_interval_t* I) {
 }
 
 const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interval_t* I) {
+  assert(I->is_point);
   return &I->a;
 }
 
 const lp_rational_t* lp_rational_interval_get_point(const lp_rational_interval_t* I) {
+  assert(I->is_point);
   return &I->a;
 }
 
 const lp_value_t* lp_interval_get_point(const lp_interval_t* I) {
+  assert(I->is_point);
   return &I->a;
 }
 
