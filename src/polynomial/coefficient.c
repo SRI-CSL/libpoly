@@ -2550,7 +2550,15 @@ void coefficient_resolve_algebraic(const lp_polynomial_context_t* ctx, const coe
       break;
     }
 
-    assert(!lp_value_is_rational(y_value));
+    if (lp_value_is_rational(y_value)) {
+      lp_integer_t multiplier;
+      integer_construct(&multiplier);
+      coefficient_evaluate_rationals(ctx, A_alg, m, A_alg, &multiplier);
+      integer_destruct(&multiplier);
+      continue;
+    }
+
+    // Proper algebraic number
     const lp_upolynomial_t* y_upoly = y_value->value.a.f;
     assert(y_upoly != 0);
 
@@ -2709,8 +2717,10 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
         // Isolate as univariate, then filter any extra roots obtained from the defining polynomials
         if (trace_is_enabled("coefficient::roots")) {
           tracef("coefficient_roots_isolate(): univariate reduct\n");
+          coefficient_print(ctx, &A_alg, trace_out);
+          tracef("\n");
         }
-        assert(coefficient_degree(&A_alg) > 1);
+        assert(coefficient_degree(&A_alg) >= 1);
 
         // Get the univariate version
         lp_upolynomial_t* A_alg_u = coefficient_to_univariate(ctx, &A_alg);
