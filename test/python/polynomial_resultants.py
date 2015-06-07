@@ -31,7 +31,7 @@ def check_resultant(p, q, expected):
 
 polypy_test.init()
 
-polypy.trace_enable("coefficient::resultant")
+# polypy.trace_enable("coefficient::resultant")
 
 polypy_test.start("Bugs")
 

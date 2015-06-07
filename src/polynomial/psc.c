@@ -175,6 +175,12 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
 
 static
 void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d, const coefficient_t* S_d_1, coefficient_t* S_e, lp_variable_t X) {
+
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("S_d = "); coefficient_print(ctx, S_d, trace_out); tracef("\n");
+    tracef("S_d_1 = "); coefficient_print(ctx, S_d_1, trace_out); tracef("\n");
+  }
+
   // n = deg(S_d) - deg(S_d_1) - 1
   assert(coefficient_degree_safe(ctx, S_d, X) > coefficient_degree_safe(ctx, S_d_1, X));
   size_t n = coefficient_degree_safe(ctx, S_d, X) - coefficient_degree_safe(ctx, S_d_1, X) - 1;
@@ -186,12 +192,26 @@ void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d,
   // (x, y) = (lc(S_d-1), lc(S_d))
   const coefficient_t* x = coefficient_lc_safe(ctx, S_d_1, X);
   const coefficient_t* y = coefficient_lc_safe(ctx, S_d, X);
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("x = "); coefficient_print(ctx, S_d, trace_out); tracef("\n");
+    tracef("y = "); coefficient_print(ctx, S_d_1, trace_out); tracef("\n");
+  }
+
   // a = 2^floor(log2(n)), a <= n < 2*a
   size_t a = 1;
-  while ((a << 1) < n) { a <<= 1; }
+  while ((a << 1) <= n) { a <<= 1; }
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("n = %zu\n", n);
+    tracef("a = %zu\n", a);
+  }
+
   // c = x
   coefficient_t c;
   coefficient_construct_copy(ctx, &c, x);
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("c = "); coefficient_print(ctx, &c, trace_out); tracef("\n");
+  }
+
   // n = n - a
   n = n - a;
   // loop
@@ -202,16 +222,28 @@ void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d,
     a = a / 2;
     coefficient_mul(ctx, &c, &c, &c);
     coefficient_div(ctx, &c, &c, y);
+    if (trace_is_enabled("coefficient::resultant")) {
+      tracef("a = %zu\n", a);
+      tracef("c = "); coefficient_print(ctx, &c, trace_out); tracef("\n");
+    }
     // if n >= a then c = (c*x)/y; n = n - a
     if (n >= a) {
       coefficient_mul(ctx, &c, &c, x);
       coefficient_div(ctx, &c, &c, y);
       n = n - a;
     }
+    if (trace_is_enabled("coefficient::resultant")) {
+      tracef("n = %zu\n", n);
+      tracef("a = %zu\n", a);
+      tracef("c = "); coefficient_print(ctx, &c, trace_out); tracef("\n");
+    }
   }
   // Return (c*S_d-1)/y
   coefficient_mul(ctx, &c, &c, S_d_1);
   coefficient_div(ctx, S_e, &c, y);
+  if (trace_is_enabled("coefficient::resultant")) {
+    tracef("S_e = "); coefficient_print(ctx, S_e, trace_out); tracef("\n");
+  }
   // Remove temps
   coefficient_destruct(&c);
 }
