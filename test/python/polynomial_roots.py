@@ -23,11 +23,6 @@ def check_roots(p, assignment, roots, expected_roots):
         print "roots =", roots
         print "expected_roots =", expected_roots
     polypy_test.check(ok)
- 
-[x, y, z] = [polypy.Variable(name) for name in ['x', 'y', 'z']]
-polypy.variable_order.set([z, y, x])
-
-polypy_test.start("Polynomial Root Isolation")
 
 # polypy.trace_enable("polynomial")
 # polypy.trace_enable("factorization")
@@ -35,7 +30,29 @@ polypy_test.start("Polynomial Root Isolation")
 # polypy.trace_enable("coefficient")
 # polypy.trace_enable("coefficient::sgn")
 # polypy.trace_enable("coefficient::roots")
-# polypy.trace_enable("coefficient::arith")
+# polypy.trace_enable("roots")
+ 
+[x, y, z, w] = [polypy.Variable(name) for name in ['x', 'y', 'z', 'w']]
+
+polypy_test.start("Bugs");
+
+polypy.variable_order.set([x, w, y, z])
+
+sqrt180 = polypy.AlgebraicNumber(x**2 - 180, 0)
+assignment = polypy.Assignment()
+assignment.set_value(x, 9)
+assignment.set_value(w, sqrt180)
+assignment.set_value(y, 0)
+
+p = ((1*x)*y)*z + (-1*w**2 + (20*x))
+
+roots = p.roots_isolate(assignment)
+check_roots(p, assignment, roots, []);
+
+polypy_test.start("Polynomial Root Isolation")
+
+polypy.variable_order.set([z, y, x])
+
 
 sqrt2 = polypy.AlgebraicNumber(x**2 - 2, 1)
 sqrt3 = polypy.AlgebraicNumber(x**2 - 3, 1)

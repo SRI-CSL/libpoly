@@ -356,6 +356,10 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
   // Get the square-free factorization and then count roots for each factor.
   lp_upolynomial_factors_t* square_free_factors = lp_upolynomial_factor_square_free(f);
 
+  //
+  // SQUARE-FREE FACTORS CAN NOT SHARE ROOTS: we therefore us the input array directly
+  //
+
   size_t factor_i;
   for (factor_i = 0; factor_i < square_free_factors->size; ++ factor_i) {
 
@@ -373,6 +377,7 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
       // Add 0 as a root
       lp_algebraic_number_construct_zero(roots + *roots_size);
       (*roots_size) ++;
+      assert(*roots_size <= lp_upolynomial_degree(f));
       continue;
     }
 
@@ -407,7 +412,10 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
 
     // Isolate the roots
     if (a_sgn_changes - b_sgn_changes > 0) {
-      sturm_seqence_isolate_roots(sturm_sequence, sturm_sequence_size, roots, roots_size, &interval_all, a_sgn_changes, b_sgn_changes);
+      size_t current_roots_size = 0;
+      sturm_seqence_isolate_roots(sturm_sequence, sturm_sequence_size, roots + *roots_size, &current_roots_size, &interval_all, a_sgn_changes, b_sgn_changes);
+      (*roots_size) += current_roots_size;
+      assert(*roots_size <= lp_upolynomial_degree(f));
     }
 
     // Destroy the temporaries

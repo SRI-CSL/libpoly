@@ -86,6 +86,9 @@ void coefficient_construct_from_univariate(const lp_polynomial_context_t* ctx, c
 /** Construct a simple monomial coefficient a*x^n */
 void coefficient_construct_simple(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* a, lp_variable_t x, unsigned n);
 
+/** Construct a simple monomial coefficient a*x^n */
+void coefficient_construct_simple_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long a, lp_variable_t x, unsigned n);
+
 /** Construct a copy of the given coefficient. */
 void coefficient_construct_copy(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from);
 
