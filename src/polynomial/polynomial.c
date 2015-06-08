@@ -990,6 +990,26 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
     sgn_condition = lp_sign_condition_negate(sgn_condition);
   }
 
+  if (degree == 0) {
+    // Evaluates to constant
+    int sgn = coefficient_sgn(A->ctx, coefficient_get_coefficient_safe(A->ctx, &A->data, 0, x), M);
+
+    if (trace_is_enabled("polynomial")) {
+      tracef("polynomial_get_feasible_set(");
+      lp_polynomial_print(A, trace_out);
+      tracef(", "); lp_sign_condition_print(sgn_condition, trace_out);
+      tracef(") => evaluates to constant of sign %d\n", sgn);
+    }
+
+    if (lp_sign_condition_consistent(sgn_condition, sgn)) {
+      // Consistent for any x
+      return lp_feasibility_set_new();
+    } else {
+      // No x
+      return lp_feasibility_set_new_internal(0);
+    }
+  }
+
   // Get the roots of the polynomial
   size_t roots_size;
   lp_value_t* roots = malloc(sizeof(lp_value_t)*degree);
