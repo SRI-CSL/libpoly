@@ -914,7 +914,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     if (x == lp_polynomial_top_variable(factor)) {
       // Proper polynomial in x
       lp_value_t* current_roots = roots_tmp + roots_tmp_size;
-      size_t current_roots_size;
+      size_t current_roots_size = 0;
       coefficient_roots_isolate(A->ctx, &factor->data, M, current_roots, &current_roots_size);
       roots_tmp_size += current_roots_size;
     } else {
