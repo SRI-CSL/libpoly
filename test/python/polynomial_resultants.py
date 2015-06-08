@@ -45,10 +45,6 @@ expected = [92254156521408*y**5-461361174686720*y**4+244807578081920*y**3-511139
             42]
 check_psc(p, q, expected)
 
-import sys;
-
-sys.exit()
-
 polypy_test.start("Speed")
 
 A = w - 2*x**3*y**2*z - x**2*y*z**3 - x*y**3*z**2 - z - 4

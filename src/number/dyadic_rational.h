@@ -159,10 +159,10 @@ int dyadic_rational_cmp(const lp_dyadic_rational_t* q1, const lp_dyadic_rational
 
 static
 int dyadic_rational_cmp_integer(const lp_dyadic_rational_t* q1, const lp_integer_t* q2) {
-  lp_dyadic_rational_t q1_dy_rat;
-  dyadic_rational_construct_from_integer(&q1_dy_rat, q2);
-  int cmp = dyadic_rational_cmp(&q1_dy_rat, q1);
-  dyadic_rational_destruct(&q1_dy_rat);
+  lp_dyadic_rational_t q2_dy_rat;
+  dyadic_rational_construct_from_integer(&q2_dy_rat, q2);
+  int cmp = dyadic_rational_cmp(q1, &q2_dy_rat);
+  dyadic_rational_destruct(&q2_dy_rat);
   return cmp;
 }
 
