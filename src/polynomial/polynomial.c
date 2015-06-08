@@ -1167,6 +1167,14 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
 
   // Get the degree of the polynomial, respecting the model
   size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
+  if (degree == 0) {
+    // Polynomial evaluates to 0, no roots => root_index < 0 is false
+    if (!negated) {
+      return lp_feasibility_set_new_internal(0);
+    } else {
+      return lp_feasibility_set_new();
+    }
+  }
 
   // Get the roots of the polynomial
   size_t roots_size;
