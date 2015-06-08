@@ -29,6 +29,24 @@
 
 #define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 
+static
+void check_polynomial_assignment(const lp_polynomial_t* A, const lp_assignment_t* M, lp_variable_t x) {
+  assert(A->data.type == COEFFICIENT_NUMERIC || VAR(&A->data) == x);
+  lp_variable_list_t vars;
+  lp_variable_list_construct(&vars);
+  lp_polynomial_get_variables(A, &vars);
+  size_t i = 0;
+  for (i = 0; i < vars.list_size; ++i) {
+    lp_variable_t y = vars.list[i];
+    if (x != y && lp_assignment_get_value(M, y)->type == LP_VALUE_NONE) {
+      lp_polynomial_print(A, trace_out);
+      tracef("\n")
+      assert(0);
+    }
+  }
+  lp_variable_list_destruct(&vars);
+}
+
 void lp_polynomial_external_clean(const lp_polynomial_t* A_const) {
   if (A_const->external && !coefficient_in_order(A_const->ctx, &A_const->data)) {
     lp_polynomial_t* A = (lp_polynomial_t*) A_const;
@@ -843,6 +861,10 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 
   lp_polynomial_external_clean(A);
 
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
+  }
+
   lp_variable_t x = lp_polynomial_top_variable(A);
   assert(x != lp_variable_null);
 
@@ -977,6 +999,10 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
 
   // Make sure we're in the right order
   lp_polynomial_external_clean(A);
+
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
+  }
 
   // Make sure that the top variable is unassigned
   lp_variable_t x = coefficient_top_variable(&A->data);
@@ -1181,6 +1207,10 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
   // Make sure we're in the right order
   lp_polynomial_external_clean(A);
 
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
+  }
+
   // Make sure that the top variable is unassigned
   lp_variable_t x = coefficient_top_variable(&A->data);
   assert(x != lp_variable_null);
@@ -1345,6 +1375,10 @@ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_conditio
 
   lp_polynomial_external_clean(A);
 
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
+  }
+
   // Evaluate the sign and check
   int p_sign = lp_polynomial_sgn(A, M);
   return lp_sign_condition_consistent(sgn_condition, p_sign);
@@ -1352,9 +1386,14 @@ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_conditio
 
 int lp_polynomial_root_constraint_evaluate(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
 
+
   int eval;
 
   lp_polynomial_external_clean(A);
+
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
+  }
 
   lp_variable_t x = lp_polynomial_top_variable(A);
   assert(x != lp_variable_null);
