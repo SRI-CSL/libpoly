@@ -79,6 +79,8 @@ void lp_algebraic_number_reduce_polynomial(const lp_algebraic_number_t* a, const
   lp_algebraic_number_t* a_nonconst = (lp_algebraic_number_t*) a;
   lp_upolynomial_delete(a_nonconst->f);
   a_nonconst->f = lp_upolynomial_construct_copy(f);
+  a_nonconst->sgn_at_a = sgn_at_a;
+  a_nonconst->sgn_at_b = sgn_at_b;
 }
 
 static inline
@@ -206,6 +208,10 @@ int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_
     // the intersection is either open or a point
     lp_dyadic_interval_t I;
     lp_dyadic_interval_construct_intersection(&I, &a1->I, &a2->I);
+
+    if (trace_is_enabled("algebraic_number")) {
+      tracef("I = "); lp_dyadic_interval_print(&I, trace_out); tracef("\n");
+    }
 
     // Refine the interval using the intersection points
     lp_algebraic_number_refine_with_point(a1, &I.a);
