@@ -817,6 +817,11 @@ int lp_upolynomial_divides(const lp_upolynomial_t* p, const lp_upolynomial_t* q)
 
   assert(p->K == q->K);
 
+  // Special case
+  if (lp_upolynomial_degree(p) > lp_upolynomial_degree(q)) {
+    return 0;
+  }
+
   lp_int_ring_t* K = p->K;
 
   int result = 0;

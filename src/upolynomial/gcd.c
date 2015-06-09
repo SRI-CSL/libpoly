@@ -363,7 +363,7 @@ static void evaluate_polynomial(const lp_upolynomial_t* A, const lp_integer_t* A
 }
 
 /**
- * Reconstruct the polynomial from the value at 2^power, while multuplying with cont.
+ * Reconstruct the polynomial from the value at 2^power, while multiplying with cont.
  */
 static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p_value, unsigned pow, const lp_integer_t* cont) {
 
@@ -512,7 +512,7 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
 
     // Get the gcd of the values and reconstruct the possible gcd
     integer_gcd_Z(&D_v, &A_v, &B_v);
-    // This also changes the value D_v
+    // This also changes the value D_v (B is the smaller one, but we need the size of A for reconstruction)
     D = reconstruct_polynomial(lp_upolynomial_degree(A) + 1, &D_v, n, &d);
 
     // Check if it divides both (B is smaller degree)
