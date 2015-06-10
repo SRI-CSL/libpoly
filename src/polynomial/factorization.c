@@ -147,6 +147,11 @@ void coefficient_factor_square_free_pp(const lp_polynomial_context_t* ctx, const
       // Degree of the factor
       size_t k = 1;
 
+      if (trace_is_enabled("factorization")) {
+        tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
+        tracef("C' = "); coefficient_print(ctx, &C_d, trace_out); tracef("\n");
+      }
+
       // P = GCD(f, f')
       coefficient_t P;
       coefficient_construct(ctx, &P);

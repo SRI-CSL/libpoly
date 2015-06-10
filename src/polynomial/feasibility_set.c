@@ -342,8 +342,12 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   return result;
 }
 
+/**
+ * Sort the intervals so that we can scan from left to right and keep adding
+ * one of the upper bounds to the union. Basically we're sorting by lower bound.
+ */
 static
-int interval_sort(const void *I1_void, const void* I2_void) {
+int interval_sort_for_union(const void *I1_void, const void* I2_void) {
   const lp_interval_t* I1 = (const lp_interval_t*) I1_void;
   const lp_interval_t* I2 = (const lp_interval_t*) I2_void;
   lp_interval_cmp_t cmp = lp_interval_cmp(I1, I2);
@@ -352,38 +356,47 @@ int interval_sort(const void *I1_void, const void* I2_void) {
   /* I1: (  )
    * I2:      (   ) */
   case LP_INTERVAL_CMP_LT_NO_INTERSECT:
+    // Scan I1 first, then I2
     return -1;
   /* I1: (   )
    * I2:   (   )    */
   case LP_INTERVAL_CMP_LT_WITH_INTERSECT:
+    // Scan I1 first, then I2
     return -1;
   /* I1: (   )
    * I2: (     )    */
   case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
-    return -1;
+    // I2 might have smaller lower bound, so we scan it first
+    return 1;
   /* I1: (     ]
    * I2:   (   ]    */
   case LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2:
+    // Scan I1 fits, then I2
     return -1;
   /* I1: (   ]
    * I2: (   ]      */
   case LP_INTERVAL_CMP_EQ:
+    // Doesn't matter
     return 0;
   /* I1:   (   ]
    * I2: (     ]    */
   case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
+    // Scan I2 first
     return 1;
   /* I1: (       )
    * I2: (    )     */
   case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
-    return 1;
+    // Scan I1 first, it might have smaller lower bound
+    return -1;
   /* I1:   (    )
    * I2: (    )     */
   case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
+    // Scan I2 first
     return 1;
   /* I1:      (   )
    * I2: (  )       */
   case LP_INTERVAL_CMP_GT_NO_INTERSECT:
+    // Scan I2 first
     return 1;
   }
 
@@ -406,7 +419,14 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
   }
   s->size += from->size;
   // Add the new intervals
-  qsort(s->intervals, s->size, sizeof(lp_interval_t), interval_sort);
+  qsort(s->intervals, s->size, sizeof(lp_interval_t), interval_sort_for_union);
+
+  if (trace_is_enabled("feasibility_set")) {
+    for (i = 0; i < s->size; ++ i) {
+      lp_interval_print(s->intervals + i, trace_out); tracef("\n");
+    }
+  }
+
   // Now, normalize the intervals
   size_t keep;
   for (i = 1, keep = 1; i < s->size; ++ i) {
@@ -415,12 +435,20 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
     //    (  )
     // (     )
     // otherwise keep the interval
-    int merge = 0;
 
     // Compare and decide whether to merge
     const lp_interval_t* I1 = s->intervals + keep - 1;
     const lp_interval_t* I2 = s->intervals + i;
     lp_interval_cmp_t cmp = lp_interval_cmp(I1, I2);
+
+    if (trace_is_enabled("feasibility_set")) {
+      tracef("I1 = "); lp_interval_print(I1, trace_out); tracef("\n");
+      tracef("I2 = "); lp_interval_print(I2, trace_out); tracef("\n");
+    }
+
+    int merge = 0;
+    int ignore = 0;
+
     switch (cmp) {
     /* I1: (  )
      * I2:      (   ) */
@@ -428,8 +456,6 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
       // Check if the edges are the same
       if (lp_value_cmp(lp_interval_get_upper_bound(I1), lp_interval_get_lower_bound(I2)) == 0 && (!I1->b_open || !I2->a_open)) {
         merge = 1;
-      } else {
-        merge = 0;
       }
       break;
     /* I1: (   )
@@ -440,7 +466,8 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
     /* I1: (   )
      * I2: (     )    */
     case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
-      merge = 1;
+      // I2 should have been first
+      assert(0);
       break;
     /* I1: (     ]
      * I2:   (   ]    */
@@ -452,10 +479,27 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
     case LP_INTERVAL_CMP_EQ:
       merge = 1;
       break;
+    /* I1:   (   ]
+     * I2: (     ]    */
     case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
+      merge = 1;
+      break;
+    /* I1: (       )
+     * I2: (    )     */
     case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
+      // Just keep I1
+      ignore = 1;
+      break;
+    /* I1:   (    )
+     * I2: (    )     */
     case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
+      // I2 should have been first
+      assert(0);
+      break;
+    /* I1:      (   )
+     * I2: (  )       */
     case LP_INTERVAL_CMP_GT_NO_INTERSECT:
+      // I2 should have been first
       assert(0);
       break;
     }
@@ -465,7 +509,7 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
       // Just use the endpoint
       const lp_value_t* new_b = lp_interval_get_upper_bound(s->intervals + i);
       lp_interval_set_b(s->intervals + keep - 1, new_b, s->intervals[i].b_open);
-    } else {
+    } else if (!ignore) {
       // We just keep the new one
       if (i != keep) {
         lp_interval_swap(s->intervals + i, s->intervals + keep);
@@ -479,4 +523,10 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
     lp_interval_destruct(s->intervals + i);
   }
   s->size = keep;
+
+  if (trace_is_enabled("feasibility_set")) {
+    for (i = 0; i < s->size; ++ i) {
+      lp_interval_print(s->intervals + i, trace_out); tracef("\n");
+    }
+  }
 }

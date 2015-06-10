@@ -169,7 +169,8 @@ void coefficient_gcd_pp(const lp_polynomial_context_t* ctx, coefficient_t* gcd, 
   TRACE("coefficient", "coefficient_gcd_pp()\n");
   STAT(coefficient, gcd_pp) ++;
 
-  if (trace_is_enabled("coefficient")) {
+  if (trace_is_enabled("coefficient::gcd")) {
+    tracef("gcd\n")
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
