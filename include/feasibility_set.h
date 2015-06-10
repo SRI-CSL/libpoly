@@ -30,7 +30,12 @@ struct lp_feasibility_set_struct {
 /**
  * Create a new feasibility set [-inf, inf].
  */
-lp_feasibility_set_t* lp_feasibility_set_new();
+lp_feasibility_set_t* lp_feasibility_set_new_full();
+
+/**
+ * Create a new feasibility set {}.
+ */
+lp_feasibility_set_t* lp_feasibility_set_new_empty();
 
 /**
  * Construct a copy.
@@ -56,6 +61,11 @@ void lp_feasibility_set_swap(lp_feasibility_set_t* s1, lp_feasibility_set_t* s2)
  * Check if the given set is empty.
  */
 int lp_feasibility_set_is_empty(const lp_feasibility_set_t* set);
+
+/**
+ * Check if the given set is full, i.e. (-inf, +inf).
+ */
+int lp_feasibility_set_is_full(const lp_feasibility_set_t* set);
 
 /**
  * Check if the given value belongs to the set.
@@ -85,6 +95,12 @@ typedef enum {
  * status only if the intersect is not s1.
  */
 lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2, lp_feasibility_set_intersect_status_t* status);
+
+/**
+ * Add one set to another, i.e. s = s \cup from.
+ */
+void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t* from);
+
 
 /**
  * Print the set.

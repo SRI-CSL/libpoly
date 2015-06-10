@@ -19,14 +19,23 @@
 #include "utils/debug_trace.h"
 #include "polynomial/feasibility_set.h"
 
+static
+void lp_feasibility_set_ensure_capacity(lp_feasibility_set_t* s, size_t size) {
+  if (size && size > s->capacity) {
+    s->capacity = size;
+    s->intervals = realloc(s->intervals, s->capacity * sizeof(lp_interval_t));
+  }
+}
+
 void lp_feasibility_set_construct(lp_feasibility_set_t* s, size_t size) {
   s->size = 0;
-  s->capacity = size;
-  if (size) {
-    s->intervals = malloc(s->capacity * sizeof(lp_interval_t));
-  } else {
-    s->intervals = 0;
-  }
+  s->capacity = 0;
+  s->intervals = 0;
+  lp_feasibility_set_ensure_capacity(s, size);
+}
+
+lp_feasibility_set_t* lp_feasibility_set_new_empty() {
+  return lp_feasibility_set_new_internal(0);
 }
 
 lp_feasibility_set_t* lp_feasibility_set_new_internal(size_t size) {
@@ -50,7 +59,7 @@ void lp_feasibility_set_destruct(lp_feasibility_set_t* s) {
   free(s->intervals);
 }
 
-lp_feasibility_set_t* lp_feasibility_set_new() {
+lp_feasibility_set_t* lp_feasibility_set_new_full() {
   lp_feasibility_set_t* result = lp_feasibility_set_new_internal(1);
   lp_value_t inf_neg, inf_pos;
   lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
@@ -96,6 +105,15 @@ void lp_feasibility_set_swap(lp_feasibility_set_t* s1, lp_feasibility_set_t* s2)
 int lp_feasibility_set_is_empty(const lp_feasibility_set_t* set) {
   return set->size == 0;
 }
+
+int lp_feasibility_set_is_full(const lp_feasibility_set_t* set) {
+  if (set->size != 1) {
+    return 0;
+  }
+  return lp_interval_get_lower_bound(set->intervals)->type == LP_VALUE_MINUS_INFINITY &&
+      lp_interval_get_upper_bound(set->intervals)->type == LP_VALUE_PLUS_INFINITY;
+}
+
 
 int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   int ret = 0;
@@ -322,4 +340,143 @@ lp_feasibility_set_t* lp_feasibility_set_intersect_with_status(const lp_feasibil
   free(intervals);
 
   return result;
+}
+
+static
+int interval_sort(const void *I1_void, const void* I2_void) {
+  const lp_interval_t* I1 = (const lp_interval_t*) I1_void;
+  const lp_interval_t* I2 = (const lp_interval_t*) I2_void;
+  lp_interval_cmp_t cmp = lp_interval_cmp(I1, I2);
+
+  switch (cmp) {
+  /* I1: (  )
+   * I2:      (   ) */
+  case LP_INTERVAL_CMP_LT_NO_INTERSECT:
+    return -1;
+  /* I1: (   )
+   * I2:   (   )    */
+  case LP_INTERVAL_CMP_LT_WITH_INTERSECT:
+    return -1;
+  /* I1: (   )
+   * I2: (     )    */
+  case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
+    return -1;
+  /* I1: (     ]
+   * I2:   (   ]    */
+  case LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2:
+    return -1;
+  /* I1: (   ]
+   * I2: (   ]      */
+  case LP_INTERVAL_CMP_EQ:
+    return 0;
+  /* I1:   (   ]
+   * I2: (     ]    */
+  case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
+    return 1;
+  /* I1: (       )
+   * I2: (    )     */
+  case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
+    return 1;
+  /* I1:   (    )
+   * I2: (    )     */
+  case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
+    return 1;
+  /* I1:      (   )
+   * I2: (  )       */
+  case LP_INTERVAL_CMP_GT_NO_INTERSECT:
+    return 1;
+  }
+
+  return 1;
+}
+
+void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t* from) {
+
+  if (from->size == 0) {
+    return;
+  }
+
+  // Make sure there is space
+  lp_feasibility_set_ensure_capacity(s, s->size + from->size);
+  // Copy over the intervals
+  size_t i;
+  lp_interval_t* copy_to = s->intervals + s->size;
+  for (i = 0; i < from->size; ++ i, copy_to ++) {
+    lp_interval_construct_copy(copy_to, from->intervals + i);
+  }
+  s->size += from->size;
+  // Add the new intervals
+  qsort(s->intervals, s->size, sizeof(lp_interval_t), interval_sort);
+  // Now, normalize the intervals
+  size_t keep;
+  for (i = 1, keep = 1; i < s->size; ++ i) {
+    // If new one has intersection with previous one, merge
+    // (   )
+    //    (  )
+    // (     )
+    // otherwise keep the interval
+    int merge = 0;
+
+    // Compare and decide whether to merge
+    const lp_interval_t* I1 = s->intervals + keep - 1;
+    const lp_interval_t* I2 = s->intervals + i;
+    lp_interval_cmp_t cmp = lp_interval_cmp(I1, I2);
+    switch (cmp) {
+    /* I1: (  )
+     * I2:      (   ) */
+    case LP_INTERVAL_CMP_LT_NO_INTERSECT:
+      // Check if the edges are the same
+      if (lp_value_cmp(lp_interval_get_upper_bound(I1), lp_interval_get_lower_bound(I2)) == 0) {
+        merge = 1;
+      } else {
+        merge = 0;
+      }
+      break;
+    /* I1: (   )
+     * I2:   (   )    */
+    case LP_INTERVAL_CMP_LT_WITH_INTERSECT:
+      merge = 1;
+      break;
+    /* I1: (   )
+     * I2: (     )    */
+    case LP_INTERVAL_CMP_LT_WITH_INTERSECT_I1:
+      merge = 1;
+      break;
+    /* I1: (     ]
+     * I2:   (   ]    */
+    case LP_INTERVAL_CMP_LEQ_WITH_INTERSECT_I2:
+      merge = 1;
+      break;
+    /* I1: (   ]
+     * I2: (   ]      */
+    case LP_INTERVAL_CMP_EQ:
+      merge = 1;
+      break;
+    case LP_INTERVAL_CMP_GEQ_WITH_INTERSECT_I1:
+    case LP_INTERVAL_CMP_GT_WITH_INTERSECT_I2:
+    case LP_INTERVAL_CMP_GT_WITH_INTERSECT:
+    case LP_INTERVAL_CMP_GT_NO_INTERSECT:
+      assert(0);
+      break;
+    }
+
+    // Merge if asked
+    if (merge) {
+      // Just use the endpoint
+      const lp_value_t* new_b = lp_interval_get_upper_bound(s->intervals + i);
+      lp_interval_set_b(s->intervals + keep - 1, new_b, s->intervals[i].b_open);
+    } else {
+      // We just keep the new one
+      if (i != keep) {
+        lp_interval_swap(s->intervals + i, s->intervals + keep);
+      }
+      keep ++;
+    }
+  }
+
+  // Destroy the leftover ones
+  for (i = keep; i < s->size; ++ i) {
+    lp_interval_destruct(s->intervals + i);
+  }
+  s->size = keep;
 }

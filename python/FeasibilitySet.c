@@ -103,7 +103,7 @@ FeasibilitySet_init(FeasibilitySet* self, PyObject* args)
 {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 0) {
     // Defaults to (-inf, +inf)
-    self->S = lp_feasibility_set_new();
+    self->S = lp_feasibility_set_new_full();
   } else {
     return -1;
   }

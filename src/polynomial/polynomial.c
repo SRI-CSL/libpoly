@@ -1031,7 +1031,7 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
 
     if (lp_sign_condition_consistent(sgn_condition, sgn)) {
       // Consistent for any x
-      return lp_feasibility_set_new();
+      return lp_feasibility_set_new_full();
     } else {
       // No x
       return lp_feasibility_set_new_internal(0);
@@ -1223,7 +1223,7 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
     if (!negated) {
       return lp_feasibility_set_new_internal(0);
     } else {
-      return lp_feasibility_set_new();
+      return lp_feasibility_set_new_full();
     }
   }
 
@@ -1259,7 +1259,7 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
     if (!negated) {
       result = lp_feasibility_set_new_internal(0);
     } else {
-      result = lp_feasibility_set_new();
+      result = lp_feasibility_set_new_full();
     }
   } else {
 

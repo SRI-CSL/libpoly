@@ -769,10 +769,13 @@ void lp_interval_collapse_to(lp_interval_t* I, const lp_value_t* v) {
 }
 
 void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open) {
-  assert(!I->is_point);
   int cmp = dyadic_rational_cmp(a, &I->b);
   assert(cmp <= 0);
   if (cmp != 0) {
+    if (I->is_point) {
+      dyadic_rational_construct_copy(&I->b, &I->a);
+      I->is_point = 0;
+    }
     dyadic_rational_assign(&I->a, a);
     I->a_open = a_open;
   } else {
@@ -782,10 +785,13 @@ void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_
 }
 
 void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open) {
-  assert(!I->is_point);
   int cmp = lp_value_cmp(a, &I->b);
   assert(cmp <= 0);
   if (cmp != 0) {
+    if (I->is_point) {
+      lp_value_construct_copy(&I->b, &I->a);
+      I->is_point = 0;
+    }
     lp_value_assign(&I->a, a);
     I->a_open = a_open;
   } else {
@@ -795,11 +801,15 @@ void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open) {
 }
 
 void lp_dyadic_interval_set_b(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* b, int b_open) {
-  assert(!I->is_point);
   int cmp = dyadic_rational_cmp(&I->a, b);
   assert(cmp <= 0);
   if (cmp != 0) {
-    dyadic_rational_assign(&I->b, b);
+    if (I->is_point) {
+      dyadic_rational_construct_copy(&I->b, b);
+      I->is_point = 0;
+    } else {
+      dyadic_rational_assign(&I->b, b);
+    }
     I->b_open = b_open;
   } else {
     assert(!I->a_open && !b_open);
@@ -808,11 +818,15 @@ void lp_dyadic_interval_set_b(lp_dyadic_interval_t* I, const lp_dyadic_rational_
 }
 
 void lp_interval_set_b(lp_interval_t* I, const lp_value_t* b, int b_open) {
-  assert(!I->is_point);
   int cmp = lp_value_cmp(&I->a, b);
   assert(cmp <= 0);
   if (cmp != 0) {
-    lp_value_assign(&I->b, b);
+    if (I->is_point) {
+      lp_value_construct_copy(&I->b, b);
+      I->is_point = 0;
+    } else {
+      lp_value_assign(&I->b, b);
+    }
     I->b_open = b_open;
   } else {
     assert(!I->a_open && !b_open);
