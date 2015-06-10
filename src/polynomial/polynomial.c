@@ -729,6 +729,13 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
     tracef("polynomial_psc("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
   }
 
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("A = "); lp_polynomial_print(A, trace_out); tracef("\n");
+    tracef("B = "); lp_polynomial_print(B, trace_out); tracef("\n");
+    tracef("var = %s\n", lp_variable_db_get_name(A->ctx->var_db, lp_polynomial_top_variable(A)));
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out); tracef("\n");
+  }
+
   assert(A->data.type == COEFFICIENT_POLYNOMIAL);
   assert(B->data.type == COEFFICIENT_POLYNOMIAL);
   assert(VAR(&A->data) == VAR(&B->data));
@@ -816,6 +823,11 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
     tracef("polynomial_factor_square_free("); lp_polynomial_print(A, trace_out); tracef(")\n");
   }
 
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("Sq Factor A = "); lp_polynomial_print(A, trace_out); tracef("\n");
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out); tracef("\n");
+  }
+
 //  assert(*factors == 0);
 //  assert(*multiplicities == 0);
 //  assert(*size == 0);
@@ -850,6 +862,10 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
     (*multiplicities)[i] = coeff_factors.multiplicities[i];
   }
 
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("Sq Factor: result size = %zu\n", *size);
+  }
+
   coefficient_factors_destruct(&coeff_factors);
 }
 
@@ -858,6 +874,13 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_roots_isolate("); lp_polynomial_print(A, trace_out); tracef(")\n");
   }
+
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("A = "); lp_polynomial_print(A, trace_out); tracef("\n");
+    tracef("var = %s\n", lp_variable_db_get_name(A->ctx->var_db, lp_polynomial_top_variable(A)));
+    lp_assignment_print(M, trace_out); tracef("\n");
+  }
+
 
   lp_polynomial_external_clean(A);
 
