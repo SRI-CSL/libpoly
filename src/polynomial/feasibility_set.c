@@ -426,7 +426,7 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
      * I2:      (   ) */
     case LP_INTERVAL_CMP_LT_NO_INTERSECT:
       // Check if the edges are the same
-      if (lp_value_cmp(lp_interval_get_upper_bound(I1), lp_interval_get_lower_bound(I2)) == 0) {
+      if (lp_value_cmp(lp_interval_get_upper_bound(I1), lp_interval_get_lower_bound(I2)) == 0 && (!I1->b_open || !I2->a_open)) {
         merge = 1;
       } else {
         merge = 0;
