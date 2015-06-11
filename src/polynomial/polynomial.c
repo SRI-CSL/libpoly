@@ -1040,9 +1040,8 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
     check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
   }
 
-  // Make sure that the top variable is unassigned
+  // Top variable
   lp_variable_t x = coefficient_top_variable(&A->data);
-  assert(lp_assignment_get_value(M, x)->type == LP_VALUE_NONE);
 
   // Get the degree of the polynomial, respecting the model
   size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
@@ -1246,9 +1245,6 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
   if (trace_is_enabled("polynomial::check_input")) {
     check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
   }
-
-  // Make sure that the top variable is unassigned
-  assert(coefficient_top_variable(&A->data) != lp_variable_null);
 
   // Get the degree of the polynomial, respecting the model
   size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
