@@ -70,8 +70,8 @@ static
 int lp_polynomial_hash_set_search(lp_polynomial_t** data, size_t mask, const lp_polynomial_t* p) {
   size_t i = lp_polynomial_hash(p) & mask;
   for (;;) {
-    if (lp_polynomial_eq(data[i], p)) return 1;
     if (data[i] == 0) return 0;
+    if (lp_polynomial_eq(data[i], p)) return 1;
     i ++;
     i &= mask;
   }
