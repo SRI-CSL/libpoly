@@ -170,3 +170,7 @@ void lp_variable_order_make_bot(lp_variable_order_t* var_order, lp_variable_t va
   assert(var_order->bot == lp_variable_null || var == lp_variable_null);
   var_order->bot = var;
 }
+
+const lp_variable_list_t* lp_variable_order_get_list(const lp_variable_order_t* var_order) {
+  return &var_order->list;
+}

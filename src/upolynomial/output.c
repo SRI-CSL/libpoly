@@ -20,7 +20,7 @@ int umonomial_print(const ulp_monomial_t* m, FILE* out) {
   len += integer_print(&m->coefficient, out);
   if (m->degree) {
     if (m->degree == 1) {
-      len += fprintf(out, "*x");
+      len += fprintf(out, "*%s", get_upolynomial_var_symbol());
     } else {
       len += fprintf(out, "*x%s%zu", get_power_symbol(), m->degree);
     }
@@ -47,6 +47,7 @@ int upolynomial_dense_print(const upolynomial_dense_t* p_d, FILE* file) {
 
 int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
   assert(p);
+
   int len = 0;
   unsigned i;
   for (i = 0; i < p->size; ++ i) {
@@ -55,9 +56,11 @@ int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
     }
     len += umonomial_print(&p->monomials[p->size-i-1], out);
   }
-  len += fprintf(out, " [");
-  len += lp_int_ring_print(p->K, out);
-  len += fprintf(out, "]");
+  if (p->K) {
+    len += fprintf(out, " [");
+    len += lp_int_ring_print(p->K, out);
+    len += fprintf(out, "]");
+  }
   return len;
 }
 

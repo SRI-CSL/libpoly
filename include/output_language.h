@@ -14,6 +14,8 @@ enum lp_output_language_enum {
   LP_OUTPUT_SMT2,
   /** Output in Python format, i.e. x**2 - 1 */
   LP_OUTPUT_PYTHON,
+  /** Output in Mathematica format */
+  LP_OUTPUT_MATHEMATICA
 };
 
 typedef enum lp_output_language_enum lp_output_language_t;

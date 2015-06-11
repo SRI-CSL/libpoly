@@ -36,3 +36,7 @@ void lp_stats_print(FILE* file) {
 void lp_set_output_language(lp_output_language_t lang) {
   set_output_language(lang);
 }
+
+void lp_set_upolynomial_var_symbol(const char* x) {
+  set_upolynomial_var_symbol(x);
+}

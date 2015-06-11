@@ -36,7 +36,7 @@ int lp_sign_condition_print(lp_sign_condition_t sgn_condition, FILE* out) {
     ret += fprintf(out, "<= 0");
     break;
   case LP_SGN_EQ_0:
-    ret += fprintf(out, "= 0");
+    ret += fprintf(out, "== 0");
     break;
   case LP_SGN_NE_0:
     ret += fprintf(out, "!= 0");
