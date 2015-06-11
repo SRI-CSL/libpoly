@@ -158,6 +158,17 @@ lp_variable_t lp_polynomial_top_variable(const lp_polynomial_t* A) {
   return coefficient_top_variable(&A->data);
 }
 
+int lp_polynomial_lc_is_constant(const lp_polynomial_t* A) {
+  lp_polynomial_external_clean(A);
+  return coefficient_lc(&A->data)->type == COEFFICIENT_NUMERIC;
+}
+
+int lp_polynomial_lc_sgn(const lp_polynomial_t* A) {
+  lp_polynomial_external_clean(A);
+  return coefficient_lc_sgn(A->ctx, &A->data);
+}
+
+
 size_t lp_polynomial_degree(const lp_polynomial_t* A) {
   lp_polynomial_external_clean(A);
   return coefficient_degree(&A->data);

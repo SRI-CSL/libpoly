@@ -75,6 +75,12 @@ size_t lp_polynomial_degree(const lp_polynomial_t* A);
 /** Returns the top variable of the polynomial */
 lp_variable_t lp_polynomial_top_variable(const lp_polynomial_t* A);
 
+/** Returns 1 if the leading coefficient is constant */
+int lp_polynomial_lc_is_constant(const lp_polynomial_t* A);
+
+/** In case lc is constant, this returns the sign */
+int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
+
 /** Get the context of the given polynomial */
 const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
 
