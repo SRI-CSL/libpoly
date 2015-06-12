@@ -120,7 +120,7 @@ void lp_variable_list_order(lp_variable_list_t* list, const lp_variable_order_t*
   for (i = 0, to_keep = 0; i < list->list_size; ++ i) {
     lp_variable_t x = list->list[i];
     if (x != lp_variable_null) {
-      to_keep ++;
+      list->list[to_keep ++] = x;
     }
   }
   list->list_size = to_keep;
