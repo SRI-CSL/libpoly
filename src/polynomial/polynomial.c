@@ -887,6 +887,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   }
 
   if (trace_is_enabled("polynomial::expensive")) {
+    tracef("Root isolation\n");
     tracef("A = "); lp_polynomial_print(A, trace_out); tracef("\n");
     tracef("var = %s\n", lp_variable_db_get_name(A->ctx->var_db, lp_polynomial_top_variable(A)));
     lp_assignment_print(M, trace_out); tracef("\n");

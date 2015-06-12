@@ -76,8 +76,14 @@ void lp_value_delete(lp_value_t* v);
 /** Assign */
 void lp_value_assign(lp_value_t* v, const lp_value_t* from);
 
+/** Assign 0 */
+void lp_value_assign_zero(lp_value_t* v);
+
 /** Assign a to value */
 void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data);
+
+/** Swap two values */
+void lp_value_swap(lp_value_t* v1, lp_value_t* v2);
 
 /** Get the approximate value */
 void lp_value_approximate(const lp_value_t* v, lp_rational_interval_t* approx);
