@@ -24,33 +24,30 @@ def check_roots(p, assignment, roots, expected_roots):
         print "expected_roots =", expected_roots
     polypy_test.check(ok)
 
-polypy.trace_enable("polynomial")
-polypy.trace_enable("polynomial::expensive")
+# polypy.trace_enable("polynomial")
+# polypy.trace_enable("polynomial::expensive")
 # polypy.trace_enable("factorization")
 # polypy.trace_enable("algebraic_number")
-polypy.trace_enable("coefficient")
-polypy.trace_enable("coefficient::sgn")
-polypy.trace_enable("coefficient::roots")
-polypy.trace_enable("roots")
+# polypy.trace_enable("coefficient")
+# polypy.trace_enable("coefficient::sgn")
+# polypy.trace_enable("coefficient::roots")
+# polypy.trace_enable("roots")
  
   
 [x, y, z, w] = [polypy.Variable(name) for name in ['x', 'y', 'z', 'w']]
 
-polypy_test.start("Polynomial Root Isolation: Speed")
-
-polypy.variable_order.set([y, x])
-
-y_value_poly = 8192*x**6 + (-14336*x**5) + 75376*x**4 + (-32736*x**3) + 109496*x**2 + 133752*x + (-32441)
-y_value = polypy.AlgebraicNumber(y_value_poly, 1)
-
-assignment = polypy.Assignment()
-assignment.set_value(y, y_value)
-
-p = (1*y**2 + 3)*x**6 + (4*y**2 + 24*y + 20)*x**5 + (36*y**2 + 112*y + 44)*x**4 + (8*y**3 + 114*y**2 + 144*y + 30)*x**3 + (1*y**4 + 24*y**3 + 142*y**2 + 40*y - 15)*x**2 + (2*y**4 + 40*y**3 + 64*y**2 - 32*y - 26)*x + (5*y**4 + 16*y**3 + 7*y**2 - 16*y - 8)
-roots = p.roots_isolate(assignment)
-
-import sys
-sys.exit()
+# polypy_test.start("Polynomial Root Isolation: Speed")
+# 
+# polypy.variable_order.set([y, x])
+# 
+# y_value_poly = 8192*x**6 + (-14336*x**5) + 75376*x**4 + (-32736*x**3) + 109496*x**2 + 133752*x + (-32441)
+# y_value = polypy.AlgebraicNumber(y_value_poly, 1)
+# 
+# assignment = polypy.Assignment()
+# assignment.set_value(y, y_value)
+# 
+# p = (1*y**2 + 3)*x**6 + (4*y**2 + 24*y + 20)*x**5 + (36*y**2 + 112*y + 44)*x**4 + (8*y**3 + 114*y**2 + 144*y + 30)*x**3 + (1*y**4 + 24*y**3 + 142*y**2 + 40*y - 15)*x**2 + (2*y**4 + 40*y**3 + 64*y**2 - 32*y - 26)*x + (5*y**4 + 16*y**3 + 7*y**2 - 16*y - 8)
+# roots = p.roots_isolate(assignment)
 
 polypy_test.start("Polynomial Root Isolation: Bugs");
 
