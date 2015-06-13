@@ -295,3 +295,5 @@ typedef void (*lp_polynomial_traverse_f) (const lp_polynomial_context_t* ctx, lp
  */
 void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f, void* data);
 
+/** Check the intergrity of the polynomial */
+int lp_polynomial_check_integrity(const lp_polynomial_t* A);

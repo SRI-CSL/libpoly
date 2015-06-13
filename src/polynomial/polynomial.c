@@ -237,11 +237,10 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
       break;
     }
   }
-  if (i < vars.list_size) {
-    return 0;
-  }
+
+  int result = (i == vars.list_size);
   lp_variable_list_destruct(&vars);
-  return 1;
+  return result;
 }
 
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
@@ -255,18 +254,9 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
 
-  // Check that all variables are assigned
-  lp_variable_list_t A_vars;
-  lp_variable_list_construct(&A_vars);
-  coefficient_get_variables(&A->data, &A_vars);
-  size_t i;
-  for (i = 0; i < A_vars.list_size; ++ i) {
-    lp_variable_t x = A_vars.list[i];
-    if (lp_assignment_get_value(m, x)->type == LP_VALUE_NONE) {
-      return -2;
-    }
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, m, lp_variable_null);
   }
-  lp_variable_list_destruct(&A_vars);
 
   return coefficient_sgn(A->ctx, &A->data, m);
 }
@@ -274,18 +264,9 @@ int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
 
-  // Check that all variables are assigned
-  lp_variable_list_t A_vars;
-  lp_variable_list_construct(&A_vars);
-  coefficient_get_variables(&A->data, &A_vars);
-  size_t i;
-  for (i = 0; i < A_vars.list_size; ++ i) {
-    lp_variable_t x = A_vars.list[i];
-    if (lp_assignment_get_value(m, x)->type == LP_VALUE_NONE) {
-      return 0;
-    }
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, m, lp_variable_null);
   }
-  lp_variable_list_destruct(&A_vars);
 
   return coefficient_evaluate(A->ctx, &A->data, m);
 }
@@ -1418,7 +1399,6 @@ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_conditio
 
 int lp_polynomial_root_constraint_evaluate(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, const lp_assignment_t* M) {
 
-
   int eval;
 
   lp_polynomial_external_clean(A);
@@ -1453,4 +1433,14 @@ int lp_polynomial_root_constraint_evaluate(const lp_polynomial_t* A, size_t root
   free(roots);
 
   return eval;
+}
+
+int lp_polynomial_check_integrity(const lp_polynomial_t* A) {
+  switch (A->data.type) {
+  case COEFFICIENT_NUMERIC:
+  case COEFFICIENT_POLYNOMIAL:
+    return 1;
+  default:
+    return 0;
+  }
 }
