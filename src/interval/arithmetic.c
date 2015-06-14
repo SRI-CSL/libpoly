@@ -55,7 +55,6 @@ void rational_interval_add(lp_rational_interval_t* S, const lp_rational_interval
     rational_add(&result.b, &result.b, &I1->a);
   } else {
     // [a, b] + [c, d] = [a + c, b + d]
-    lp_rational_interval_t result;
     rational_construct(&result.a);
     rational_construct(&result.b);
     rational_add(&result.a, &I1->a, &I2->a);
