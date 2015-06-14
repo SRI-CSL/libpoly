@@ -157,7 +157,7 @@ int dyadic_rational_cmp(const lp_dyadic_rational_t* q1, const lp_dyadic_rational
   }
 }
 
-static
+static inline
 int dyadic_rational_cmp_integer(const lp_dyadic_rational_t* q1, const lp_integer_t* q2) {
   lp_dyadic_rational_t q2_dy_rat;
   dyadic_rational_construct_from_integer(&q2_dy_rat, q2);
