@@ -114,6 +114,9 @@ int lp_feasibility_set_is_full(const lp_feasibility_set_t* set) {
       lp_interval_get_upper_bound(set->intervals)->type == LP_VALUE_PLUS_INFINITY;
 }
 
+int lp_feasibility_set_is_point(const lp_feasibility_set_t* set) {
+  return set->size == 1 && set->intervals->is_point;
+}
 
 int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   int ret = 0;

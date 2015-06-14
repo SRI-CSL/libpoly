@@ -68,6 +68,11 @@ int lp_feasibility_set_is_empty(const lp_feasibility_set_t* set);
 int lp_feasibility_set_is_full(const lp_feasibility_set_t* set);
 
 /**
+ * Check if the set is a point {a}.
+ */
+int lp_feasibility_set_is_point(const lp_feasibility_set_t* set);
+
+/**
  * Check if the given value belongs to the set.
  */
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value);
