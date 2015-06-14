@@ -15,7 +15,7 @@
  * An interval (a, b) with both points rationals. The side is open if
  * the _open is true.
  */
-typedef struct lp_rational_interval_struct {
+struct lp_rational_interval_struct {
   /** Is the end at the point a open */
   size_t a_open : 1;
   /** Is the end at the point b open */
@@ -26,7 +26,7 @@ typedef struct lp_rational_interval_struct {
   lp_rational_t a;
   /** The right end */
   lp_rational_t b;
-} lp_rational_interval_t;
+};
 
 /** Construct the interval (a, b) */
 void lp_rational_interval_construct(lp_rational_interval_t* I, const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open);

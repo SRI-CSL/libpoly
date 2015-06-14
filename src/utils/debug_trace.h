@@ -46,6 +46,6 @@ int trace_is_enabled(const char* tag) {
   return 0;
 }
 
-#define TRACE(tag, fmt, ...)
+#define TRACE(tag, ...)
 #define TRACE_CMD(tag, cmd)
 #endif
