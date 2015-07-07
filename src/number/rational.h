@@ -78,6 +78,7 @@ int rational_print(const lp_rational_t* c, FILE* out) {
   return mpq_out_str(out, 10, c);
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 static inline
 char* rational_to_string(const lp_rational_t* q) {
   char* str = 0;
@@ -87,6 +88,7 @@ char* rational_to_string(const lp_rational_t* q) {
   fclose(f);
   return str;
 }
+#endif
 
 static inline
 double rational_to_double(const lp_rational_t* q) {

@@ -132,6 +132,7 @@ int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   return ret;
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
   char* str = 0;
   size_t size = 0;
@@ -140,6 +141,7 @@ char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
   fclose(f);
   return str;
 }
+#endif
 
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value) {
   // TODO: binary search

@@ -316,10 +316,12 @@ int lp_polynomial_print(const lp_polynomial_t* A, FILE* out) {
   return coefficient_print(A->ctx, &A->data, out);
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_polynomial_to_string(const lp_polynomial_t* A) {
   lp_polynomial_external_clean(A);
   return coefficient_to_string(A->ctx, &A->data);
 }
+#endif
 
 void lp_polynomial_add(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
 

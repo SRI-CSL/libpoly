@@ -300,7 +300,7 @@ void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C
 }
 
 const coefficient_t* coefficient_lc_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_variable_t x) {
-  __unused(ctx);
+  __var_unused(ctx);
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return C;
@@ -447,7 +447,7 @@ size_t coefficient_degree_m(const lp_polynomial_context_t* ctx, const coefficien
 }
 
 size_t coefficient_degree_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_variable_t x) {
-  __unused(ctx);
+  __var_unused(ctx);
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return 0;
@@ -503,7 +503,7 @@ static const coefficient_t* get_zero() {
 }
 
 const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, size_t d, lp_variable_t x) {
-  __unused(ctx);
+  __var_unused(ctx);
 
   if (d > coefficient_degree_safe(ctx, C, x)) {
     return get_zero();

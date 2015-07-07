@@ -481,6 +481,7 @@ void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
   }
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_value_to_string(const lp_value_t* v) {
   char* str = 0;
   size_t size = 0;
@@ -489,6 +490,7 @@ char* lp_value_to_string(const lp_value_t* v) {
   fclose(f);
   return str;
 }
+#endif
 
 
 

@@ -15,7 +15,8 @@
 #include <stdlib.h>
 #include <printf.h>
 
-#define __unused(x) ((void)x)
+
+#define __var_unused(x) ((void)x)
 
 static inline
 int integer_in_ring(lp_int_ring_t* K, const lp_integer_t* c) {
@@ -125,6 +126,7 @@ int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out) {
   return len;
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L 
 static inline
 char* integer_to_string(const lp_integer_t* c) {
   char* str = 0;
@@ -134,6 +136,7 @@ char* integer_to_string(const lp_integer_t* c) {
   fclose(f);
   return str;
 }
+#endif
 
 
 static inline
@@ -286,7 +289,7 @@ void integer_inv(lp_int_ring_t* K, lp_integer_t* inv, const lp_integer_t* a) {
   assert(integer_in_ring(K, a));
   int result = mpz_invert(inv, a, &K->M);
   assert(result);
-  __unused(result);
+  __var_unused(result);
   integer_ring_normalize(K, inv);
 }
 

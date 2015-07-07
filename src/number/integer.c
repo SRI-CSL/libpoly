@@ -80,6 +80,7 @@ int lp_int_ring_print(lp_int_ring_t* K, FILE* out) {
   return len;
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_int_ring_to_string(lp_int_ring_t* K) {
   char* str = 0;
   size_t size = 0;
@@ -88,6 +89,7 @@ char* lp_int_ring_to_string(lp_int_ring_t* K) {
   fclose(f);
   return str;
 }
+#endif
 
 lp_int_ring_t* lp_Z = 0;
 
@@ -135,9 +137,11 @@ int lp_integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out
   return integer_print_matrix(c, m, n, out);
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L 
 char* lp_integer_to_string(const lp_integer_t* c) {
   return integer_to_string(c);
 }
+#endif
 
 long lp_integer_to_int(const lp_integer_t* c) {
   return integer_to_int(c);

@@ -1027,6 +1027,7 @@ int lp_interval_size_approx(const lp_interval_t* I) {
   }
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_interval_to_string(const lp_interval_t* I) {
   char* str = 0;
   size_t size = 0;
@@ -1035,6 +1036,7 @@ char* lp_interval_to_string(const lp_interval_t* I) {
   fclose(f);
   return str;
 }
+#endif
 
 int lp_interval_cmp_lower_bounds(const lp_interval_t* I1, const lp_interval_t* I2) {
   const lp_value_t* I1_lb = lp_interval_get_lower_bound(I1);

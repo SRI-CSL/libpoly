@@ -50,9 +50,11 @@ int lp_dyadic_rational_print(const lp_dyadic_rational_t* c, FILE* out) {
 }
 
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_dyadic_rational_to_string(const lp_dyadic_rational_t* q) {
   return dyadic_rational_to_string(q);
 }
+#endif
 
 
 double lp_dyadic_rational_to_double(const lp_dyadic_rational_t* q) {

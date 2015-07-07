@@ -70,8 +70,8 @@ void lp_algebraic_number_swap(lp_algebraic_number_t* a, lp_algebraic_number_t* b
 
 static inline
 void lp_algebraic_number_reduce_polynomial(const lp_algebraic_number_t* a, const lp_upolynomial_t* f, int sgn_at_a, int sgn_at_b) {
-  __unused(sgn_at_a);
-  __unused(sgn_at_b);
+  __var_unused(sgn_at_a);
+  __var_unused(sgn_at_b);
   assert(a->f);
   assert(a->sgn_at_a * a->sgn_at_b < 0);
   assert(sgn_at_a * sgn_at_b < 0);
@@ -395,6 +395,7 @@ int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out) {
   }
 }
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a) {
   char* str = 0;
   size_t size = 0;
@@ -403,6 +404,7 @@ char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a) {
   fclose(f);
   return str;
 }
+#endif
 
 double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
 
@@ -622,7 +624,7 @@ void lp_algebraic_number_op(
 
 static
 void lp_algebraic_number_add_construct_op(coefficient_t* f_r, void* data) {
-  __unused(data);
+  __var_unused(data);
   const lp_polynomial_context_t* ctx = lp_algebraic_pctx();
 
   // Construct the polynomial z - (x + y)
@@ -641,7 +643,7 @@ void lp_algebraic_number_add_construct_op(coefficient_t* f_r, void* data) {
 
 static
 void lp_algebraic_number_add_interval_op(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2, void* data) {
-  __unused(data);
+  __var_unused(data);
   dyadic_interval_add(I, I1, I2);
 }
 
@@ -651,7 +653,7 @@ void lp_algebraic_number_add(lp_algebraic_number_t* sum, const lp_algebraic_numb
 }
 
 void lp_algebraic_number_sub_construct_op(coefficient_t* f_r, void* data) {
-  __unused(data);
+  __var_unused(data);
   const lp_polynomial_context_t* ctx = lp_algebraic_pctx();
 
   // Construct the polynomial z - (x - y)
@@ -669,7 +671,7 @@ void lp_algebraic_number_sub_construct_op(coefficient_t* f_r, void* data) {
 }
 
 void lp_algebraic_number_sub_interval_op(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2, void* data) {
-  __unused(data);
+  __var_unused(data);
   dyadic_interval_sub(I, I1, I2);
 }
 
@@ -697,7 +699,7 @@ void lp_algebraic_number_neg(lp_algebraic_number_t* neg, const lp_algebraic_numb
 }
 
 void lp_algebraic_number_mul_construct_op(coefficient_t* f_r, void* data) {
-  __unused(data);
+  __var_unused(data);
   const lp_polynomial_context_t* ctx = lp_algebraic_pctx();
 
   // Construct the polynomial z - (x*y)
@@ -714,7 +716,7 @@ void lp_algebraic_number_mul_construct_op(coefficient_t* f_r, void* data) {
 }
 
 void lp_algebraic_number_mul_interval_op(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2, void* data) {
-  __unused(data);
+  __var_unused(data);
   dyadic_interval_mul(I, I1, I2);
 }
 
@@ -741,7 +743,7 @@ void lp_algebraic_number_pow_construct_op(coefficient_t* f_r, void* data) {
 
 void lp_algebraic_number_pow_interval_op(lp_dyadic_interval_t* I, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2, void* data) {
   assert(I2 == 0);
-  __unused(I2);
+  __var_unused(I2);
   unsigned n = *((unsigned*) data);
   dyadic_interval_pow(I, I1, n);
 }
