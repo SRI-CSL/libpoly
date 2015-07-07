@@ -5,6 +5,10 @@ project(libpoly C)
 
 include(CheckFunctionExists)
 
+if(APPLE)
+  set(CMAKE_MACOSX_RPATH ON)
+endif()
+
 check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
 
 # Configure the library source
