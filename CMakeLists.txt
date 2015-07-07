@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 2.6)
 
-
 project(libpoly C)
 
-include(CheckFunctionExists)
-
 if(APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
+ # This is the simplest setting that seems to currently work on the mac.
+ # 
+ set(CMAKE_MACOSX_RPATH OFF)
+ set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
+
+include(CheckFunctionExists)
 
 check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
 
