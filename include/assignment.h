@@ -36,8 +36,10 @@ void lp_assignment_delete(lp_assignment_t* m);
 /** Print the model */
 int lp_assignment_print(const lp_assignment_t* m, FILE* out);
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 /** Get the string representation of the model */
 char* lp_assignment_to_string(const lp_assignment_t* m);
+#endif
 
 /**
  * Set the value of a variable (value is copied over). If value is 0 (pointer)

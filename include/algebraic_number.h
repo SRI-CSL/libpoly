@@ -64,8 +64,10 @@ int lp_algebraic_number_cmp_void(const void* a1, const void* a2);
 /** Print the number */
 int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out);
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 /** Return a string representation of the number */
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a);
+#endif
 
 /** Convert to double */
 double lp_algebraic_number_to_double(const lp_algebraic_number_t* a);

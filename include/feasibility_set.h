@@ -112,7 +112,9 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
  */
 int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out);
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 /**
  * Return the string representation of the set.
  */
 char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set);
+#endif

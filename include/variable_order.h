@@ -53,8 +53,10 @@ lp_variable_t lp_variable_order_top(const lp_variable_order_t* var_order);
 /** Print the list of variables */
 int lp_variable_order_print(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db, FILE* out);
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 /** Return a string representation of the order */
 char* lp_variable_order_to_string(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db);
+#endif
 
 /** Return the variable list */
 const lp_variable_list_t* lp_variable_order_get_list(const lp_variable_order_t* var_order);

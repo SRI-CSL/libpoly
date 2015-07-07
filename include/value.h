@@ -100,8 +100,10 @@ int lp_value_cmp_rational(const lp_value_t* v, const lp_rational_t* q);
 /** Print the value */
 int lp_value_print(const lp_value_t* v, FILE* out);
 
+#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
 /** Return a string representation */
 char* lp_value_to_string(const lp_value_t* v);
+#endif
 
 /**
  * Check if the value is a rational number: either an integer, dyadic rational,
