@@ -57,3 +57,15 @@ add_library(poly SHARED ${poly_SOURCES})
 target_link_libraries(poly ${GMP_LIBRARY})
 
 install(TARGETS poly LIBRARY DESTINATION lib)
+
+# BD: attempt to also build libpoly.a
+add_library(static_poly STATIC ${poly_SOURCES})
+set_target_properties(static_poly PROPERTIES OUTPUT_NAME poly)
+install(TARGETS static_poly ARCHIVE DESTINATION lib)
+
+# A variant of libpoly.a that's position indepdent
+add_library(static_pic_poly STATIC ${poly_SOURCES})
+set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
+
+
+
