@@ -19,10 +19,7 @@
 
 #pragma once
 
-#define LIBPOLY_VERSION_MAJOR 0
-#define LIBPOLY_VERSION_MINOR 0
-#define LIBPOLY_VERSION_GIT 0
-
+#include "version.h"
 #include "output_language.h"
 
 #include <stdio.h>
