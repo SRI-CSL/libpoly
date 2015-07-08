@@ -1,8 +1,20 @@
-/*
- * interval.h
+/**
+ * Copyright 2015, SRI International.
  *
- *  Created on: Jan 25, 2014
- *      Author: dejan
+ * This file is part of LibPoly.
+ *
+ * LibPoly is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LibPoly is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -137,4 +149,3 @@ lp_interval_cmp_t lp_interval_cmp(const lp_interval_t* I1, const lp_interval_t* 
  * Compares the two intervals and assigns the intersect (if any).
  */
 lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const lp_interval_t* I2, lp_interval_t* P);
-

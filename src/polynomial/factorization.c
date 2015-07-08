@@ -1,8 +1,20 @@
-/*
- * factorization.c
+/**
+ * Copyright 2015, SRI International.
  *
- *  Created on: Mar 26, 2014
- *      Author: dejan
+ * This file is part of LibPoly.
+ *
+ * LibPoly is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LibPoly is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "polynomial/factorization.h"
@@ -263,5 +275,3 @@ void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const co
 
   }
 }
-
-

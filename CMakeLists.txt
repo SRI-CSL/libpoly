@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 
 project(libpoly C)
 
+set(LIBPOLY_VERSION_MAJOR 0)
+set(LIBPOLY_VERSION_MINOR 1)
+set(LIBPOLY_VERSION_PATCH 0)
+set(LIBPOLY_VERSION ${LIBPOLY_VERSION_MAJOR}.${LIBPOLY_VERSION_MINOR}.${LIBPOLY_VERSION_PATCH}) 
+
 if(APPLE)
  # This is the simplest setting that seems to currently work on the mac.
  # 
