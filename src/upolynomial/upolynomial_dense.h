@@ -1,8 +1,20 @@
-/*
- * upolynomial_buffer.h
+/**
+ * Copyright 2015, SRI International.
  *
- *  Created on: Nov 17, 2013
- *      Author: dejan
+ * This file is part of LibPoly.
+ *
+ * LibPoly is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * LibPoly is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -193,4 +205,3 @@ void upolynomial_dense_reduce_Z(const upolynomial_dense_t* p_d, const upolynomia
  */
 void upolynomial_dense_derivative(lp_int_ring_t* K, const upolynomial_dense_t* p_d,
     upolynomial_dense_t* p_d_prime);
-
