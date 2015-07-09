@@ -37,7 +37,7 @@ STAT_DECLARE(int, upolynomial, factor_distinct_degree)
 STAT_DECLARE(int, upolynomial, factor_berlekamp_square_free)
 
 /**
- * We are given a polynomial f and we will return it's square-free factorization
+ * We are given a polynomial f and we will return its square-free factorization
  *
  *  f = \prod_{k} f_k^k
  *
@@ -194,7 +194,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_u
 }
 
 /**
- * Make sure its primitive and then discharge.
+ * Make sure it's primitive and then discharge.
  */
 lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial_t* f) {
 
@@ -351,7 +351,6 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
   lp_upolynomial_delete(f_rest);
   lp_upolynomial_delete(x);
   lp_upolynomial_delete(x_pow);
-  lp_upolynomial_delete(tmp);
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_distinct_degree("); lp_upolynomial_print(f, trace_out); tracef(") = ");
