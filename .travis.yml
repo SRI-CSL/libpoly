@@ -1,0 +1,21 @@
+language: c
+
+compiler:
+  - clang
+  - gcc
+
+env:
+  matrix:
+    - CMAKE_BUILD_TYPE=Debug
+    - CMAKE_BUILD_TYPE=Release
+
+install:
+  - sudo apt-key update
+  - sudo apt-get update
+  - sudo apt-get install gcc cmake make libgmp-dev python2.7-dev
+
+script:
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
+  - make
+  - make check
