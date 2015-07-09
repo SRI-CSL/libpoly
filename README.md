@@ -10,7 +10,7 @@ features and the API might change rapidly.
 To compile on an Ubuntu machine you can install the prerequisites with  
 
 ```
-sudo apt-get install gcc cmake make libgmp-dev python2.7-dev 
+sudo apt-get install gcc cmake make libgmp-dev python2.7-dev apt-get python-sympy
 ```
 
 Python is used for testing the library purposes through the Python bindings 
