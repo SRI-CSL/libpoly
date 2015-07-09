@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SRI-CSL/libpoly.svg?branch=master)](https://travis-ci.org/SRI-CSL/libpoly)
+
 # LibPoly
 
 LibPoly is a C library for manipulating polynomials. The target applications 
