@@ -82,7 +82,7 @@ void lp_dyadic_rational_destruct(lp_dyadic_rational_t* q);
 int lp_dyadic_rational_print(const lp_dyadic_rational_t* c, FILE* out);
 
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /**
  * Returns the string representation of the number.
  */

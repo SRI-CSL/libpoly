@@ -112,7 +112,7 @@ int lp_value_cmp_rational(const lp_value_t* v, const lp_rational_t* q);
 /** Print the value */
 int lp_value_print(const lp_value_t* v, FILE* out);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /** Return a string representation */
 char* lp_value_to_string(const lp_value_t* v);
 #endif

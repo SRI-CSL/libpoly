@@ -45,6 +45,8 @@ check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
 
 if(HAVE_OPEN_MEMSTREAM)
 
+  add_definitions(-DHAVE_OPEN_MEMSTREAM)
+
   # Configure the python bindings	
   add_subdirectory(python)
 

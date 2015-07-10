@@ -159,7 +159,7 @@ int lp_polynomial_divides(const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 /** Prints the polynomial to the given stream. */
 int lp_polynomial_print(const lp_polynomial_t* A, FILE* out);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /** Returns the string representation of the polynomial. */
 char* lp_polynomial_to_string(const lp_polynomial_t* A);
 #endif

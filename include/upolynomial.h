@@ -100,7 +100,7 @@ void lp_upolynomial_unpack(const lp_upolynomial_t* p, lp_integer_t* out);
  */
 int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /**
  * Get a string representation of the polynomial (you own the memory).
  */

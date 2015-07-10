@@ -76,7 +76,7 @@ int lp_algebraic_number_cmp_void(const void* a1, const void* a2);
 /** Print the number */
 int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /** Return a string representation of the number */
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a);
 #endif

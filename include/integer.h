@@ -62,7 +62,7 @@ int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2);
 /** Print */
 int lp_int_ring_print(lp_int_ring_t* K, FILE* out);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /** Get the string representation */
 char* lp_int_ring_to_string(lp_int_ring_t* K);
 #endif
