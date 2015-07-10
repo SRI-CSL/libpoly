@@ -25,7 +25,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <printf.h>
 
 
 #define __var_unused(x) ((void)x)
