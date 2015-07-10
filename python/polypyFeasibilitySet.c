@@ -17,65 +17,65 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Interval.h"
-#include "Value.h"
+#include "polypyFeasibilitySet.h"
+#include "polypyValue.h"
 
 #include <structmember.h>
 
 static void
-Interval_dealloc(Interval* self);
+FeasibilitySet_dealloc(FeasibilitySet* self);
 
 static PyObject*
-Interval_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+FeasibilitySet_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 static int
-Interval_init(Interval* self, PyObject* args);
+FeasibilitySet_init(FeasibilitySet* self, PyObject* args);
 
 static PyObject*
-Interval_str(PyObject* self);
+FeasibilitySet_str(PyObject* self);
 
 static PyObject*
-Interval_pick_value(PyObject* self);
+FeasibilitySet_pick_value(PyObject* self);
 
 static PyObject*
-Interval_contains_value(PyObject* self, PyObject* args);
+FeasibilitySet_intersect(PyObject* self, PyObject* args);
 
-PyMethodDef Interval_methods[] = {
-    {"pick_value", (PyCFunction)Interval_pick_value, METH_NOARGS, "Returns a value from the interval."},
-    {"contains", (PyCFunction)Interval_contains_value, METH_VARARGS, "Returns true if the value is in the interval."},
+PyMethodDef FeasibilitySet_methods[] = {
+    {"pick_value", (PyCFunction)FeasibilitySet_pick_value, METH_NOARGS, "Returns a value from the interval."},
+    {"intersect", (PyCFunction)FeasibilitySet_intersect, METH_VARARGS, "Returns the intersection of the interval with another one."},
     {NULL}  /* Sentinel */
 };
 
-PyTypeObject IntervalType = {
+PyTypeObject FeasibilitySetType = {
     PyObject_HEAD_INIT(NULL)
     0,                          /*ob_size*/
-    "polypy.Interval",   /*tp_name*/
-    sizeof(Interval), /*tp_basicsize*/
+    "polypy.FeasibilitySet",   /*tp_name*/
+    sizeof(FeasibilitySet), /*tp_basicsize*/
     0,                          /*tp_itemsize*/
-    (destructor)Interval_dealloc, /*tp_dealloc*/
+    (destructor)FeasibilitySet_dealloc, /*tp_dealloc*/
     0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
     0                    ,      /*tp_compare*/
-    Interval_str,               /*tp_repr*/
+    FeasibilitySet_str,               /*tp_repr*/
     0,                          /*tp_as_number*/
     0,                          /*tp_as_sequence*/
     0,                          /*tp_as_mapping*/
     0,                          /*tp_hash */
     0,                          /*tp_call*/
-    Interval_str,            /*tp_str*/
+    FeasibilitySet_str,            /*tp_str*/
     0,                          /*tp_getattro*/
     0,                          /*tp_setattro*/
     0,                          /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "Interval objects", /* tp_doc */
+    "FeasibilitySet objects", /* tp_doc */
     0,                             /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    Interval_methods,       /* tp_methods */
+    FeasibilitySet_methods,       /* tp_methods */
     0,                         /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
@@ -83,86 +83,86 @@ PyTypeObject IntervalType = {
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    (initproc)Interval_init,/* tp_init */
+    (initproc)FeasibilitySet_init,/* tp_init */
     0,                         /* tp_alloc */
-    Interval_new,           /* tp_new */
+    FeasibilitySet_new,           /* tp_new */
 };
 
 static void
-Interval_dealloc(Interval* self)
+FeasibilitySet_dealloc(FeasibilitySet* self)
 {
-  lp_interval_destruct(&self->I);
+  lp_feasibility_set_delete(self->S);
   self->ob_type->tp_free((PyObject*)self);
 }
 
 PyObject*
-PyInterval_create(const lp_interval_t* I) {
-  Interval *self;
-  self = (Interval*)IntervalType.tp_alloc(&IntervalType, 0);
-  if (self != NULL && I) {
-    lp_interval_construct_copy(&self->I, I);
+PyFeasibilitySet_create(lp_feasibility_set_t* S) {
+  FeasibilitySet *self;
+  self = (FeasibilitySet*)FeasibilitySetType.tp_alloc(&FeasibilitySetType, 0);
+  if (self != NULL) {
+    self->S = S;
   }
   return (PyObject *)self;
 }
 
 static PyObject*
-Interval_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-  return PyInterval_create(0);
+FeasibilitySet_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+  return PyFeasibilitySet_create(0);
 }
 
 static int
-Interval_init(Interval* self, PyObject* args)
+FeasibilitySet_init(FeasibilitySet* self, PyObject* args)
 {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 0) {
     // Defaults to (-inf, +inf)
-    lp_interval_construct_full(&self->I);
+    self->S = lp_feasibility_set_new_full();
   } else {
     return -1;
   }
   return 0;
 }
 
-static PyObject* Interval_str(PyObject* self) {
-  Interval* I = (Interval*) self;
-  char* I_str = lp_interval_to_string(&I->I);
+static PyObject* FeasibilitySet_str(PyObject* self) {
+  FeasibilitySet* S = (FeasibilitySet*) self;
+  char* I_str = lp_feasibility_set_to_string(S->S);
   PyObject* str = PyString_FromString(I_str);
   free(I_str);
   return str;
 }
 
 static PyObject*
-Interval_pick_value(PyObject* self) {
-  Interval* I = (Interval*) self;
+FeasibilitySet_pick_value(PyObject* self) {
+  FeasibilitySet* S = (FeasibilitySet*) self;
   lp_value_t v;
   lp_value_construct_none(&v);
-  lp_interval_pick_value(&I->I, &v);
+  lp_feasibility_set_pick_value(S->S, &v);
   PyObject* result = PyValue_create(&v);
   lp_value_destruct(&v);
   return result;
 }
 
 static PyObject*
-Interval_contains_value(PyObject* self, PyObject* args) {
+FeasibilitySet_intersect(PyObject* self, PyObject* args) {
+  FeasibilitySet* S = (FeasibilitySet*) self;
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
-  PyObject* value_obj = PyTuple_GetItem(args, 0);
-
-  if (!PyValue_CHECK(value_obj)) {
+  PyObject* feasibility_set_obj = PyTuple_GetItem(args, 0);
+  if (!PyFeasibilitySet_CHECK(feasibility_set_obj)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
-  lp_interval_t* I = &((Interval*) self)->I;
-  lp_value_t* v = &((Value*) value_obj)->v;
+  // Get the arguments
+  lp_feasibility_set_t* S1 = ((FeasibilitySet*) self)->S;
+  lp_feasibility_set_t* S2 = ((FeasibilitySet*) feasibility_set_obj)->S;
 
-  int result = lp_interval_contains(I, v);
+  // The intersect
+  lp_feasibility_set_t* P = lp_feasibility_set_intersect(S1, S2);
+  PyObject* P_obj = PyFeasibilitySet_create(P);
 
-  PyObject* result_object = result ? Py_True : Py_False;
-  Py_INCREF(result_object);
-
-  return result_object;
+  return P_obj;
 }

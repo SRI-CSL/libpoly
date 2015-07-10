@@ -17,8 +17,8 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "VariableOrder.h"
-#include "Variable.h"
+#include "polypyVariableOrder.h"
+#include "polypyVariable.h"
 
 #include <structmember.h>
 #include <stdlib.h>

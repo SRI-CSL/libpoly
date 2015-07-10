@@ -17,7 +17,7 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Integer.h"
+#include "polypyInteger.h"
 
 #include <structmember.h>
 

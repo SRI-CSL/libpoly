@@ -17,16 +17,16 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Integer.h"
-#include "Variable.h"
-#include "VariableOrder.h"
-#include "UPolynomial.h"
-#include "AlgebraicNumber.h"
-#include "Polynomial.h"
-#include "Assignment.h"
-#include "Value.h"
-#include "Interval.h"
-#include "FeasibilitySet.h"
+#include "polypyInteger.h"
+#include "polypyVariable.h"
+#include "polypyVariableOrder.h"
+#include "polypyUPolynomial.h"
+#include "polypyAlgebraicNumber.h"
+#include "polypyPolynomial.h"
+#include "polypyAssignment.h"
+#include "polypyValue.h"
+#include "polypyInterval.h"
+#include "polypyFeasibilitySet.h"
 
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {

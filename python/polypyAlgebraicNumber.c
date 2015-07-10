@@ -17,9 +17,9 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AlgebraicNumber.h"
-#include "UPolynomial.h"
-#include "Polynomial.h"
+#include "polypyAlgebraicNumber.h"
+#include "polypyUPolynomial.h"
+#include "polypyPolynomial.h"
 
 #include <structmember.h>
 

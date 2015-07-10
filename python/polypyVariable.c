@@ -17,9 +17,9 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Variable.h"
-#include "Integer.h"
-#include "Polynomial.h"
+#include "polypyVariable.h"
+#include "polypyInteger.h"
+#include "polypyPolynomial.h"
 
 #include <structmember.h>
 

@@ -17,7 +17,7 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Value.h"
+#include "polypyValue.h"
 
 #include <structmember.h>
 

@@ -1,16 +1,16 @@
 set(polypy_SOURCES 
-    AlgebraicNumber.c
-    Assignment.c
-    Integer.c
-    Polynomial.c
+    polypyAlgebraicNumber.c
+    polypyAssignment.c
+    polypyInteger.c
+    polypyPolynomial.c
     polypy.c
-    UPolynomial.c
+    polypyUPolynomial.c
     utils.c
-    Variable.c
-    VariableOrder.c
-    Value.c
-    Interval.c
-    FeasibilitySet.c
+    polypyVariable.c
+    polypyVariableOrder.c
+    polypyValue.c
+    polypyInterval.c
+    polypyFeasibilitySet.c
 )
 
 find_package(PythonInterp)

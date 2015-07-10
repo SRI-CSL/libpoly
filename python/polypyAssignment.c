@@ -17,10 +17,10 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Assignment.h"
-#include "Variable.h"
+#include "polypyAssignment.h"
+#include "polypyVariable.h"
 #include "utils.h"
-#include "AlgebraicNumber.h"
+#include "polypyAlgebraicNumber.h"
 
 #include <structmember.h>
 
