@@ -17,7 +17,7 @@ To compile on an Ubuntu machine you can install the prerequisites with
 sudo apt-get install gcc cmake make libgmp-dev python2.7-dev python-sympy
 ```
 
-Python is used for testing the library purposes through the Python bindings 
+Python is used for testing the library through the Python bindings 
 (these are also useful for playing with the library). The Python bindings are 
 currently not supported for Macs or Windows machines.
 
