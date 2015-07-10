@@ -126,7 +126,7 @@ size_t lp_integer_bits(const lp_integer_t* c);
  */
 int lp_integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out);
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 /**
  * Returns the string representation of the integer.
  */
