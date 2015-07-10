@@ -66,10 +66,10 @@ install(TARGETS static_poly ARCHIVE DESTINATION lib)
 # another version that's build to be position-indenpedent code.
 # This allows the library to be embedded into something like libyices.so
 #
-# Linux and old versions of Darwin (and probably other systems) don't use fPIC by default.
-# We just check for Linux here.
+# Linux, FreeBSD, and old versions of Darwin (and probably other systems) don't use fPIC by default.
+# We just check for Linux and FreeBSD here.
 # 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
 endif()
