@@ -21,7 +21,7 @@
 #include "Variable.h"
 
 #include <structmember.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 /** Default variable database */
 static lp_variable_order_t* default_var_order = 0;
