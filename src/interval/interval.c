@@ -1039,7 +1039,7 @@ int lp_interval_size_approx(const lp_interval_t* I) {
   }
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* lp_interval_to_string(const lp_interval_t* I) {
   char* str = 0;
   size_t size = 0;

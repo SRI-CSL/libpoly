@@ -76,7 +76,7 @@ int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
   return len;
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* lp_upolynomial_to_string(const lp_upolynomial_t* p) {
   char* str = 0;
   size_t size = 0;

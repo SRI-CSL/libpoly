@@ -407,7 +407,7 @@ int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out) {
   }
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a) {
   char* str = 0;
   size_t size = 0;

@@ -160,7 +160,7 @@ int lp_variable_order_print(const lp_variable_order_t* var_order, const lp_varia
   return ret;
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* lp_variable_order_to_string(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db) {
   char* str = 0;
   size_t size = 0;

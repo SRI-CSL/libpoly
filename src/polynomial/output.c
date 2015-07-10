@@ -101,7 +101,7 @@ int coefficient_print(const lp_polynomial_context_t* ctx, const coefficient_t* C
   return ret;
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* coefficient_to_string(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   char* str = 0;
   size_t size = 0;

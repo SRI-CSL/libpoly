@@ -90,7 +90,7 @@ int rational_print(const lp_rational_t* c, FILE* out) {
   return mpq_out_str(out, 10, c);
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 static inline
 char* rational_to_string(const lp_rational_t* q) {
   char* str = 0;

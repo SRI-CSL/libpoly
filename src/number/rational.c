@@ -63,7 +63,7 @@ int lp_rational_print(const lp_rational_t* c, FILE* out) {
   return rational_print(c, out);
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* lp_rational_to_string(const lp_rational_t* q) {
   return rational_to_string(q);
 }

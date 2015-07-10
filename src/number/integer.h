@@ -138,7 +138,7 @@ int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out) {
   return len;
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 static inline
 char* integer_to_string(const lp_integer_t* c) {
   char* str = 0;

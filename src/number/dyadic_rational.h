@@ -111,7 +111,7 @@ int dyadic_rational_print(const lp_dyadic_rational_t* dq, FILE* out) {
   return ret;
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 static inline
 char* dyadic_rational_to_string(const lp_dyadic_rational_t* q) {
   char* str = 0;

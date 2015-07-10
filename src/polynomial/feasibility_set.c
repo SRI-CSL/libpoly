@@ -144,7 +144,7 @@ int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   return ret;
 }
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if HAVE_OPEN_MEMSTREAM
 char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
   char* str = 0;
   size_t size = 0;
