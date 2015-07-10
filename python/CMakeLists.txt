@@ -16,6 +16,7 @@ set(polypy_SOURCES
 find_package(PythonInterp)
 find_package(PythonLibs)
 
+include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
 include_directories(${PYTHON_INCLUDE_PATH})
 

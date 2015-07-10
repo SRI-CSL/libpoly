@@ -39,16 +39,6 @@ set(poly_SOURCES
 # Add warnings as errors for good practice
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra -std=gnu99")
 
-# Find the GMP number library
-find_path(GMP_INCLUDE_DIR gmp.h)
-find_library(GMP_LIBRARY gmp)
-if (GMP_INCLUDE_DIR AND GMP_LIBRARY)
-    message(STATUS "GMP headers: " ${GMP_INCLUDE_DIR})
-    message(STATUS "GMP library: " ${GMP_LIBRARY})
-else()
-    MESSAGE(FATAL_ERROR "Could not the GMP number library (sudo apt-get install libgmp-dev)")
-endif()
-
 include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
 include_directories(${libpoly_SOURCE_DIR}/src)
@@ -64,14 +54,23 @@ target_link_libraries(poly ${GMP_LIBRARY})
 
 install(TARGETS poly LIBRARY DESTINATION lib)
 
-# BD: attempt to also build libpoly.a
+#
+# BD: also build the archive libpoly.a
+#
 add_library(static_poly STATIC ${poly_SOURCES})
 set_target_properties(static_poly PROPERTIES OUTPUT_NAME poly)
 install(TARGETS static_poly ARCHIVE DESTINATION lib)
 
-# A variant of libpoly.a that's position indepdent
-add_library(static_pic_poly STATIC ${poly_SOURCES})
-set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
-
-
+#
+# If libpoly.a is not position independent, we may need
+# another version that's build to be position-indenpedent code.
+# This allows the library to be embedded into something like libyices.so
+#
+# Linux and old versions of Darwin (and probably other systems) don't use fPIC by default.
+# We just check for Linux here.
+# 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  add_library(static_pic_poly STATIC ${poly_SOURCES})
+  set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
+endif()
 

@@ -14,15 +14,34 @@ if(APPLE)
  set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-include(CheckFunctionExists)
+#
+# Search for GMP. We do this here since GMP_INCLUDE_DIR may be
+# required for building the python binding.
+#
+# Find the GMP number library
+find_path(GMP_INCLUDE_DIR gmp.h)
+find_library(GMP_LIBRARY gmp)
+if (GMP_INCLUDE_DIR AND GMP_LIBRARY)
+    message(STATUS "GMP headers: " ${GMP_INCLUDE_DIR})
+    message(STATUS "GMP library: " ${GMP_LIBRARY})
+else()
+    MESSAGE(FATAL_ERROR "Could not the GMP number library (sudo apt-get install libgmp-dev)")
+endif()
 
-check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
 
 # Configure the library source
 add_subdirectory(src)
 
 # Configure the headers
 add_subdirectory(include)
+
+
+#
+# The python binding requires open_memstream 
+#
+include(CheckFunctionExists)
+
+check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
 
 if(HAVE_OPEN_MEMSTREAM)
 
