@@ -52,7 +52,16 @@ set_target_properties(poly PROPERTIES
 
 target_link_libraries(poly ${GMP_LIBRARY})
 
-install(TARGETS poly LIBRARY DESTINATION lib)
+#
+# For windows and friends: the DLL goes into <install>/bin
+# and the lib goes into <install>/lib
+# cmake complains if the RUNTIME DESTINATION bin is missing
+#
+if (CYGWIN OR WIN32 OR MINGW)
+ install(TARGETS poly LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+else()
+ install(TARGETS poly LIBRARY DESTINATION)
+endif()
 
 #
 # BD: also build the archive libpoly.a
