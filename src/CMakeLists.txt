@@ -60,7 +60,7 @@ target_link_libraries(poly ${GMP_LIBRARY})
 if (CYGWIN OR WIN32 OR MINGW)
  install(TARGETS poly LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
 else()
- install(TARGETS poly LIBRARY DESTINATION)
+ install(TARGETS poly LIBRARY DESTINATION lib)
 endif()
 
 #
