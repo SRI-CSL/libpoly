@@ -38,6 +38,9 @@ set(poly_SOURCES
 
 # Add warnings as errors for good practice
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra -std=gnu99")
+if (WIN32)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format")
+endif()
 
 include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
