@@ -1,7 +1,0 @@
-#!/bin/bash
-rm -rf cov-int
-cd build;
-rm -rf *
-cmake .. 
-make clean
-cov-build --dir ../cov-int make
