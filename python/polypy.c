@@ -97,7 +97,6 @@ initpolypy(void)
   m = Py_InitModule3("polypy", polypy_methods, "PolyPy Libarary.");
 
   // Initialize the library
-  lp_init();
   lp_set_output_language(LP_OUTPUT_PYTHON);
 
   Py_INCREF(&CoefficientRingType);

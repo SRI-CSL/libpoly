@@ -23,12 +23,6 @@
 #include "utils/debug_trace.h"
 #include "utils/output.h"
 
-
-void lp_init(void) {
-  stats_construct();
-  trace_set_output(stderr);
-}
-
 void lp_trace_enable(const char* tag) {
   trace_enable(tag);
 }

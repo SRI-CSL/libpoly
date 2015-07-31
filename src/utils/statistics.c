@@ -30,7 +30,7 @@ typedef struct int_stats_struct {
   char* names[INITIAL_STATS];
 } int_stats_t;
 
-/** Integer statistics */
+/** Integer statistics (default init all to 0) */
 static int_stats_t int_stats;
 
 int* stats_register_int(const char* name) {
@@ -47,10 +47,7 @@ void stats_print(FILE* out) {
   }
 }
 
-void stats_construct(void) {
-  int_stats.count = 0;
-}
-
+__attribute__ (( __destructor__ ))
 void stats_destruct(void) {
   size_t i;
   for (i = 0;i < int_stats.count; ++ i) {

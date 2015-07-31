@@ -21,8 +21,10 @@
 
 #include <stdio.h>
 
-/** Where the output goes (defaults to */
-extern FILE* trace_out;
+/** Where the output goes (defaults to stderr). Use the macro below */
+extern FILE* trace_out_real;
+
+#define trace_out (trace_out_real ? trace_out_real : stderr)
 
 /** Print to the debug trace printf style */
 #define tracef(...) fprintf(trace_out, __VA_ARGS__);

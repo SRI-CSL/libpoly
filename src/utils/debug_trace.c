@@ -58,8 +58,8 @@ void trace_disable(const char* tag) {
 #endif
 }
 
-FILE* trace_out = 0;
+FILE* trace_out_real = 0;
 
 void trace_set_output(FILE* file) {
-  trace_out = file;
+  trace_out_real = file;
 }

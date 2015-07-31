@@ -63,12 +63,6 @@ typedef struct lp_interval_struct lp_interval_t;
 typedef struct lp_feasibility_set_struct lp_feasibility_set_t;
 typedef struct lp_polynomial_hash_set_struct lp_polynomial_hash_set_t;
 
-/**
- * Function to initialize the library (statistics, logging). Should be called
- * before any other function.
- */
-void lp_init();
-
 /** Enable a given tag for tracing */
 void lp_trace_enable(const char* tag);
 

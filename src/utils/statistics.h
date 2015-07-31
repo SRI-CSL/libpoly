@@ -27,12 +27,6 @@ int* stats_register_int(const char* name);
 /** Print the statistics to the given file */
 void stats_print(FILE* out);
 
-/** Construct statistics (DO NOT CALL) */
-void stats_construct(void);
-
-/** Destruct statistics (DO NOT CALL) */
-void stats_destruct(void);
-
 // names and output
 #define STAT_NAME(module, name) __stat_ ## module ## _ ## name
 #define STAT_INIT_NAME(module, name) __stat_ ## module ## _ ## name ## __init
@@ -47,7 +41,7 @@ void stats_destruct(void);
 #define STAT_DECLARE(type, module, name)      \
   type* STAT_NAME(module, name);              \
                                               \
-  __attribute__ (( __constructor__ (102) ))   \
+  __attribute__ (( __constructor__ ))   \
   void STAT_INIT_NAME(module, name) (void) {  \
     STAT_NAME(module, name) = stats_register_ ## type(STAT_OUT(module, name)); \
   }
