@@ -1,2 +1,3 @@
 #!/bin/bash
-brew install cmake gmp
+brew outdated cmake || brew upgrade cmake
+brew outdated gmp || brew upgrade gmp
