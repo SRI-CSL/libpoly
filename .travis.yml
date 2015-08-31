@@ -24,4 +24,4 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
   - make
-  - make check
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; make check; fi
