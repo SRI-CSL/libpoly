@@ -1,5 +1,9 @@
 language: c
 
+os:
+  - linux
+  - osx
+
 compiler:
   - clang
   - gcc
@@ -9,10 +13,12 @@ env:
     - CMAKE_BUILD_TYPE=Debug
     - CMAKE_BUILD_TYPE=Release
 
+before_install:
+   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-key update; sudo apt-get update; fi
+   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
 install:
-  - sudo apt-key update
-  - sudo apt-get update
-  - sudo apt-get install gcc cmake make libgmp-dev python2.7-dev python-sympy
+   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/ubuntu.deps.sh; fi
+   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./scripts/osx.deps.sh; fi
 
 script:
   - cd build
