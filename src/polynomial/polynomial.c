@@ -43,7 +43,14 @@
 
 static
 void check_polynomial_assignment(const lp_polynomial_t* A, const lp_assignment_t* M, lp_variable_t x) {
-  assert(A->data.type == COEFFICIENT_NUMERIC || VAR(&A->data) == x);
+
+  // Given variable must be top
+  if (A->data.type != COEFFICIENT_NUMERIC && x != lp_variable_null && VAR(&A->data) != x) {
+    fprintf(stderr, "M = "); lp_assignment_print(M, stderr); fprintf(stderr, "\n");
+    fprintf(stderr, "A = "); lp_polynomial_print(A, stderr); fprintf(stderr, "\n");
+    assert(0);
+  }
+
   lp_variable_list_t vars;
   lp_variable_list_construct(&vars);
   lp_polynomial_get_variables(A, &vars);

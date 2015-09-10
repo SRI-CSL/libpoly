@@ -418,7 +418,7 @@ void integer_lcm_Z(lp_integer_t* lcm, const lp_integer_t* a, const lp_integer_t*
   mpz_lcm(lcm, a, b);
 }
 
-/** Returns the log2 approximantion of |a|, i.e. a k such that 2^k < |a| <= 2^k. */
+/** Returns the log2 approximation of |a|, i.e. a k such that 2^k < |a| <= 2^k. */
 static inline
 unsigned integer_log2_abs(lp_integer_t* a) {
   return mpz_sizeinbase(a, 2) - 1;

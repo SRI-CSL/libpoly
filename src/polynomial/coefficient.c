@@ -626,9 +626,9 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
 
 /**
  * C is an univariate polynomial C(x), we compute a bound L = 1/2^k such that
- * any root of C(x) that is not zero is outsize of [L, -L].
+ * any root of C(x) that is not zero is outside of [L, -L].
  *
- * If C(x) = c_n x^n + ... + c_1 x + c_0 then the lower bound of on roots is an
+ * If C(x) = c_n x^n + ... + c_1 x + c_0 then the lower bound L on roots is an
  * upper bound 1/L on roots of C(1/x) = c_n + ... + c0 x^n.
  *
  * We compute the upper bound using the Cauchy bound
@@ -650,7 +650,7 @@ unsigned coefficient_root_lower_bound(const coefficient_t* C) {
     assert(i < SIZE(C));
   }
 
-  // First one (modulo the intial zeroes
+  // First one (modulo the initial zeroes
   unsigned log_c0 = integer_log2_abs(&COEFF(C, i)->value.num);
 
   // Get thge max log
@@ -666,7 +666,7 @@ unsigned coefficient_root_lower_bound(const coefficient_t* C) {
   }
 
   // Return the bound
-  return max_log - log_c0;
+  return max_log - log_c0 + 1;
 }
 
 STAT_DECLARE(int, coefficient, sgn)
@@ -755,8 +755,8 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         //
         // has a as at least one zero.
         //
-        // We can estimate the bound L on the smallest root of B, and refine the
-        // evaluation interval until it is either in (-L, L), in which case
+        // We can estimate the bound L on the smallest *non-zero* root of B, and
+        // refine the evaluation interval until it is either in (-L, L), in which case
         // it must be 0, or until it doesn't contain 0, in which case we get
         // the sign.
         //
