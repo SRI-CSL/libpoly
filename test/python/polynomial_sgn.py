@@ -123,7 +123,7 @@ assignment.set_value(z, -1)
 # print assignment
 
 p = (y+z)*x**3
-check_sgn(p, assignment, 2)
+check_sgn(p, assignment, 1)
 
 p = (y-z)*x**2
 check_sgn(p, assignment, 0)
@@ -132,4 +132,21 @@ p = y*x
 check_sgn(p, assignment, 1)
 
 p = (y+z)*x**3 + (y-z)*x**2 + y*x + z
-check_sgn(p, assignment, 2)
+check_sgn(p, assignment, 1)
+
+# regressions
+
+p = (128*y**2)*x + ((-256*z)*y - 2)
+
+x_value = polypy.AlgebraicNumber(1*x**2 + (-139338*x) + (-1253799), 0) 
+y_value = polypy.AlgebraicNumber(576*x**2 + (-2112*x) + 1, 0)
+z_value = polypy.AlgebraicNumber(64*x**2 + (-17415), 0)
+
+assignment.set_value(x, x_value);
+assignment.set_value(y, y_value);
+assignment.set_value(z, z_value);
+
+check_sgn(p, assignment, -1)
+
+
+
