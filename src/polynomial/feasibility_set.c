@@ -165,38 +165,54 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
   return 0;
 }
 
+// We get smallest integer < rational < algebraic
+// If same we get one with largest interval size
+static inline
+int same_or_better_complexity(const lp_value_t* v1, int v1_interval_size, const lp_value_t* v2, int v2_interval_size) {
+
+  // See if any is integer
+  int v1_is_int = lp_value_is_integer(v1);
+  int v2_is_int = lp_value_is_integer(v2);
+  if (v1_is_int && !v2_is_int) {
+    return 1;
+  }
+  if (v2_is_int && !v1_is_int) {
+    return 0;
+  }
+
+  // See if any is rational
+  int v1_is_rational = lp_value_is_rational(v1);
+  int v2_is_rational = lp_value_is_rational(v2);
+  if (v1_is_rational && !v2_is_rational) {
+    return 1;
+  }
+  if (v2_is_rational && !v1_is_rational) {
+    return 0;
+  }
+
+  // Same type, compare the intervals
+  return v1_interval_size <= v2_interval_size;
+}
+
 void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* value) {
   size_t i;
 
   assert(!lp_feasibility_set_is_empty(set));
 
-  int max_size = INT_MIN;
-  size_t max_i = 0;
+  lp_interval_pick_value(set->intervals, value);
+  int value_interval_size = lp_interval_size_approx(set->intervals);
 
-  for (i = 0; i < set->size; ++ i) {
-    int current_size = lp_interval_size_approx(set->intervals + i);
-    if (current_size > max_size) {
-      max_size = current_size;
-      max_i = i;
+  lp_value_t current;
+  lp_value_construct_none(&current);
+  for (i = 1; i < set->size; ++ i) {
+    int current_interval_size = lp_interval_size_approx(set->intervals);
+    lp_interval_pick_value(set->intervals + i, value);
+    if (!same_or_better_complexity(value, value_interval_size, &current, current_interval_size)) {
+      lp_value_swap(value, &current);
+      value_interval_size = current_interval_size;
     }
   }
-
-  if (max_size > INT_MIN) {
-    // Found an interval, pick value
-    lp_interval_pick_value(set->intervals + max_i, value);
-  } else {
-    lp_value_type_t min = LP_VALUE_MINUS_INFINITY;
-    size_t min_i = 0;
-    // All points, find a simple value
-    for (i = 0; i < set->size; ++ i) {
-      const lp_value_t* point = lp_interval_get_point(set->intervals + i);
-      if (point->type < min) {
-        min = point->type;
-        min_i = i;
-      }
-    }
-    lp_value_assign(value, lp_interval_get_point(set->intervals + min_i));
-  }
+  lp_value_destruct(&current);
 }
 
 lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2) {

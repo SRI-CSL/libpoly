@@ -90,7 +90,8 @@ int lp_feasibility_set_is_point(const lp_feasibility_set_t* set);
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value);
 
 /**
- * Pick a value from the feasible set (must be non-empty).
+ * Pick a value from the feasible set (must be non-empty). If an integer value
+ * is available it will be picked.
  */
 void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* v);
 
