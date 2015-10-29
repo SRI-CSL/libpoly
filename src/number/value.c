@@ -352,7 +352,7 @@ int lp_value_is_rational(const lp_value_t* v) {
   case LP_VALUE_RATIONAL:
     return 1;
   case LP_VALUE_ALGEBRAIC:
-    return lp_algebraic_number_is_integer(&v->value.a);
+    return lp_algebraic_number_is_rational(&v->value.a);
   default:
     return 0;
   }
