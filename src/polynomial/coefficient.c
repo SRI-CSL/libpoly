@@ -439,6 +439,11 @@ size_t coefficient_degree(const coefficient_t* C) {
 }
 
 size_t coefficient_degree_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M) {
+
+  if (trace_is_enabled("coefficient::roots")) {
+    tracef("coefficient_degree_m("); coefficient_print(ctx, C, trace_out); tracef(")\n");
+  }
+
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
     return 0;
@@ -674,7 +679,7 @@ STAT_DECLARE(int, coefficient, sgn)
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {
 
   if (trace_is_enabled("coefficient::sgn")) {
-    tracef("coefficient_sgn("); coefficient_print(ctx, C, trace_out); tracef("\n");
+    tracef("coefficient_sgn("); coefficient_print(ctx, C, trace_out); tracef(")\n");
   }
   STAT(coefficient, sgn) ++;
 

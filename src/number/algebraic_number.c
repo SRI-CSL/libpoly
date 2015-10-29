@@ -810,3 +810,24 @@ void lp_algebraic_number_get_rational_midpoint(const lp_algebraic_number_t* a, l
   lp_rational_destruct(&tmp_q);
   lp_dyadic_rational_destruct(&tmp_dy);
 }
+
+int lp_algebraic_number_is_rational(const lp_algebraic_number_t* a) {
+  if (lp_dyadic_interval_is_point(&a->I)) {
+    // If a point, we're (dyadic) rational
+    return 1;
+  } else if (lp_upolynomial_degree(a->f) == 1) {
+    // If degree 1, we're directly rational
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int lp_algebraic_number_is_integer(const lp_algebraic_number_t* a) {
+  if (lp_dyadic_interval_is_point(&a->I)) {
+    // If a point, we're (dyadic) rational
+    return lp_dyadic_rational_is_integer(&a->I.a);
+  } else {
+    return 0;
+  }
+}

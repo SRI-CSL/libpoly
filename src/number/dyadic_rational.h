@@ -378,3 +378,8 @@ void dyadic_rational_floor(const lp_dyadic_rational_t* a, lp_dyadic_rational_t* 
     floor->n = 0;
   }
 }
+
+static inline
+int dyadic_rational_is_integer(const lp_dyadic_rational_t* a) {
+  return a->n == 0;
+}

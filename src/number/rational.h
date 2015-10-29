@@ -224,3 +224,8 @@ static inline
 void rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling) {
   mpz_cdiv_q(q_ceiling, mpq_numref(q), mpq_denref(q));
 }
+
+static inline
+int rational_is_integer(const lp_rational_t* q) {
+  return mpz_cmp_ui(mpq_denref(q), 1) == 0;
+}

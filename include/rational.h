@@ -176,6 +176,11 @@ void lp_rational_div_2exp(lp_rational_t* div, const lp_rational_t* a, unsigned n
 void lp_rational_get_num(const lp_rational_t* q, lp_integer_t* num);
 
 /**
- * GEt the denominator of the rational.
+ * Get the denominator of the rational.
  */
 void lp_rational_get_den(const lp_rational_t* q, lp_integer_t* den);
+
+/**
+ * Return true if the number is integer.
+ */
+int lp_rational_is_integer(const lp_rational_t* q);

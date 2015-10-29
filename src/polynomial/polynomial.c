@@ -1237,7 +1237,16 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
 lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_get_feasible_set_root("); lp_polynomial_print(A, trace_out); tracef(", %zu, ", root_index); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
+    tracef("lp_polynomial_root_constraint_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", %zu, ", root_index); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
+  }
+
+  static int count;
+  count ++;
+
+  if (count == 1378) {
+    lp_trace_enable("polynomial");
+    lp_trace_enable("coefficient::roots");
+    lp_trace_enable("coefficient::sgn");
   }
 
   assert(!lp_polynomial_is_constant(A));
@@ -1252,7 +1261,7 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
   // Get the degree of the polynomial, respecting the model
   size_t degree = coefficient_degree_m(A->ctx, &A->data, M);
   if (degree == 0) {
-    // Polynomial evaluates to 0, no roots => root_index < 0 is false
+    // Polynomial evaluates to constant, no roots => root_index < 0 is false
     if (!negated) {
       return lp_feasibility_set_new_internal(0);
     } else {
@@ -1264,6 +1273,7 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
   size_t roots_size;
   lp_value_t* roots = malloc(sizeof(lp_value_t)*degree);
   lp_polynomial_roots_isolate(A, M, roots, &roots_size);
+  assert(roots_size <= degree);
 
   /**
    * Example:

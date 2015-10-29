@@ -351,18 +351,24 @@ int lp_value_is_rational(const lp_value_t* v) {
   case LP_VALUE_DYADIC_RATIONAL:
   case LP_VALUE_RATIONAL:
     return 1;
+  case LP_VALUE_ALGEBRAIC:
+    return lp_algebraic_number_is_integer(&v->value.a);
+  default:
+    return 0;
+  }
+}
+
+int lp_value_is_integer(const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    return 1;
+  case LP_VALUE_DYADIC_RATIONAL:
+    return lp_dyadic_rational_is_integer(&v->value.dy_q);
+  case LP_VALUE_RATIONAL:
+    return lp_rational_is_integer(&v->value.q);
     break;
   case LP_VALUE_ALGEBRAIC:
-    if (lp_dyadic_interval_is_point(&v->value.a.I)) {
-      // If a point, we're (dyadic) rational
-      return 1;
-    } else if (lp_upolynomial_degree(v->value.a.f) == 1) {
-      // If degree 1, we're directly rational
-      return 1;
-    } else {
-      return 0;
-    }
-    break;
+    return lp_algebraic_number_is_integer(&v->value.a);
   default:
     return 0;
   }

@@ -168,3 +168,8 @@ void lp_dyadic_rational_get_num(const lp_dyadic_rational_t* q, lp_integer_t* num
  * Get the denominator of the number, i.e. 2^n.
  */
 void lp_dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den);
+
+/**
+ * Returns tre if the number is integer.
+ */
+int lp_dyadic_rational_is_integer(const lp_dyadic_rational_t* q);

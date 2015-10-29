@@ -124,6 +124,12 @@ char* lp_value_to_string(const lp_value_t* v);
 int lp_value_is_rational(const lp_value_t* v);
 
 /**
+ * Check if the value is an integer number: either an integer, dyadic rational,
+ * a rational, or a algebraic number that has reduced to a point.
+ */
+int lp_value_is_integer(const lp_value_t* v);
+
+/**
  * Get the rational if is_rational is true.
  */
 void lp_value_get_rational(const lp_value_t* v, lp_rational_t* q);

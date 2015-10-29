@@ -136,3 +136,7 @@ void lp_dyadic_rational_get_num(const lp_dyadic_rational_t* q, lp_integer_t* num
 void lp_dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den) {
   dyadic_rational_get_den(q, den);
 }
+
+int lp_dyadic_rational_is_integer(const lp_dyadic_rational_t* q) {
+  return dyadic_rational_is_integer(q);
+}

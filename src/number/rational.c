@@ -142,3 +142,7 @@ void lp_rational_get_num(const lp_rational_t* q, lp_integer_t* num) {
 void lp_rational_get_den(const lp_rational_t* q, lp_integer_t* den) {
   rational_get_den(q, den);
 }
+
+int lp_rational_is_integer(const lp_rational_t* q) {
+  return rational_is_integer(q);
+}
