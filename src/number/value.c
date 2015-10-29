@@ -374,6 +374,44 @@ int lp_value_is_integer(const lp_value_t* v) {
   }
 }
 
+void lp_value_ceiling(const lp_value_t* v, lp_integer_t* v_ceiling) {
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    lp_integer_assign(lp_Z, v_ceiling, &v->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_ceiling(&v->value.dy_q, v_ceiling);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_ceiling(&v->value.q, v_ceiling);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_algebraic_number_ceiling(&v->value.a, v_ceiling);
+    break;
+  default:
+    assert(0);
+  }
+}
+
+void lp_value_floor(const lp_value_t* v, lp_integer_t* v_floor) {
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    lp_integer_assign(lp_Z, v_floor, &v->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_floor(&v->value.dy_q, v_floor);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_floor(&v->value.q, v_floor);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_algebraic_number_floor(&v->value.a, v_floor);
+    break;
+  default:
+    assert(0);
+  }
+}
+
 void lp_value_get_rational(const lp_value_t* v, lp_rational_t* q) {
   lp_rational_t result;
 

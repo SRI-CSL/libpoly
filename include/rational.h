@@ -184,3 +184,13 @@ void lp_rational_get_den(const lp_rational_t* q, lp_integer_t* den);
  * Return true if the number is integer.
  */
 int lp_rational_is_integer(const lp_rational_t* q);
+
+/**
+ * Return the ceiling.
+ */
+void lp_rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling);
+
+/**
+ * Return the floor.
+ */
+void lp_rational_floor(const lp_rational_t* q, lp_integer_t* q_floor);

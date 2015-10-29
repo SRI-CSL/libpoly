@@ -173,3 +173,13 @@ void lp_dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den
  * Returns tre if the number is integer.
  */
 int lp_dyadic_rational_is_integer(const lp_dyadic_rational_t* q);
+
+/**
+ * Get the ceiling of the number.
+ */
+void lp_dyadic_rational_ceiling(const lp_dyadic_rational_t* q, lp_integer_t* q_ceiling);
+
+/**
+ * Get the floor of the number.
+ */
+void lp_dyadic_rational_floor(const lp_dyadic_rational_t* q, lp_integer_t* q_floor);

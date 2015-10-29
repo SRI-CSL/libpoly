@@ -126,3 +126,9 @@ int lp_algebraic_number_is_rational(const lp_algebraic_number_t* a);
 
 /** Returns true if an integer number (complete) */
 int lp_algebraic_number_is_integer(const lp_algebraic_number_t* a);
+
+/** Returns the ceiling of the number */
+void lp_algebraic_number_ceiling(const lp_algebraic_number_t* a, lp_integer_t* a_ceiling);
+
+/** Returns the floor of the number */
+void lp_algebraic_number_floor(const lp_algebraic_number_t* a, lp_integer_t* a_floor);

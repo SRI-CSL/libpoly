@@ -140,3 +140,11 @@ void lp_dyadic_rational_get_den(const lp_dyadic_rational_t* q, lp_integer_t* den
 int lp_dyadic_rational_is_integer(const lp_dyadic_rational_t* q) {
   return dyadic_rational_is_integer(q);
 }
+
+void lp_dyadic_rational_ceiling(const lp_dyadic_rational_t* q, lp_integer_t* q_ceiling) {
+  dyadic_rational_ceiling_int(q, q_ceiling);
+}
+
+void lp_dyadic_rational_floor(const lp_dyadic_rational_t* q, lp_integer_t* q_floor) {
+  dyadic_rational_floor_int(q, q_floor);
+}

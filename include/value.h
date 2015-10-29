@@ -129,6 +129,12 @@ int lp_value_is_rational(const lp_value_t* v);
  */
 int lp_value_is_integer(const lp_value_t* v);
 
+/** Get the floor of the value */
+void lp_value_floor(const lp_value_t* v, lp_integer_t* v_floor);
+
+/** Get the ceiling of the value */
+void lp_value_ceiling(const lp_value_t* v, lp_integer_t* v_ceiling);
+
 /**
  * Get the rational if is_rational is true.
  */

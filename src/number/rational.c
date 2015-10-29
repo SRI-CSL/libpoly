@@ -146,3 +146,11 @@ void lp_rational_get_den(const lp_rational_t* q, lp_integer_t* den) {
 int lp_rational_is_integer(const lp_rational_t* q) {
   return rational_is_integer(q);
 }
+
+void lp_rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling) {
+  rational_ceiling(q, q_ceiling);
+}
+
+void lp_rational_floor(const lp_rational_t* q, lp_integer_t* q_floor) {
+  rational_floor(q, q_floor);
+}

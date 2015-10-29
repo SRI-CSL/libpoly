@@ -831,3 +831,15 @@ int lp_algebraic_number_is_integer(const lp_algebraic_number_t* a) {
     return 0;
   }
 }
+
+void lp_algebraic_number_ceiling(const lp_algebraic_number_t* a, lp_integer_t* a_ceiling) {
+  if (lp_dyadic_interval_is_point(&a->I)) {
+    dyadic_rational_ceiling_int(&a->I.a, a_ceiling);
+  } else {
+    dyadic_rational_ceiling_int(&a->I.b, a_ceiling);
+  }
+}
+
+void lp_algebraic_number_floor(const lp_algebraic_number_t* a, lp_integer_t* a_floor) {
+  dyadic_rational_floor_int(&a->I.a, a_floor);
+}

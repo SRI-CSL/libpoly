@@ -367,6 +367,8 @@ void dyadic_rational_ceiling(const lp_dyadic_rational_t* a, lp_dyadic_rational_t
   if (a->n > 0) {
     integer_div_ceiling_pow2(&ceil->a, &a->a, a->n);
     ceil->n = 0;
+  } else {
+    dyadic_rational_assign(ceil, a);
   }
 }
 
@@ -376,6 +378,28 @@ void dyadic_rational_floor(const lp_dyadic_rational_t* a, lp_dyadic_rational_t* 
   if (a->n > 0) {
     integer_div_floor_pow2(&floor->a, &a->a, a->n);
     floor->n = 0;
+  } else {
+    dyadic_rational_assign(floor, a);
+  }
+}
+
+static inline
+void dyadic_rational_ceiling_int(const lp_dyadic_rational_t* a, lp_integer_t* ceil) {
+  // Just divide a with 2^n
+  if (a->n > 0) {
+    integer_div_ceiling_pow2(ceil, &a->a, a->n);
+  } else {
+    integer_assign(lp_Z, ceil, &a->a);
+  }
+}
+
+static inline
+void dyadic_rational_floor_int(const lp_dyadic_rational_t* a, lp_integer_t* floor) {
+  // Just divide a with 2^n
+  if (a->n > 0) {
+    integer_div_floor_pow2(floor, &a->a, a->n);
+  } else {
+    integer_assign(lp_Z, floor, &a->a);
   }
 }
 
