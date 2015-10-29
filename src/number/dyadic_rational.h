@@ -359,5 +359,22 @@ int dyadic_rational_get_distance_size(const lp_dyadic_rational_t* lower, const l
   }
 
   return size;
+}
 
+static inline
+void dyadic_rational_ceiling(const lp_dyadic_rational_t* a, lp_dyadic_rational_t* ceil) {
+  // Just divide a with 2^n
+  if (a->n > 0) {
+    integer_div_ceiling_pow2(&ceil->a, &a->a, a->n);
+    ceil->n = 0;
+  }
+}
+
+static inline
+void dyadic_rational_floor(const lp_dyadic_rational_t* a, lp_dyadic_rational_t* floor) {
+  // Just divide a with 2^n
+  if (a->n > 0) {
+    integer_div_floor_pow2(&floor->a, &a->a, a->n);
+    floor->n = 0;
+  }
 }

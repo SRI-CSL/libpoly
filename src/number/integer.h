@@ -409,6 +409,16 @@ void integer_div_rem_pow2_Z(lp_integer_t* div, lp_integer_t* rem, const lp_integ
 }
 
 static inline
+void integer_div_floor_pow2(lp_integer_t* div, const lp_integer_t* a, unsigned n) {
+  mpz_fdiv_q_2exp(div, a, n);
+}
+
+static inline
+void integer_div_ceiling_pow2(lp_integer_t* div, const lp_integer_t* a, unsigned n) {
+  mpz_cdiv_q_2exp(div, a, n);
+}
+
+static inline
 void integer_gcd_Z(lp_integer_t* gcd, const lp_integer_t* a, const lp_integer_t* b) {
   mpz_gcd(gcd, a, b);
 }

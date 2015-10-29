@@ -513,6 +513,8 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     tracef("b = "); lp_value_print(b, trace_out); tracef(", b_strict = %d\n", b_strict);
   }
 
+  // Compare a and b. If they are equal the only option is the value they hold.
+  // If a > b then we swap them
   int cmp = lp_value_cmp(a, b);
   if (cmp == 0) {
     // Same, we're done
@@ -524,20 +526,20 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     int strict_tmp = a_strict; a_strict = b_strict; b_strict = strict_tmp;
   }
 
-  // If the whole R we're done
+  // If the whole R we're done, just pick 0
   if (a->type == LP_VALUE_MINUS_INFINITY && b->type == LP_VALUE_PLUS_INFINITY) {
      // (-inf, +inf), just pick 0
-     lp_rational_t zero;
-     lp_rational_construct(&zero);
-     lp_value_assign_raw(v, LP_VALUE_RATIONAL, &zero);
-     lp_rational_destruct(&zero);
+     lp_integer_t zero;
+     lp_integer_construct(&zero);
+     lp_value_assign_raw(v, LP_VALUE_INTEGER, &zero);
+     lp_integer_destruct(&zero);
      return;
    }
 
-  // We have a < b, and comparison ensures that the algebraic intervals will be
-  // disjoint
+  // We have a < b, at least one of them is not infinity, and comparison ensures
+  // that the algebraic intervals will be disjoint
 
-  // Get the values a_ub and b_lb such that a <= a_ub < b_lb <= b
+  // Get rational values a_ub and b_lb such that a <= a_ub <= b_lb <= b
   lp_rational_t a_ub, b_lb;
   int a_inf = 0, b_inf = 0;
 
@@ -559,6 +561,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
       rational_construct(&a_ub);
       lp_value_get_rational(a, &a_ub);
     } else {
+      // Get the upper bound of the interval as a_ub
       rational_construct_from_dyadic(&a_ub, &a->value.a.I.b);
     }
     break;
@@ -584,6 +587,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
       rational_construct(&b_lb);
       lp_value_get_rational(b, &b_lb);
     } else {
+      // Get the lower bound of the interval as b_lb
       rational_construct_from_dyadic(&b_lb, &b->value.a.I.a);
     }
     break;
@@ -593,27 +597,39 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
 
   assert(!a_inf || !b_inf);
 
+  // We have rational values a_ub and b_ub such that a <= a_ub <= b_lb <= b
+  // or one of them is infinity
+
   if (a_inf) {
-    // If a is infinity, just take it to be [b-1
-    lp_rational_t one;
-    lp_rational_construct_from_int(&one, 1, 1);
-    rational_construct(&a_ub);
-    rational_sub(&a_ub, &b_lb, &one);
-    lp_rational_destruct(&one);
-    a_strict = 0;
+    // -inf < b_lb <= b
+    // just pick the value to be floor(b_lb)-1
+    lp_integer_t result;
+    lp_integer_construct(&result);
+    rational_floor(&b_lb, &result);
+    lp_integer_dec(lp_Z, &result);
+    lp_value_assign_raw(v, LP_VALUE_INTEGER, &result);
+    lp_integer_destruct(&result);
+    lp_rational_destruct(&b_lb);
+    return;
   }
 
   if (b_inf) {
-    // If b is infinity, just take it to be a + 1]
-    lp_rational_t one;
-    lp_rational_construct_from_int(&one, 1, 1);
-    rational_construct(&b_lb);
-    rational_add(&b_lb, &a_ub, &one);
-    lp_rational_destruct(&one);
-    b_strict = 0;
+    // a <= a_ub < +inf
+    // just pick the value to be ceil(a_ub)+1
+    lp_integer_t result;
+    lp_integer_construct(&result);
+    rational_ceiling(&a_ub, &result);
+    lp_integer_inc(lp_Z, &result);
+    lp_value_assign_raw(v, LP_VALUE_INTEGER, &result);
+    lp_integer_destruct(&result);
+    lp_rational_destruct(&a_ub);
+    return;
   }
 
-  // If a_ub == b_lb, this is due to algebraic number intervals, so just return a_ub
+  // We have rational values a_ub and b_ub such that a <= a_ub <= b_lb <= b
+  // Both a_ub and b_lb are constructed
+
+  // If a_ub == b_lb, this is due to algebraic number intervals, so refine once more
   cmp = rational_cmp(&a_ub, &b_lb);
   if (cmp == 0) {
     assert(!lp_value_is_rational(a) || !lp_value_is_rational(b));
@@ -632,11 +648,15 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     lp_rational_t result;
 
     // Get the smallest integer interval around [a_ub, b_lb] and refine
+
+    // a <= a_ub < b_lb <= b
+    // m = (a_ub + b_lb)/2 so a < m < b
     lp_rational_t m;
     rational_construct(&m);
     rational_add(&m, &a_ub, &b_lb);
     rational_div_2exp(&m, &m, 1);
 
+    // floor(m) <= m <= ceil(m)
     lp_integer_t m_floor, m_ceil;
     integer_construct(&m_floor);
     rational_floor(&m, &m_floor);

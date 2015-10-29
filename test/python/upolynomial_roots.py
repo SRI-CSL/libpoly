@@ -35,6 +35,7 @@ def check_roots_count(p, expected, lb = None, ub = None):
         polypy_test.check(True)
 
 # polypy.trace_enable("roots")
+# polypy.trace_enable("algebraic_number")
 # polypy.trace_enable("division")
 # polypy.trace_enable("sturm_sequence_check")
 

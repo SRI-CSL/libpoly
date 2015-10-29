@@ -33,17 +33,42 @@
 
 #include <assert.h>
 
+static
+void lp_algebraic_number_refine_with_point(const lp_algebraic_number_t* a_const, const lp_dyadic_rational_t* q);
+
 void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f, const lp_dyadic_interval_t* lr) {
   assert(f);
-  // Zero should be divisible by 0
+  // Zero should always constructed separately
   assert(lp_upolynomial_const_term(f));
   assert(lr->a_open && lr->b_open);
   assert(lp_upolynomial_is_primitive(f));
+
   a->f = f;
   lp_dyadic_interval_construct_copy(&a->I, lr);
   a->sgn_at_a = lp_upolynomial_sgn_at_dyadic_rational(f, &a->I.a);
   a->sgn_at_b = lp_upolynomial_sgn_at_dyadic_rational(f, &a->I.b);
   assert(a->sgn_at_a * a->sgn_at_b < 0);
+
+  // Refine so that the interval is < 1, i.e. log < 0
+  while (lp_dyadic_interval_size(&a->I) >= 0) {
+    lp_algebraic_number_refine(a);
+  }
+
+  // We now have at most one integer in the interval, so just check the options
+  if (a->f) {
+    lp_dyadic_rational_t value;
+    dyadic_rational_construct(&value);
+    dyadic_rational_ceiling(&value, &a->I.a);
+    lp_algebraic_number_refine_with_point(a, &value);
+    dyadic_rational_destruct(&value);
+  }
+  if (a->f) {
+    lp_dyadic_rational_t value;
+    dyadic_rational_construct(&value);
+    dyadic_rational_floor(&value, &a->I.b);
+    lp_algebraic_number_refine_with_point(a, &value);
+    dyadic_rational_destruct(&value);
+  }
 }
 
 void lp_algebraic_number_construct_zero(lp_algebraic_number_t* a) {

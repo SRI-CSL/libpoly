@@ -1023,9 +1023,8 @@ void lp_interval_pick_value(const lp_interval_t* I, lp_value_t* v) {
 }
 
 int lp_dyadic_interval_size(const lp_dyadic_interval_t* I) {
-  // If point, size is 0
   if (I->is_point) {
-    return 0;
+    return INT_MIN;
   } else {
     return dyadic_rational_get_distance_size(&I->a, &I->b);
   }
