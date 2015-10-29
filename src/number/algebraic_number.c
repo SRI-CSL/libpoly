@@ -58,14 +58,14 @@ void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f
   if (a->f) {
     lp_dyadic_rational_t value;
     dyadic_rational_construct(&value);
-    dyadic_rational_ceiling(&value, &a->I.a);
+    dyadic_rational_ceiling(&a->I.a, &value);
     lp_algebraic_number_refine_with_point(a, &value);
     dyadic_rational_destruct(&value);
   }
   if (a->f) {
     lp_dyadic_rational_t value;
     dyadic_rational_construct(&value);
-    dyadic_rational_floor(&value, &a->I.b);
+    dyadic_rational_floor(&a->I.b, &value);
     lp_algebraic_number_refine_with_point(a, &value);
     dyadic_rational_destruct(&value);
   }
