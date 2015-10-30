@@ -3,6 +3,7 @@
 import polypy
 import polypy_test
 
+import sys
 import time
  
 polypy_test.init()
@@ -36,6 +37,19 @@ sgn_name = {
             polypy.SGN_GT_0 : ">  0",
             polypy.SGN_GE_0 : ">= 0"
 }
+
+polypy_test.start("Polynomial Feasibility Integer")
+
+assignment = polypy.Assignment()
+
+p1 = x**2 - 7
+S1 = p1.feasible_set(assignment, polypy.SGN_GE_0) # (-inf, -2.6], [2.6, +inf)
+p2 = x*(x - 4)
+S2 = p2.feasible_set(assignment, polypy.SGN_LT_0) # (0, 4)
+
+S = S1.intersect(S2)
+v = S.pick_value();
+polypy_test.check(v.to_double() == 3)
 
 polypy_test.start("Feasibility Intervals Intersection")
 

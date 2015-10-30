@@ -586,6 +586,9 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
   // Get rational values a_ub and b_lb such that a <= a_ub <= b_lb <= b
   lp_rational_t a_ub, b_lb;
   int a_inf = 0, b_inf = 0;
+  int a_ub_strict = a_strict;
+  int b_lb_strict = b_strict;
+
 
   switch (a->type) {
   case LP_VALUE_MINUS_INFINITY:
@@ -607,6 +610,8 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     } else {
       // Get the upper bound of the interval as a_ub
       rational_construct_from_dyadic(&a_ub, &a->value.a.I.b);
+      // Algebaic bound is strict so a_ub can be picked
+      a_ub_strict = 0;
     }
     break;
   default:
@@ -633,6 +638,8 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     } else {
       // Get the lower bound of the interval as b_lb
       rational_construct_from_dyadic(&b_lb, &b->value.a.I.a);
+      // Algebraic bound is strict so b_lb can be picked
+      b_lb_strict = 0;
     }
     break;
   default:
@@ -707,7 +714,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     integer_construct_copy(lp_Z, &m_ceil, &m_floor);
     integer_inc(lp_Z, &m_ceil);
 
-    if (trace_is_enabled("value::pick")) {
+    if (trace_is_enabled("value::get_value_between")) {
       tracef("a_ub = ");
       lp_rational_print(&a_ub, trace_out);
       tracef("\n");
@@ -725,16 +732,14 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
       tracef("\n");
     }
 
-    // If a_ub < m_floor, we can take this value
+    // If a_ub < m_floor (or equal and bound allows it), we can take this value
     cmp = lp_rational_cmp_integer(&a_ub, &m_floor);
-    // if ((cmp > 0) || (!a_strict && cmp >= 0)) {
-    if (cmp < 0) {
+    if (cmp < 0 || (cmp == 0 && !a_ub_strict)) {
       lp_rational_construct_from_integer(&result, &m_floor);
     } else {
-      // If m_ceil < b_lb, we can take this value
+      // If m_ceil < b_lb (or equal and bound allows it), we can take this value
       cmp = lp_rational_cmp_integer(&b_lb, &m_ceil);
-      // if ((b_strict&& cmp > 0) || (!b_strict && cmp <= 0)) {
-      if (cmp > 0) {
+      if (cmp > 0 || (cmp == 0 && !b_lb_strict)) {
         lp_rational_construct_from_integer(&result, &m_ceil);
       } else {
 
@@ -787,7 +792,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
   rational_destruct(&b_lb);
 
   if (trace_is_enabled("value::get_value_between")) {
-    tracef("lp_value_get_value_between() =>"); lp_value_print(v, trace_out); tracef("\n");
+    tracef("lp_value_get_value_between() => "); lp_value_print(v, trace_out); tracef("\n");
   }
 
 }
