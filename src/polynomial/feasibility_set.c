@@ -215,6 +215,11 @@ void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* 
   lp_value_destruct(&current);
 }
 
+void lp_feasibility_set_pick_first_value(const lp_feasibility_set_t* set, lp_value_t* value) {
+  assert(!lp_feasibility_set_is_empty(set));
+  lp_interval_pick_value(set->intervals, value);
+}
+
 lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2) {
   lp_feasibility_set_intersect_status_t status;
   return lp_feasibility_set_intersect_with_status(s1, s2, &status);

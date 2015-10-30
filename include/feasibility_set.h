@@ -96,6 +96,11 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
 void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* v);
 
 /**
+ * Pick a value from the first interval towards -inf.
+ */
+void lp_feasibility_set_pick_first_value(const lp_feasibility_set_t* set, lp_value_t* v);
+
+/**
  * Get intersection of the two sets, returns the status in the given variable.
  */
 lp_feasibility_set_t* lp_feasibility_set_intersect(const lp_feasibility_set_t* s1, const lp_feasibility_set_t* s2);
