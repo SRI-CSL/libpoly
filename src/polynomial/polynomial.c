@@ -1240,9 +1240,6 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
     tracef("lp_polynomial_root_constraint_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", %zu, ", root_index); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
   }
 
-  static int count;
-  count ++;
-
   assert(!lp_polynomial_is_constant(A));
 
   // Make sure we're in the right order
