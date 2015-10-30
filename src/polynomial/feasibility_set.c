@@ -206,7 +206,7 @@ void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* 
   lp_value_construct_none(&current);
   for (i = 1; i < set->size; ++ i) {
     int current_interval_size = lp_interval_size_approx(set->intervals + i);
-    lp_interval_pick_value(set->intervals + i, value);
+    lp_interval_pick_value(set->intervals + i, &current);
     if (!same_or_better_complexity(value, value_interval_size, &current, current_interval_size)) {
       lp_value_swap(value, &current);
       value_interval_size = current_interval_size;

@@ -1243,12 +1243,6 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
   static int count;
   count ++;
 
-  if (count == 1378) {
-    lp_trace_enable("polynomial");
-    lp_trace_enable("coefficient::roots");
-    lp_trace_enable("coefficient::sgn");
-  }
-
   assert(!lp_polynomial_is_constant(A));
 
   // Make sure we're in the right order
