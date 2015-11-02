@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 
+STAT_DECLARE(int, coefficient, factor_content_free)
 STAT_DECLARE(int, coefficient, factor_square_free)
 STAT_DECLARE(int, coefficient, factor_square_free_pp)
 
@@ -272,6 +273,45 @@ void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const co
   if (trace_is_enabled("factorization")) {
     tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(") =>");
     coefficient_factors_print(ctx, factors, trace_out); tracef("\n");
-
   }
+}
+
+void coefficient_factor_content_free(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors)  {
+
+  STAT(coefficient, factor_square_free) ++;
+
+  if (trace_is_enabled("factorization")) {
+    tracef("coefficient_factor_content_free("); coefficient_print(ctx, C, trace_out); tracef(")\n");
+  }
+
+  coefficient_t C_pp, C_cont;
+  coefficient_construct(ctx, &C_pp);
+  coefficient_construct(ctx, &C_cont);
+
+  // Get the content and primitive part
+  coefficient_pp_cont(ctx, &C_pp, &C_cont, C);
+
+  // Factor the content if not trivial
+  if (!coefficient_is_constant(&C_cont)) {
+    coefficient_factor_content_free(ctx, &C_cont, factors);
+  } else {
+    // Add if not one
+    if (!coefficient_is_one(ctx, &C_cont)) {
+      coefficient_factors_add(ctx, factors, &C_cont, 1);
+    }
+  }
+
+  // Add the primitive part
+  if (!coefficient_is_one(ctx, &C_pp)) {
+    coefficient_factors_add(ctx, factors, &C_pp, 1);
+  }
+
+  coefficient_destruct(&C_pp);
+  coefficient_destruct(&C_cont);
+
+  if (trace_is_enabled("factorization")) {
+    tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(") =>");
+    coefficient_factors_print(ctx, factors, trace_out); tracef("\n");
+  }
+
 }

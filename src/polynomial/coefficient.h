@@ -174,6 +174,9 @@ int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t*
 /** Returns true if the coefficient is 1 */
 int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
+/** Returns true if the coefficient is -1 */
+int coefficient_is_minus_one(const lp_polynomial_context_t* ctx, const coefficient_t* C);
+
 /** Returns the sign of the coefficient in the model */
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
 
@@ -234,7 +237,7 @@ void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, c
 void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n);
 
 /** Division with x^n (C should have degree at least n)  */
-void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n);
+void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n);
 
 /** Compute P = C^n. */
 void coefficient_pow(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n);
@@ -265,6 +268,9 @@ void coefficient_reduce(const lp_polynomial_context_t* ctx, const coefficient_t*
 
 /** Compute C1 = D*C2, in the given ring (assumes that C2 divides C1). */
 void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2);
+
+/** Compute C = C/A */
+void coefficient_div_constant(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* A);
 
 /** Divide the degrees of the main variable of coefficient with the given number */
 void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* C, size_t p);

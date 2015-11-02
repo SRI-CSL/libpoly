@@ -559,6 +559,13 @@ int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* 
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, 1) == 0;
 }
 
+STAT_DECLARE(int, coefficient, is_minus_one)
+
+int coefficient_is_minus_one(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
+  STAT(coefficient, is_minus_one) ++;
+  return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, -1) == 0;
+}
+
 void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m, lp_rational_interval_t* value) {
 
   if (trace_is_enabled("coefficient")) {
@@ -1495,21 +1502,31 @@ void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const
 
 STAT_DECLARE(int, coefficient, shr)
 
-void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, unsigned n) {
+void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shr()\n");
   STAT(coefficient, shl) ++;
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
+    tracef("x = %s\n", lp_variable_db_get_name(ctx->var_db, x));
     tracef("n  = %u\n", n);
   }
 
-  assert(C->type == COEFFICIENT_POLYNOMIAL);
-  assert(n < SIZE(C));
-
   if (n == 0) {
     coefficient_assign(ctx, S, C);
-  } else if (n + 1 == SIZE(C)) {
+    return;
+  }
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    assert(coefficient_is_zero(ctx, C));
+    coefficient_assign(ctx, S, C);
+    return;
+  }
+
+  assert(VAR(C) == x);
+  assert(n + 1 <= SIZE(C));
+
+  if (n + 1 == SIZE(C)) {
     if (S == C) {
       coefficient_t result;
       coefficient_construct_copy(ctx, &result, coefficient_lc(C));
@@ -1905,50 +1922,99 @@ void coefficient_reduce(
 }
 
 
+void coefficient_div_constant(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* A) {
+
+  size_t i ;
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    integer_div_Z(&C->value.num, &C->value.num, A);
+  } else {
+    for (i = 0; i < SIZE(C); ++ i) {
+      coefficient_div_constant(ctx, COEFF(C, i), A);
+    }
+  }
+}
+
 STAT_DECLARE(int, coefficient, div)
 
 void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_div()\n");
   STAT(coefficient, div) ++;
 
-  if (trace_is_enabled("coefficient")) {
+  // 0/C2 = 0
+  if (coefficient_is_zero(ctx, C1)) {
+    coefficient_assign(ctx, D, C1);
+    return;
+  }
+
+  // C1/C1 = 1
+  if (coefficient_cmp(ctx, C1, C2) == 0) {
+    coefficient_assign_int(ctx, D, 1);
+    return;
+  }
+
+  // Special case for constants
+  if (coefficient_is_constant(C2)) {
+    coefficient_assign(ctx, D, C1);
+    coefficient_div_constant(ctx, D, &C2->value.num);
+    return;
+  }
+
+  // If different variables
+  if (VAR(C1) != VAR(C2)) {
+    coefficient_t result;
+    coefficient_construct_rec(ctx, &result, VAR(C1), SIZE(C1));
+    size_t i;
+    for (i = 0; i < SIZE(C1); ++ i) {
+      coefficient_div(ctx, COEFF(&result, i), COEFF(C1, i), C2);
+    }
+    coefficient_swap(&result, D);
+    coefficient_destruct(&result);
+    return;
+  }
+
+  // Both polynomials in the same variables, check if we can divide by x^k
+  size_t i = 0;
+  while (coefficient_is_zero(ctx, COEFF(C2, i))) {
+    ++ i;
+  }
+  if (i > 0) {
+    // i = first non-zero coefficient, shift by i
+    coefficient_t C1_shifted, C2_shifted;
+    lp_variable_t x = VAR(C2);
+    coefficient_construct(ctx, &C1_shifted);
+    coefficient_construct(ctx, &C2_shifted);
+    coefficient_shr(ctx, &C1_shifted, C1, x, i);
+    coefficient_shr(ctx, &C2_shifted, C2, x, i);
+    coefficient_div(ctx, D, &C1_shifted, &C2_shifted);
+    coefficient_destruct(&C1_shifted);
+    coefficient_destruct(&C2_shifted);
+    return;
+  }
+
+  if (trace_is_enabled("coefficient") || trace_is_enabled("coefficient::div")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
     tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
   assert(!coefficient_is_zero(ctx, C2));
 
-  if (coefficient_is_one(ctx, C2) || coefficient_is_zero(ctx, C1)) {
-    coefficient_assign(ctx, D, C1);
-    return;
-  }
-
   int cmp_type = coefficient_cmp_type(ctx, C1, C2);
 
   assert(cmp_type >= 0);
 
-  if (cmp_type == 0 && C1->type == COEFFICIENT_NUMERIC) {
-    assert(C2->type == COEFFICIENT_NUMERIC);
-    if (D->type == COEFFICIENT_POLYNOMIAL) {
-      coefficient_destruct(D);
-      coefficient_construct(ctx, D);
+  if (trace_is_enabled("coefficient::check_division")) {
+    coefficient_t R;
+    coefficient_construct(ctx, &R);
+    coefficient_reduce(ctx, C1, C2, 0, D, &R, REMAINDERING_EXACT_SPARSE);
+    if (!coefficient_is_zero(ctx, &R)) {
+      tracef("WRONG DIVISION!\n");
+      tracef("P = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+      tracef("Q = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
     }
-    assert(integer_divides(ctx->K, &C2->value.num, &C1->value.num));
-    integer_div_exact(ctx->K, &D->value.num, &C1->value.num, &C2->value.num);
+    coefficient_destruct(&R);
   } else {
-    if (trace_is_enabled("coefficient::check_division")) {
-      coefficient_t R;
-      coefficient_construct(ctx, &R);
-      coefficient_reduce(ctx, C1, C2, 0, D, &R, REMAINDERING_EXACT_SPARSE);
-      if (!coefficient_is_zero(ctx, &R)) {
-        tracef("WRONG DIVISION!\n");
-        tracef("P = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
-        tracef("Q = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
-      }
-      coefficient_destruct(&R);
-    } else {
-      coefficient_reduce(ctx, C1, C2, 0, D, 0, REMAINDERING_EXACT_SPARSE);
-    }
+    coefficient_reduce(ctx, C1, C2, 0, D, 0, REMAINDERING_EXACT_SPARSE);
   }
 
   if (trace_is_enabled("coefficient")) {

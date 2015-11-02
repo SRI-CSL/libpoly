@@ -39,3 +39,6 @@ int coefficient_factors_print(const lp_polynomial_context_t* ctx, const coeffici
 
 /** Factors the given coefficient into square-free factors. */
 void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors);
+
+/** Factor the given coefficient into content-free factors */
+void coefficient_factor_content_free(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors);

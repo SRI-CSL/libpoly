@@ -882,6 +882,55 @@ void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*
   coefficient_factors_destruct(&coeff_factors);
 }
 
+void lp_polynomial_factor_content_free(const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_factor_content_free("); lp_polynomial_print(A, trace_out); tracef(")\n");
+  }
+
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("Content Factor A = "); lp_polynomial_print(A, trace_out); tracef("\n");
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out); tracef("\n");
+  }
+
+  const lp_polynomial_context_t* ctx = A->ctx;
+
+  if (trace_is_enabled("polynomial")) {
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out);
+    tracef("\n");
+  }
+
+  lp_polynomial_external_clean(A);
+  coefficient_factors_t coeff_factors;
+  coefficient_factors_construct(&coeff_factors);
+
+  coefficient_factor_content_free(ctx, &A->data, &coeff_factors);
+
+  if (coeff_factors.size) {
+    *size = coeff_factors.size;
+    *factors = malloc(sizeof(lp_polynomial_t*) * (*size));
+    *multiplicities = malloc(sizeof(size_t) * (*size));
+  } else {
+    *size = 0;
+    *factors = 0;
+    *multiplicities = 0;
+  }
+
+  size_t i;
+  for (i = 0; i < *size; ++ i) {
+    (*factors)[i] = malloc(sizeof(lp_polynomial_t));
+    lp_polynomial_construct_from_coefficient((*factors)[i], A->ctx, coeff_factors.factors + i);
+    (*multiplicities)[i] = coeff_factors.multiplicities[i];
+  }
+
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("Content Factor: result size = %zu\n", *size);
+  }
+
+  coefficient_factors_destruct(&coeff_factors);
+}
+
+
 void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size) {
 
   if (trace_is_enabled("polynomial")) {

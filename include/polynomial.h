@@ -258,6 +258,13 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const l
 void lp_polynomial_factor_square_free(const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size);
 
 /**
+ * Get the content-free factorization of the given polynomial. It will allocate
+ * the given arrays and return the polynomials and their multiplicities in
+ * them.
+ */
+void lp_polynomial_factor_content_free(const lp_polynomial_t* A, lp_polynomial_t*** factors, size_t** multiplicities, size_t* size);
+
+/**
  * Given a polynomial p(x1, ..., xn, y) with y being the top variable, and an
  * assignment M that assigns x1, ..., xn, the function returns the roots of p
  * at M. The output array should be big enough to fit the root, i.e. at least
