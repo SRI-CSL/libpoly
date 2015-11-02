@@ -1999,10 +1999,6 @@ void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const
 
   assert(!coefficient_is_zero(ctx, C2));
 
-  int cmp_type = coefficient_cmp_type(ctx, C1, C2);
-
-  assert(cmp_type >= 0);
-
   if (trace_is_enabled("coefficient::check_division")) {
     coefficient_t R;
     coefficient_construct(ctx, &R);
