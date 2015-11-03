@@ -5,8 +5,6 @@ import polypy_test
  
 polypy_test.init()
  
-polypy_test.start("Addition")
-
 x = polypy.Variable("x");
 y = polypy.Variable("y");
 z = polypy.Variable("z"); 
@@ -35,6 +33,7 @@ def check_lcm(p, q, expected):
 
 polypy_test.start("GCD")
 
+# polypy.trace_enable("coefficient::gcd")
 # polypy.trace_enable("polynomial")
 # polypy.trace_enable("coefficient")
 # polypy.trace_enable("coefficient::order")

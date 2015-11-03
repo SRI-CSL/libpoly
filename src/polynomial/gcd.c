@@ -170,16 +170,16 @@ int coefficient_gcd_pp_univariate(const lp_polynomial_context_t* ctx,
   }
 }
 
-STAT_DECLARE(int, coefficient, gcd_pp)
+STAT_DECLARE(int, coefficient, gcd_pp_euclid)
 
 /**
  * Compute the gcd of two primitive polynomials P and Q. The polynomials P and
  * Q will be used and changed in the computation.
  */
-void coefficient_gcd_pp(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
+void coefficient_gcd_pp_euclid(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_pp()\n");
-  STAT(coefficient, gcd_pp) ++;
+  STAT(coefficient, gcd_pp_euclid) ++;
 
   if (trace_is_enabled("coefficient::gcd")) {
     tracef("gcd\n")
@@ -214,7 +214,7 @@ void coefficient_gcd_pp(const lp_polynomial_context_t* ctx, coefficient_t* gcd, 
     do {
 
       // One step reduction
-      coefficient_reduce(ctx, P, Q, 0, 0, &R, REMAINDERING_LCM_SPARSE);
+      coefficient_reduce(ctx, P, Q, 0, 0, &R, REMAINDERING_PSEUDO_SPARSE);
 
       int cmp_type = coefficient_cmp_type(ctx, Q, &R);
       if (cmp_type == 0) {
@@ -235,6 +235,119 @@ void coefficient_gcd_pp(const lp_polynomial_context_t* ctx, coefficient_t* gcd, 
 
     coefficient_swap(Q, gcd);
     coefficient_destruct(&R);
+  }
+
+  coefficient_destruct(&gcd_u);
+
+  if (trace_is_enabled("coefficient")) {
+    tracef("coefficient_gcd_pp() => "); coefficient_print(ctx, gcd, trace_out); tracef("\n");
+  }
+}
+
+STAT_DECLARE(int, coefficient, gcd_pp_subresultant)
+
+/**
+ * Compute the gcd of two primitive polynomials P and Q. The polynomials P and
+ * Q will be used and changed in the computation.
+ */
+void coefficient_gcd_pp_subresultant(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
+
+  TRACE("coefficient", "coefficient_gcd_pp_euclid()\n");
+  STAT(coefficient, gcd_pp_subresultant) ++;
+
+  if (trace_is_enabled("coefficient::gcd")) {
+    tracef("gcd\n")
+    tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+    tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
+  }
+
+  // Try to compute the univariate GCD first
+  coefficient_t gcd_u;
+  coefficient_construct(ctx, &gcd_u);
+
+  int precise = coefficient_gcd_pp_univariate(ctx, &gcd_u, P, Q);
+  if (precise) {
+    // GCD = 1, just copy the univariate gcd
+    coefficient_swap(gcd, &gcd_u);
+  } else {
+
+    // Make sure that P >= Q
+    if (SIZE(P) < SIZE(Q)) {
+      coefficient_t* tmp = P; P = Q; Q = tmp;
+    }
+
+    coefficient_t R;
+    coefficient_construct(ctx, &R);
+
+    coefficient_t h, g;
+    coefficient_construct_from_int(ctx, &g, 1);
+    coefficient_construct_from_int(ctx, &h, 1);
+
+    coefficient_t tmp1, tmp2;
+    coefficient_construct(ctx, &tmp1);
+    coefficient_construct(ctx, &tmp2);
+
+    // Subresultant GCD
+    //
+    do {
+
+      // d = deg(P) - deg(Q)
+      assert(SIZE(P) >= SIZE(Q));
+      unsigned delta = SIZE(P) - SIZE(Q);
+
+      // One step reduction
+      coefficient_reduce(ctx, P, Q, 0, 0, &R, REMAINDERING_PSEUDO_SPARSE);
+
+      if (trace_is_enabled("coefficient::gcd")) {
+        tracef("------------\n");
+        tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
+        tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
+        tracef("h = "); coefficient_print(ctx, &h, trace_out); tracef("\n");
+        tracef("g = "); coefficient_print(ctx, &g, trace_out); tracef("\n");
+        tracef("d = %u\n", delta);
+      }
+
+      int cmp_type = coefficient_cmp_type(ctx, Q, &R);
+      if (cmp_type == 0) {
+        // P = Q
+        coefficient_swap(P, Q);
+        // Q = R/g*(h^delta)
+        coefficient_div(ctx, &tmp1, &R, &g);
+        coefficient_pow(ctx, &tmp2, &h, delta);
+        coefficient_div(ctx, Q, &tmp1, &tmp2);
+        // g = lc(P)
+        coefficient_assign(ctx, &g, coefficient_lc(P));
+        // h = h^(1-delta)*g^delta
+        if (delta == 0) {
+          // h = h, nothing to do
+        } else if (delta == 1) {
+          // h = g
+          coefficient_assign(ctx, &h, &g);
+        } else {
+          // h = g^delta/h^(delta-1))
+          coefficient_pow(ctx, &tmp1, &g, delta);
+          coefficient_pow(ctx, &tmp2, &h, delta-1);
+          coefficient_div(ctx, &h, &tmp1, &tmp2);
+        }
+      } else {
+        assert(cmp_type > 0);
+        if (!coefficient_is_zero(ctx, &R)) {
+          coefficient_destruct(Q);
+          coefficient_construct_from_int(ctx, Q, 1);
+        } else {
+          coefficient_pp(ctx, Q, Q);
+        }
+        break;
+      }
+    } while (1);
+
+    coefficient_swap(Q, gcd);
+    coefficient_destruct(&R);
+
+    coefficient_destruct(&h);
+    coefficient_destruct(&g);
+    coefficient_destruct(&tmp1);
+    coefficient_destruct(&tmp2);
   }
 
   coefficient_destruct(&gcd_u);
@@ -308,7 +421,7 @@ void coefficient_gcd(const lp_polynomial_context_t* ctx, coefficient_t* gcd, con
         coefficient_gcd(ctx, &gcd_cont, &P_cont, &Q_cont);
 
         // Get the gcd of the primitive parts
-        coefficient_gcd_pp(ctx, gcd, &P, &Q);
+        coefficient_gcd_pp_euclid(ctx, gcd, &P, &Q);
 
         // Multiply in the content gcd
         coefficient_mul(ctx, gcd, gcd, &gcd_cont);
