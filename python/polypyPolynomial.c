@@ -56,6 +56,9 @@ Polynomial_cmp(PyObject* self, PyObject* args);
 static PyObject*
 Polynomial_richcompare(PyObject* self, PyObject* args, int op);
 
+static long
+Polynomial_hash(PyObject* self);
+
 static PyObject*
 Polynomial_degree(PyObject* self);
 
@@ -147,6 +150,9 @@ static PyObject*
 Polynomial_vars(PyObject* self);
 
 static PyObject*
+Polynomial_var(PyObject* self);
+
+static PyObject*
 Polynomial_feasible_intervals(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -174,6 +180,7 @@ PyMethodDef Polynomial_methods[] = {
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
     {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
+    {"var", (PyCFunction)Polynomial_var, METH_NOARGS, "Returns the top variable of the polynomial"},
     {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals of the polynomial (has to be univariate modulo the assignment)"},
     {"feasible_set", (PyCFunction)Polynomial_feasible_set, METH_VARARGS, "Returns feasible set of the polynomial (has to be univariate modulo the assignment)"},
     {NULL}  /* Sentinel */
@@ -242,7 +249,7 @@ PyTypeObject PolynomialType = {
     &Polynomial_NumberMethods,  /*tp_as_number*/
     0,                          /*tp_as_sequence*/
     0,                          /*tp_as_mapping*/
-    0,                          /*tp_hash */
+    Polynomial_hash,            /*tp_hash */
     0,                          /*tp_call*/
     Polynomial_str,             /*tp_str*/
     0,                          /*tp_getattro*/
@@ -388,6 +395,12 @@ Polynomial_cmp(PyObject* self, PyObject* other) {
   // Compare
   int cmp = lp_polynomial_cmp(p1->p, p2->p);
   return cmp > 0 ? 1 : cmp < 0 ? -1 : 0;
+}
+
+static long
+Polynomial_hash(PyObject* self) {
+  Polynomial* p = (Polynomial*) self;
+  return lp_polynomial_hash(p->p);
 }
 
 static PyObject* Polynomial_str(PyObject* self) {
@@ -1251,6 +1264,9 @@ Polynomial_vars(PyObject* self) {
   lp_variable_list_t p_vars;
   lp_variable_list_construct(&p_vars);
 
+  // Get the variables
+  lp_polynomial_get_variables(p, &p_vars);
+
   // Copy the polynomials into a list
   PyObject* list = PyList_New(p_vars.list_size);
   size_t i;
@@ -1262,6 +1278,12 @@ Polynomial_vars(PyObject* self) {
   lp_variable_list_destruct(&p_vars);
 
   return list;
+}
+
+static PyObject*
+Polynomial_var(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  return PyVariable_create(lp_polynomial_top_variable(p));
 }
 
 

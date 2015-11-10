@@ -52,8 +52,14 @@ Variable_dealloc(Variable* self);
 static PyObject*
 Variable_str(PyObject* self);
 
+static int
+Variable_cmp(PyObject* self, PyObject* other);
+
 static PyObject*
 Variable_repr(PyObject* self);
+
+static long
+Variable_hash(PyObject* self);
 
 PyMethodDef Variable_methods[] = {
     {NULL}  /* Sentinel */
@@ -132,12 +138,12 @@ PyTypeObject VariableType = {
     0,                            /*tp_print*/
     0,                            /*tp_getattr*/
     0,                            /*tp_setattr*/
-    0,                            /*tp_compare*/
+    Variable_cmp,                 /*tp_compare*/
     Variable_repr,                /*tp_repr*/
     &Variable_NumberMethods,   /*tp_as_number*/
     0,                            /*tp_as_sequence*/
     0,                            /*tp_as_mapping*/
-    0,                            /*tp_hash */
+    Variable_hash,                /*tp_hash */
     0,                            /*tp_call*/
     Variable_str,                 /*tp_str*/
     0,                            /*tp_getattro*/
@@ -210,6 +216,23 @@ static PyObject* Variable_str(PyObject* self) {
   return str;
 }
 
+static int Variable_cmp(PyObject* self, PyObject* other) {
+  Variable* x = (Variable*) self;
+  if (PyVariable_CHECK(other)) {
+    Variable* y = (Variable*) other;
+    if (x->x > y->x) {
+      return 1;
+    } else if (x->x == y->x) {
+      return 0;
+    } else {
+      return -1;
+    }
+  } else {
+    return -1;
+  }
+}
+
+
 static PyObject* Variable_repr(PyObject* self) {
   Variable* x = (Variable*) self;
   const char* x_str = lp_variable_db_get_name(Variable_get_default_db(), x->x);
@@ -218,6 +241,11 @@ static PyObject* Variable_repr(PyObject* self) {
   PyObject* str = PyString_FromString(x_repr);
   free(x_repr);
   return str;
+}
+
+static long Variable_hash(PyObject* self) {
+  Variable* x = (Variable*) self;
+  return x->x;
 }
 
 static
