@@ -102,10 +102,10 @@ void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* v
 /** Puts the k-th coefficient of A into C */
 void lp_polynomial_get_coefficient(lp_polynomial_t* C, const lp_polynomial_t* A, size_t k);
 
-/** Get the reductum of the polynomial (the polynomial withough the leading coefficient) */
+/** Get the reductum of the polynomial (the polynomial without the leading coefficient) */
 void lp_polynomial_reductum(lp_polynomial_t* R, const lp_polynomial_t* A);
 
-/** Get the model-based reductum of the polynomial (the polynomial withough the leading coefficient) */
+/** Get the model-based reductum of the polynomial (the polynomial without the leading coefficient) */
 void lp_polynomial_reductum_m(lp_polynomial_t* R, const lp_polynomial_t* A, const lp_assignment_t* m);
 
 /** Returns true if the polynomial is a constant */

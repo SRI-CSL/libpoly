@@ -373,6 +373,12 @@ void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, 
     -- i;
   }
 
+  if (i < 0) {
+    // All zero
+    coefficient_assign_int(ctx, R, 0);
+    return;
+  }
+
   coefficient_t result;
   coefficient_construct_rec(ctx, &result, VAR(C), i + 1);
 
