@@ -115,6 +115,11 @@ void integer_assign_int(lp_int_ring_t* K, lp_integer_t* c, long from) {
 }
 
 static inline
+double integer_get_int(const lp_integer_t* c) {
+  return mpz_get_si(c);
+}
+
+static inline
 void integer_destruct(lp_integer_t* c) {
   mpz_clear(c);
 }

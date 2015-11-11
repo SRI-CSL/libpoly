@@ -151,6 +151,19 @@ initpolypy(void)
   Py_INCREF(&ValueType);
   PyModule_AddObject(m, "Value", (PyObject*)&ValueType);
 
+  // Sign conditions
+  lp_value_t value_inf_pos, value_inf_neg;
+  lp_value_construct(&value_inf_pos, LP_VALUE_PLUS_INFINITY, NULL);
+  lp_value_construct(&value_inf_neg, LP_VALUE_MINUS_INFINITY, NULL);
+  PyObject* inf_pos = PyValue_create(&value_inf_pos);
+  PyObject* inf_neg = PyValue_create(&value_inf_neg);
+  PyModule_AddObject(m, "INFINITY_POS", inf_pos);
+  PyModule_AddObject(m, "INFINITY_NEG", inf_neg);
+  Py_INCREF(inf_pos);
+  Py_INCREF(inf_neg);
+  lp_value_destruct(&value_inf_pos);
+  lp_value_destruct(&value_inf_neg);
+
   Py_INCREF(&IntervalType);
   PyModule_AddObject(m, "Interval", (PyObject*)&IntervalType);
 

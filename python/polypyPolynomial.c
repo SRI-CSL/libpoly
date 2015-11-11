@@ -400,7 +400,12 @@ Polynomial_cmp(PyObject* self, PyObject* other) {
 static long
 Polynomial_hash(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
-  return lp_polynomial_hash(p->p);
+  long hash = lp_polynomial_hash(p->p);
+  if (hash == -1) {
+    // value -1 should not be returned as a normal return value
+    hash = 0;
+  }
+  return hash;
 }
 
 static PyObject* Polynomial_str(PyObject* self) {
@@ -1167,6 +1172,8 @@ Polynomial_roots_count(PyObject* self, PyObject* args) {
 static PyObject*
 Polynomial_roots_isolate(PyObject* self, PyObject* args) {
 
+  int i;
+
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
@@ -1182,11 +1189,22 @@ Polynomial_roots_isolate(PyObject* self, PyObject* args) {
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
 
-  // Check that the top variable is unassigned
+  // Check that the top variable is the only unassigned
   lp_variable_t x = lp_polynomial_top_variable(p);
+  lp_variable_list_t p_vars;
+  lp_variable_list_construct(&p_vars);
+  lp_polynomial_get_variables(p, &p_vars);
+  for (i = 0; i < p_vars.list_size; ++ i) {
+    lp_variable_t p_var = p_vars.list[i];
+    if (p_var != x && lp_assignment_get_value(assignment, p_var)->type == LP_VALUE_NONE) {
+      PyErr_SetString(PyExc_RuntimeError, "Polynomial must be univariate modulo the assignment: a non-top variable is not assigned.");
+      return NULL;
+    }
+  }
+  lp_variable_list_destruct(&p_vars);
   if (lp_assignment_get_value(assignment, x)->type != LP_VALUE_NONE) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "Polynomial must be univariate modulo the assignment: top variable is assigned.");
+    return NULL;
   }
 
   // Get the degree of the polynomial and allocate the values
@@ -1199,7 +1217,6 @@ Polynomial_roots_isolate(PyObject* self, PyObject* args) {
   // Generate a list of roots
   PyObject* list = PyList_New(roots_size);
 
-  int i;
   for (i = 0; i < roots_size; ++ i) {
     PyObject* c = PyValue_create(roots + i);
     PyList_SetItem(list, i, c);

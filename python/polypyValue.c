@@ -42,6 +42,12 @@ Value_richcompare(PyObject* self, PyObject* other, int op);
 static PyObject*
 Value_str(PyObject* self);
 
+static long
+Value_hash(PyObject* self);
+
+static PyObject*
+Value_get_value_between(PyObject* self, PyObject* args);
+
 static PyObject*
 Value_add(PyObject* self, PyObject* args);
 
@@ -59,6 +65,7 @@ Value_pow(PyObject* self, PyObject* args);
 
 PyMethodDef Value_methods[] = {
     {"to_double", (PyCFunction)Value_to_double, METH_NOARGS, "Returns the approximation of the value"},
+    {"get_value_between", (PyCFunction)Value_get_value_between, METH_VARARGS, "Returns a value between this and given value"},
     {NULL}  /* Sentinel */
 };
 
@@ -125,7 +132,7 @@ PyTypeObject ValueType = {
     &Value_NumberMethods, /*tp_as_number*/
     0,                          /*tp_as_sequence*/
     0,                          /*tp_as_mapping*/
-    0,                          /*tp_hash */
+    &Value_hash,                          /*tp_hash */
     0,                          /*tp_call*/
     Value_str,        /*tp_str*/
     0,                          /*tp_getattro*/
@@ -265,6 +272,8 @@ Value_richcompare(PyObject* self, PyObject* other, int op) {
     case Py_GE:
       result = cmp >= 0 ? Py_True : Py_False;
       break;
+    default:
+      assert(0);
     }
   }
 
@@ -278,6 +287,53 @@ static PyObject* Value_str(PyObject* self) {
   PyObject* pystr = PyString_FromString(cstr);
   free(cstr);
   return pystr;
+}
+
+static long
+Value_hash(PyObject* self) {
+  Value* v = (Value*) self;
+  long hash = lp_value_hash(&v->v);
+  if (hash == -1) {
+    // value -1 should not be returned as a normal return value
+    hash = 0;
+  }
+  return hash;
+}
+
+static PyObject*
+Value_get_value_between(PyObject* self, PyObject* args) {
+  // self is always a polynomial
+  Value* v1 = (Value*) self;
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  PyObject* other = PyTuple_GetItem(args, 0);
+
+  // other should be a value
+  if (!PyValue_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  Value* v2 = (Value*) other;
+
+  // compare the values (they should be different)
+  if (v1->v.type == LP_VALUE_NONE || v2->v.type == LP_VALUE_NONE) {
+    PyErr_SetString(PyExc_RuntimeError, "Values should not be null.");
+    return NULL;
+  }
+  if (lp_value_cmp(&v1->v, &v2->v) == 0) {
+    PyErr_SetString(PyExc_RuntimeError, "Values should be different.");
+    return NULL;
+  }
+
+  lp_value_t m;
+  lp_value_construct_none(&m);
+  lp_value_get_value_between(&v1->v, 1, &v2->v, 1, &m);
+  PyObject* result = PyValue_create(&m);
+  lp_value_destruct(&m);
+
+  return result;
 }
 
 static PyObject*

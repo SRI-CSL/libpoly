@@ -21,6 +21,7 @@
 #include "polypyVariable.h"
 #include "utils.h"
 #include "polypyAlgebraicNumber.h"
+#include "polypyValue.h"
 
 #include <structmember.h>
 
@@ -215,6 +216,10 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           lp_value_construct(&value, LP_VALUE_ALGEBRAIC, &((AlgebraicNumber*) value_obj)->a);
           lp_assignment_set_value(a->assignment, var->x, &value);
           lp_value_destruct(&value);
+          Py_RETURN_NONE;
+        } else if (PyValue_CHECK(value_obj)) {
+          Value* value = (Value*) value_obj;
+          lp_assignment_set_value(a->assignment, var->x, &value->v);
           Py_RETURN_NONE;
         } else {
           Py_INCREF(Py_NotImplemented);

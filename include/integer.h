@@ -107,6 +107,11 @@ void lp_integer_assign(lp_int_ring_t* K, lp_integer_t* c, const lp_integer_t* fr
 void lp_integer_assign_int(lp_int_ring_t* K, lp_integer_t* c, long x);
 
 /**
+ * Get the int value if it fits (otherwise reutrns truncated version of the same sign)
+ */
+long lp_integer_get_int(const lp_integer_t* c);
+
+/**
  * Deallocates the integer.
  */
 void lp_integer_destruct(lp_integer_t* c);
