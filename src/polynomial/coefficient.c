@@ -687,6 +687,23 @@ unsigned coefficient_root_lower_bound(const coefficient_t* C) {
   return max_log - log_c0 + 1;
 }
 
+int coefficient_is_assigned(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    if (lp_assignment_get_value(m, VAR(C))->type == LP_VALUE_NONE) {
+      return 0;
+    } else {
+      size_t i;
+      for (i = 0; i < SIZE(C); ++ i) {
+        if (!coefficient_is_assigned(ctx, COEFF(C, i), m)) {
+          // Not assigned
+          return 0;
+        }
+      }
+    }
+  }
+  return 1;
+}
+
 STAT_DECLARE(int, coefficient, sgn)
 
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {

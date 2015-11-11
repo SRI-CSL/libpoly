@@ -177,6 +177,9 @@ int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* 
 /** Returns true if the coefficient is -1 */
 int coefficient_is_minus_one(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
+/** Returns true if all variables of C are assigned */
+int coefficient_is_assigned(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
+
 /** Returns the sign of the coefficient in the model */
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
 

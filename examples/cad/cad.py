@@ -29,7 +29,7 @@ class CAD:
     projection_map = None
     
     # Signs of relevant polynomials, mapping top variables to polynomials (for lifting)
-    sign_map = None
+    sign_condition_map = None
     
     # Set of variables we're working with
     variables = None
@@ -40,10 +40,10 @@ class CAD:
         polypy.variable_order.set(variable_list)
         # Map from variables to sets of polynomials
         self.projection_map = {}
-        self.sign_map = {}
+        self.sign_condition_map = {}
         for x in variable_list:
             self.projection_map[x] = set()
-            self.sign_map[x] = set()
+            self.sign_condition_map[x] = set()
             
         # Variables 
         self.variables = variable_list
@@ -62,7 +62,18 @@ class CAD:
                 self.projection_map[x].add(f_factor)
         # If sign give, remember it
         if sign_condition is not None:
-            self.sign_map[x].add((f, sign_condition))            
+            self.sign_condition_map[x].add((f, sign_condition))            
+    
+    # 
+    # Check if the assignmnent respects the polynomials with top variable x  
+    #
+    def check_assignment(self, x, assignment):
+        for p, sgn_condition in self.sign_condition_map[x]:
+            # Check
+            if not p.sgn_check(assignment, sgn_condition):
+                print "Discarding ", assignment, "due to", p
+                return False
+        return True
     
     #
     # Add a collection of polynomials to CAD
@@ -105,8 +116,6 @@ class CAD:
             return        
         # Lift first variable
         x = variables[0] 
-        print "Lifting:", x
-        print "Current model: ", assignment
         # Get the roots
         roots = set()
         for f in self.projection_map[x]:
@@ -128,12 +137,15 @@ class CAD:
                 cad_points.extend([v, r2])
             # A point larger than all roots
             last = roots_sorted[-1].get_value_between(polypy.INFINITY_POS)
-            cad_points.append(last)
-        # We have the points now
-        print "Choices:", cad_points
+            cad_points.append(last)      
+        # Go recursive
         for v in cad_points:
-            assignment.set_value(x, v)
-            self.lift_first_var(variables[1:], assignment)
+            # Set the assignment
+            assignment.set_value(x, v)            
+            # Go recursive if assignment doesn't invalidate any constraints
+            if self.check_assignment(x, assignment):
+                self.lift_first_var(variables[1:], assignment)            
+            # Unset assignment
             assignment.unset_value(x)                    
     
     # 
@@ -153,7 +165,7 @@ class CAD:
             print x, ":", self.projection_map[x]
         print "Sign map:"
         for x in self.variables:
-            print x, ":", self.sign_map[x]
+            print x, ":", self.sign_condition_map[x]
       
 if __name__ == "__main__":
     # Some variables
@@ -161,10 +173,9 @@ if __name__ == "__main__":
     y = polypy.Variable("y");
     # Setup CAD  
     cad = CAD([x, y]) 
-    cad.add_polynomial(x**2 + y**2 - 1, polypy.SGN_LT_0)
-    cad.add_polynomial((x-1)**2 + y**2 - 1, polypy.SGN_GT_0)
+    cad.add_polynomial(x**2 + y**2 - 1, polypy.SGN_EQ_0)
+    cad.add_polynomial((x-1)**2 + y**2 - 1, polypy.SGN_EQ_0)
     # Project
     cad.project()
-    cad.print_state()
     # Lift
     cad.lift()

@@ -270,6 +270,11 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
   }
 }
 
+int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m) {
+  lp_polynomial_external_clean(A);
+  return coefficient_is_assigned(A->ctx, &A->data, m);
+}
+
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
 

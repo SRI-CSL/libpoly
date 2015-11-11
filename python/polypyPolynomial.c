@@ -72,6 +72,9 @@ static PyObject*
 Polynomial_sgn(PyObject* self, PyObject* arguments);
 
 static PyObject*
+Polynomial_sgn_check(PyObject* self, PyObject* args);
+
+static PyObject*
 Polynomial_rem(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -163,6 +166,7 @@ PyMethodDef Polynomial_methods[] = {
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
     {"reductum", (PyCFunction)Polynomial_reductum, METH_VARARGS, "Returns the reductum of the polynomial"},
     {"sgn", (PyCFunction)Polynomial_sgn, METH_VARARGS, "Returns the sign of the polynomials in the given model"},
+    {"sgn_check", (PyCFunction)Polynomial_sgn_check, METH_VARARGS, "Returns true if the sign of the polynomail respects the sign condition."},
     {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial"},
     {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial"},
     {"sprem", (PyCFunction)Polynomial_sprem, METH_VARARGS, "Returns the sparse pseudo remainder of current and given polynomial"},
@@ -1190,20 +1194,8 @@ Polynomial_roots_isolate(PyObject* self, PyObject* args) {
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
 
   // Check that the top variable is the only unassigned
-  lp_variable_t x = lp_polynomial_top_variable(p);
-  lp_variable_list_t p_vars;
-  lp_variable_list_construct(&p_vars);
-  lp_polynomial_get_variables(p, &p_vars);
-  for (i = 0; i < p_vars.list_size; ++ i) {
-    lp_variable_t p_var = p_vars.list[i];
-    if (p_var != x && lp_assignment_get_value(assignment, p_var)->type == LP_VALUE_NONE) {
-      PyErr_SetString(PyExc_RuntimeError, "Polynomial must be univariate modulo the assignment: a non-top variable is not assigned.");
-      return NULL;
-    }
-  }
-  lp_variable_list_destruct(&p_vars);
-  if (lp_assignment_get_value(assignment, x)->type != LP_VALUE_NONE) {
-    PyErr_SetString(PyExc_RuntimeError, "Polynomial must be univariate modulo the assignment: top variable is assigned.");
+  if (!lp_polynomial_is_univariate_m(p, assignment)) {
+    PyErr_SetString(PyExc_RuntimeError, "roots_count(): Polynomial must be univariate modulo the assignment.");
     return NULL;
   }
 
@@ -1412,8 +1404,8 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
 
   // Check if all but the top variable are unassigned
   if (!lp_polynomial_is_univariate_m(p, assignment)) {
-    Py_IncRef(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): Polynomial must be univariate modulo the assignment.");
+    return NULL;
   }
 
   // Get the feasible intervals
@@ -1460,8 +1452,8 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
 
   // Check if all but the top variable are unassigned
   if (!lp_polynomial_is_univariate_m(p, assignment)) {
-    Py_IncRef(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_set(): Polynomial must be univariate modulo the assignment.");
+    return NULL;
   }
 
   // Get the feasible intervals
@@ -1470,3 +1462,44 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
   // Return the list
   return PyFeasibilitySet_create(feasible);
 }
+
+static PyObject*
+Polynomial_sgn_check(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 2) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* assignment_obj = PyTuple_GetItem(args, 0);
+  if (!PyAssignment_CHECK(assignment_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
+  if (!PyInt_Check(sgn_condition_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+    // Get the arguments
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
+  lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+
+  // Check if all but the top variable are unassigned
+  if (!lp_polynomial_is_assigned(p, assignment)) {
+    PyErr_SetString(PyExc_RuntimeError, "sgn_check(): All polynomial variables should be assigned by the given assignment.");
+    return NULL;
+  }
+
+  // Check the sign
+  int sgn = lp_polynomial_sgn(p, assignment);
+  if (lp_sign_condition_consistent(sgn_condition, sgn)) {
+    Py_RETURN_TRUE;
+  } else {
+    Py_RETURN_FALSE;
+  }
+}
+
