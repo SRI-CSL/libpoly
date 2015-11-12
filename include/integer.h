@@ -139,9 +139,14 @@ char* lp_integer_to_string(const lp_integer_t* c);
 #endif
 
 /**
- * Returns the int representation of the integer.
+ * Returns the int representation of the integer (truncated but keeps sign).
  */
 long lp_integer_to_int(const lp_integer_t* c);
+
+/**
+ * Returns the double representation of the integer.
+ */
+double lp_integer_to_double(const lp_integer_t* c);
 
 /**
  * Returns true if the integer is a prime number.

@@ -154,3 +154,6 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
 
 /** Get an approximation of the size between lower and upper */
 int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t* upper);
+
+/** Get the double (approximation) of the value */
+double lp_value_to_double(const lp_value_t* v);

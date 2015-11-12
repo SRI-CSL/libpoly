@@ -18,6 +18,7 @@
  */
 
 #include "polypyValue.h"
+#include "utils.h"
 
 #include <structmember.h>
 
@@ -63,6 +64,15 @@ Value_mul(PyObject* self, PyObject* args);
 static PyObject*
 Value_pow(PyObject* self, PyObject* args);
 
+static PyObject*
+Value_int(PyObject* self);
+
+static PyObject*
+Value_long(PyObject* self);
+
+static PyObject*
+Value_float(PyObject* self);
+
 PyMethodDef Value_methods[] = {
     {"to_double", (PyCFunction)Value_to_double, METH_NOARGS, "Returns the approximation of the value"},
     {"get_value_between", (PyCFunction)Value_get_value_between, METH_VARARGS, "Returns a value between this and given value"},
@@ -88,9 +98,9 @@ PyNumberMethods Value_NumberMethods = {
      0, // binaryfunc nb_xor;
      0, // binaryfunc nb_or;
      0, // coercion nb_coerce;       /* Used by the coerce() function */
-     0, // unaryfunc nb_int;
-     0, // unaryfunc nb_long;
-     0, // unaryfunc nb_float;
+     Value_int, // unaryfunc nb_int;
+     Value_long, // unaryfunc nb_long;
+     Value_float, // unaryfunc nb_float;
      0, // unaryfunc nb_oct;
      0, // unaryfunc nb_hex;
 
@@ -364,4 +374,43 @@ static PyObject*
 Value_pow(PyObject* self, PyObject* other) {
   assert(0);
   return 0;
+}
+
+// Returns the o converted to an integer object on success, or NULL on failure.
+// If the argument is outside the integer range a long object will be returned
+// instead. This is the equivalent of the Python expression int(o).
+// Return value: New reference.
+static PyObject*
+Value_int(PyObject* self) {
+  Value* value_obj = (Value*) self;
+  lp_integer_t int_cast;
+  lp_integer_construct(&int_cast);
+  lp_value_floor(&value_obj->v, &int_cast);
+  PyObject* py_int_cast = integer_to_PyInt(&int_cast);
+  lp_integer_destruct(&int_cast);
+  return py_int_cast;
+}
+
+// Returns the o converted to a long integer object on success, or NULL on
+// failure. This is the equivalent of the Python expression long(o).
+// Return value: New reference.
+static PyObject*
+Value_long(PyObject* self) {
+  Value* value_obj = (Value*) self;
+  lp_integer_t int_cast;
+  lp_integer_construct(&int_cast);
+  lp_value_floor(&value_obj->v, &int_cast);
+  PyObject* py_int_cast = integer_to_PyLong(&int_cast);
+  lp_integer_destruct(&int_cast);
+  return py_int_cast;
+}
+
+// Returns the o converted to a float object on success, or NULL on failure.
+// This is the equivalent of the Python expression float(o).
+// Return value: New reference.
+static PyObject*
+Value_float(PyObject* self) {
+  Value* value_obj = (Value*) self;
+  double value = lp_value_to_double(&value_obj->v);
+  return PyFloat_FromDouble(value);
 }

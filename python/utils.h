@@ -38,9 +38,14 @@ int PyLong_or_Int_Check(PyObject* o);
 void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring_t* K, lp_integer_t* x);
 
 /**
- * Get a python integer from our integer.
+ * Get a python integer (or long) from our integer.
  */
 PyObject* integer_to_PyInt(const lp_integer_t* x);
+
+/**
+ * Get a python long from our integer.
+ */
+PyObject* integer_to_PyLong(const lp_integer_t* x);
 
 /**
  * Construct the rational from Python float.

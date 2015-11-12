@@ -173,7 +173,7 @@ if __name__ == "__main__":
     y = polypy.Variable("y");
     # Setup CAD  
     cad = CAD([x, y]) 
-    cad.add_polynomial(x**2 + y**2 - 1, polypy.SGN_EQ_0)
+    cad.add_polynomial(2*x - 1, polypy.SGN_EQ_0)
     cad.add_polynomial((x-1)**2 + y**2 - 1, polypy.SGN_EQ_0)
     # Project
     cad.project()

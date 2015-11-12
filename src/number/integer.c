@@ -163,6 +163,10 @@ long lp_integer_to_int(const lp_integer_t* c) {
   return integer_to_int(c);
 }
 
+double lp_integer_to_double(const lp_integer_t* c) {
+  return integer_to_double(c);
+}
+
 int lp_integer_is_prime(const lp_integer_t* c) {
   return integer_is_prime(c);
 }

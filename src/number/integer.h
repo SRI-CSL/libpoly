@@ -166,6 +166,11 @@ long integer_to_int(const lp_integer_t* c) {
 }
 
 static inline
+double integer_to_double(const lp_integer_t* c) {
+  return mpz_get_d(c);
+}
+
+static inline
 int integer_is_prime(const lp_integer_t* c) {
   return mpz_probab_prime_p(c, 25);
 }

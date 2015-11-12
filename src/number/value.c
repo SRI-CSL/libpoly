@@ -29,6 +29,7 @@
 #include "utils/debug_trace.h"
 
 #include <limits.h>
+#include <math.h>
 
 void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data) {
   v->type = type;
@@ -875,5 +876,27 @@ size_t lp_value_hash(lp_value_t* v) {
     lp_integer_destruct(&floor);
     return hash;
   }
+  }
+}
+
+double lp_value_to_double(const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_NONE:
+    return 0;
+  case LP_VALUE_PLUS_INFINITY:
+    return INFINITY;
+  case LP_VALUE_MINUS_INFINITY:
+    return -INFINITY;
+  case LP_VALUE_INTEGER:
+    return lp_integer_to_double(&v->value.z);
+  case LP_VALUE_DYADIC_RATIONAL:
+    return lp_dyadic_rational_to_double(&v->value.dy_q);
+  case LP_VALUE_RATIONAL:
+    return lp_rational_to_double(&v->value.q);
+  case LP_VALUE_ALGEBRAIC:
+    return lp_algebraic_number_to_double(&v->value.a);
+  default:
+    return 0;
+    assert(0);
   }
 }

@@ -50,6 +50,14 @@ PyObject* integer_to_PyInt(const lp_integer_t* x) {
   return result;
 }
 
+PyObject* integer_to_PyLong(const lp_integer_t* x) {
+  char* str = lp_integer_to_string(x);
+  char* str_p = 0;
+  PyObject* result = PyLong_FromString(str, &str_p, 10);
+  free(str);
+  return result;
+}
+
 void PyFloat_to_dyadic_rational(PyObject* o, lp_dyadic_rational_t* x) {
   double o_double = PyFloat_AsDouble(o);
   lp_dyadic_rational_construct_from_double(x, o_double);
