@@ -13,13 +13,13 @@ class Cylinder:
     # Variable values in the region
     values = []
 
-    # Add a on top of the cylinder definition
+    # Add a on top of the cylinder_nofity definition
     def push(self, x, definition, value):
         self.variables.append(x)
         self.definitions.append(definition)
         self.values.append(value)
         
-    # Pop the top of cylinder definition
+    # Pop the top of cylinder_nofity definition
     def pop(self):
         self.values.pop()
         self.definitions.pop()
@@ -35,8 +35,8 @@ class Cylinder:
 # Notifications for the cylinders of CAD
 class CylinderNotify(object):
         
-    # A cylinder and an assignment in the cylinder
-    def notify(self, cylinder, assignment):
+    # A cylinder_nofity and an assignment in the cylinder_nofity
+    def cylinder_notify(self, cylinder, assignment):
         print "Assignmnent: ", assignment
         print "Cylinder:\n", cylinder
         pass
@@ -55,7 +55,7 @@ class CAD:
     variables = []
     
     # Notification
-    region_notify = CylinderNotify()
+    cylinder_notify = CylinderNotify()
     
     # Polynomials with sign conditions are considered a conjunction
     CONJUCTIVE  = 0
@@ -148,7 +148,7 @@ class CAD:
     def lift_first_var(self, variables, assignment, cylinder):
         # We've tried all variables, this assignment checks out
         if len(variables) == 0:
-            self.region_notify.notify(cylinder, assignment)
+            self.cylinder_notify.cylinder_notify(cylinder, assignment)
             return        
         # Lift first variable
         x = variables[0] 
