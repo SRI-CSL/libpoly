@@ -315,25 +315,25 @@ Value_get_value_between(PyObject* self, PyObject* args) {
   // self is always a polynomial
   Value* v1 = (Value*) self;
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "get_value_between(): need one argument.");
+    return NULL;
   }
   PyObject* other = PyTuple_GetItem(args, 0);
 
   // other should be a value
   if (!PyValue_CHECK(other)) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "get_value_between(): argument not a value.");
+    return NULL;
   }
   Value* v2 = (Value*) other;
 
   // compare the values (they should be different)
   if (v1->v.type == LP_VALUE_NONE || v2->v.type == LP_VALUE_NONE) {
-    PyErr_SetString(PyExc_RuntimeError, "Values should not be null.");
+    PyErr_SetString(PyExc_RuntimeError, "get_value_between(): values should not be null.");
     return NULL;
   }
   if (lp_value_cmp(&v1->v, &v2->v) == 0) {
-    PyErr_SetString(PyExc_RuntimeError, "Values should be different.");
+    PyErr_SetString(PyExc_RuntimeError, "get_value_between(): values should be different.");
     return NULL;
   }
 

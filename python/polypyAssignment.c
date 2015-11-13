@@ -222,16 +222,16 @@ Assignment_set_value(PyObject* self, PyObject* args) {
           lp_assignment_set_value(a->assignment, var->x, &value->v);
           Py_RETURN_NONE;
         } else {
-          Py_INCREF(Py_NotImplemented);
-          return Py_NotImplemented;
+          PyErr_SetString(PyExc_RuntimeError, "set_value(): not a value.");
+          return NULL;
         }
       } else {
-        Py_INCREF(Py_NotImplemented);
-        return Py_NotImplemented;
+        PyErr_SetString(PyExc_RuntimeError, "set_value(): not a variable.");
+        return NULL;
       }
     } else {
-      Py_INCREF(Py_NotImplemented);
-      return Py_NotImplemented;
+      PyErr_SetString(PyExc_RuntimeError, "set_value(): need two arguments.");
+      return NULL;
     }
 }
 
@@ -245,11 +245,11 @@ Assignment_unset_value(PyObject* self, PyObject* args) {
       lp_assignment_set_value(a->assignment, var->x, 0);
       Py_RETURN_NONE;
     } else {
-      Py_INCREF(Py_NotImplemented);
-      return Py_NotImplemented;
+      PyErr_SetString(PyExc_RuntimeError, "set_value(): not a variable.");
+      return NULL;
     }
   } else {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "set_value(): need one argument.");
+    return NULL;
   }
 }
