@@ -177,7 +177,7 @@ class CAD:
             cylinder.pop()
             # Get the section [r2]
             if r2[0] != polypy.INFINITY_POS:
-                cylinder.push(x, (r2[1],), v)
+                cylinder.push(x, (r2[1],), r2[0])
                 assignment.set_value(x, r2[0])
                 # Go recursive if assignment doesn't invalidate any constraints
                 if self.check_assignment(x, assignment):
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     y = polypy.Variable("y");
     # Setup CAD  
     cad = CAD([x, y]) 
-    cad.add_polynomial(x**2 + y**2 - 1, polypy.SGN_LE_0)
+    cad.add_polynomial(x**2 + y**2 - 1, polypy.SGN_GE_0)
     # Project
     cad.project()
     # Lift
