@@ -6,37 +6,33 @@ import cad
 import matplotlib.pyplot as plt
 
 # 2D plotting of polynomials
-class PolyPlot2D(CylinderNotify):
-        
-    # The variables
-    x = None
-    y = None
-    
-    # List of polynomials with sign conditions
-    polynomials = None
-    
+class PolyPlot2D(cad.CylinderNotify):
+            
     # Initialize   
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.cad = cad.CAD([x, y])
         self.polynomials = []
+        self.cylinders = []
 
     # Add a polynomial
     def add_polynomial(self, f, sign_condition):
         self.polynomials.append((f, sign_condition))
-        self.cad.add_polynomial(f, sign_condition)
 
     # Show the plot
     def show(self):
-        # Do CAD
+        # Run the CAD and collect cyllinders
         mycad = cad.CAD([x, y])
-        mycad.project()
-        mycad.lift()
+        mycad.cylinder_notify = self
+        for (f, sign_condition) in self.polynomials: 
+            mycad.add_polynomial(f, sign_condition)
+        mycad.run()
         
     # Notifications on sylinders
-    def cylinder_notify(self, cylinder):
-        pass 
+    def cylinder_notify(self, cylinder, assignment):
+        self.cylinders.append(cylinder)
+        print "Cylinder:\n", cylinder
 
 if __name__ == "__main__":
     # Some variables
