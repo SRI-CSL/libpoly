@@ -33,6 +33,7 @@ set(poly_SOURCES
     polynomial/polynomial_context.c
     polynomial/feasibility_set.c
     polynomial/polynomial_hash_set.c
+    polynomial/polynomial_vector.c
     poly.c
 )
 

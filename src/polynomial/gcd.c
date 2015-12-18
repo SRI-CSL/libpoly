@@ -22,6 +22,7 @@
 
 #include "polynomial/gcd.h"
 #include "polynomial/output.h"
+#include "polynomial/polynomial_vector.h"
 
 #include "upolynomial/upolynomial.h"
 
@@ -607,4 +608,90 @@ void coefficient_cont(const lp_polynomial_context_t* ctx, coefficient_t* cont, c
 
 void coefficient_pp(const lp_polynomial_context_t* ctx, coefficient_t* pp, const coefficient_t* C) {
   coefficient_pp_cont(ctx, pp, 0, C);
+}
+
+lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, const lp_assignment_t* m) {
+
+  // Only for polynomials of the same type
+  assert(C1->type == COEFFICIENT_POLYNOMIAL);
+  assert(C2->type == COEFFICIENT_POLYNOMIAL);
+  assert(coefficient_top_variable(C1) == coefficient_top_variable(C2));
+
+  TRACE("coefficient", "coefficient_lcm()\n");
+
+  if (trace_is_enabled("coefficient")) {
+    tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+    tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
+  }
+
+  coefficient_t A, B, P, R, cont;
+  coefficient_construct_copy(ctx, &A, C1);
+  coefficient_construct_copy(ctx, &B, C2);
+  coefficient_construct(ctx, &P);
+  coefficient_construct(ctx, &R);
+  coefficient_construct(ctx, &cont);
+
+  lp_polynomial_vector_t* assumptions = lp_polynomial_vector_new(ctx);
+
+  // Get the reductums of A and B
+  coefficient_reductum_m(ctx, &A, &A, m, assumptions);
+  coefficient_reductum_m(ctx, &B, &B, m, assumptions);
+
+  // Get the primitive parts
+  coefficient_pp_cont(ctx, &A, &cont, &A);
+  if (!coefficient_is_constant(&cont)) {
+    lp_polynomial_vector_push_back_coeff(assumptions, &cont);
+  }
+  coefficient_pp_cont(ctx, &B, &cont, &B);
+  if (!coefficient_is_constant(&cont)) {
+    lp_polynomial_vector_push_back_coeff(assumptions, &cont);
+  }
+
+  // Swap A and B if def(A) < deg(B)
+  if (coefficient_degree(&A) < coefficient_degree(&B)) {
+    coefficient_swap(&A, &B);
+  }
+
+  //
+  // We compute the reduction of A and B in Z[y, x], i.e.
+  //
+  //   P*A = Q*B + R
+  //
+  // with P in Z[y], Q in Z[y, x], and deg(R) < deg(B) or deg(R) == 0.
+  //
+  // We keep the accumulating the assumptions of the reduction and keep A, B, R
+  // such reduced my model and primitive.
+  //
+  do {
+
+    // One step reduction, we get P*A = Q*B + R
+    // If A, B have a common zero, this is also a zero of R (if R is in x)
+    // If B, R have a common zero, this is also a zero of A if P != 0
+    coefficient_reduce(ctx, &A, &B, &P, 0, &R, REMAINDERING_PSEUDO_SPARSE);
+    lp_polynomial_vector_push_back_coeff(assumptions, &P);
+
+    // Reduce R and pp
+    if (!coefficient_is_constant(&R)) {
+      coefficient_reductum_m(ctx, &R, &R, m, assumptions);
+    }
+    coefficient_pp_cont(ctx, &R, &cont, &R);
+    if (!coefficient_is_constant(&cont)) {
+      lp_polynomial_vector_push_back_coeff(assumptions, &cont);
+    }
+
+    // We continue if we didn't get a constant
+    int cmp_type = coefficient_cmp_type(ctx, &B, &R);
+    if (cmp_type == 0) {
+       // A = B, B = R (already reduced)
+      coefficient_swap(&A, &B);
+      coefficient_swap(&B, &R);
+    } else {
+      // Got to the GCD, but we need to maintain the sign of R
+      lp_polynomial_vector_push_back_coeff(assumptions, &R);
+      break;
+    }
+  } while (1);
+
+  // Return the assumptions
+  return assumptions;
 }

@@ -37,6 +37,7 @@
 
 #include "variable/variable_order.h"
 #include "polynomial/polynomial_context.h"
+#include "polynomial/polynomial_vector.h"
 
 #include <assignment.h>
 
@@ -395,13 +396,16 @@ void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, 
   coefficient_destruct(&result);
 }
 
-void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m) {
+void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m, lp_polynomial_vector_t* assumptions) {
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
   // Locate the first non-zero ceofficient (normal reductum is the next nonzero)
   int i = SIZE(C) - 1;
   while (i >= 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
+    if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
+      lp_polynomial_vector_push_back_coeff(assumptions, COEFF(C, i));
+    }
     -- i;
   }
 
@@ -409,6 +413,8 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
     // All zero
     coefficient_assign_int(ctx, R, 0);
     return;
+  } else if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
+    lp_polynomial_vector_push_back_coeff(assumptions, COEFF(C, i));
   }
 
   coefficient_t result;

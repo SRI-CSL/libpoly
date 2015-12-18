@@ -254,6 +254,12 @@ void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A1, co
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
+ * Compute the model-based GCD of the two polynomials. Adds the assumptiopns to
+ * the vector.
+ */
+lp_polynomial_vector_t* lp_polynomial_mgcd(const lp_polynomial_t* p, const lp_polynomial_t* q, const lp_assignment_t* m);
+
+/**
  * Get the square-free factorization of the given polynomial. It will allocate
  * the given arrays and return the polynomials and their multiplicities in
  * them.

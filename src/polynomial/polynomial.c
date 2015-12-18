@@ -101,6 +101,12 @@ void lp_polynomial_construct_from_coefficient(lp_polynomial_t* A, const lp_polyn
   coefficient_construct_copy(A->ctx, &A->data, from);
 }
 
+lp_polynomial_t* lp_polynomial_new_from_coefficient(const lp_polynomial_context_t* ctx, const coefficient_t* from) {
+  lp_polynomial_t* result = lp_polynomial_alloc();
+  lp_polynomial_construct_from_coefficient(result, ctx, from);
+  return result;
+}
+
 void lp_polynomial_construct_copy(lp_polynomial_t* A, const lp_polynomial_t* from) {
   A->ctx = 0;
   A->external = 0;
@@ -223,7 +229,7 @@ void lp_polynomial_reductum(lp_polynomial_t* R, const lp_polynomial_t* A) {
 void lp_polynomial_reductum_m(lp_polynomial_t* R, const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
   lp_polynomial_set_context(R, A->ctx);
-  coefficient_reductum_m(A->ctx, &R->data, &A->data, m);
+  coefficient_reductum_m(A->ctx, &R->data, &A->data, m, 0);
 }
 
 int lp_polynomial_is_constant(const lp_polynomial_t* A) {
@@ -804,6 +810,26 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
       tracef("PSC[%zu] = ", i); lp_polynomial_print(psc[i], trace_out); tracef("\n");
     }
   }
+}
+
+lp_polynomial_vector_t* lp_polynomial_mgcd(const lp_polynomial_t* A, const lp_polynomial_t* B, const lp_assignment_t* m) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_mgcd("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
+  }
+
+  assert(A->data.type == COEFFICIENT_POLYNOMIAL);
+  assert(B->data.type == COEFFICIENT_POLYNOMIAL);
+  assert(VAR(&A->data) == VAR(&B->data));
+
+  const lp_polynomial_context_t* ctx = A->ctx;
+  assert(lp_polynomial_context_equal(B->ctx, ctx));
+
+  lp_polynomial_external_clean(A);
+  lp_polynomial_external_clean(B);
+
+  // Compute it
+  return coefficient_mgcd(ctx, &A->data, &B->data, m);
 }
 
 void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A, const lp_polynomial_t* B) {
