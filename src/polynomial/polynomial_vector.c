@@ -54,7 +54,7 @@ void lp_polynomial_vector_check_size_for_add(lp_polynomial_vector_t* v) {
   if (v->size == v->capacity) {
     v->capacity ++;
     v->capacity += v->capacity >> 1;
-    v->data = (coefficient_t*) realloc(v->data, v->capacity*sizeof(coefficient_t*));
+    v->data = (coefficient_t*) realloc(v->data, v->capacity*sizeof(coefficient_t));
   }
 }
 
