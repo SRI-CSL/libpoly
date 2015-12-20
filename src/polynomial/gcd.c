@@ -624,6 +624,8 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
     tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
   }
 
+  lp_variable_t x = coefficient_top_variable(C1);
+
   coefficient_t A, B, P, R, cont;
   coefficient_construct_copy(ctx, &A, C1);
   coefficient_construct_copy(ctx, &B, C2);
@@ -645,6 +647,11 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
   coefficient_pp_cont(ctx, &B, &cont, &B);
   if (!coefficient_is_constant(&cont)) {
     lp_polynomial_vector_push_back_coeff(assumptions, &cont);
+  }
+
+  // If one of the coefficient reduces to a constant, we're done
+  if (coefficient_top_variable(&A) != x || coefficient_top_variable(&B) != x) {
+    return assumptions;
   }
 
   // Swap A and B if def(A) < deg(B)
