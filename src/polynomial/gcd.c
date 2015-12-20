@@ -639,15 +639,9 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
   coefficient_reductum_m(ctx, &A, &A, m, assumptions);
   coefficient_reductum_m(ctx, &B, &B, m, assumptions);
 
-  // Get the primitive parts
+  // Get the primitive parts (reductum includes the sign of cont)
   coefficient_pp_cont(ctx, &A, &cont, &A);
-  if (!coefficient_is_constant(&cont)) {
-    lp_polynomial_vector_push_back_coeff(assumptions, &cont);
-  }
   coefficient_pp_cont(ctx, &B, &cont, &B);
-  if (!coefficient_is_constant(&cont)) {
-    lp_polynomial_vector_push_back_coeff(assumptions, &cont);
-  }
 
   // If one of the coefficient reduces to a constant, we're done
   if (coefficient_top_variable(&A) != x || coefficient_top_variable(&B) != x) {
@@ -684,9 +678,6 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
       coefficient_reductum_m(ctx, &R, &R, m, assumptions);
     }
     coefficient_pp_cont(ctx, &R, &cont, &R);
-    if (!coefficient_is_constant(&cont)) {
-      lp_polynomial_vector_push_back_coeff(assumptions, &cont);
-    }
 
     // We continue if we didn't get a constant
     int cmp_type = coefficient_cmp_type(ctx, &B, &R);
