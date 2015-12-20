@@ -668,7 +668,7 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
     // One step reduction, we get P*A = Q*B + R
     // If A, B have a common zero, this is also a zero of R (if R is in x)
     // If B, R have a common zero, this is also a zero of A if P != 0
-    coefficient_reduce(ctx, &A, &B, &P, 0, &R, REMAINDERING_PSEUDO_SPARSE);
+    coefficient_reduce(ctx, &A, &B, &P, 0, &R, REMAINDERING_LCM_SPARSE);
     if (!coefficient_is_constant(&P)) {
       lp_polynomial_vector_push_back_coeff(assumptions, &P);
     }

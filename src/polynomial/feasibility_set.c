@@ -191,7 +191,7 @@ int same_or_better_complexity(const lp_value_t* v1, int v1_interval_size, const 
   }
 
   // Same type, compare the intervals
-  return v1_interval_size <= v2_interval_size;
+  return v1_interval_size >= v2_interval_size;
 }
 
 void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* value) {
