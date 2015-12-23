@@ -190,7 +190,7 @@ PyMethodDef Polynomial_methods[] = {
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
     {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
     {"var", (PyCFunction)Polynomial_var, METH_NOARGS, "Returns the top variable of the polynomial"},
-    {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals of the polynomial (has to be univariate modulo the assignment)"},
+    {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals (list) of the polynomial (has to be univariate modulo the assignment)"},
     {"feasible_set", (PyCFunction)Polynomial_feasible_set, METH_VARARGS, "Returns feasible set of the polynomial (has to be univariate modulo the assignment)"},
     {NULL}  /* Sentinel */
 };
@@ -1463,23 +1463,23 @@ static PyObject*
 Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 2) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): Needs two arguments, an assignment and a sign condition.");
+    return NULL;
   }
 
   PyObject* assignment_obj = PyTuple_GetItem(args, 0);
   if (!PyAssignment_CHECK(assignment_obj)) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): First argument must be an assignment.");
+    return NULL;
   }
 
   PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
   if (!PyInt_Check(sgn_condition_obj)) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): Second argument must be a sign-condition.");
+    return NULL;
   }
 
-    // Get the arguments
+  // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
   lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
@@ -1503,6 +1503,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   }
   // Remove temp
   lp_feasibility_set_delete(feasible);
+
   // Return the list
   return list;
 }
@@ -1527,7 +1528,7 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
     return Py_NotImplemented;
   }
 
-    // Get the arguments
+  // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
   lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);

@@ -44,3 +44,6 @@ void lp_polynomial_vector_destruct(lp_polynomial_vector_t* v);
 
 /** Add to back (makes a copy) */
 void lp_polynomial_vector_push_back_coeff(lp_polynomial_vector_t* v, const coefficient_t* C);
+
+/** Add while breaking everything so that gcd v[i] v[j] = 1, ignore constants */
+void lp_polynomial_vector_push_back_coeff_prime(lp_polynomial_vector_t* v, const coefficient_t* C);

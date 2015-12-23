@@ -102,6 +102,12 @@ coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C
 static void
 coefficient_normalize(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
+/**
+ * Same as above, but uses the model.
+ */
+static void
+coefficient_normalize_m(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_assignment_t* m);
+
 int
 coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
@@ -404,7 +410,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
   int i = SIZE(C) - 1;
   while (i >= 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
     if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
-      lp_polynomial_vector_push_back_coeff(assumptions, COEFF(C, i));
+      lp_polynomial_vector_push_back_coeff_prime(assumptions, COEFF(C, i));
     }
     -- i;
   }
@@ -414,7 +420,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
     coefficient_assign_int(ctx, R, 0);
     return;
   } else if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
-    lp_polynomial_vector_push_back_coeff(assumptions, COEFF(C, i));
+    lp_polynomial_vector_push_back_coeff_prime(assumptions, COEFF(C, i));
   }
 
   coefficient_t result;
@@ -1556,14 +1562,10 @@ void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const
   assert(n + 1 <= SIZE(C));
 
   if (n + 1 == SIZE(C)) {
-    if (S == C) {
-      coefficient_t result;
-      coefficient_construct_copy(ctx, &result, coefficient_lc(C));
-      coefficient_swap(&result, S);
-      coefficient_destruct(&result);
-    } else {
-      coefficient_assign(ctx, S, coefficient_lc(C));
-    }
+    coefficient_t result;
+    coefficient_construct_copy(ctx, &result, coefficient_lc(C));
+    coefficient_swap(&result, S);
+    coefficient_destruct(&result);
   } else {
     coefficient_t result;
     coefficient_construct_rec(ctx, &result, VAR(C), SIZE(C) - n);
@@ -2004,7 +2006,7 @@ void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const
 
   // Both polynomials in the same variables, check if we can divide by x^k
   size_t i = 0;
-  while (coefficient_is_zero(ctx, COEFF(C2, i))) {
+  while (coefficient_is_zero(ctx, COEFF(C2, i)) && coefficient_is_zero(ctx, COEFF(C1, i))) {
     ++ i;
   }
   if (i > 0) {

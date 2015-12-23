@@ -2,6 +2,8 @@
 
 import polypy
 import polypy_test
+
+import sys
  
 polypy_test.init()
  
@@ -17,6 +19,37 @@ polypy_test.start("model-based GCD")
 # polypy.trace_enable("coefficient")
 # polypy.trace_enable("coefficient::order")
 # polypy.trace_enable("coefficient::reduce")
+
+m = polypy.Assignment()
+m.set_value(y, -1)
+A = 1*x**11 - 110*x**9 + 7920*x**7 - 332640*x**5 + 6652800*x**3 + (110*y**8 - 7920*y**6 + 332640*y**4 - 6652800*y**2)*x
+B = 72*x**6 - 3024*x**4 + 60480*x**2 + (1*y**8 - 72*y**6 + 3024*y**4 - 60480*y**2)
+print A.mgcd(B, m)
+
+sys.exit()
+
+m = polypy.Assignment()
+m.set_value(y, -1)
+
+A = 1*x
+B = 72*x**6 - 3024*x**4 + 60480*x**2 + (1*y**8 - 72*y**6 + 3024*y**4 - 60480*y**2)
+C = 1*x**11 - 110*x**9 + 7920*x**7 - 332640*x**5 + 6652800*x**3 + (110*y**8 - 7920*y**6 + 332640*y**4 - 6652800*y**2)*x
+
+m = polypy.Assignment()
+m.set_value(y, 0)
+
+A = 72*x**6 - 3024*x**4 + 60480*x**2 + (y**8 - 72*y**6 + 3024*y**4 - 60480*y**2)
+B = A.derivative()
+
+PSC = A.psc(B)
+MGCD = A.mgcd(B, m)
+
+print "A =", A
+print "B =", B
+print "PSC =", PSC
+print "MGCD =", MGCD
+
+sys.exit(0)
 
 x5 = polypy.Variable("x5")     
 x9 = polypy.Variable("x9")     

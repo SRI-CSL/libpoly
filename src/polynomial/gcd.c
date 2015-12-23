@@ -670,7 +670,7 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
     // If B, R have a common zero, this is also a zero of A if P != 0
     coefficient_reduce(ctx, &A, &B, &P, 0, &R, REMAINDERING_LCM_SPARSE);
     if (!coefficient_is_constant(&P)) {
-      lp_polynomial_vector_push_back_coeff(assumptions, &P);
+      lp_polynomial_vector_push_back_coeff_prime(assumptions, &P);
     }
 
     // Reduce R and pp
@@ -688,7 +688,7 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
     } else {
       // Got to the GCD, but we need to maintain the sign of R
       if (!coefficient_is_constant(&R)) {
-        lp_polynomial_vector_push_back_coeff(assumptions, &R);
+        lp_polynomial_vector_push_back_coeff_prime(assumptions, &R);
       }
       break;
     }

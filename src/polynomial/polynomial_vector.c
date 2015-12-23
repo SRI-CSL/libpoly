@@ -20,6 +20,8 @@
 #include "polynomial_vector.h"
 #include "polynomial.h"
 
+#include "polynomial/gcd.h"
+
 #include <stdlib.h>
 
 #define DEFAULT_SIZE 10
@@ -85,3 +87,38 @@ size_t lp_polynomial_vector_size(const lp_polynomial_vector_t* v) {
 lp_polynomial_t* lp_polynomial_vector_at(const lp_polynomial_vector_t* v, size_t i) {
   return lp_polynomial_new_from_coefficient(v->ctx, v->data + i);
 }
+
+void lp_polynomial_vector_push_back_coeff_prime(lp_polynomial_vector_t* v, const coefficient_t* C) {
+
+  size_t old_size = v->size;
+
+  coefficient_t to_add, gcd;
+  coefficient_construct(v->ctx, &gcd);
+  coefficient_construct_copy(v->ctx, &to_add, C);
+
+  size_t i;
+  for (i = 0; i < old_size && !coefficient_is_constant(&to_add); ++ i) {
+    coefficient_gcd(v->ctx, &gcd, v->data + i, &to_add);
+    if (!coefficient_is_constant(&gcd)) {
+      coefficient_div(v->ctx, v->data + i, v->data + i, &gcd);
+      coefficient_div(v->ctx, &to_add, &to_add, &gcd);
+      // They might reduce to constant or even be the same
+      if (coefficient_is_constant(v->data + i)) {
+        coefficient_swap(v->data + i, &to_add);
+      }
+      if (coefficient_is_constant(v->data + i)) {
+        coefficient_swap(v->data + i, &gcd);
+      } else {
+        lp_polynomial_vector_push_back_coeff(v, &gcd);
+      }
+    }
+  }
+
+  if (!coefficient_is_constant(&to_add)) {
+    lp_polynomial_vector_push_back_coeff(v, &to_add);
+  }
+
+  coefficient_destruct(&gcd);
+  coefficient_destruct(&to_add);
+}
+
