@@ -641,7 +641,9 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
 
   // Get the primitive parts (reductum includes the sign of cont)
   coefficient_pp_cont(ctx, &A, &cont, &A);
+  lp_polynomial_vector_push_back_coeff_prime(assumptions, &cont);
   coefficient_pp_cont(ctx, &B, &cont, &B);
+  lp_polynomial_vector_push_back_coeff_prime(assumptions, &cont);
 
   // If one of the coefficient reduces to a constant, we're done
   if (coefficient_top_variable(&A) != x || coefficient_top_variable(&B) != x) {
@@ -665,6 +667,12 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
   //
   do {
 
+    if (trace_is_enabled("coefficient::mgcd")) {
+      tracef("A = "); coefficient_print(ctx, &A, trace_out); tracef("\n");
+      tracef("B = "); coefficient_print(ctx, &B, trace_out); tracef("\n");
+    }
+
+
     // One step reduction, we get P*A = Q*B + R
     // If A, B have a common zero, this is also a zero of R (if R is in x)
     // If B, R have a common zero, this is also a zero of A if P != 0
@@ -678,6 +686,7 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
       coefficient_reductum_m(ctx, &R, &R, m, assumptions);
     }
     coefficient_pp_cont(ctx, &R, &cont, &R);
+    lp_polynomial_vector_push_back_coeff_prime(assumptions, &cont);
 
     // We continue if we didn't get a constant
     int cmp_type = coefficient_cmp_type(ctx, &B, &R);

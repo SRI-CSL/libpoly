@@ -19,6 +19,34 @@ polypy_test.start("model-based GCD")
 # polypy.trace_enable("coefficient")
 # polypy.trace_enable("coefficient::order")
 # polypy.trace_enable("coefficient::reduce")
+polypy.trace_enable("coefficient::mgcd")
+
+x0 = polypy.Variable("x0");
+x1 = polypy.Variable("x1");
+x2 = polypy.Variable("x2");
+x3 = polypy.Variable("x3");
+x4 = polypy.Variable("x4");
+
+polypy.variable_order.set([x0, x1, x2, x3, x4])
+
+m = polypy.Assignment()
+m.set_value(x0, 2)
+m.set_value(x1, 3)
+m.set_value(x2, 3)
+m.set_value(x3, 9)
+
+
+A = (1*x3)*x4**4 + ((-2*x0)*x3 + (2*x1))*x4**3 + ((1*x0**2)*x3 + (2*x2 + ((-2*x0)*x1 - 40)))*x4**2 + (80*x0)*x4 + (-40*x0**2)
+B = A.derivative()
+
+PSC = A.psc(B)
+print "PSC =", PSC
+MGCD = A.mgcd(B, m)
+print "MGCD =", MGCD
+
+sys.exit()
+
+
 
 m = polypy.Assignment()
 m.set_value(y, -1)
