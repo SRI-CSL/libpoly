@@ -610,14 +610,14 @@ void coefficient_pp(const lp_polynomial_context_t* ctx, coefficient_t* pp, const
   coefficient_pp_cont(ctx, pp, 0, C);
 }
 
-lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, const lp_assignment_t* m) {
+lp_polynomial_vector_t* coefficient_mgcd_primitive(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, const lp_assignment_t* m) {
 
   // Only for polynomials of the same type
   assert(C1->type == COEFFICIENT_POLYNOMIAL);
   assert(C2->type == COEFFICIENT_POLYNOMIAL);
   assert(coefficient_top_variable(C1) == coefficient_top_variable(C2));
 
-  TRACE("coefficient", "coefficient_lcm()\n");
+  TRACE("coefficient", "coefficient_mgcd_primitive()\n");
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -641,9 +641,7 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
 
   // Get the primitive parts (reductum includes the sign of cont)
   coefficient_pp_cont(ctx, &A, &cont, &A);
-  lp_polynomial_vector_push_back_coeff_prime(assumptions, &cont);
   coefficient_pp_cont(ctx, &B, &cont, &B);
-  lp_polynomial_vector_push_back_coeff_prime(assumptions, &cont);
 
   // If one of the coefficient reduces to a constant, we're done
   if (coefficient_top_variable(&A) != x || coefficient_top_variable(&B) != x) {
@@ -672,23 +670,19 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
       tracef("B = "); coefficient_print(ctx, &B, trace_out); tracef("\n");
     }
 
-
     // One step reduction, we get P*A = Q*B + R
     // If A, B have a common zero, this is also a zero of R (if R is in x)
     // If B, R have a common zero, this is also a zero of A if P != 0
     coefficient_reduce(ctx, &A, &B, &P, 0, &R, REMAINDERING_LCM_SPARSE);
-//    if (!coefficient_is_constant(&P)) {
-//      lp_polynomial_vector_push_back_coeff_prime(assumptions, &P);
-//    }
 
-    // Reduce R and pp
-    if (!coefficient_is_constant(&R)) {
+    // Reduce R
+    if (coefficient_cmp_type(ctx, &B, &R) == 0) {
+      // Reduce R and pp
       coefficient_reductum_m(ctx, &R, &R, m, assumptions);
+      coefficient_pp_cont(ctx, &R, &cont, &R);
     }
-    coefficient_pp_cont(ctx, &R, &cont, &R);
-    lp_polynomial_vector_push_back_coeff_prime(assumptions, &cont);
 
-    // We continue if we didn't get a constant
+    // We continue if we didn't get a 'constant'
     int cmp_type = coefficient_cmp_type(ctx, &B, &R);
     if (cmp_type == 0) {
        // A = B, B = R (already reduced)
@@ -697,7 +691,7 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
     } else {
       // Got to the GCD, but we need to maintain the sign of R
       if (!coefficient_is_constant(&R)) {
-        lp_polynomial_vector_push_back_coeff_prime(assumptions, &R);
+        lp_polynomial_vector_push_back_coeff(assumptions, &R);
       }
       break;
     }
@@ -705,4 +699,135 @@ lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, con
 
   // Return the assumptions
   return assumptions;
+}
+
+/** Adapted subresultant GCD */
+lp_polynomial_vector_t* coefficient_mgcd_pp_subresultant(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, const lp_assignment_t* m) {
+
+  // Only for polynomials of the same type
+  assert(C1->type == COEFFICIENT_POLYNOMIAL);
+  assert(C2->type == COEFFICIENT_POLYNOMIAL);
+  assert(coefficient_top_variable(C1) == coefficient_top_variable(C2));
+
+  lp_variable_t x = coefficient_top_variable(C1);
+
+  coefficient_t P, Q, cont;
+  coefficient_construct_copy(ctx, &P, C1);
+  coefficient_construct_copy(ctx, &Q, C2);
+  coefficient_construct(ctx, &cont);
+
+  if (trace_is_enabled("coefficient::mgcd")) {
+    tracef("mgcd\n")
+    tracef("P = "); coefficient_print(ctx, &P, trace_out); tracef("\n");
+    tracef("Q = "); coefficient_print(ctx, &Q, trace_out); tracef("\n");
+  }
+
+  lp_polynomial_vector_t* assumptions = lp_polynomial_vector_new(ctx);
+
+  // Get the reductums of P and Q
+  coefficient_reductum_m(ctx, &P, &Q, m, assumptions);
+  coefficient_reductum_m(ctx, &P, &Q, m, assumptions);
+
+  // Get the primitive parts (reductum includes the sign of cont)
+  coefficient_pp_cont(ctx, &P, &cont, &P);
+  coefficient_pp_cont(ctx, &Q, &cont, &Q);
+
+  // If one of the coefficient reduces to a constant, we're done
+  if (coefficient_top_variable(&P) != x || coefficient_top_variable(&Q) != x) {
+    return assumptions;
+  }
+
+  // Make sure that P >= Q
+  if (SIZE(&P) < SIZE(&Q)) {
+    coefficient_swap(&P, &Q);
+  }
+
+  coefficient_t R;
+  coefficient_construct(ctx, &R);
+
+  coefficient_t h, g;
+  coefficient_construct_from_int(ctx, &g, 1);
+  coefficient_construct_from_int(ctx, &h, 1);
+
+  coefficient_t tmp1, tmp2;
+  coefficient_construct(ctx, &tmp1);
+  coefficient_construct(ctx, &tmp2);
+
+  // Subresultant GCD
+  //
+  do {
+
+    // d = deg(P) - deg(Q)
+    assert(SIZE(&P) >= SIZE(&Q));
+    unsigned delta = SIZE(&P) - SIZE(&Q);
+
+    // One step reduction
+    coefficient_reduce(ctx, &P, &Q, 0, 0, &R, REMAINDERING_PSEUDO_SPARSE);
+
+    if (trace_is_enabled("coefficient::gcd")) {
+      tracef("------------\n");
+      tracef("P = "); coefficient_print(ctx, &P, trace_out); tracef("\n");
+      tracef("Q = "); coefficient_print(ctx, &Q, trace_out); tracef("\n");
+      tracef("h = "); coefficient_print(ctx, &h, trace_out); tracef("\n");
+      tracef("g = "); coefficient_print(ctx, &g, trace_out); tracef("\n");
+      tracef("d = %u\n", delta);
+    }
+
+    // Reduce R
+    int cmp_type = coefficient_cmp_type(ctx, &Q, &R);
+    if (coefficient_cmp_type(ctx, &Q, &R) == 0) {
+      // Reduce R and pp
+      coefficient_reductum_m(ctx, &R, &R, m, assumptions);
+      coefficient_pp_cont(ctx, &R, &cont, &R);
+    } else {
+      assert(cmp_type > 0);
+    }
+
+    // We continue if x still there
+    cmp_type = coefficient_cmp_type(ctx, &Q, &R);
+    if (cmp_type == 0) {
+      // P = Q
+      coefficient_swap(&P, &Q);
+      // Q = R/g*(h^delta)
+      coefficient_div(ctx, &tmp1, &R, &g);
+      coefficient_pow(ctx, &tmp2, &h, delta);
+      coefficient_div(ctx, &Q, &tmp1, &tmp2);
+      // g = lc(P)
+      coefficient_assign(ctx, &g, coefficient_lc(&P));
+      // h = h^(1-delta)*g^delta
+      if (delta == 0) {
+        // h = h, nothing to do
+      } else if (delta == 1) {
+        // h = g
+        coefficient_assign(ctx, &h, &g);
+      } else {
+        // h = g^delta/h^(delta-1))
+        coefficient_pow(ctx, &tmp1, &g, delta);
+        coefficient_pow(ctx, &tmp2, &h, delta-1);
+        coefficient_div(ctx, &h, &tmp1, &tmp2);
+      }
+    } else {
+      assert(cmp_type > 0);
+      if (!coefficient_is_constant(&R)) {
+        lp_polynomial_vector_push_back_coeff(assumptions, &R);
+      }
+      break;
+    }
+  } while (1);
+
+  coefficient_destruct(&R);
+  coefficient_destruct(&h);
+  coefficient_destruct(&g);
+  coefficient_destruct(&tmp1);
+  coefficient_destruct(&tmp2);
+  coefficient_destruct(&cont);
+  coefficient_destruct(&P);
+  coefficient_destruct(&Q);
+
+  return assumptions;
+}
+
+
+lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, const lp_assignment_t* m) {
+  return coefficient_mgcd_primitive(ctx, C1, C2, m);
 }

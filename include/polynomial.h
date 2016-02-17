@@ -240,6 +240,15 @@ void lp_polynomial_gcd(lp_polynomial_t* gcd, const lp_polynomial_t* A1, const lp
 /** Compute the least common multiple lcm(A1, A2). */
 void lp_polynomial_lcm(lp_polynomial_t* lcm, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
+/** Compute the content part of the polynomial: gcd(coefficients) */
+void lp_polynomial_cont(lp_polynomial_t* cont, const lp_polynomial_t* A);
+
+/** Compute the primitive part of the polynomial: A/cont(A) */
+void lp_polynomial_pp(lp_polynomial_t* pp, const lp_polynomial_t* A);
+
+/** Compute the primitive part and the content of the polynomial */
+void lp_polynomial_pp_cont(lp_polynomial_t* pp, lp_polynomial_t* cont, const lp_polynomial_t* A);
+
 /**
  * Compute the resultant of A1 and A2 in their top variable. Both A1 and A2
  * must be (non-trivial) polynomials over the same variable.
@@ -254,7 +263,7 @@ void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A1, co
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
- * Compute the model-based GCD of the two polynomials. Adds the assumptiopns to
+ * Compute the model-based GCD of the two polynomials. Adds the assumptions to
  * the vector.
  */
 lp_polynomial_vector_t* lp_polynomial_mgcd(const lp_polynomial_t* p, const lp_polynomial_t* q, const lp_assignment_t* m);
@@ -325,5 +334,5 @@ typedef void (*lp_polynomial_traverse_f) (const lp_polynomial_context_t* ctx, lp
  */
 void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f, void* data);
 
-/** Check the intergrity of the polynomial */
+/** Check the integrity of the polynomial */
 int lp_polynomial_check_integrity(const lp_polynomial_t* A);

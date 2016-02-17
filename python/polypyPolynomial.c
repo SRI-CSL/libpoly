@@ -160,6 +160,15 @@ static PyObject*
 Polynomial_var(PyObject* self);
 
 static PyObject*
+Polynomial_pp(PyObject* self);
+
+static PyObject*
+Polynomial_cont(PyObject* self);
+
+static PyObject*
+Polynomial_pp_cont(PyObject* self);
+
+static PyObject*
 Polynomial_feasible_intervals(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -190,6 +199,9 @@ PyMethodDef Polynomial_methods[] = {
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
     {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
     {"var", (PyCFunction)Polynomial_var, METH_NOARGS, "Returns the top variable of the polynomial"},
+    {"pp", (PyCFunction)Polynomial_pp, METH_NOARGS, "Returns the primitive part of the polynomial"},
+    {"cont", (PyCFunction)Polynomial_cont, METH_NOARGS, "Returns the content of the polynomial"},
+    {"pp_cont", (PyCFunction)Polynomial_pp_cont, METH_NOARGS, "Returns the tuple (pp, cont) of the polynomial"},
     {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals (list) of the polynomial (has to be univariate modulo the assignment)"},
     {"feasible_set", (PyCFunction)Polynomial_feasible_set, METH_VARARGS, "Returns feasible set of the polynomial (has to be univariate modulo the assignment)"},
     {NULL}  /* Sentinel */
@@ -1586,3 +1598,37 @@ Polynomial_sgn_check(PyObject* self, PyObject* args) {
   }
 }
 
+static PyObject*
+Polynomial_pp(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* p_ctx = lp_polynomial_get_context(p);
+  lp_polynomial_t* pp = lp_polynomial_new(p_ctx);
+  lp_polynomial_pp(pp, p);
+  PyObject* pp_py = Polynomial_create(pp);
+  return pp_py;
+}
+
+static PyObject*
+Polynomial_cont(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* p_ctx = lp_polynomial_get_context(p);
+  lp_polynomial_t* cont = lp_polynomial_new(p_ctx);
+  lp_polynomial_cont(cont, p);
+  PyObject* cont_py = Polynomial_create(cont);
+  return cont_py;
+}
+
+static PyObject*
+Polynomial_pp_cont(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* p_ctx = lp_polynomial_get_context(p);
+  lp_polynomial_t* pp = lp_polynomial_new(p_ctx);
+  lp_polynomial_t* cont = lp_polynomial_new(p_ctx);
+  lp_polynomial_pp_cont(pp, cont, p);
+  PyObject* pp_py = Polynomial_create(pp);
+  PyObject* cont_py = Polynomial_create(cont);
+  PyObject* tuple = PyTuple_New(2);
+  PyTuple_SetItem(tuple, 0, pp_py);
+  PyTuple_SetItem(tuple, 1, cont_py);
+  return tuple;
+}

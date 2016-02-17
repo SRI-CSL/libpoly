@@ -747,6 +747,28 @@ void lp_polynomial_reduce(
   }
 }
 
+void lp_polynomial_cont(lp_polynomial_t* cont, const lp_polynomial_t* A) {
+  const lp_polynomial_context_t* ctx = A->ctx;
+  lp_polynomial_external_clean(A);
+  lp_polynomial_set_context(cont, ctx);
+  coefficient_cont(ctx, &cont->data, &A->data);
+}
+
+void lp_polynomial_pp(lp_polynomial_t* pp, const lp_polynomial_t* A) {
+  const lp_polynomial_context_t* ctx = A->ctx;
+  lp_polynomial_external_clean(A);
+  lp_polynomial_set_context(pp, ctx);
+  coefficient_pp(ctx, &pp->data, &A->data);
+}
+
+void lp_polynomial_pp_cont(lp_polynomial_t* pp, lp_polynomial_t* cont, const lp_polynomial_t* A) {
+  const lp_polynomial_context_t* ctx = A->ctx;
+  lp_polynomial_external_clean(A);
+  lp_polynomial_set_context(pp, ctx);
+  lp_polynomial_set_context(cont, ctx);
+  coefficient_pp_cont(ctx, &pp->data, &cont->data, &A->data);
+}
+
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp_polynomial_t* B) {
 
   if (trace_is_enabled("polynomial")) {

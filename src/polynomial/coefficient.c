@@ -410,7 +410,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
   int i = SIZE(C) - 1;
   while (i >= 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
     if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
-      lp_polynomial_vector_push_back_coeff_prime(assumptions, COEFF(C, i));
+      lp_polynomial_vector_push_back_coeff(assumptions, COEFF(C, i));
     }
     -- i;
   }
@@ -420,7 +420,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
     coefficient_assign_int(ctx, R, 0);
     return;
   } else if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
-    lp_polynomial_vector_push_back_coeff_prime(assumptions, COEFF(C, i));
+    lp_polynomial_vector_push_back_coeff(assumptions, COEFF(C, i));
   }
 
   coefficient_t result;
