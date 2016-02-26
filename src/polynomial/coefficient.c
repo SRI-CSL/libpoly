@@ -663,7 +663,7 @@ void coefficient_value_approx(const lp_polynomial_context_t* ctx, const coeffici
  *
  * We compute the upper bound using the Cauchy bound
  *
- *   bound = max(|c_0|, ... |c_n|)/c_0
+ *   bound = 1 + max(|c_0|, ... |c_n|)/|c_0|
  *
  * We take L = 1/bound, and so we compute k = log(max/c0) = log(max) - log(c0)
  */
@@ -680,7 +680,7 @@ unsigned coefficient_root_lower_bound(const coefficient_t* C) {
     assert(i < SIZE(C));
   }
 
-  // First one (modulo the initial zeroes
+  // First one (modulo the initial zeroes)
   unsigned log_c0 = integer_log2_abs(&COEFF(C, i)->value.num);
 
   // Get thge max log
@@ -695,7 +695,10 @@ unsigned coefficient_root_lower_bound(const coefficient_t* C) {
     }
   }
 
-  // Return the bound
+  // Return the bound:
+  // * max_log is upper bound approximation, that's good
+  // * log_c0 is upper bound approximation, so we add one
+  // * max_log >= log_c0, so we're safe
   return max_log - log_c0 + 1;
 }
 
@@ -800,13 +803,14 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         //
         //   B(z) = Resultant(A, p1, ..., pn)
         //
-        // has a as at least one zero.
+        // has a as at least one zero and value of C_rat corresponds to one of
+        // those zeros.
         //
-        // We can estimate the bound L on the smallest *non-zero* root of B, and
-        // refine the evaluation interval until it is either in (-L, L), in which case
-        // it must be 0, or until it doesn't contain 0, in which case we get
-        // the sign.
-        //
+        // We estimate the bound L on the smallest *non-zero* root of B. We
+        // then estimate C_rat until either
+        // * it doesn't contain 0, when we can return the sign
+        // * it doens't belong to (-L, L) => doesn't contain 0 => return the sign
+        // * it belongs to (-L, L), and therefore the sign must be 0
 
         // The temporary variable, we'll be using
         lp_variable_t z = lp_polynomial_context_get_temp_variable(ctx);
@@ -832,6 +836,12 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         coefficient_order(ctx, &A);
         coefficient_resolve_algebraic(ctx, &A, m, &A);
         lp_variable_order_make_bot(ctx->var_order, lp_variable_null);
+
+        if (trace_is_enabled("coefficient::sgn")) {
+          tracef("coefficient_sgn(): A = ");
+          coefficient_print(ctx, &A, trace_out);
+          tracef("\n");
+        }
 
         // Get the lower bound on the roots
         unsigned k = coefficient_root_lower_bound(&A);
@@ -899,6 +909,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         lp_rational_destruct(&L_neg);
 
         // Safe to give the sign based on the interval bound
+        // * interval_sgn returns 0 if 0 in interval, otherwise the sign
         sgn = lp_rational_interval_sgn(&C_rat_approx);
         if (trace_is_enabled("coefficient::sgn")) {
           tracef("coefficient_sgn(): interval is good => %d\n", sgn);
@@ -2929,62 +2940,8 @@ void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coeffic
               tracef("\n");
             }
 
-            // A_rat has at most one zero at each of root intervals and it
-            // evaluates to opposite signs there. As a first check we approximate
-            // at the borders to see if it evaluates to opposite signs.
-            int zero_by_border_evaluation = 0;
-//          if (!lp_value_is_rational(&x_value)) {
-//            // Remember the old interval of x
-//            lp_dyadic_interval_t x_old;
-//            lp_dyadic_interval_construct_copy(&x_old, &x_value.value.a.I);
-//            // Approximate the interval
-//            lp_rational_interval_t x_interval;
-//            lp_rational_interval_construct_zero(&x_interval);
-//            lp_value_approx(&x_value, &x_interval);
-//            // If still an interval, evaluate
-//            if (!x_interval.is_point) {
-//              lp_rational_interval_t lb_value, ub_value;
-//              lp_rational_interval_construct_zero(&lb_value);
-//              lp_rational_interval_construct_zero(&ub_value);
-//              lp_value_t x_value_at_bound;
-//              // Do at lower bound
-//              lp_value_construct(&x_value_at_bound, LP_VALUE_DYADIC_RATIONAL, &x_value.value.a.I.a);
-//              lp_assignment_set_value((lp_assignment_t*) M, x, &x_value_at_bound);
-//              coefficient_value_approx(ctx, &A_rat, M, &lb_value);
-//              lp_value_destruct(&x_value_at_bound);
-//              // Do at upper bound
-//              lp_value_construct(&x_value_at_bound, LP_VALUE_DYADIC_RATIONAL, &x_value.value.a.I.b);
-//              lp_assignment_set_value((lp_assignment_t*) M, x, &x_value_at_bound);
-//              coefficient_value_approx(ctx, &A_rat, M, &ub_value);
-//              lp_value_destruct(&x_value_at_bound);
-//              if (trace_is_enabled("coefficient::roots")) {
-//                tracef("coefficient_roots_isolate(): lb_value = "); lp_rational_interval_print(&lb_value, trace_out); tracef("\n");
-//                tracef("coefficient_roots_isolate(): ub_value = "); lp_rational_interval_print(&ub_value, trace_out); tracef("\n");
-//              }
-//              // Compare signs
-//              int ub_sgn = lp_rational_interval_sgn(&lb_value);
-//              int lb_sgn = lp_rational_interval_sgn(&ub_value);
-//              if (ub_sgn*lb_sgn < 0) {
-//                // Definite zero
-//                zero_by_border_evaluation = 1;
-//              }
-//              // Restore true value
-//              lp_assignment_set_value((lp_assignment_t*) M, x, &x_value);
-//              // Remove temp
-//              lp_rational_interval_destruct(&lb_value);
-//              lp_rational_interval_destruct(&ub_value);
-//            }
-//            // Restore interval if not a point
-//            if (!lp_value_is_rational(&x_value)) {
-//              lp_dyadic_interval_swap(&x_value.value.a.I, &x_old);
-//            }
-//            // Remove temps
-//            lp_rational_interval_destruct(&x_interval);
-//            lp_dyadic_interval_destruct(&x_old);
-//          }
-
             // If zero by border or full sign is 0 then keep it
-            if (zero_by_border_evaluation || coefficient_sgn(ctx, &A_rat, M) == 0) {
+            if (coefficient_sgn(ctx, &A_rat, M) == 0) {
               if (i != to_keep) {
                 lp_algebraic_number_swap(algebraic_roots + to_keep, algebraic_roots + i);
               }

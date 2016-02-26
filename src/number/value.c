@@ -843,7 +843,7 @@ int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t*
   rational_get_den(m, &den);
 
   // Size = log(num/den) = log(num) - log(den)
-  int size = ((int)integer_log2_abs(&num)) - ((int)integer_log2_abs(&den));
+  int size = ((int)integer_log2_abs(&num)) - ((int)integer_log2_abs(&den)) + 1;
 
   integer_destruct(&num);
   integer_destruct(&den);

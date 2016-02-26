@@ -997,7 +997,6 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     lp_assignment_print(M, trace_out); tracef("\n");
   }
 
-
   lp_polynomial_external_clean(A);
 
   if (trace_is_enabled("polynomial::check_input")) {
@@ -1025,8 +1024,14 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     tracef("polynomial_roots_isolate(): factoring\n");
   }
 
+  // Get the reduced polynomial
+  lp_polynomial_t A_r;
+  lp_polynomial_construct(&A_r, A->ctx);
+  lp_polynomial_reductum_m(&A_r, A, M);
+  assert(x == lp_polynomial_top_variable(A));
+
   // Get the square-free factorization
-  lp_polynomial_factor_square_free(A, &factors, &multiplicities, &factors_size);
+  lp_polynomial_factor_square_free(&A_r, &factors, &multiplicities, &factors_size);
 
   // Count the max number of roots
   size_t total_degree = 0;
@@ -1128,6 +1133,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   free(multiplicities);
   free(roots_tmp);
   lp_value_destruct(&x_value_backup);
+  lp_polynomial_destruct(&A_r);
 }
 
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {

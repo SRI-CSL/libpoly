@@ -184,7 +184,8 @@ Assignment_get_value(PyObject* self, PyObject* args) {
 
 static PyObject*
 Assignment_set_value(PyObject* self, PyObject* args) {
-  if (PyTuple_Check(args) && PyTuple_Size(args) == 2) {
+  if (PyTuple_Check(args)) {
+    if (PyTuple_Size(args) == 2) {
       PyObject* var_obj = PyTuple_GetItem(args, 0);
       PyObject* value_obj = PyTuple_GetItem(args, 1);
       if (PyVariable_CHECK(var_obj)) {
@@ -229,10 +230,39 @@ Assignment_set_value(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_RuntimeError, "set_value(): not a variable.");
         return NULL;
       }
+    } else if (PyTuple_Size(args) == 3) {
+      // Three arguments, rational
+      PyObject* var_obj = PyTuple_GetItem(args, 0);
+      PyObject* p_obj = PyTuple_GetItem(args, 1);
+      PyObject* q_obj = PyTuple_GetItem(args, 2);
+      if (PyLong_or_Int_Check(p_obj) && PyLong_or_Int_Check(q_obj)) {
+        Assignment* a = (Assignment*) self;
+        Variable* var = (Variable*) var_obj;
+        lp_integer_t p_int, q_int;
+        PyLong_or_Int_to_integer(p_obj, lp_Z, &p_int);
+        PyLong_or_Int_to_integer(q_obj, lp_Z, &q_int);
+        lp_rational_t value_rat;
+        lp_rational_construct_from_div(&value_rat, &p_int, &q_int);
+        lp_value_t value;
+        lp_value_construct(&value, LP_VALUE_RATIONAL, &value_rat);
+        lp_assignment_set_value(a->assignment, var->x, &value);
+        lp_value_destruct(&value);
+        lp_rational_destruct(&value_rat);
+        lp_integer_destruct(&p_int);
+        lp_integer_destruct(&q_int);
+        Py_RETURN_NONE;
+      } else {
+        PyErr_SetString(PyExc_RuntimeError, "set_value(): for rationals, both numerator and denominator must be integer.");
+        return NULL;
+      }
     } else {
-      PyErr_SetString(PyExc_RuntimeError, "set_value(): need two arguments.");
+      PyErr_SetString(PyExc_RuntimeError, "set_value(): need two or three arguments.");
       return NULL;
     }
+  } else {
+    PyErr_SetString(PyExc_RuntimeError, "set_value(): need two or three arguments.");
+    return NULL;
+  }
 }
 
 static PyObject*
