@@ -19,6 +19,7 @@
 
 #include <upolynomial.h>
 #include <monomial.h>
+#include "variable_list.h"
 
 #include "polynomial/gcd.h"
 #include "polynomial/output.h"
@@ -171,6 +172,130 @@ int coefficient_gcd_pp_univariate(const lp_polynomial_context_t* ctx,
   }
 }
 
+// First 100 primes
+static const long primes[100] = {
+    2,   3,   5,   7,  11,  13,  17,  19,  23,  29,
+   31,  37,  41,  43,  47,  53,  59,  61,  67,  71,
+   73,  79,  83,  89,  97, 101, 103, 107, 109, 113,
+  127, 131, 137, 139, 149, 151, 157, 163, 167, 173,
+  179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
+  233, 239, 241, 251, 257, 263, 269, 271, 277, 281,
+  283, 293, 307, 311, 313, 317, 331, 337, 347, 349,
+  353, 359, 367, 373, 379, 383, 389, 397, 401, 409,
+  419, 421, 431, 433, 439, 443, 449, 457, 461, 463,
+  467, 479, 487, 491, 499, 503, 509, 521, 523, 541
+};
+
+int check_prime_with_coefficients(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_integer_t* a, lp_integer_t* gcd_tmp) {
+  if (C->type == COEFFICIENT_NUMERIC) {
+    integer_gcd_Z(gcd_tmp, a, &C->value.num);
+    if (integer_cmp_int(lp_Z, gcd_tmp, 1) != 0) {
+      // Not prime
+      return 0;
+    }
+  } else {
+    size_t i;
+    for (i = 0; i < SIZE(C); ++ i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        if (!check_prime_with_coefficients(ctx, COEFF(C, i), a, gcd_tmp)) {
+          return 0;
+        }
+      }
+    }
+  }
+  // Prime with all coefficients
+  return 1;
+}
+
+void coefficient_evaluate_int(const lp_polynomial_context_t* ctx, lp_integer_t* C_val, const coefficient_t* C, const lp_assignment_t* m) {
+  if (C->type == COEFFICIENT_NUMERIC) {
+    integer_assign(ctx->K, C_val, &C->value.num);
+  } else {
+    size_t i;
+    lp_integer_t x_pow, coeff_value;
+    integer_construct(&x_pow);
+    integer_construct(&coeff_value);
+    integer_assign_int(lp_Z, C_val, 0);
+    for (i = 0; i < SIZE(C); ++ i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        coefficient_evaluate_int(ctx, &coeff_value, COEFF(C, i), m);
+        const lp_value_t* value = lp_assignment_get_value(m, VAR(C));
+        assert(value->type == LP_VALUE_INTEGER);
+        integer_pow(ctx->K, &x_pow, &value->value.z,i);
+        integer_add_mul(ctx->K, C_val, &x_pow, &coeff_value);
+      }
+    }
+    integer_destruct(&x_pow);
+    integer_destruct(&coeff_value);
+  }
+}
+
+
+int check_gcd_by_evaluation(const lp_polynomial_context_t* ctx, const coefficient_t* P, const coefficient_t* Q) {
+
+  lp_variable_list_t vars;
+  lp_variable_list_construct(&vars);
+  coefficient_get_variables(P, &vars);
+  coefficient_get_variables(Q, &vars);
+
+  lp_integer_t a, gcd_tmp;
+  integer_construct(&a);
+  integer_construct(&gcd_tmp);
+
+  lp_value_t a_value;
+  lp_value_construct_none(&a_value);
+
+  lp_assignment_t m;
+  lp_assignment_construct(&m, ctx->var_db);
+
+  size_t i, prime_index = 0;
+  for (i = 0; i < vars.list_size; i ++) {
+    while (prime_index < 100) {
+      integer_assign_int(lp_Z, &a, primes[prime_index]);
+      if (check_prime_with_coefficients(ctx, P, &a, &gcd_tmp) &&
+          check_prime_with_coefficients(ctx, Q, &a, &gcd_tmp)) {
+        // Use this for assignment
+        lp_value_assign_raw(&a_value, LP_VALUE_INTEGER, &a);
+        lp_assignment_set_value(&m, vars.list[i], &a_value);
+        break;
+      }
+      // skip it
+      prime_index ++;
+    }
+    if (prime_index >= 100) {
+      // exceeded all primes, just use the last one
+      lp_value_assign_raw(&a_value, LP_VALUE_INTEGER, &a);
+      lp_assignment_set_value(&m, vars.list[i], &a_value);
+    } else {
+      // used it
+      prime_index ++;
+    }
+  }
+
+  // compute the gcd of the evaluations
+  lp_integer_t P_val, Q_val;
+  integer_construct(&P_val);
+  integer_construct(&Q_val);
+  coefficient_evaluate_int(ctx, &P_val, P, &m);
+  coefficient_evaluate_int(ctx, &Q_val, Q, &m);
+
+  integer_gcd_Z(&gcd_tmp, &P_val, &Q_val);
+  int result = integer_cmp_int(lp_Z, &gcd_tmp, 1) == 0;
+
+  lp_integer_destruct(&P_val);
+  lp_integer_destruct(&Q_val);
+
+  lp_value_destruct(&a_value);
+
+  lp_integer_destruct(&a);
+  lp_integer_destruct(&gcd_tmp);
+
+  lp_assignment_destruct(&m);
+  lp_variable_list_destruct(&vars);
+
+  return result;
+}
+
 STAT_DECLARE(int, coefficient, gcd_pp_euclid)
 
 /**
@@ -186,6 +311,12 @@ void coefficient_gcd_pp_euclid(const lp_polynomial_context_t* ctx, coefficient_t
     tracef("gcd\n")
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
+  }
+
+  // Check if gcd is 1 by heuristic evaluation
+  if (check_gcd_by_evaluation(ctx, P, Q)) {
+    coefficient_assign_int(ctx, gcd, 1);
+    return;
   }
 
   // Try to compute the univariate GCD first
