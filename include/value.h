@@ -86,7 +86,7 @@ void lp_value_destruct(lp_value_t* v);
 void lp_value_delete(lp_value_t* v);
 
 /** Get a hash of the value */
-size_t lp_value_hash(lp_value_t* v);
+size_t lp_value_hash(const lp_value_t* v);
 
 /** Assign */
 void lp_value_assign(lp_value_t* v, const lp_value_t* from);

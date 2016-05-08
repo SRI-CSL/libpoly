@@ -860,7 +860,7 @@ int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t*
 // is rational we sometimes miss it. For example a = <x*(2x-1), (0,1)> is 1/2.
 // To hack this, we just take the floor of the number and return that.
 //
-size_t lp_value_hash(lp_value_t* v) {
+size_t lp_value_hash(const lp_value_t* v) {
   switch (v->type) {
   case LP_VALUE_NONE:
     return 0;
