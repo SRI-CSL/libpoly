@@ -40,3 +40,6 @@ void coefficient_pp_cont(const lp_polynomial_context_t* ctx, coefficient_t* pp, 
 
 /** Compute the least common multiple. */
 void coefficient_lcm(const lp_polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2);
+
+/** Compute the assumptions that ensure gcd is same degree, and put the assumptions into the assumptions vector. */
+lp_polynomial_vector_t* coefficient_mgcd(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2, const lp_assignment_t* m);

@@ -101,6 +101,12 @@ void lp_polynomial_construct_from_coefficient(lp_polynomial_t* A, const lp_polyn
   coefficient_construct_copy(A->ctx, &A->data, from);
 }
 
+lp_polynomial_t* lp_polynomial_new_from_coefficient(const lp_polynomial_context_t* ctx, const coefficient_t* from) {
+  lp_polynomial_t* result = lp_polynomial_alloc();
+  lp_polynomial_construct_from_coefficient(result, ctx, from);
+  return result;
+}
+
 void lp_polynomial_construct_copy(lp_polynomial_t* A, const lp_polynomial_t* from) {
   A->ctx = 0;
   A->external = 0;
@@ -223,7 +229,7 @@ void lp_polynomial_reductum(lp_polynomial_t* R, const lp_polynomial_t* A) {
 void lp_polynomial_reductum_m(lp_polynomial_t* R, const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
   lp_polynomial_set_context(R, A->ctx);
-  coefficient_reductum_m(A->ctx, &R->data, &A->data, m);
+  coefficient_reductum_m(A->ctx, &R->data, &A->data, m, 0);
 }
 
 int lp_polynomial_is_constant(const lp_polynomial_t* A) {
@@ -741,6 +747,28 @@ void lp_polynomial_reduce(
   }
 }
 
+void lp_polynomial_cont(lp_polynomial_t* cont, const lp_polynomial_t* A) {
+  const lp_polynomial_context_t* ctx = A->ctx;
+  lp_polynomial_external_clean(A);
+  lp_polynomial_set_context(cont, ctx);
+  coefficient_cont(ctx, &cont->data, &A->data);
+}
+
+void lp_polynomial_pp(lp_polynomial_t* pp, const lp_polynomial_t* A) {
+  const lp_polynomial_context_t* ctx = A->ctx;
+  lp_polynomial_external_clean(A);
+  lp_polynomial_set_context(pp, ctx);
+  coefficient_pp(ctx, &pp->data, &A->data);
+}
+
+void lp_polynomial_pp_cont(lp_polynomial_t* pp, lp_polynomial_t* cont, const lp_polynomial_t* A) {
+  const lp_polynomial_context_t* ctx = A->ctx;
+  lp_polynomial_external_clean(A);
+  lp_polynomial_set_context(pp, ctx);
+  lp_polynomial_set_context(cont, ctx);
+  coefficient_pp_cont(ctx, &pp->data, &cont->data, &A->data);
+}
+
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp_polynomial_t* B) {
 
   if (trace_is_enabled("polynomial")) {
@@ -804,6 +832,26 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
       tracef("PSC[%zu] = ", i); lp_polynomial_print(psc[i], trace_out); tracef("\n");
     }
   }
+}
+
+lp_polynomial_vector_t* lp_polynomial_mgcd(const lp_polynomial_t* A, const lp_polynomial_t* B, const lp_assignment_t* m) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_mgcd("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
+  }
+
+  assert(A->data.type == COEFFICIENT_POLYNOMIAL);
+  assert(B->data.type == COEFFICIENT_POLYNOMIAL);
+  assert(VAR(&A->data) == VAR(&B->data));
+
+  const lp_polynomial_context_t* ctx = A->ctx;
+  assert(lp_polynomial_context_equal(B->ctx, ctx));
+
+  lp_polynomial_external_clean(A);
+  lp_polynomial_external_clean(B);
+
+  // Compute it
+  return coefficient_mgcd(ctx, &A->data, &B->data, m);
 }
 
 void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A, const lp_polynomial_t* B) {
@@ -949,7 +997,6 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     lp_assignment_print(M, trace_out); tracef("\n");
   }
 
-
   lp_polynomial_external_clean(A);
 
   if (trace_is_enabled("polynomial::check_input")) {
@@ -977,8 +1024,14 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     tracef("polynomial_roots_isolate(): factoring\n");
   }
 
+  // Get the reduced polynomial
+  lp_polynomial_t A_r;
+  lp_polynomial_construct(&A_r, A->ctx);
+  lp_polynomial_reductum_m(&A_r, A, M);
+  assert(x == lp_polynomial_top_variable(A));
+
   // Get the square-free factorization
-  lp_polynomial_factor_square_free(A, &factors, &multiplicities, &factors_size);
+  lp_polynomial_factor_square_free(&A_r, &factors, &multiplicities, &factors_size);
 
   // Count the max number of roots
   size_t total_degree = 0;
@@ -1080,6 +1133,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   free(multiplicities);
   free(roots_tmp);
   lp_value_destruct(&x_value_backup);
+  lp_polynomial_destruct(&A_r);
 }
 
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {

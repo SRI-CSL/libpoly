@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 import polypy
 import polypy_test
  
@@ -35,6 +36,7 @@ def check_roots(p, assignment, roots, expected_roots):
  
   
 [x, y, z, w] = [polypy.Variable(name) for name in ['x', 'y', 'z', 'w']]
+[x0, x1, x2, x3, x4, x5, x6, x7] = [polypy.Variable(name) for name in ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7']]
 
 # polypy_test.start("Polynomial Root Isolation: Speed")
 # 
@@ -51,6 +53,24 @@ def check_roots(p, assignment, roots, expected_roots):
 
 polypy_test.start("Polynomial Root Isolation: Bugs");
 
+polypy.variable_order.set([x0, x1, x2, x3, x4, x5, x6, x7])
+p = ((16*x0**2 - 32*x0 + 16)*x5**2 + ((32*x0 - 32)*x1)*x5 + (16*x1**2))*x7**2 + ((8*x0**2 - 16*x0 + 8)*x5**2 + ((16*x0**2 - 32*x0 + 16)*x2**2 + (-8*x1**2)))*x7 + ((1*x0**2 - 2*x0 + 1)*x5**2 + ((-2*x0 + 2)*x1)*x5 + (1*x1**2))
+
+p_lc = ((16*x0**2 - 32*x0 + 16)*x5**2 + ((32*x0 - 32)*x1)*x5 + (16*x1**2))
+
+assignment = polypy.Assignment()
+v = polypy.AlgebraicNumber(32*x**2 + (-64*x) + 15, 0)
+assignment.set_value(x0, v)
+assignment.set_value(x1, 28);
+assignment.set_value(x2, -1, 4)
+assignment.set_value(x3, 3)
+assignment.set_value(x4, 277771, 4096)
+assignment.set_value(x5, 786743, 20480)
+assignment.set_value(x6, -6437)
+
+roots = p.roots_isolate(assignment); 
+check_roots(p, assignment, roots, [-8503.31536081940])
+
 polypy.variable_order.set([x, w, y, z])
 
 sqrt180 = polypy.AlgebraicNumber(x**2 - 180, 0)
@@ -63,6 +83,7 @@ p = ((1*x)*y)*z + (-1*w**2 + (20*x))
 
 roots = p.roots_isolate(assignment)
 check_roots(p, assignment, roots, []);
+
 
 polypy_test.start("Polynomial Root Isolation: Basic")
 

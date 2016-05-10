@@ -62,6 +62,7 @@ typedef struct lp_interval_struct lp_interval_t;
 
 typedef struct lp_feasibility_set_struct lp_feasibility_set_t;
 typedef struct lp_polynomial_hash_set_struct lp_polynomial_hash_set_t;
+typedef struct lp_polynomial_vector_struct lp_polynomial_vector_t;
 
 /** Enable a given tag for tracing */
 void lp_trace_enable(const char* tag);

@@ -36,3 +36,6 @@ struct lp_polynomial_struct {
 
 /** Construct from coefficient */
 void lp_polynomial_construct_from_coefficient(lp_polynomial_t* A, const lp_polynomial_context_t* ctx, const coefficient_t* from);
+
+/** New from coefficient */
+lp_polynomial_t* lp_polynomial_new_from_coefficient(const lp_polynomial_context_t* ctx, const coefficient_t* from);

@@ -32,6 +32,7 @@
 #include "sign_condition.h"
 #include "feasibility_set.h"
 #include "value.h"
+#include "polynomial_vector.h"
 
 #include <structmember.h>
 
@@ -147,6 +148,9 @@ static PyObject*
 Polynomial_psc(PyObject* self, PyObject* args);
 
 static PyObject*
+Polynomial_mgcd(PyObject* self, PyObject* args);
+
+static PyObject*
 Polynomial_evaluate(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -154,6 +158,15 @@ Polynomial_vars(PyObject* self);
 
 static PyObject*
 Polynomial_var(PyObject* self);
+
+static PyObject*
+Polynomial_pp(PyObject* self);
+
+static PyObject*
+Polynomial_cont(PyObject* self);
+
+static PyObject*
+Polynomial_pp_cont(PyObject* self);
 
 static PyObject*
 Polynomial_feasible_intervals(PyObject* self, PyObject* args);
@@ -181,11 +194,15 @@ PyMethodDef Polynomial_methods[] = {
     {"derivative", (PyCFunction)Polynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
     {"psc", (PyCFunction)Polynomial_psc, METH_VARARGS, "Returns the principal subresultant coefficients of the current and given polynomial"},
+    {"mgcd", (PyCFunction)Polynomial_mgcd, METH_VARARGS, "Returns assumptions that the GCD of two polynomials is of same degree"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
     {"vars", (PyCFunction)Polynomial_vars, METH_NOARGS, "Returns the list of variables in the polynomial"},
     {"var", (PyCFunction)Polynomial_var, METH_NOARGS, "Returns the top variable of the polynomial"},
-    {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals of the polynomial (has to be univariate modulo the assignment)"},
+    {"pp", (PyCFunction)Polynomial_pp, METH_NOARGS, "Returns the primitive part of the polynomial"},
+    {"cont", (PyCFunction)Polynomial_cont, METH_NOARGS, "Returns the content of the polynomial"},
+    {"pp_cont", (PyCFunction)Polynomial_pp_cont, METH_NOARGS, "Returns the tuple (pp, cont) of the polynomial"},
+    {"feasible_intervals", (PyCFunction)Polynomial_feasible_intervals, METH_VARARGS, "Returns feasible intervals (list) of the polynomial (has to be univariate modulo the assignment)"},
     {"feasible_set", (PyCFunction)Polynomial_feasible_set, METH_VARARGS, "Returns feasible set of the polynomial (has to be univariate modulo the assignment)"},
     {NULL}  /* Sentinel */
 };
@@ -1055,6 +1072,83 @@ Polynomial_psc(PyObject* self, PyObject* args) {
 }
 
 static PyObject*
+Polynomial_mgcd(PyObject* self, PyObject* args) {
+
+  // self is always a polynomial
+  Polynomial* p1 = (Polynomial*) self;
+  const lp_polynomial_context_t* p1_ctx = lp_polynomial_get_context(p1->p);
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 2) {
+    PyErr_SetString(PyExc_RuntimeError, "mgcd(): Need two arguments.");
+    return NULL;
+  }
+
+  // Assignment
+  PyObject* py_assignment = PyTuple_GetItem(args, 1);
+  if (!PyAssignment_CHECK(py_assignment)) {
+    PyErr_SetString(PyExc_RuntimeError, "mgcd(): Second argument should be an assignment.");
+    return NULL;
+  }
+  const lp_assignment_t* assignment = ((Assignment*) py_assignment)->assignment;
+
+  // Other polynomial
+  PyObject* other = PyTuple_GetItem(args, 0);
+
+  int dec_other = 0;
+
+  // Make sure other is a polynomial
+  if (!PyPolynomial_CHECK(other)) {
+    if (PyVariable_CHECK(other)) {
+      other = PyPolynomial_FromVariable(other, p1_ctx);
+      dec_other = 1;
+    } else {
+      PyErr_SetString(PyExc_RuntimeError, "mgcd(): First argument should be a polynomial.");
+      return NULL;
+    }
+  }
+
+  // Othe polynomial
+  Polynomial* p2 = (Polynomial*) other;
+  const lp_polynomial_context_t* p2_ctx = lp_polynomial_get_context(p2->p);
+  if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
+    PyErr_SetString(PyExc_RuntimeError, "mgcd(): Polynomials should be over the same context.");
+    return NULL;
+  }
+
+  // Check the arguments (must be same top variable)
+  if (lp_polynomial_is_constant(p1->p) || lp_polynomial_is_constant(p2->p)) {
+    PyErr_SetString(PyExc_RuntimeError, "mgcd(): Polynomials should be over the same top variables.");
+    return NULL;
+  }
+
+  if (lp_polynomial_top_variable(p1->p) != lp_polynomial_top_variable(p2->p)) {
+    PyErr_SetString(PyExc_RuntimeError, "mgcd(): Polynomials should be over the same top variables.");
+    return NULL;
+  }
+
+  // Compute the gcd
+  lp_polynomial_vector_t* mgcd = lp_polynomial_mgcd(p1->p, p2->p, assignment);
+
+  // Copy the polynomials into a list
+  size_t size = lp_polynomial_vector_size(mgcd);
+  PyObject* list = PyList_New(size);
+  size_t i;
+  for (i = 0; i < size; ++i) {
+    lp_polynomial_t* mgcd_i = lp_polynomial_vector_at(mgcd, i);
+    PyObject* p = Polynomial_create(mgcd_i);
+    PyList_SetItem(list, i, p);
+  }
+  lp_polynomial_vector_delete(mgcd);
+
+  if (dec_other) {
+    Py_DECREF(other);
+  }
+
+  // Return the result
+  return list;
+}
+
+static PyObject*
 Polynomial_resultant(PyObject* self, PyObject* args) {
 
   // self is always a polynomial
@@ -1381,23 +1475,23 @@ static PyObject*
 Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 2) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): Needs two arguments, an assignment and a sign condition.");
+    return NULL;
   }
 
   PyObject* assignment_obj = PyTuple_GetItem(args, 0);
   if (!PyAssignment_CHECK(assignment_obj)) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): First argument must be an assignment.");
+    return NULL;
   }
 
   PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
   if (!PyInt_Check(sgn_condition_obj)) {
-    Py_INCREF(Py_NotImplemented);
-    return Py_NotImplemented;
+    PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): Second argument must be a sign-condition.");
+    return NULL;
   }
 
-    // Get the arguments
+  // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
   lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
@@ -1421,6 +1515,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   }
   // Remove temp
   lp_feasibility_set_delete(feasible);
+
   // Return the list
   return list;
 }
@@ -1445,7 +1540,7 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
     return Py_NotImplemented;
   }
 
-    // Get the arguments
+  // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
   lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
@@ -1503,3 +1598,37 @@ Polynomial_sgn_check(PyObject* self, PyObject* args) {
   }
 }
 
+static PyObject*
+Polynomial_pp(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* p_ctx = lp_polynomial_get_context(p);
+  lp_polynomial_t* pp = lp_polynomial_new(p_ctx);
+  lp_polynomial_pp(pp, p);
+  PyObject* pp_py = Polynomial_create(pp);
+  return pp_py;
+}
+
+static PyObject*
+Polynomial_cont(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* p_ctx = lp_polynomial_get_context(p);
+  lp_polynomial_t* cont = lp_polynomial_new(p_ctx);
+  lp_polynomial_cont(cont, p);
+  PyObject* cont_py = Polynomial_create(cont);
+  return cont_py;
+}
+
+static PyObject*
+Polynomial_pp_cont(PyObject* self) {
+  lp_polynomial_t* p = ((Polynomial*) self)->p;
+  const lp_polynomial_context_t* p_ctx = lp_polynomial_get_context(p);
+  lp_polynomial_t* pp = lp_polynomial_new(p_ctx);
+  lp_polynomial_t* cont = lp_polynomial_new(p_ctx);
+  lp_polynomial_pp_cont(pp, cont, p);
+  PyObject* pp_py = Polynomial_create(pp);
+  PyObject* cont_py = Polynomial_create(cont);
+  PyObject* tuple = PyTuple_New(2);
+  PyTuple_SetItem(tuple, 0, pp_py);
+  PyTuple_SetItem(tuple, 1, cont_py);
+  return tuple;
+}

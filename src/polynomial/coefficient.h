@@ -162,11 +162,7 @@ const coefficient_t* coefficient_lc_m(const lp_polynomial_context_t* ctx, const 
 void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C);
 
 /** Get the model-based reductum of the coefficient */
-void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m);
-
-/** Get the model-based reductum of the coefficient */
-void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m);
-
+void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C, const lp_assignment_t* m, lp_polynomial_vector_t* assumptions);
 
 /** Returns true if the coefficient is 0 */
 int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t* C);
