@@ -524,6 +524,32 @@ void coefficient_lcm(const lp_polynomial_context_t* ctx, coefficient_t* lcm, con
 
 STAT_DECLARE(int, coefficient, pp_cont)
 
+static
+int coefficient_pp_cont_special(const lp_polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C) {
+  if (coefficient_is_linear(C)) {
+    // Just get the constants and GCD
+    coefficient_t gcd;
+    coefficient_construct_copy(ctx, &gcd, coefficient_lc(C));
+    // Get the GCD of all leading coefficient (including the constant)
+    const coefficient_t* C_it = C;
+    while (C_it->type == COEFFICIENT_POLYNOMIAL) {
+      C_it = COEFF(C_it, 0);
+      coefficient_gcd(ctx, &gcd, &gcd, coefficient_lc(C_it));
+    }
+    // Now divide C/gcd to get the pp
+    if (pp) {
+      coefficient_assign(ctx, pp, C);
+      coefficient_div_constant(ctx, pp, &gcd.value.num);
+    }
+    if (cont) {
+      coefficient_swap(&gcd, cont);
+    }
+    coefficient_destruct(&gcd);
+    return 1;
+  }
+  return 0;
+}
+
 void coefficient_pp_cont(const lp_polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C) {
 
   TRACE("coefficient", "coefficient_pp_cont()\n");
@@ -534,6 +560,11 @@ void coefficient_pp_cont(const lp_polynomial_context_t* ctx, coefficient_t* pp, 
   }
 
   assert(ctx->K == lp_Z);
+
+  int special = coefficient_pp_cont_special(ctx, pp, cont, C);
+  if (special) {
+    return;
+  }
 
   switch (C->type) {
   case COEFFICIENT_NUMERIC:

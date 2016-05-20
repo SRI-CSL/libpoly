@@ -119,6 +119,9 @@ void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C
 /** Check if the coefficient is univariate */
 int coefficient_is_univariate(const coefficient_t* C);
 
+/** Check if the coefficient is linear */
+int coefficient_is_linear(const coefficient_t* C);
+
 /** Returns true if the coefficient conforms to internal representation (mainly debug purposes) */
 int coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t* C);
 

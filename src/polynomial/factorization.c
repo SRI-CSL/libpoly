@@ -238,6 +238,26 @@ void coefficient_factor_square_free_pp(const lp_polynomial_context_t* ctx, const
   }
 }
 
+static
+int coefficient_factor_square_free_special(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors) {
+  // Check if linear
+  if (coefficient_is_linear(C)) {
+    // We only need to take out the get the content and primitive part
+    coefficient_t C_pp, C_cont;
+    coefficient_construct(ctx, &C_pp);
+    coefficient_construct(ctx, &C_cont);
+    coefficient_pp_cont(ctx, &C_pp, &C_cont, C);
+    if (!coefficient_is_one(ctx, &C_cont)) {
+      coefficient_factors_add(ctx, factors, &C_cont, 1);
+    }
+    if (!coefficient_is_one(ctx, &C_pp)) {
+      coefficient_factors_add(ctx, factors, &C_pp, 1);
+    }
+    return 1;
+  }
+  return 0;
+}
+
 void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors) {
 
   STAT(coefficient, factor_square_free) ++;
@@ -246,6 +266,13 @@ void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const co
     tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(")\n");
   }
 
+  // Check for special cases
+  int special = coefficient_factor_square_free_special(ctx, C, factors);
+  if (special) {
+    return;
+  }
+
+  // Regular factorization
   coefficient_t C_pp, C_cont;
   coefficient_construct(ctx, &C_pp);
   coefficient_construct(ctx, &C_cont);

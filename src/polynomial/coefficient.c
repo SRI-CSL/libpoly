@@ -2247,6 +2247,16 @@ int coefficient_is_univariate(const coefficient_t* C) {
   }
 }
 
+int coefficient_is_linear(const coefficient_t* C) {
+  if (C->type != COEFFICIENT_POLYNOMIAL) {
+    return 0;
+  }
+  while (C->type == COEFFICIENT_POLYNOMIAL && coefficient_degree(C) == 1 && coefficient_lc(C)->type == COEFFICIENT_NUMERIC) {
+    C = COEFF(C, 0);
+  }
+  return (C->type == COEFFICIENT_NUMERIC);
+}
+
 const lp_integer_t* coefficient_get_constant(const coefficient_t* C) {
   while (C->type == COEFFICIENT_POLYNOMIAL) {
     C = COEFF(C, 0);
