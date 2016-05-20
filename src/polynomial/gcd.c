@@ -530,11 +530,17 @@ int coefficient_pp_cont_special(const lp_polynomial_context_t* ctx, coefficient_
     // Just get the constants and GCD
     coefficient_t gcd;
     coefficient_construct_copy(ctx, &gcd, coefficient_lc(C));
+    if (coefficient_lc_sgn(ctx, &gcd) < 0) {
+      coefficient_neg(ctx, &gcd, &gcd);
+    }
     // Get the GCD of all leading coefficient (including the constant)
     const coefficient_t* C_it = C;
     while (C_it->type == COEFFICIENT_POLYNOMIAL) {
       C_it = COEFF(C_it, 0);
       coefficient_gcd(ctx, &gcd, &gcd, coefficient_lc(C_it));
+    }
+    if (coefficient_lc_sgn(ctx, C) < 0) {
+      coefficient_neg(ctx, &gcd, &gcd);
     }
     // Now divide C/gcd to get the pp
     if (pp) {
