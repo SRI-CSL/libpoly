@@ -253,6 +253,8 @@ int coefficient_factor_square_free_special(const lp_polynomial_context_t* ctx, c
     if (!coefficient_is_one(ctx, &C_pp)) {
       coefficient_factors_add(ctx, factors, &C_pp, 1);
     }
+    coefficient_destruct(&C_pp);
+    coefficient_destruct(&C_cont);
     return 1;
   }
   return 0;
