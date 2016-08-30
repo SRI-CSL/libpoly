@@ -250,11 +250,11 @@ void lp_upolynomial_div_rem_exact(const lp_upolynomial_t* p, const lp_upolynomia
     lp_upolynomial_t** div, lp_upolynomial_t** rem);
 
 /**
- * Psuedo-division of polynomials, div and rem such that
+ * Pseudo-division of polynomials, div and rem such that
  *
- *   lcm(q)^(p_deg - q_deg + 1) p = div*q + rem
+ *   lc(q)^(p_deg - q_deg + 1) p = div*q + rem
  *
- * This assynes that deg(p) >= deg(q).
+ * This assumes that deg(p) >= deg(q).
  *
  * Note: all computation is done in ring of p and q, but the algorithm doesn't
  * take advantage of existence of possible inverses -- algorithm proceeds as
@@ -300,7 +300,7 @@ lp_upolynomial_t* lp_upolynomial_extended_gcd(const lp_upolynomial_t* p, const l
  *
  *  u*p+v*q = r
  *
- * for u an d. Assumes that gcd(p, q) divides r. Result such that
+ * for u and v. Assumes that gcd(p, q) divides r. Result such that
  *
  *   deg(u) < deg(q), deg(v) < deg(p)
  */
@@ -308,14 +308,15 @@ void lp_upolynomial_solve_bezout(const lp_upolynomial_t* p, const lp_upolynomial
     lp_upolynomial_t** u, lp_upolynomial_t** v);
 
 /**
- * Returns the factorization of the given polynomial in its ring.
+ * Returns the factorization of the given polynomial in its ring. (DO NOT USE)
  */
 lp_upolynomial_factors_t* lp_upolynomial_factor(const lp_upolynomial_t* p);
 
 /**
  * Returns the square-free factorization of the given polynomial in its ring.
  * In a square-free factorization each factor is square-free. Individual
- * factors are also mutually prime, i.e. gcd(f_i, f_j) = 1 for i != j.
+ * factors are also mutually prime, i.e. gcd(f_i, f_j) = 1 for i != j. If x
+ * appears as a factor, it is always separate in the result.
  */
 lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial_t* p);
 
@@ -335,6 +336,7 @@ int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_rational_inte
 /**
  * Isolate the distinct real roots of the given polynomial. Roots should be
  * an (unconstructed) array of algebraic numbers with size at least
- * lp_upolynomial_roots_count(p, 0).
+ * lp_upolynomial_roots_count(p, 0). You can use degree of the polynomial for
+ * an estimate of the number of roots.
  */
 void lp_upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
