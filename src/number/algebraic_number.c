@@ -240,7 +240,7 @@ int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_
   }
 
   // We only have a problem if the intervals intersect
-  if (!lp_dyadic_interval_disjunct(&a1->I, &a2->I)) {
+  if (!lp_dyadic_interval_disjoint(&a1->I, &a2->I)) {
     // First intersect the intervals. Since both intervals are open or points
     // the intersection is either open or a point
     lp_dyadic_interval_t I;
@@ -513,7 +513,7 @@ void filter_roots(lp_algebraic_number_t* roots, size_t* roots_size, const lp_dya
   size_t i, to_keep;
   for (i = 0, to_keep = 0; i < *roots_size; ++ i) {
     lp_algebraic_number_t* root = roots + i;
-    if (lp_dyadic_interval_disjunct(&root->I, I)) {
+    if (lp_dyadic_interval_disjoint(&root->I, I)) {
       // Remove this root
       lp_algebraic_number_destruct(root);
     } else {

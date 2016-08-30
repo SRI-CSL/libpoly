@@ -123,7 +123,7 @@ int lp_dyadic_interval_cmp_rational(const lp_dyadic_interval_t* I, const lp_rati
 
 
 /** Check whether two intervals are disjunct */
-int lp_dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
+int lp_dyadic_interval_disjoint(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
 /** Scale the interval by power of 2 */
 void lp_dyadic_interval_scale(lp_dyadic_interval_t* I, int n);
@@ -134,5 +134,5 @@ int lp_dyadic_interval_is_point(const lp_dyadic_interval_t* I);
 /** Get the point value */
 const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interval_t* I);
 
-/** Get the size of the interval log value */
+/** Get the size of the interval log value (upper bound) */
 int lp_dyadic_interval_size(const lp_dyadic_interval_t* I);

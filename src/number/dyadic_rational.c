@@ -36,7 +36,6 @@ void lp_dyadic_rational_construct_from_double(lp_dyadic_rational_t* q, double x)
   dyadic_rational_construct_from_double(q, x);
 }
 
-
 void lp_dyadic_rational_construct_copy(lp_dyadic_rational_t* q, const lp_dyadic_rational_t* from) {
   dyadic_rational_construct_copy(q, from);
 }

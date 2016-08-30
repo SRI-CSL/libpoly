@@ -865,7 +865,8 @@ int lp_dyadic_interval_equals(const lp_dyadic_interval_t* I1, const lp_dyadic_in
   return 1;
 }
 
-int lp_dyadic_interval_disjunct(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
+/** Are two intervals disjoint */
+int lp_dyadic_interval_disjoint(const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2) {
   if (I1->is_point) {
     return !lp_dyadic_interval_contains_dyadic_rational(I2, &I1->a);
   }
