@@ -872,7 +872,7 @@ size_t lp_value_hash(const lp_value_t* v) {
     lp_integer_t floor;
     lp_integer_construct(&floor);
     lp_value_floor(v, &floor);
-    size_t hash = lp_integer_get_int(&floor);
+    size_t hash = lp_integer_to_int(&floor);
     lp_integer_destruct(&floor);
     return hash;
   }

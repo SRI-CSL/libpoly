@@ -133,10 +133,6 @@ void lp_integer_assign_int(lp_int_ring_t* K, lp_integer_t* c, long x) {
   integer_assign_int(K, c, x);
 }
 
-long lp_integer_get_int(const lp_integer_t* c) {
-  return integer_get_int(c);
-}
-
 void lp_integer_destruct(lp_integer_t* c) {
   integer_destruct(c);
 }

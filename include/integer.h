@@ -107,11 +107,6 @@ void lp_integer_assign(lp_int_ring_t* K, lp_integer_t* c, const lp_integer_t* fr
 void lp_integer_assign_int(lp_int_ring_t* K, lp_integer_t* c, long x);
 
 /**
- * Get the int value if it fits (otherwise reutrns truncated version of the same sign)
- */
-long lp_integer_get_int(const lp_integer_t* c);
-
-/**
  * Deallocates the integer.
  */
 void lp_integer_destruct(lp_integer_t* c);
@@ -129,7 +124,7 @@ size_t lp_integer_bits(const lp_integer_t* c);
 /**
  * Prints the integer matrix (m)x(n) to the given stream.
  */
-int lp_integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out);
+int lp_integer_print_matrix(const lp_integer_t* c_array, size_t m, size_t n, FILE* out);
 
 #if HAVE_OPEN_MEMSTREAM
 /**
