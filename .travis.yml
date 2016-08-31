@@ -1,5 +1,8 @@
 language: c
 
+notifications:
+  slack: sriformalmethods:1DWq3BI30wLc3ZAc3Fc37n6x
+  
 os:
   - linux
   - osx
