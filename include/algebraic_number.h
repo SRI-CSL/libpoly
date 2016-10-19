@@ -38,7 +38,7 @@ struct lp_algebraic_number_struct {
 };
 
 /**
- * Construct the algebraic number given it's polynomial and the isolating
+ * Construct the algebraic number given its polynomial and the isolating
  * interval. The number takes over the reference of f.
  */
 void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f, const lp_dyadic_interval_t* I);
@@ -90,7 +90,7 @@ void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_
 /** Get the midpoint of the defining interval */
 void lp_algebraic_number_get_rational_midpoint(const lp_algebraic_number_t* a, lp_rational_t* q);
 
-/** Refine the number by halfing it's interval. */
+/** Refine the number by halving its interval. */
 void lp_algebraic_number_refine(lp_algebraic_number_t* a);
 
 /**
@@ -118,7 +118,7 @@ void lp_algebraic_number_neg(lp_algebraic_number_t* neg, const lp_algebraic_numb
 /** Multiplication */
 void lp_algebraic_number_mul(lp_algebraic_number_t* mul, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 
-/** Multiplication */
+/** Exponentiation */
 void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n);
 
 /** Returns true if a rational number (not complete) */
