@@ -2,39 +2,9 @@
 
 import polypy
 import itertools
-
-# Definition of a cylindrical region
-class Cylinder:
-    
-    # Variables (ordered)    
-    variables = []    
-    # List of sections/sector per variable
-    definitions = []
-    # Variable values in the region
-    values = []
-
-    # Add a on top of the cylinder_nofity definition
-    def push(self, x, definition, value):
-        self.variables.append(x)
-        self.definitions.append(definition)
-        self.values.append(value)
-        
-    # Pop the top of cylinder_nofity definition
-    def pop(self):
-        self.values.pop()
-        self.definitions.pop()
-        self.variables.pop()
-
-    # For printouts
-    def __str__(self):
-        out = ""
-        for (x, definition, value) in zip(self.variables, self.definitions, self.values):
-            out = out + "%s -> %s in %s\n" % (x, value, definition)
-        return out 
         
 # Notifications for the cylinders of CAD
-class CylinderNotify(object):
-        
+class CylinderNotify(object):        
     # A cylinder_nofity and an assignment in the cylinder_nofity
     def cylinder_notify(self, cylinder, assignment):
         print "Assignmnent: ", assignment
@@ -124,7 +94,7 @@ class CAD:
                 f1_R = get_reductums(f1, x)
                 f2_R = get_reductums(f2, x)
                 for (g1, g2) in itertools.product(f1_R, f2_R):
-                    self.add_polynomial(g1.psc(g2))
+                    self.add_polynomial(g1.psc(g2))        
             
     # Lift the first variable, update the assignment and lift recursively
     def lift_first_var(self, variables, assignment, cylinder):
@@ -144,13 +114,15 @@ class CAD:
         # Sort the roots and eliminate duplicates
         roots_sorted = sorted(roots_list, key = lambda (v,d): v)
         # Go recursive on the sectors
-        roots_sorted = [(polypy.INFINITY_NEG, polypy.INFINITY_NEG)] + roots_sorted + [(polypy.INFINITY_POS, polypy.INFINITY_POS)]
+        roots_sorted = [(polypy.INFINITY_NEG, polypy.INFINITY_NEG)] + \
+                       roots_sorted + \
+                       [(polypy.INFINITY_POS, polypy.INFINITY_POS)]
         root_i, root_j = itertools.tee(roots_sorted)
         next(root_j)
         for r1, r2 in itertools.izip(root_i, root_j):
             # Get the sector (r1, r2)          
             v = r1[0].get_value_between(r2[0]);
-            cylinder.push(x, (r1[1], r2[1]), v)
+            cylinder.append({ "var" : x, "sector" : (r1[1], r2[1]), "value" : v})
             assignment.set_value(x, v)
             # Go recursive if assignment doesn't invalidate any constraints
             if self.check_assignment(x, assignment):
@@ -159,8 +131,9 @@ class CAD:
             cylinder.pop()
             # Get the section [r2]
             if r2[0] != polypy.INFINITY_POS:
-                cylinder.push(x, (r2[1],), r2[0])
-                assignment.set_value(x, r2[0])
+                v = r2[0]
+                cylinder.append({ "var" : x, "section" : r2[1], "value": v})
+                assignment.set_value(x, v)
                 # Go recursive if assignment doesn't invalidate any constraints
                 if self.check_assignment(x, assignment):
                     self.lift_first_var(variables[1:], assignment, cylinder)                        
@@ -170,7 +143,7 @@ class CAD:
     # Do the lifting
     def lift(self):
         assignment = polypy.Assignment()
-        cylinder = Cylinder()
+        cylinder = []
         self.lift_first_var(self.variables, assignment, cylinder)
                  
     # Run the CAD construction

@@ -21,6 +21,7 @@
 #include "utils.h"
 
 #include <structmember.h>
+#include <math.h>
 
 static void
 Value_dealloc(Value* self);
@@ -228,10 +229,10 @@ Value_to_double(PyObject* self) {
     value = lp_algebraic_number_to_double(&a->v.value.a);
     break;
   case LP_VALUE_PLUS_INFINITY:
-    assert(0);
+    value = INFINITY;
     break;
   case LP_VALUE_MINUS_INFINITY:
-    assert(0);
+    value = -INFINITY;
     break;
   }
 
