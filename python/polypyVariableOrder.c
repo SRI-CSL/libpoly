@@ -57,9 +57,13 @@ VariableOrder_pop(PyObject* self);
 static PyObject*
 VariableOrder_set(PyObject* self, PyObject* args);
 
+static PyObject*
+VariableOrder_cmp(PyObject* self, PyObject* args);
+
 PyMethodDef VariableOrder_methods[] = {
     {"push", (PyCFunction)VariableOrder_push, METH_VARARGS, "Add a variable to the top of the order"},
     {"pop", (PyCFunction)VariableOrder_pop, METH_NOARGS, "Remove the top variable from the order"},
+    {"cmp", (PyCFunction)VariableOrder_cmp, METH_VARARGS, "Compare two variables"},
     {"set", (PyCFunction)VariableOrder_set, METH_VARARGS, "Set the order to the given list of variables"},
     {NULL}  /* Sentinel */
 };
@@ -234,6 +238,35 @@ VariableOrder_push(PyObject* self, PyObject* args) {
 
   Py_RETURN_NONE;
 }
+
+
+static PyObject*
+VariableOrder_cmp(PyObject* self, PyObject* args) {
+  int error = 0;
+  if (PyTuple_Check(args) && PyTuple_Size(args) == 2) {
+    PyObject* x_var = PyTuple_GetItem(args, 0);
+    PyObject* y_var = PyTuple_GetItem(args, 1);
+    if (PyVariable_CHECK(x_var) && PyVariable_CHECK(y_var)) {
+      lp_variable_order_t* var_order = ((VariableOrder*) self)->var_order;
+      lp_variable_t x = ((Variable*) x_var)->x;
+      lp_variable_t y = ((Variable*) y_var)->x;
+      int cmp = lp_variable_order_cmp(var_order, x, y);
+      if (cmp < 0) return PyInt_FromLong(-1);
+      else if (cmp > 0) return PyInt_FromLong(1);
+      else return PyInt_FromLong(0);
+    } else {
+      error = 1;
+    }
+  } else {
+    error = 1;
+  }
+  if (error) {
+    PyErr_SetString(PyExc_BaseException, "Only variables can be pushed");
+  }
+
+  Py_RETURN_NONE;
+}
+
 
 static PyObject*
 VariableOrder_pop(PyObject* self) {
