@@ -57,9 +57,6 @@ add_subdirectory(src)
 # Configure the headers
 add_subdirectory(include)
 
-# Configure the documentation
-add_subdirectory(doc)
-
 #
 # The python binding depends on HAVE_OPEN_MEMSTREAM
 #
