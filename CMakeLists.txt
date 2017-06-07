@@ -7,6 +7,10 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 project(libpoly C)
 
+option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON) 
+option(LIBPOLY_BUILD_STATIC_PIC "Build the static PIC library" ON)
+option(LIBPOLY_BUILD_STATIC "Build the static libraru" ON)
+
 set(LIBPOLY_VERSION_MAJOR 0)
 set(LIBPOLY_VERSION_MINOR 1)
 set(LIBPOLY_VERSION_PATCH 1)
@@ -53,11 +57,13 @@ add_subdirectory(src)
 # Configure the headers
 add_subdirectory(include)
 
+# Configure the documentation
+add_subdirectory(doc)
 
 #
 # The python binding depends on HAVE_OPEN_MEMSTREAM
 #
-if(HAVE_OPEN_MEMSTREAM)
+if(LIBPOLY_BUILD_PYTHON_API AND HAVE_OPEN_MEMSTREAM)
 
   # Configure the python bindings	
   add_subdirectory(python)

@@ -67,9 +67,11 @@ endif()
 #
 # BD: also build the archive libpoly.a
 #
-add_library(static_poly STATIC ${poly_SOURCES})
-set_target_properties(static_poly PROPERTIES OUTPUT_NAME poly)
-install(TARGETS static_poly ARCHIVE DESTINATION lib)
+if (LIBPOLY_BUILD_STATIC)
+  add_library(static_poly STATIC ${poly_SOURCES})
+  set_target_properties(static_poly PROPERTIES OUTPUT_NAME poly)
+  install(TARGETS static_poly ARCHIVE DESTINATION lib)
+endif()
 
 #
 # If libpoly.a is not position independent, we may need
@@ -79,8 +81,7 @@ install(TARGETS static_poly ARCHIVE DESTINATION lib)
 # Linux, FreeBSD, and old versions of Darwin (and probably other systems) don't use fPIC by default.
 # We just check for Linux and FreeBSD here.
 # 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+if(LIBPOLY_BUILD_STATIC_PIC AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
 endif()
-
