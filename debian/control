@@ -1,0 +1,37 @@
+Source: libpoly0
+Section: libs
+Priority: optional
+Maintainer: Ian A. Mason <iam@csl.sri.com>
+Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 9), cmake, libgmp-dev
+Homepage: https://github.com/SRI-CSL/libpoly
+
+Package: libpoly0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Multi-Arch: same
+Description: C library for manipulating multivariate polynomials
+ Used by the SMT solver yices2.
+
+Package: libpoly-dev
+Section: libdevel
+Architecture: any
+Depends: libpoly0 (= ${binary:Version}), ${misc:Depends}, libgmp-dev
+Description: C library for manipulating multivariate polynomials
+ Used by the SMT solver yices2.
+ .
+ This package contains development headers for libpoly.
+
+
+Package: libpoly-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Multi-Arch: same
+Depends: libpoly0 (= ${binary:Version}), ${misc:Depends}
+Provides: libpoly-dbg
+Description: C library for manipulating multivariate polynomials
+ Used by the SMT solver yices2.
+ .
+ This package contains the debugging symbols for libpoly.
