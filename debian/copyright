@@ -1,4 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: libpoly
+Upstream-Contact: Dejan Jovanović <dejan.jovanovic@sri.com>
+Source: https://github.com/SRI-CSL/libpoly
 
 Files: *
 Copyright: 2017 SRI International

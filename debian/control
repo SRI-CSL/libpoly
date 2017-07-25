@@ -2,8 +2,8 @@ Source: libpoly0
 Section: libs
 Priority: optional
 Maintainer: Ian A. Mason <iam@csl.sri.com>
-Standards-Version: 3.9.6
-Build-Depends: debhelper (>= 9), cmake, libgmp-dev
+Standards-Version: 3.9.8
+Build-Depends: debhelper (>= 10), cmake, libgmp-dev
 Homepage: https://github.com/SRI-CSL/libpoly
 
 Package: libpoly0
