@@ -7,10 +7,6 @@
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DLIBPOLY_BUILD_PYTHON_API=OFF  -DLIBPOLY_BUILD_STATIC_PIC=OFF
-#	sed 's/@DEB_HOST_MULTIARCH@/$(DEB_HOST_MULTIARCH)/g' \
-#	  debian/libpoly0.install.in > debian/libpoly0.install
-#	sed 's/@DEB_HOST_MULTIARCH@/$(DEB_HOST_MULTIARCH)/g' \
-#	  debian/libpoly-dev.install.in > debian/libpoly-dev.install
 
 override_dh_clean:
 	rm -f include/version.h
