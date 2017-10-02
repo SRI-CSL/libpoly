@@ -37,3 +37,29 @@ location (such as ```/usr/local```).
 
 If the tests are enabled, you can do a sanity check of the library by doing a
 ```make check```.
+
+
+## Installing Prebuilt Binaries
+
+Currently you can install the libpoly library (without python support) either using Homebrew or Aptitude.
+
+#### Homebrew
+
+Installing on Darwin using homebrew can be achieved via:
+```
+brew install SRI-CSL/sri-csl/libpoly
+```
+
+
+#### Aptitude
+
+To install libpoly on Ubuntu or Debian, do the following:
+```
+sudo add-apt-repository ppa:sri-csl/formal-methods
+sudo apt-get update
+sudo apt-get install libpoly-dev
+```
+This will install the full mcsat enabled version of Yices (as well as the headers and dynamic library).
+
+
+
