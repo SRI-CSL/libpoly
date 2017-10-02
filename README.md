@@ -59,7 +59,7 @@ sudo add-apt-repository ppa:sri-csl/formal-methods
 sudo apt-get update
 sudo apt-get install libpoly-dev
 ```
-This will install the full mcsat enabled version of Yices (as well as the headers and dynamic library).
+
 
 
 
