@@ -81,13 +81,10 @@ void lp_dyadic_rational_destruct(lp_dyadic_rational_t* q);
  */
 int lp_dyadic_rational_print(const lp_dyadic_rational_t* c, FILE* out);
 
-
-#if HAVE_OPEN_MEMSTREAM
 /**
  * Returns the string representation of the number.
  */
 char* lp_dyadic_rational_to_string(const lp_dyadic_rational_t* q);
-#endif
 
 /**
  * Return the double representation of the rational.

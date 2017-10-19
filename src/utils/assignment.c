@@ -88,7 +88,6 @@ int lp_assignment_print(const lp_assignment_t* m, FILE* out) {
   return ret;
 }
 
-#if HAVE_OPEN_MEMSTREAM
 char* lp_assignment_to_string(const lp_assignment_t* m) {
   char* str = 0;
   size_t size = 0;
@@ -97,9 +96,6 @@ char* lp_assignment_to_string(const lp_assignment_t* m) {
   fclose(f);
   return str;
 }
-#endif
-
-
 
 void lp_assignment_set_value(lp_assignment_t* m, lp_variable_t x, const lp_value_t* value) {
   if (value) {

@@ -62,10 +62,8 @@ int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2);
 /** Print */
 int lp_int_ring_print(lp_int_ring_t* K, FILE* out);
 
-#if HAVE_OPEN_MEMSTREAM
 /** Get the string representation */
 char* lp_int_ring_to_string(lp_int_ring_t* K);
-#endif
 
 /** Construct a 0 integer. */
 void lp_integer_construct(lp_integer_t* c);
@@ -126,12 +124,10 @@ size_t lp_integer_bits(const lp_integer_t* c);
  */
 int lp_integer_print_matrix(const lp_integer_t* c_array, size_t m, size_t n, FILE* out);
 
-#if HAVE_OPEN_MEMSTREAM
 /**
  * Returns the string representation of the integer.
  */
 char* lp_integer_to_string(const lp_integer_t* c);
-#endif
 
 /**
  * Returns the int representation of the integer (truncated but keeps sign).

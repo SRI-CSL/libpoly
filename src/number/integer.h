@@ -137,7 +137,6 @@ int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out) {
   return len;
 }
 
-#if HAVE_OPEN_MEMSTREAM
 static inline
 char* integer_to_string(const lp_integer_t* c) {
   char* str = 0;
@@ -147,8 +146,6 @@ char* integer_to_string(const lp_integer_t* c) {
   fclose(f);
   return str;
 }
-#endif
-
 
 static inline
 size_t integer_bits(const lp_integer_t* c) {

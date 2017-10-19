@@ -100,12 +100,10 @@ void lp_upolynomial_unpack(const lp_upolynomial_t* p, lp_integer_t* out);
  */
 int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out);
 
-#if HAVE_OPEN_MEMSTREAM
 /**
  * Get a string representation of the polynomial (you own the memory).
  */
 char* lp_upolynomial_to_string(const lp_upolynomial_t* p);
-#endif
 
 /**
  * Returns true if this is a zero polynomial

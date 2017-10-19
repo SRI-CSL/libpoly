@@ -63,12 +63,9 @@ int lp_rational_print(const lp_rational_t* c, FILE* out) {
   return rational_print(c, out);
 }
 
-#if HAVE_OPEN_MEMSTREAM
 char* lp_rational_to_string(const lp_rational_t* q) {
   return rational_to_string(q);
 }
-#endif
-
 
 double lp_rational_to_double(const lp_rational_t* q) {
   return rational_to_double(q);

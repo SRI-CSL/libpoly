@@ -432,7 +432,6 @@ int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out) {
   }
 }
 
-#if HAVE_OPEN_MEMSTREAM
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a) {
   char* str = 0;
   size_t size = 0;
@@ -441,7 +440,6 @@ char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a) {
   fclose(f);
   return str;
 }
-#endif
 
 double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
 

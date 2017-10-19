@@ -83,12 +83,10 @@ void lp_rational_destruct(lp_rational_t* q);
  */
 int lp_rational_print(const lp_rational_t* c, FILE* out);
 
-#if HAVE_OPEN_MEMSTREAM
 /**
  * Returns the string representation of the rational.
  */
 char* lp_rational_to_string(const lp_rational_t* q);
-#endif
 
 /**
  * Return the double representation of the rational.

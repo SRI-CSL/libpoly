@@ -46,9 +46,7 @@ include(CheckFunctionExists)
 check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
 
 if(HAVE_OPEN_MEMSTREAM)
-
   add_definitions(-DHAVE_OPEN_MEMSTREAM)
-
 endif()
 
 # Configure the library source
@@ -57,10 +55,7 @@ add_subdirectory(src)
 # Configure the headers
 add_subdirectory(include)
 
-#
-# The python binding depends on HAVE_OPEN_MEMSTREAM
-#
-if(LIBPOLY_BUILD_PYTHON_API AND HAVE_OPEN_MEMSTREAM)
+if(LIBPOLY_BUILD_PYTHON_API)
 
   # Configure the python bindings	
   add_subdirectory(python)

@@ -537,7 +537,6 @@ void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
   }
 }
 
-#if HAVE_OPEN_MEMSTREAM
 char* lp_value_to_string(const lp_value_t* v) {
   char* str = 0;
   size_t size = 0;
@@ -546,9 +545,6 @@ char* lp_value_to_string(const lp_value_t* v) {
   fclose(f);
   return str;
 }
-#endif
-
-
 
 void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_value_t* b, int b_strict, lp_value_t* v) {
 

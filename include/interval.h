@@ -81,10 +81,8 @@ int lp_interval_size_approx(const lp_interval_t* I);
 /** Prints the interval to the given stream. */
 int lp_interval_print(const lp_interval_t* I, FILE* out);
 
-#if HAVE_OPEN_MEMSTREAM
 /** Returns the string representation of the interval */
 char* lp_interval_to_string(const lp_interval_t* I);
-#endif
 
 /** Is this interval a point */
 int lp_interval_is_point(const lp_interval_t* I);
