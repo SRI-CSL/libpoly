@@ -26,6 +26,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "utils/open_memstream.h"
+
 /**
  * A simple variable order that orders variable based on a given list, and
  * order the rest of the variables based on their variable id.

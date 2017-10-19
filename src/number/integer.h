@@ -26,6 +26,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "utils/open_memstream.h"
 
 #define __var_unused(x) ((void)x)
 

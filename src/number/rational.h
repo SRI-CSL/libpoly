@@ -22,6 +22,8 @@
 #include <rational.h>
 #include <assert.h>
 
+#include "utils/open_memstream.h"
+
 static inline
 void rational_construct(lp_rational_t* q) {
   mpq_init(q);

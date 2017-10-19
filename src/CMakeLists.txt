@@ -4,6 +4,7 @@ set(poly_SOURCES
     utils/statistics.c
     utils/output.c
     utils/sign_condition.c
+    utils/open_memstream.c
     number/integer.c
     number/rational.c
     number/dyadic_rational.c
