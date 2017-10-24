@@ -1,0 +1,9 @@
+from distutils.core import setup, Extension
+
+polypy = Extension('polypy', 
+                    sources = ['${polypy_SOURCES_STR}'])
+
+setup (name = 'polypy',
+       version = '${LIBPOLY_VERSION}',
+       description = 'A library for symbolic computation with polynomials',
+       ext_modules = [polypy])
