@@ -43,7 +43,7 @@ def project(poly_map, vars):
       f1_R = get_reductums(f1, x)
       f2_R = get_reductums(f2, x)
       for (g1, g2) in itertools.product(f1_R, f2_R):
-        add_polynomial(poly_map, g1.psc(g2))        
+        add_polynomials(poly_map, g1.psc(g2))        
             
 # Lift the first variable, update the assignment and lift recursively
 def lift_first_var(poly_map, vars, m):
