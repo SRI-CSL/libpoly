@@ -2,7 +2,7 @@ language: c
 
 notifications:
   slack: sriformalmethods:1DWq3BI30wLc3ZAc3Fc37n6x
-  
+
 os:
   - linux
   - osx
@@ -19,12 +19,14 @@ env:
 before_install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-key update; sudo apt-get update; fi
    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
+
 install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/ubuntu.deps.sh; fi
    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./scripts/osx.deps.sh; fi
 
 script:
   - cd build
+  - echo `which python`
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib ..; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..; fi
   - make
