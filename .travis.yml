@@ -26,7 +26,9 @@ install:
 
 script:
   - cd build
-  - export PATH="/usr/local/bin:${PATH}" ; echo `which python`
+  - export PATH="/usr/local/bin:$PATH"
+  - echo $PATH
+  - echo `which python`
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib ..; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..; fi
   - make
