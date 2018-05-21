@@ -22,9 +22,9 @@
 #include "version.h"
 #include "output_language.h"
 
-#include <gmp.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <gmp.h>
 
 #ifdef __cplusplus
 extern "C" {
