@@ -21,6 +21,10 @@
 
 #include "poly.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Allocate and construct a new vector */
 lp_polynomial_vector_t* lp_polynomial_vector_new(const lp_polynomial_context_t* ctx);
 
@@ -38,3 +42,7 @@ size_t lp_polynomial_vector_size(const lp_polynomial_vector_t* v);
 
 /** Returns the polynomial at i (newly constructed each time) */
 lp_polynomial_t* lp_polynomial_vector_at(const lp_polynomial_vector_t* v, size_t i);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

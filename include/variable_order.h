@@ -21,6 +21,10 @@
 
 #include "poly.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Construct a new variable order. Attaches one. */
 lp_variable_order_t* lp_variable_order_new(void);
 
@@ -70,3 +74,7 @@ char* lp_variable_order_to_string(const lp_variable_order_t* var_order, const lp
 
 /** Return the variable list */
 const lp_variable_list_t* lp_variable_order_get_list(const lp_variable_order_t* var_order);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

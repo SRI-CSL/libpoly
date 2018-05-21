@@ -22,7 +22,9 @@
 #include "poly.h"
 #include "value.h"
 
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct lp_assignment_struct {
   /** Size of the map */
@@ -65,3 +67,7 @@ void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, l
 
 /** Get the sign of the polynomial in the model */
 int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

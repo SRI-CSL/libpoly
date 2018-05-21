@@ -21,7 +21,9 @@
 
 #include "integer.h"
 
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Power of single variable.
@@ -74,3 +76,7 @@ void lp_monomial_gcd(const lp_polynomial_context_t* ctx, lp_monomial_t* gcd, con
 
 /** Print the monomial */
 int lp_monomial_print(const lp_polynomial_context_t* ctx, const lp_monomial_t* m, FILE* out);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

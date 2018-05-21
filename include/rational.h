@@ -21,11 +21,12 @@
 
 #include "poly.h"
 
-#include <stdio.h>
-#include <gmp.h>
-
 #include "integer.h"
 #include "dyadic_rational.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Construct rational 0/1.
@@ -192,3 +193,7 @@ void lp_rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling);
  * Return the floor.
  */
 void lp_rational_floor(const lp_rational_t* q, lp_integer_t* q_floor);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

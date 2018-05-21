@@ -22,13 +22,17 @@
 #include "version.h"
 #include "output_language.h"
 
-#include <stdio.h>
 #include <gmp.h>
+#include <stdio.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //
 // Definitions of all relevant types
 //
-
 
 /** Rationals are GMP rationals */
 typedef __mpq_struct lp_rational_t;
@@ -78,3 +82,7 @@ void lp_stats_print(FILE* file);
 
 /** Set the output language */
 void lp_set_output_language(lp_output_language_t lang);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

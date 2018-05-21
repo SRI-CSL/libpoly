@@ -22,6 +22,10 @@
 #include "poly.h"
 #include "integer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Construct the factors with no factors, and constant 1. */
 lp_upolynomial_factors_t* lp_upolynomial_factors_construct(void);
 
@@ -61,3 +65,7 @@ lp_int_ring_t* lp_upolynomial_factors_ring(const lp_upolynomial_factors_t* f);
  * "larger" than the existing ring.
  */
 void lp_upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, lp_int_ring_t* K);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

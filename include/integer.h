@@ -21,9 +21,9 @@
 
 #include "poly.h"
 
-#include <stdint.h>
-#include <stdio.h>
-#include <gmp.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Modulus for computing in the congruence ring */
 typedef struct {
@@ -304,3 +304,7 @@ void lp_integer_lcm_Z(lp_integer_t* lcm, const lp_integer_t* a, const lp_integer
  * Returns the hash of the integer.
  */
 size_t lp_integer_hash(const lp_integer_t* a);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

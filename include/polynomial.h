@@ -28,6 +28,10 @@
 #include "monomial.h"
 #include "sign_condition.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Polynomials incorporate the context and coefficient data. The also carry
  * flags so as not to re-do any computation.
@@ -334,3 +338,7 @@ void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f
 
 /** Check the integrity of the polynomial */
 int lp_polynomial_check_integrity(const lp_polynomial_t* A);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

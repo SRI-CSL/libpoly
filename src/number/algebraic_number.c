@@ -472,6 +472,43 @@ double lp_algebraic_number_to_double(const lp_algebraic_number_t* a_const) {
   return result;
 }
 
+void lp_algebraic_number_to_rational(const lp_algebraic_number_t* a_const, lp_rational_t* q) {
+
+  lp_rational_t tmp;
+
+  // If a point, just return it's double
+  if (a_const->f == 0) {
+    rational_construct_from_dyadic(&tmp, &a_const->I.a);
+    rational_swap(q, &tmp);
+    rational_destruct(&tmp);
+    return;
+  }
+
+  // We do the necessary refinement on a copy
+  lp_algebraic_number_t a;
+  lp_algebraic_number_construct_copy(&a, a_const);
+
+  // Refine the number until we get the desired precision
+  lp_dyadic_rational_t interval_size;
+  dyadic_rational_construct(&interval_size);
+  dyadic_rational_sub(&interval_size, &a.I.b, &a.I.a);
+  if (interval_size.n < 100) {
+    int iterations = 100 - interval_size.n;
+    while (a.f && iterations > 0) {
+      lp_algebraic_number_refine_const_internal(&a);
+      iterations --;
+    }
+  }
+
+  rational_construct_from_dyadic(&tmp, &a.I.a);
+  rational_swap(q, &tmp);
+  rational_destruct(&tmp);
+
+  dyadic_rational_destruct(&interval_size);
+  lp_algebraic_number_destruct(&a);
+}
+
+
 /** Polynomial context for resultant computation */
 static const lp_polynomial_context_t* algebraic_ctx = 0;
 

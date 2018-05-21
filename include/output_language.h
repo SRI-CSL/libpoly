@@ -19,6 +19,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum lp_output_language_enum {
   /** Output in latex format, i.e. x^2 - 1 */
   LP_OUTPUT_LATEX,
@@ -31,3 +35,7 @@ enum lp_output_language_enum {
 };
 
 typedef enum lp_output_language_enum lp_output_language_t;
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

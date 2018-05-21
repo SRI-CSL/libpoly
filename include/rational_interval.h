@@ -23,6 +23,10 @@
 
 #include "rational.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * An interval (a, b) with both points rationals. The side is open if
  * the _open is true.
@@ -102,3 +106,7 @@ int lp_rational_interval_is_point(const lp_rational_interval_t* I);
 
 /** Get the point value */
 const lp_rational_t* lp_rational_interval_get_point(const lp_rational_interval_t* I);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

@@ -21,7 +21,9 @@
 
 #include "poly.h"
 
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Sign condition contains two signs, both either -1, 0, 1, in ascending order.
@@ -59,3 +61,7 @@ lp_sign_condition_t lp_sign_condition_negate(lp_sign_condition_t sgn_condition);
  * Print the sign condition.
  */
 int lp_sign_condition_print(lp_sign_condition_t sgn_condition, FILE* out);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

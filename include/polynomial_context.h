@@ -24,6 +24,10 @@
 #include "integer.h"
 #include "variable_order.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Information providing semantic context for available operations on
  * polynomials.
@@ -57,3 +61,7 @@ void lp_polynomial_context_detach(lp_polynomial_context_t* ctx);
  * equality and their variable order is identical (pointers)
  */
 int lp_polynomial_context_equal(const lp_polynomial_context_t* ctx1, const lp_polynomial_context_t* ctx2);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

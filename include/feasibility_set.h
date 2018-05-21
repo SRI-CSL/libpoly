@@ -22,6 +22,10 @@
 #include "poly.h"
 #include "sign_condition.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Set of disjoint intervals representing an algebraic set, ordered from
  * left to right (-inf to +inf).
@@ -134,3 +138,7 @@ int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out);
  * Return the string representation of the set.
  */
 char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

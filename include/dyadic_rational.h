@@ -21,10 +21,11 @@
 
 #include "poly.h"
 
-#include <stdio.h>
-#include <gmp.h>
-
 #include "integer.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Fraction of the form a/2^n, with n non-negative. The fraction is reduced, i.e.
@@ -180,3 +181,7 @@ void lp_dyadic_rational_ceiling(const lp_dyadic_rational_t* q, lp_integer_t* q_c
  * Get the floor of the number.
  */
 void lp_dyadic_rational_floor(const lp_dyadic_rational_t* q, lp_integer_t* q_floor);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

@@ -27,7 +27,9 @@
 #include "algebraic_number.h"
 #include "value.h"
 
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Types of values for the assignment */
 typedef enum {
@@ -155,3 +157,7 @@ int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t*
 
 /** Get the double (approximation) of the value */
 double lp_value_to_double(const lp_value_t* v);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

@@ -25,6 +25,10 @@
 #include "rational.h"
 #include "interval.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Construct the polynomial given its coefficients. Coefficients should be
  * indexed by degree and they will be normalized according to the given ring.
@@ -338,3 +342,7 @@ int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_rational_inte
  * an estimate of the number of roots.
  */
 void lp_upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

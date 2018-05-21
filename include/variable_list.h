@@ -21,6 +21,10 @@
 
 #include "poly.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * A list of variable that keeps an index for each variable. We don't expect
  * too many variables in the database, so we keep a map as an array.
@@ -70,3 +74,7 @@ void lp_variable_list_remove(lp_variable_list_t* list, lp_variable_t x);
 
 /** Order the list based on the given order */
 void lp_variable_list_order(lp_variable_list_t* list, const lp_variable_order_t* order);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

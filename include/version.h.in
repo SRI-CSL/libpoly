@@ -19,8 +19,15 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LIBPOLY_VERSION_MAJOR @LIBPOLY_VERSION_MAJOR@
 #define LIBPOLY_VERSION_MINOR @LIBPOLY_VERSION_MINOR@
 #define LIBPOLY_VERSION_PATCH @LIBPOLY_VERSION_PATCH@
 #define LIBPOLY_VERSION @LIBPOLY_VERSION@
 
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

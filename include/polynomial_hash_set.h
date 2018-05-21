@@ -21,7 +21,9 @@
 
 #include "poly.h"
 
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct lp_polynomial_hash_set_struct {
   /** The data */
@@ -59,3 +61,7 @@ void lp_polynomial_hash_set_clear(lp_polynomial_hash_set_t* set);
 
 /** Print the set. */
 int lp_polynomial_hash_set_print(const lp_polynomial_hash_set_t* set, FILE* out);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

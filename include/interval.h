@@ -22,6 +22,10 @@
 #include "poly.h"
 #include "value.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * An interval (a, b) with both point being values. This side is open is _open
  * is true.
@@ -147,3 +151,7 @@ lp_interval_cmp_t lp_interval_cmp(const lp_interval_t* I1, const lp_interval_t* 
  * Compares the two intervals and assigns the intersect (if any).
  */
 lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const lp_interval_t* I2, lp_interval_t* P);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

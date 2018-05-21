@@ -21,9 +21,11 @@
 
 #include "poly.h"
 
-#include <stdio.h>
-
 #include "dyadic_interval.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Algebraic number represented as the only root of the polynomial f in the
@@ -79,8 +81,11 @@ int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out);
 /** Return a string representation of the number */
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a);
 
-/** Convert to double */
+/** Convert to double approximation */
 double lp_algebraic_number_to_double(const lp_algebraic_number_t* a);
+
+/** Convert to rational approximation */
+void lp_algebraic_number_to_rational(const lp_algebraic_number_t* a, lp_rational_t* q);
 
 /** Get the midpoint of the defining interval */
 void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_dyadic_rational_t* q);
@@ -130,3 +135,7 @@ void lp_algebraic_number_ceiling(const lp_algebraic_number_t* a, lp_integer_t* a
 
 /** Returns the floor of the number */
 void lp_algebraic_number_floor(const lp_algebraic_number_t* a, lp_integer_t* a_floor);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif

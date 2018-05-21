@@ -23,6 +23,10 @@
 
 #include "dyadic_rational.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * A dyadic interval is an interval either an interval of the form (a, b) where
  * both a and b are dyadic rationals. This is different from the traditional
@@ -136,3 +140,7 @@ const lp_dyadic_rational_t* lp_dyadic_interval_get_point(const lp_dyadic_interva
 
 /** Get the size of the interval log value (upper bound) */
 int lp_dyadic_interval_size(const lp_dyadic_interval_t* I);
+
+#ifdef __cplusplus
+} /* close extern "C" { */
+#endif
