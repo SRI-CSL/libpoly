@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "poly.h"
+
 #include "integer.h"
 
 #ifdef __cplusplus
