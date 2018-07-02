@@ -7,18 +7,18 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 project(libpoly C)
 
-option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON) 
+option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON)
 option(LIBPOLY_BUILD_STATIC_PIC "Build the static PIC library" ON)
 option(LIBPOLY_BUILD_STATIC "Build the static libraru" ON)
 
 set(LIBPOLY_VERSION_MAJOR 0)
 set(LIBPOLY_VERSION_MINOR 1)
-set(LIBPOLY_VERSION_PATCH 4)
-set(LIBPOLY_VERSION ${LIBPOLY_VERSION_MAJOR}.${LIBPOLY_VERSION_MINOR}.${LIBPOLY_VERSION_PATCH}) 
+set(LIBPOLY_VERSION_PATCH 5)
+set(LIBPOLY_VERSION ${LIBPOLY_VERSION_MAJOR}.${LIBPOLY_VERSION_MINOR}.${LIBPOLY_VERSION_PATCH})
 
 if(APPLE)
  # This is the simplest setting that seems to currently work on the mac.
- # 
+ #
  set(CMAKE_MACOSX_RPATH OFF)
  set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
@@ -39,7 +39,7 @@ endif()
 
 
 #
-# Check for open_memstream 
+# Check for open_memstream
 #
 include(CheckFunctionExists)
 
@@ -57,7 +57,7 @@ add_subdirectory(include)
 
 if(LIBPOLY_BUILD_PYTHON_API)
 
-  # Configure the python bindings	
+  # Configure the python bindings
   add_subdirectory(python)
 
   # Configure the tests

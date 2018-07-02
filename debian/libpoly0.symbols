@@ -260,6 +260,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_algebraic_number_sub_interval_op@Base 1.3
  lp_algebraic_number_swap@Base 1.3
  lp_algebraic_number_to_double@Base 1.3
+ lp_algebraic_number_to_rational@Base 1.5
  lp_algebraic_number_to_string@Base 1.3
  lp_assignment_construct@Base 1.3
  lp_assignment_delete@Base 1.3
