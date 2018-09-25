@@ -19,6 +19,7 @@
 
 #include "polypyFeasibilitySet.h"
 #include "polypyValue.h"
+#include "utils.h"
 
 #include <structmember.h>
 

@@ -20,6 +20,7 @@
 #include "polypyAlgebraicNumber.h"
 #include "polypyUPolynomial.h"
 #include "polypyPolynomial.h"
+#include "utils.h"
 
 #include <structmember.h>
 

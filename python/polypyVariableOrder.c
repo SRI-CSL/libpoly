@@ -19,6 +19,7 @@
 
 #include "polypyVariableOrder.h"
 #include "polypyVariable.h"
+#include "utils.h"
 
 #include <structmember.h>
 #include <stdlib.h>

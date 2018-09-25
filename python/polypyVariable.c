@@ -20,6 +20,7 @@
 #include "polypyVariable.h"
 #include "polypyInteger.h"
 #include "polypyPolynomial.h"
+#include "utils.h"
 
 #include <structmember.h>
 

@@ -27,6 +27,7 @@
 #include "polypyValue.h"
 #include "polypyInterval.h"
 #include "polypyFeasibilitySet.h"
+#include "utils.h"
 
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {

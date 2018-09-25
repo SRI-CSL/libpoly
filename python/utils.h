@@ -20,6 +20,7 @@
 #pragma once
 
 #include <Python.h>
+#include "py3c.h"
 
 #include "integer.h"
 #include "rational.h"

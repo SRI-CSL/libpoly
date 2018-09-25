@@ -18,6 +18,7 @@
  */
 
 #include "polypyInteger.h"
+#include "utils.h"
 
 #include <structmember.h>
 
