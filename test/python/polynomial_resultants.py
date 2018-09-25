@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
 from __future__ import print_function
+import sys
+
 import polypy
 import polypy_test
+
+PY2 = sys.version_info < (3, 0)
 
 x = polypy.Variable("x");
 y = polypy.Variable("y");
@@ -13,7 +17,10 @@ polypy.variable_order.set([w, z, y, x]);
 
 def check_psc(p, q, expected):
     psc = p.psc(q)
-    ok = cmp(psc, expected) == 0
+    if PY2:
+        ok = cmp(psc, expected) == 0
+    else:
+        ok = (psc == expected)
     if (not ok):
         print("p =", p)
         print("q =", q)
