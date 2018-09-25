@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
 
@@ -99,20 +100,20 @@ def check_feasible(p, var, assignment, expected):
 #         print "p_feasible =", p_feasible        
         ok = len(p_feasible) == expected
         if (not ok):
-            print "expected =", expected
-            print "p_feasible =", p_feasible        
+            print("expected =", expected)
+            print("p_feasible =", p_feasible)        
         if ok:
             for I in p_feasible:             
                 v = I.pick_value()
                 ok = I.contains(v)
                 if (not ok):
-                    print "I =", I
-                    print "v =", v
+                    print("I =", I)
+                    print("v =", v)
                     break 
         if (not ok):
-            print "p =", p
-            print "assignment =", assignment
-            print "sgn =", sgn_name[sgn]            
+            print("p =", p)
+            print("assignment =", assignment)
+            print("sgn =", sgn_name[sgn])            
         polypy_test.check(ok)
 
 assignment = polypy.Assignment()

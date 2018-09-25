@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
 
@@ -14,20 +15,20 @@ def check_psc(p, q, expected):
     psc = p.psc(q)
     ok = cmp(psc, expected) == 0
     if (not ok):
-        print "p =", p
-        print "q =", q
-        print "psc      =", psc
-        print "expected =", expected
+        print("p =", p)
+        print("q =", q)
+        print("psc      =", psc)
+        print("expected =", expected)
     polypy_test.check(ok)
 
 def check_resultant(p, q, expected):
     resultant = p.resultant(q)
     ok = resultant == expected
     if (not ok):
-        print "p =", p
-        print "q =", q
-        print "resultant =", resultant
-        print "expected  =", expected
+        print("p =", p)
+        print("q =", q)
+        print("resultant =", resultant)
+        print("expected  =", expected)
 
 polypy_test.init()
 

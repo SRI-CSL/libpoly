@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import polypy
 import random
 import sympy
@@ -9,7 +11,7 @@ FAIL = 0
  Call to start a unit test.
 """
 def start(description):
-    print "\t* Checking", description
+    print("\t* Checking", description)
 
 """
  Call to check a unit test.
@@ -21,7 +23,7 @@ def check(ok):
     elif ok == False:
         FAIL = FAIL + 1
     else:
-        print "Didn't get True/False"    
+        print("Didn't get True/False")
         
 """
  Make a random polynomial (degree bound and M bound on the coefficient 
@@ -104,11 +106,11 @@ class SympyWrapper:
         gcd_gold = self.sympy_gcd(p, q).simplify()
         ok = self.sympy_from_upolynomial(gcd) == gcd_gold
         if (not ok):
-            print "Wrong gcd"
-            print "p =", p 
-            print "q =", q
-            print "gcd =", gcd
-            print "expected =", gcd_gold
+            print("Wrong gcd")
+            print("p =", p)
+            print("q =", q)
+            print("gcd =", gcd)
+            print("expected =", gcd_gold)
         return ok         
             
     def check_extended_gcd(self, p, q, gcd, u, v):
@@ -117,27 +119,27 @@ class SympyWrapper:
         (sympy_gcd, sympy_u, sympy_v) = self.sympy_extended_gcd(p, q)
         ok = self.sympy_from_upolynomial(gcd) == sympy_gcd
         if (not ok):
-            print "Wrong gcd"
-            print "p =", p 
-            print "q =", q
-            print "gcd =", gcd
-            print "expected =", sympy_gcd
+            print("Wrong gcd")
+            print("p =", p)
+            print("q =", q)
+            print("gcd =", gcd)
+            print("expected =", sympy_gcd)
             return False
         ok = self.sympy_from_upolynomial(u) == sympy_u
         if (not ok):
-            print "Wrong u"
-            print "p =", p 
-            print "q =", q
-            print "u =", u
-            print "expected =", sympy_u
+            print("Wrong u")
+            print("p =", p)
+            print("q =", q)
+            print("u =", u)
+            print("expected =", sympy_u)
             return False        
         ok = self.sympy_from_upolynomial(v) == sympy_v
         if (not ok):
-            print "Wrong v"
-            print "p =", p 
-            print "q =", q
-            print "v =", v
-            print "expected =", sympy_v
+            print("Wrong v")
+            print("p =", p)
+            print("q =", q)
+            print("v =", v)
+            print("expected =", sympy_v)
             return False
         return True
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 import argparse
 import polypy
@@ -25,20 +26,20 @@ tests = ["python/upolynomial_gcd.py",
          "python/polynomial_feasibility.py"]
 
 if (args.sympy):
-    print "Sympy checking enabled"
+    print("Sympy checking enabled")
     polypy_test.sympy_checker.enabled = True
 else:
-    print "Sympy checking disabled"
+    print("Sympy checking disabled")
     polypy_test.sympy_checker.enabled = False
-        
-for test in tests:    
-    print "Running", test, ":"
+
+for test in tests:
+    print("Running", test, ":")
     context = dict()
     execfile(test, context, context)
     module = context["polypy_test"]
-    print "PASS:", module.PASS
-    print "FAIL:", module.FAIL
+    print("PASS:", module.PASS)
+    print("FAIL:", module.FAIL)
 
 if (args.stats):    
-    print "Statistics:"
+    print("Statistics:")
     polypy.stats_print()

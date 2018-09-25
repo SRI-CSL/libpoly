@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
 
@@ -7,13 +8,13 @@ polypy_test.init()
 
 def check_roots_isolate(p, expected):
     roots = p.roots_isolate()
-    sorted = all(roots[i] < roots[i+1] for i in xrange(len(roots)-1))
+    sorted = all(roots[i] < roots[i+1] for i in range(len(roots)-1))
     count = len(roots)
     if ((not sorted) or count != expected):
-        print "p = ", p
-        print "sorted = ", sorted
-        print "count = ", count
-        print "expected = ", expected
+        print("p = ", p)
+        print("sorted = ", sorted)
+        print("count = ", count)
+        print("expected = ", expected)
         polypy_test.check(False)
     else:
         polypy_test.check(True)
@@ -26,11 +27,11 @@ def check_roots_count(p, expected, lb = None, ub = None):
         
     if (count != expected):
         polypy_test.check(False)
-        print "p =", p
-        print "lb =", lb
-        print "ub =", ub
-        print "count =", count
-        print "expected = ", expected 
+        print("p =", p)
+        print("lb =", lb)
+        print("ub =", ub)
+        print("count =", count)
+        print("expected = ", expected) 
     else:
         polypy_test.check(True)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
  
@@ -12,10 +13,10 @@ def check_sgn(p, assignment, expected_sgn):
     sgn = p.sgn(assignment)
     ok = (sgn > 0 and expected_sgn > 0) or (sgn < 0 and expected_sgn < 0) or (sgn == 0 and expected_sgn == 0)
     if (not ok):
-        print "p =", p
-        print "assignment =", assignment
-        print "sgn =", sgn
-        print "expected_sgn =", expected_sgn
+        print("p =", p)
+        print("assignment =", assignment)
+        print("sgn =", sgn)
+        print("expected_sgn =", expected_sgn)
     polypy_test.check(ok)
 
 polypy_test.start("Sign Determination")

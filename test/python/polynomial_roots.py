@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import sys
 import polypy
 import polypy_test
@@ -13,16 +14,16 @@ def check_roots(p, assignment, roots, expected_roots):
             root_double = root.to_double()
             ok = abs(root_double - expected_root) < 0.000001
             if (not ok):
-                print "p =", p
-                print "assignment =", assignment
-                print "root =", root
-                print "expected_root =", expected_root
+                print("p =", p)
+                print("assignment =", assignment)
+                print("root =", root)
+                print("expected_root =", expected_root)
                 break
     else:
-        print "p =", p
-        print "assignment =", assignment
-        print "roots =", roots
-        print "expected_roots =", expected_roots
+        print("p =", p)
+        print("assignment =", assignment)
+        print("roots =", roots)
+        print("expected_roots =", expected_roots)
     polypy_test.check(ok)
 
 # polypy.trace_enable("polynomial")

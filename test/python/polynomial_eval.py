@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
  
@@ -12,11 +13,11 @@ def check_value(p, assignment, value, expected_value):
     value_double = value.to_double()
     ok = abs(value_double - expected_value) < 0.000001
     if (not ok):
-        print "p =", p
-        print "assignment =", assignment
-        print "value =", value
-        print "value_double =", value_double
-        print "expected_value =", expected_value
+        print("p =", p)
+        print("assignment =", assignment)
+        print("value =", value)
+        print("value_double =", value_double)
+        print("expected_value =", expected_value)
     polypy_test.check(ok)
 
 polypy_test.start("Polynomial Evaluation")

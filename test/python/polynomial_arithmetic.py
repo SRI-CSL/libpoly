@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
  
@@ -7,19 +8,19 @@ def check_binary(op, op_name, p, q, expected):
     result = op(p, q)
     ok = result == expected
     if (not ok):
-        print "p =", p
-        print "q =", q
-        print op_name, "=", result
-        print "expected =", expected
+        print("p =", p)
+        print("q =", q)
+        print(op_name, "=", result)
+        print("expected =", expected)
     polypy_test.check(ok)
 
 def check_unary(op, op_name, p, expected):
     result = op(p)
     ok = result == expected
     if (not ok):
-        print "p =", p
-        print op_name, "=", result
-        print "expected =", expected
+        print("p =", p)
+        print(op_name, "=", result)
+        print("expected =", expected)
     polypy_test.check(ok)
         
 polypy_test.init()

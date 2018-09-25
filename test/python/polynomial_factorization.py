@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import polypy
 import polypy_test
  
@@ -11,10 +12,10 @@ def check_factorization(p, p_factors, expected_size):
         mul = mul * (factor**multiplicity)
     ok = (p == mul) and (expected_size == len(p_factors))
     if (not ok):
-        print "p =", p
-        print "p_factors =", p_factors
-        print "expected_size =", expected_size
-        print "mul =", mul
+        print("p =", p)
+        print("p_factors =", p_factors)
+        print("expected_size =", expected_size)
+        print("mul =", mul)
     polypy_test.check(ok)
 
 polypy_test.start("Square-Free Factorization")
