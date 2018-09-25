@@ -65,8 +65,10 @@ Value_pow(PyObject* self, PyObject* args);
 static PyObject*
 Value_int(PyObject* self);
 
+#if !IS_PY3
 static PyObject*
 Value_long(PyObject* self);
+#endif
 
 static PyObject*
 Value_float(PyObject* self);
@@ -78,51 +80,16 @@ PyMethodDef Value_methods[] = {
 };
 
 PyNumberMethods Value_NumberMethods = {
-     Value_add, // binaryfunc nb_add;
-     Value_sub, // binaryfunc nb_subtract;
-     Value_mul, // binaryfunc nb_multiply;
-     0, // binaryfunc nb_divide;
-     0, // binaryfunc nb_remainder;
-     0, // binaryfunc nb_divmod;
-     (ternaryfunc)Value_pow, // ternaryfunc nb_power;
-     Value_neg, // unaryfunc nb_negative;
-     0, // unaryfunc nb_positive;
-     0, // unaryfunc nb_absolute;
-     0, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
-     0, // unaryfunc nb_invert;
-     0, // binaryfunc nb_lshift;
-     0, // binaryfunc nb_rshift;
-     0, // binaryfunc nb_and;
-     0, // binaryfunc nb_xor;
-     0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
-     Value_int, // unaryfunc nb_int;
-     Value_long, // unaryfunc nb_long;
-     Value_float, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
-
-     /* Added in release 2.0 */
-     0, // binaryfunc nb_inplace_add;
-     0, // binaryfunc nb_inplace_subtract;
-     0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
-     0, // binaryfunc nb_inplace_remainder;
-     0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
-     0, // binaryfunc nb_inplace_rshift;
-     0, // binaryfunc nb_inplace_and;
-     0, // binaryfunc nb_inplace_xor;
-     0, // binaryfunc nb_inplace_or;
-
-     /* Added in release 2.2 */
-     0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
-     0, // binaryfunc nb_inplace_floor_divide;
-     0, // binaryfunc nb_inplace_true_divide;
-
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     .nb_add = Value_add,
+     .nb_subtract = Value_sub,
+     .nb_multiply = Value_mul,
+     .nb_power = (ternaryfunc)Value_pow,
+     .nb_negative = Value_neg,
+     .nb_int = Value_int,
+     .nb_float = Value_float,
+#if !IS_PY3
+     .nb_long = Value_long,
+#endif
 };
 
 PyTypeObject ValueType = {
@@ -350,6 +317,7 @@ Value_int(PyObject* self) {
   return py_int_cast;
 }
 
+#if !IS_PY3
 // Returns the o converted to a long integer object on success, or NULL on
 // failure. This is the equivalent of the Python expression long(o).
 // Return value: New reference.
@@ -363,6 +331,7 @@ Value_long(PyObject* self) {
   lp_integer_destruct(&int_cast);
   return py_int_cast;
 }
+#endif
 
 // Returns the o converted to a float object on success, or NULL on failure.
 // This is the equivalent of the Python expression float(o).

@@ -126,51 +126,20 @@ PyMethodDef UPolynomial_methods[] = {
 };
 
 PyNumberMethods UPolynomial_NumberMethods = {
-     UPolynomialObject_add, // binaryfunc nb_add;
-     UPolynomialObject_sub, // binaryfunc nb_subtract;
-     UPolynomialObject_mul, // binaryfunc nb_multiply;
-     UPolynomialObject_div, // binaryfunc nb_divide;
-     UPolynomialObject_rem, // binaryfunc nb_remainder;
-     UPolynomialObject_divmod, // binaryfunc nb_divmod;
-     (ternaryfunc)UPolynomialObject_pow, // ternaryfunc nb_power;
-     UPolynomialObject_neg, // unaryfunc nb_negative;
-     0, // unaryfunc nb_positive;
-     0, // unaryfunc nb_absolute;
-     UPolynomialObject_nonzero, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
-     0, // unaryfunc nb_invert;
-     0, // binaryfunc nb_lshift;
-     0, // binaryfunc nb_rshift;
-     0, // binaryfunc nb_and;
-     0, // binaryfunc nb_xor;
-     0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
-     0, // unaryfunc nb_int;
-     0, // unaryfunc nb_long;
-     0, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
-
-     /* Added in release 2.0 */
-     0, // binaryfunc nb_inplace_add;
-     0, // binaryfunc nb_inplace_subtract;
-     0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
-     0, // binaryfunc nb_inplace_remainder;
-     0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
-     0, // binaryfunc nb_inplace_rshift;
-     0, // binaryfunc nb_inplace_and;
-     0, // binaryfunc nb_inplace_xor;
-     0, // binaryfunc nb_inplace_or;
-
-     /* Added in release 2.2 */
-     0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
-     0, // binaryfunc nb_inplace_floor_divide;
-     0, // binaryfunc nb_inplace_true_divide;
-
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     .nb_add = UPolynomialObject_add,
+     .nb_subtract = UPolynomialObject_sub,
+     .nb_multiply = UPolynomialObject_mul,
+     .nb_remainder = UPolynomialObject_rem,
+     .nb_divmod = UPolynomialObject_divmod,
+     .nb_power = (ternaryfunc)UPolynomialObject_pow,
+     .nb_negative = UPolynomialObject_neg,
+     .nb_true_divide = UPolynomialObject_div,
+#if IS_PY3
+     .nb_bool = UPolynomialObject_nonzero,
+#else
+     .nb_divide = UPolynomialObject_div,
+     .nb_nonzero = UPolynomialObject_nonzero,
+#endif
 };
 
 PyTypeObject UPolynomialType = {

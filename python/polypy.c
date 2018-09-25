@@ -29,8 +29,6 @@
 #include "polypyFeasibilitySet.h"
 #include "utils.h"
 
-#include "py3c_compat.h"
-
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {
 #ifndef NDEBUG

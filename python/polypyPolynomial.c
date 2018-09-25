@@ -205,51 +205,20 @@ PyMethodDef Polynomial_methods[] = {
 };
 
 PyNumberMethods Polynomial_NumberMethods = {
-     Polynomial_add, // binaryfunc nb_add;
-     Polynomial_sub, // binaryfunc nb_subtract;
-     Polynomial_mul, // binaryfunc nb_multiply;
-     Polynomial_div, // binaryfunc nb_divide;
-     Polynomial_rem_operator, // binaryfunc nb_remainder;
-     Polynomial_divmod, // binaryfunc nb_divmod;
-     (ternaryfunc)Polynomial_pow, // ternaryfunc nb_power;
-     Polynomial_neg, // unaryfunc nb_negative;
-     0, // unaryfunc nb_positive;
-     0, // unaryfunc nb_absolute;
-     Polynomial_nonzero, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
-     0, // unaryfunc nb_invert;
-     0, // binaryfunc nb_lshift;
-     0, // binaryfunc nb_rshift;
-     0, // binaryfunc nb_and;
-     0, // binaryfunc nb_xor;
-     0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
-     0, // unaryfunc nb_int;
-     0, // unaryfunc nb_long;
-     0, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
-
-     /* Added in release 2.0 */
-     0, // binaryfunc nb_inplace_add;
-     0, // binaryfunc nb_inplace_subtract;
-     0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
-     0, // binaryfunc nb_inplace_remainder;
-     0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
-     0, // binaryfunc nb_inplace_rshift;
-     0, // binaryfunc nb_inplace_and;
-     0, // binaryfunc nb_inplace_xor;
-     0, // binaryfunc nb_inplace_or;
-
-     /* Added in release 2.2 */
-     0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
-     0, // binaryfunc nb_inplace_floor_divide;
-     0, // binaryfunc nb_inplace_true_divide;
-
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     .nb_add = Polynomial_add,
+     .nb_subtract = Polynomial_sub,
+     .nb_multiply = Polynomial_mul,
+     .nb_remainder = Polynomial_rem_operator,
+     .nb_divmod = Polynomial_divmod,
+     .nb_power = (ternaryfunc)Polynomial_pow,
+     .nb_negative = Polynomial_neg,
+     .nb_true_divide = Polynomial_div,
+#if IS_PY3
+     .nb_bool = Polynomial_nonzero,
+#else
+     .nb_divide = Polynomial_div,
+     .nb_nonzero = Polynomial_nonzero,
+#endif
 };
 
 PyTypeObject PolynomialType = {

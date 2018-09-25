@@ -70,51 +70,11 @@ PyMethodDef AlgebraicNumber_methods[] = {
 };
 
 PyNumberMethods AlgebraicNumber_NumberMethods = {
-     AlgebraicNumber_add, // binaryfunc nb_add;
-     AlgebraicNumber_sub, // binaryfunc nb_subtract;
-     AlgebraicNumber_mul, // binaryfunc nb_multiply;
-     0, // binaryfunc nb_divide;
-     0, // binaryfunc nb_remainder;
-     0, // binaryfunc nb_divmod;
-     (ternaryfunc)AlgebraicNumber_pow, // ternaryfunc nb_power;
-     AlgebraicNumber_neg, // unaryfunc nb_negative;
-     0, // unaryfunc nb_positive;
-     0, // unaryfunc nb_absolute;
-     0, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
-     0, // unaryfunc nb_invert;
-     0, // binaryfunc nb_lshift;
-     0, // binaryfunc nb_rshift;
-     0, // binaryfunc nb_and;
-     0, // binaryfunc nb_xor;
-     0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
-     0, // unaryfunc nb_int;
-     0, // unaryfunc nb_long;
-     0, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
-
-     /* Added in release 2.0 */
-     0, // binaryfunc nb_inplace_add;
-     0, // binaryfunc nb_inplace_subtract;
-     0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
-     0, // binaryfunc nb_inplace_remainder;
-     0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
-     0, // binaryfunc nb_inplace_rshift;
-     0, // binaryfunc nb_inplace_and;
-     0, // binaryfunc nb_inplace_xor;
-     0, // binaryfunc nb_inplace_or;
-
-     /* Added in release 2.2 */
-     0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
-     0, // binaryfunc nb_inplace_floor_divide;
-     0, // binaryfunc nb_inplace_true_divide;
-
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     .nb_add = AlgebraicNumber_add,
+     .nb_subtract = AlgebraicNumber_sub,
+     .nb_multiply = AlgebraicNumber_mul,
+     .nb_power = (ternaryfunc)AlgebraicNumber_pow,
+     .nb_negative = AlgebraicNumber_neg,
 };
 
 PyTypeObject AlgebraicNumberType = {
