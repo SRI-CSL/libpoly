@@ -120,18 +120,12 @@ initpolypy(void)
   PyModule_AddObject(m, "Polynomial", (PyObject*)&PolynomialType);
 
   // Sign conditions
-  PyObject* Py_SGN_LT_0 = PyInt_FromLong(LP_SGN_LT_0);
-  PyObject* Py_SGN_LE_0 = PyInt_FromLong(LP_SGN_LE_0);
-  PyObject* Py_SGN_EQ_0 = PyInt_FromLong(LP_SGN_EQ_0);
-  PyObject* Py_SGN_NE_0 = PyInt_FromLong(LP_SGN_NE_0);
-  PyObject* Py_SGN_GT_0 = PyInt_FromLong(LP_SGN_GT_0);
-  PyObject* Py_SGN_GE_0 = PyInt_FromLong(LP_SGN_GE_0);
-  PyModule_AddObject(m, "SGN_LT_0", Py_SGN_LT_0);
-  PyModule_AddObject(m, "SGN_LE_0", Py_SGN_LE_0);
-  PyModule_AddObject(m, "SGN_EQ_0", Py_SGN_EQ_0);
-  PyModule_AddObject(m, "SGN_NE_0", Py_SGN_NE_0);
-  PyModule_AddObject(m, "SGN_GT_0", Py_SGN_GT_0);
-  PyModule_AddObject(m, "SGN_GE_0", Py_SGN_GE_0);
+  PyModule_AddIntConstant(m, "SGN_LT_0", LP_SGN_LT_0);
+  PyModule_AddIntConstant(m, "SGN_LE_0", LP_SGN_LE_0);
+  PyModule_AddIntConstant(m, "SGN_EQ_0", LP_SGN_EQ_0);
+  PyModule_AddIntConstant(m, "SGN_NE_0", LP_SGN_NE_0);
+  PyModule_AddIntConstant(m, "SGN_GT_0", LP_SGN_GT_0);
+  PyModule_AddIntConstant(m, "SGN_GE_0", LP_SGN_GE_0);
 
   Py_INCREF(&AssignmentType);
   PyModule_AddObject(m, "Assignment", (PyObject*)&AssignmentType);
