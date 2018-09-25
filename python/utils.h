@@ -72,3 +72,9 @@ int PyLong_or_Int_or_Float_Check(PyObject* o);
  * Construct a value from a python number.
  */
 void PyLong_or_Int_or_float_to_value(PyObject* o, lp_value_t* v);
+
+#if IS_PY3
+// On Python 3, Py_TPFLAGS_CHECKTYPES is always on.
+// See: https://py3c.readthedocs.io/en/latest/ext-types.html#type-flags
+#define Py_TPFLAGS_CHECKTYPES 0
+#endif
