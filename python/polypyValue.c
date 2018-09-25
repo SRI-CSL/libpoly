@@ -294,7 +294,7 @@ Value_richcompare(PyObject* self, PyObject* other, int op) {
 static PyObject* Value_str(PyObject* self) {
   Value* v = (Value*) self;
   char* cstr = lp_value_to_string(&v->v);
-  PyObject* pystr = PyString_FromString(cstr);
+  PyObject* pystr = PyStr_FromString(cstr);
   free(cstr);
   return pystr;
 }

@@ -432,7 +432,7 @@ static PyObject* Polynomial_str(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
   if (p) {
     char* p_str = lp_polynomial_to_string(p->p);
-    PyObject* str = PyString_FromString(p_str);
+    PyObject* str = PyStr_FromString(p_str);
     free(p_str);
     return str;
   } else {

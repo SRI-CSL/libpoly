@@ -125,7 +125,7 @@ Interval_init(Interval* self, PyObject* args)
 static PyObject* Interval_str(PyObject* self) {
   Interval* I = (Interval*) self;
   char* I_str = lp_interval_to_string(&I->I);
-  PyObject* str = PyString_FromString(I_str);
+  PyObject* str = PyStr_FromString(I_str);
   free(I_str);
   return str;
 }

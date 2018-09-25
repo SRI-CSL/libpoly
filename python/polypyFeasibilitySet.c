@@ -125,7 +125,7 @@ FeasibilitySet_init(FeasibilitySet* self, PyObject* args)
 static PyObject* FeasibilitySet_str(PyObject* self) {
   FeasibilitySet* S = (FeasibilitySet*) self;
   char* I_str = lp_feasibility_set_to_string(S->S);
-  PyObject* str = PyString_FromString(I_str);
+  PyObject* str = PyStr_FromString(I_str);
   free(I_str);
   return str;
 }

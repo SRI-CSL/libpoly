@@ -432,7 +432,7 @@ static PyObject* UPolynomial_str(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
     char* p_str = lp_upolynomial_to_string(p->p);
-    PyObject* str = PyString_FromString(p_str);
+    PyObject* str = PyStr_FromString(p_str);
     free(p_str);
     return str;
   } else {

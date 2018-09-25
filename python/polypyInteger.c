@@ -134,7 +134,7 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
           long M_int = PyLong_AsLongAndOverflow(modulus, &overflow);
           if (overflow) {
             PyObject* M_str = PyObject_Str(modulus);
-            char* M_cstr = PyString_AsString(M_str);
+            char* M_cstr = PyStr_AsString(M_str);
             lp_integer_t M;
             lp_integer_construct_from_string(lp_Z, &M, M_cstr, 10);
             int is_prime = lp_integer_is_prime(&M);
@@ -203,11 +203,11 @@ static PyObject* CoefficientRing_str(PyObject* self) {
   if (K) {
     if (K->K) {
       char* K_str = lp_int_ring_to_string(K->K);
-      PyObject* str = PyString_FromString(K_str);
+      PyObject* str = PyStr_FromString(K_str);
       free(K_str);
       return str;
     } else {
-      return PyString_FromString("Z");
+      return PyStr_FromString("Z");
     }
   } else {
     Py_RETURN_NONE;

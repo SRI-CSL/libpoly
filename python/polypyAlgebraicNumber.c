@@ -316,7 +316,7 @@ AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op) {
 static PyObject* AlgebraicNumber_str(PyObject* self) {
   AlgebraicNumber* a = (AlgebraicNumber*) self;
   char* cstr = lp_algebraic_number_to_string(&a->a);
-  PyObject* pystr = PyString_FromString(cstr);
+  PyObject* pystr = PyStr_FromString(cstr);
   free(cstr);
   return pystr;
 }

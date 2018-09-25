@@ -142,7 +142,7 @@ Assignment_dealloc(Assignment* self)
 static PyObject* Assignment_str(PyObject* self) {
   Assignment* a = (Assignment*) self;
   char* a_str = lp_assignment_to_string(a->assignment);
-  PyObject* str = PyString_FromString(a_str);
+  PyObject* str = PyStr_FromString(a_str);
   free(a_str);
   return str;
 }

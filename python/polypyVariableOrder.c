@@ -198,7 +198,7 @@ static PyObject*
 VariableOrder_str(PyObject* self) {
   VariableOrder* var_order = (VariableOrder*) self;
   char* var_order_str = lp_variable_order_to_string(var_order->var_order, Variable_get_default_db());
-  PyObject* str = PyString_FromString(var_order_str);
+  PyObject* str = PyStr_FromString(var_order_str);
   free(var_order_str);
   return str;
 }
@@ -209,7 +209,7 @@ VariableOrder_repr(PyObject* self) {
   char* var_order_str = lp_variable_order_to_string(var_order->var_order, Variable_get_default_db());
   char* var_order_repr = malloc(strlen(var_order_str) + strlen(VariableOrderType.tp_name) + 3);
   sprintf(var_order_repr, "%s(%s)", VariableOrderType.tp_name, var_order_str);
-  PyObject* str = PyString_FromString(var_order_repr);
+  PyObject* str = PyStr_FromString(var_order_repr);
   free(var_order_repr);
   free(var_order_str);
   return str;
