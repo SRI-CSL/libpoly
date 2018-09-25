@@ -36,7 +36,7 @@ void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring_t* K, lp_integer_t* c) {
   }
   if (PyLong_Check(o)) {
     PyObject* o_str = PyObject_Str(o);
-    char* o_cstr = PyString_AsString(o_str);
+    const char* o_cstr = PyStr_AsString(o_str);
     lp_integer_construct_from_string(K, c, o_cstr, 10);
     Py_DECREF(o_str);
   }
