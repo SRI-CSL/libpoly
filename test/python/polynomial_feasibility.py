@@ -128,7 +128,7 @@ check_feasible(p_slow, x, assignment, p_expected)
 
 p_slow = (1*y**3 + (2*z**3)*y)*x**3 + ((2*z)*y**3)*x**2 + ((2*z**2)*y**2 + 3)
 
-# for random in xrange(1000):
+# for random in range(1000):
 #     start = time.time()
 #     p = polypy_test.random_polynomial(3, 2, [x, y, z], 5)
 #     print p

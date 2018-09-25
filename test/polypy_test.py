@@ -30,7 +30,7 @@ def check(ok):
  magnitude.    
 """
 def random_upolynomial(K, degree, M, lc = None):
-    coeff = [random.randint(-M, M) for _ in xrange(degree)]
+    coeff = [random.randint(-M, M) for _ in range(degree)]
     if (lc is None):
         coeff.append(random.randint(1, M))
     else:
@@ -41,7 +41,7 @@ def random_upolynomial(K, degree, M, lc = None):
 def random_monomial(degree, M, p_vars):
     m = random.randint(1, M)
     if random.randint(0, 1):
-        m_vars = [p_vars[i] for i in sorted(random.sample(xrange(len(p_vars)), random.randint(0, len(p_vars))))]
+        m_vars = [p_vars[i] for i in sorted(random.sample(range(len(p_vars)), random.randint(0, len(p_vars))))]
         for var in m_vars:
             deg = random.randint(1, degree)
             m = m*(var**deg)
@@ -53,7 +53,7 @@ def random_monomial(degree, M, p_vars):
 def random_polynomial(degree, M, p_vars, trials):
     # Generate monomials
     p = random.randint(1, M)
-    for _ in xrange(trials):
+    for _ in range(trials):
         p = p + random_monomial(degree, M, p_vars)
     while (not isinstance(p, polypy.Polynomial)) or (p.degree() == 0):
         p = p + random_monomial(degree, M, p_vars)
