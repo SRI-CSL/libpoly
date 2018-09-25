@@ -64,8 +64,7 @@ PyMethodDef Assignment_methods[] = {
 };
 
 PyTypeObject AssignmentType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                            /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.Assignment",          /*tp_name*/
     sizeof(Variable),            /*tp_basicsize*/
     0,                            /*tp_itemsize*/

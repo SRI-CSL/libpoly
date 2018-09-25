@@ -117,8 +117,7 @@ PyNumberMethods AlgebraicNumber_NumberMethods = {
 };
 
 PyTypeObject AlgebraicNumberType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.AlgebraicNumber",   /*tp_name*/
     sizeof(AlgebraicNumber),    /*tp_basicsize*/
     0,                          /*tp_itemsize*/

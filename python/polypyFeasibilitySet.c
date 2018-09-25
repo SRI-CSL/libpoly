@@ -47,8 +47,7 @@ PyMethodDef FeasibilitySet_methods[] = {
 };
 
 PyTypeObject FeasibilitySetType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.FeasibilitySet",   /*tp_name*/
     sizeof(FeasibilitySet), /*tp_basicsize*/
     0,                          /*tp_itemsize*/

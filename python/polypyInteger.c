@@ -45,8 +45,7 @@ PyMethodDef CoefficientRing_methods[] = {
 };
 
 PyTypeObject CoefficientRingType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.CoefficientRing",   /*tp_name*/
     sizeof(CoefficientRing), /*tp_basicsize*/
     0,                          /*tp_itemsize*/

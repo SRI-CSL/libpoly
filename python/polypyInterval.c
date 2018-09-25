@@ -47,8 +47,7 @@ PyMethodDef Interval_methods[] = {
 };
 
 PyTypeObject IntervalType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.Interval",   /*tp_name*/
     sizeof(Interval), /*tp_basicsize*/
     0,                          /*tp_itemsize*/

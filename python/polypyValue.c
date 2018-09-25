@@ -129,8 +129,7 @@ PyNumberMethods Value_NumberMethods = {
 };
 
 PyTypeObject ValueType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.Value",   /*tp_name*/
     sizeof(Value),    /*tp_basicsize*/
     0,                          /*tp_itemsize*/

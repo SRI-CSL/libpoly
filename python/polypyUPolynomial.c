@@ -177,8 +177,7 @@ PyNumberMethods UPolynomial_NumberMethods = {
 };
 
 PyTypeObject UPolynomialType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.UPolynomial",       /*tp_name*/
     sizeof(UPolynomialObject),  /*tp_basicsize*/
     0,                          /*tp_itemsize*/

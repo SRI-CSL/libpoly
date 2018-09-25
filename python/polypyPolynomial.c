@@ -256,8 +256,7 @@ PyNumberMethods Polynomial_NumberMethods = {
 };
 
 PyTypeObject PolynomialType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "polypy.Polynomial",        /*tp_name*/
     sizeof(Polynomial),       /*tp_basicsize*/
     0,                          /*tp_itemsize*/
