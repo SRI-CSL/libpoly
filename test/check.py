@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from io import open
 
 import argparse
 import polypy
@@ -32,10 +33,18 @@ else:
     print("Sympy checking disabled")
     polypy_test.sympy_checker.enabled = False
 
+def compile_file(filename):
+    """Compile a file for use with exec() for both Python 2 and 3"""
+    # See: https://portingguide.readthedocs.io/en/latest/builtins.html#removed-execfile
+    with open(filename, encoding='utf-8') as f:
+        return compile(f.read(), filename, 'exec')
+
 for test in tests:
     print("Running", test, ":")
     context = dict()
-    execfile(test, context, context)
+
+    exec(compile_file(test), context, context)
+
     module = context["polypy_test"]
     print("PASS:", module.PASS)
     print("FAIL:", module.FAIL)
