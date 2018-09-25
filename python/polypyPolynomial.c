@@ -304,7 +304,7 @@ Polynomial_dealloc(Polynomial* self)
     lp_polynomial_destruct(self->p);
     free(self->p);
   }
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*

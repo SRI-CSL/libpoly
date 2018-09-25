@@ -174,7 +174,7 @@ static void
 Value_dealloc(Value* self)
 {
   lp_value_destruct(&self->v);
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*

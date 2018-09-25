@@ -92,7 +92,7 @@ static void
 FeasibilitySet_dealloc(FeasibilitySet* self)
 {
   lp_feasibility_set_delete(self->S);
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*

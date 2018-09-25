@@ -90,7 +90,7 @@ static void
 CoefficientRing_dealloc(CoefficientRing* self)
 {
   if (self->K) lp_int_ring_detach(self->K);
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*

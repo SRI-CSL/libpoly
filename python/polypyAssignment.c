@@ -137,7 +137,7 @@ Assignment_dealloc(Assignment* self)
   if (self->assignment) {
     lp_assignment_delete(self->assignment);
   }
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject* Assignment_str(PyObject* self) {

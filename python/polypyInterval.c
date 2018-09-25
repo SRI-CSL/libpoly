@@ -92,7 +92,7 @@ static void
 Interval_dealloc(Interval* self)
 {
   lp_interval_destruct(&self->I);
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*

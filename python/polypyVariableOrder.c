@@ -191,7 +191,7 @@ VariableOrder_dealloc(VariableOrder* self)
   if (self->var_order) {
     lp_variable_order_detach(self->var_order);
   }
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject*

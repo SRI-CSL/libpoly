@@ -206,7 +206,7 @@ Variable_init(Variable* self, PyObject* args)
 static void
 Variable_dealloc(Variable* self)
 {
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject* Variable_str(PyObject* self) {

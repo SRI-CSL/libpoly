@@ -222,7 +222,7 @@ static void
 UPolynomial_dealloc(UPolynomialObject* self)
 {
   if (self->p) lp_upolynomial_delete(self->p);
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*

@@ -162,7 +162,7 @@ static void
 AlgebraicNumber_dealloc(AlgebraicNumber* self)
 {
   lp_algebraic_number_destruct(&self->a);
-  self->ob_type->tp_free((PyObject*)self);
+  Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 PyObject*
