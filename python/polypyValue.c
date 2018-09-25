@@ -35,9 +35,6 @@ Value_init(Value* self, PyObject* args);
 static PyObject*
 Value_to_double(PyObject* self);
 
-static int
-Value_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 Value_richcompare(PyObject* self, PyObject* other, int op);
 
@@ -137,7 +134,7 @@ PyTypeObject ValueType = {
     0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
-    Value_cmp,        /*tp_compare*/
+    0,                          /*tp_compare*/
     Value_str,        /*tp_repr*/
     &Value_NumberMethods, /*tp_as_number*/
     0,                          /*tp_as_sequence*/
@@ -238,57 +235,19 @@ Value_to_double(PyObject* self) {
   return PyFloat_FromDouble(value);
 }
 
-static int
-Value_cmp(PyObject* self, PyObject* other) {
-  // Check arguments
-  if (!PyValue_CHECK(self) || !PyValue_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  Value* v1 = (Value*) self;
-  Value* v2 = (Value*) other;
-  // Compare
-  return lp_value_cmp(&v1->v, &v2->v);
-}
-
 static PyObject*
 Value_richcompare(PyObject* self, PyObject* other, int op) {
   PyObject *result = 0;
 
   if (!PyValue_CHECK(other)) {
-    result = Py_NotImplemented;
+    Py_RETURN_NOTIMPLEMENTED;
   } else {
     lp_value_t* self_v = &((Value*) self)->v;
     lp_value_t* other_v = &((Value*) other)->v;
     int cmp = lp_value_cmp(self_v, other_v);
 
-    switch (op) {
-    case Py_LT:
-      result = cmp < 0 ? Py_True : Py_False;
-      break;
-    case Py_LE:
-      result = cmp <= 0 ? Py_True : Py_False;
-      break;
-    case Py_EQ:
-      result = cmp == 0 ? Py_True : Py_False;
-      break;
-    case Py_NE:
-      result = cmp != 0 ? Py_True : Py_False;
-      break;
-    case Py_GT:
-      result = cmp > 0 ? Py_True : Py_False;
-      break;
-    case Py_GE:
-      result = cmp >= 0 ? Py_True : Py_False;
-      break;
-    default:
-      assert(0);
-    }
+    Py_RETURN_RICHCOMPARE(cmp, 0, op);
   }
-
-  Py_INCREF(result);
-  return result;
 }
 
 static PyObject* Value_str(PyObject* self) {

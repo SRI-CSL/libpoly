@@ -51,10 +51,10 @@ static void
 Variable_dealloc(Variable* self);
 
 static PyObject*
-Variable_str(PyObject* self);
+Variable_richcmp(PyObject* self, PyObject* other, int op);
 
-static int
-Variable_cmp(PyObject* self, PyObject* other);
+static PyObject*
+Variable_str(PyObject* self);
 
 static PyObject*
 Variable_repr(PyObject* self);
@@ -138,7 +138,7 @@ PyTypeObject VariableType = {
     0,                            /*tp_print*/
     0,                            /*tp_getattr*/
     0,                            /*tp_setattr*/
-    Variable_cmp,                 /*tp_compare*/
+    0,                            /*tp_compare*/
     Variable_repr,                /*tp_repr*/
     &Variable_NumberMethods,   /*tp_as_number*/
     0,                            /*tp_as_sequence*/
@@ -153,7 +153,7 @@ PyTypeObject VariableType = {
     "Variable objects",   /* tp_doc */
     0,                            /* tp_traverse */
     0,                            /* tp_clear */
-    0,                            /* tp_richcompare */
+    Variable_richcmp,             /* tp_richcompare */
     0,                            /* tp_weaklistoffset */
     0,                            /* tp_iter */
     0,                            /* tp_iternext */
@@ -216,19 +216,13 @@ static PyObject* Variable_str(PyObject* self) {
   return str;
 }
 
-static int Variable_cmp(PyObject* self, PyObject* other) {
+static PyObject* Variable_richcmp(PyObject* self, PyObject* other, int op) {
   Variable* x = (Variable*) self;
   if (PyVariable_CHECK(other)) {
     Variable* y = (Variable*) other;
-    if (x->x > y->x) {
-      return 1;
-    } else if (x->x == y->x) {
-      return 0;
-    } else {
-      return -1;
-    }
+    Py_RETURN_RICHCOMPARE(x->x, y->x, op);
   } else {
-    return -1;
+    Py_RETURN_NOTIMPLEMENTED;
   }
 }
 

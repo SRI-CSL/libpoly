@@ -36,9 +36,6 @@ UPolynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int
 UPolynomial_init(UPolynomialObject* self, PyObject* args);
 
-static int
-UPolynomial_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 UPolynomial_richcompare(PyObject* self, PyObject* args, int op);
 
@@ -185,7 +182,7 @@ PyTypeObject UPolynomialType = {
     0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
-    UPolynomial_cmp,      /*tp_compare*/
+    0,                          /*tp_compare*/
     UPolynomial_str,            /*tp_repr*/
     &UPolynomial_NumberMethods, /*tp_as_number*/
     0,                          /*tp_as_sequence*/
@@ -298,7 +295,7 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
   PyObject *result = 0;
 
   if (!PyUPolynomial_CHECK(other) || !PyInt_Check(other)) {
-    result = Py_NotImplemented;
+    Py_RETURN_NOTIMPLEMENTED;
   } else {
     lp_upolynomial_t* self_p = ((UPolynomialObject*) self)->p;
     lp_upolynomial_t* other_p = 0;
@@ -312,50 +309,12 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
 
     int cmp = lp_upolynomial_cmp(self_p, other_p);
 
-    switch (op) {
-    case Py_LT:
-      result = cmp < 0 ? Py_True : Py_False;
-      break;
-    case Py_LE:
-      result = cmp <= 0 ? Py_True : Py_False;
-      break;
-    case Py_EQ:
-      result = cmp == 0 ? Py_True : Py_False;
-      break;
-    case Py_NE:
-      result = cmp != 0 ? Py_True : Py_False;
-      break;
-    case Py_GT:
-      result = cmp > 0 ? Py_True : Py_False;
-      break;
-    case Py_GE:
-      result = cmp >= 0 ? Py_True : Py_False;
-      break;
-    }
-
     if (PyInt_Check(other)) {
       lp_upolynomial_delete(other_p);
     }
+
+    Py_RETURN_RICHCOMPARE(cmp, 0, op);
   }
-
-  Py_INCREF(result);
-  return result;
-}
-
-static int
-UPolynomial_cmp(PyObject* self, PyObject* other) {
-
-  // Check arguments
-  if (!PyUPolynomial_CHECK(self) || !PyUPolynomial_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  UPolynomialObject* p1 = (UPolynomialObject*) self;
-  UPolynomialObject* p2 = (UPolynomialObject*) other;
-  // Compare
-  int cmp = lp_upolynomial_cmp(p1->p, p2->p);
-  return cmp > 0 ? 1 : cmp < 0 ? -1 : 0;
 }
 
 static PyObject*

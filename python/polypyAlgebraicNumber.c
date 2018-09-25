@@ -126,7 +126,7 @@ PyTypeObject AlgebraicNumberType = {
     0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
-    AlgebraicNumber_cmp,        /*tp_compare*/
+    0,                          /*tp_compare*/
     AlgebraicNumber_str,        /*tp_repr*/
     &AlgebraicNumber_NumberMethods, /*tp_as_number*/
     0,                          /*tp_as_sequence*/
@@ -262,55 +262,17 @@ AlgebraicNumber_refine(PyObject* self) {
   Py_RETURN_NONE;
 }
 
-static int
-AlgebraicNumber_cmp(PyObject* self, PyObject* other) {
-  // Check arguments
-  if (!PyAlgebraicNumber_CHECK(self) || !PyAlgebraicNumber_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  AlgebraicNumber* a1 = (AlgebraicNumber*) self;
-  AlgebraicNumber* a2 = (AlgebraicNumber*) other;
-  // Compare
-  return lp_algebraic_number_cmp(&a1->a, &a2->a);
-}
-
 static PyObject*
 AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op) {
-  PyObject *result = 0;
-
   if (!PyAlgebraicNumber_CHECK(other)) {
-    result = Py_NotImplemented;
+    Py_RETURN_NOTIMPLEMENTED;
   } else {
     lp_algebraic_number_t* self_a = &((AlgebraicNumber*) self)->a;
     lp_algebraic_number_t* other_a = &((AlgebraicNumber*) other)->a;
     int cmp = lp_algebraic_number_cmp(self_a, other_a);
 
-    switch (op) {
-    case Py_LT:
-      result = cmp < 0 ? Py_True : Py_False;
-      break;
-    case Py_LE:
-      result = cmp <= 0 ? Py_True : Py_False;
-      break;
-    case Py_EQ:
-      result = cmp == 0 ? Py_True : Py_False;
-      break;
-    case Py_NE:
-      result = cmp != 0 ? Py_True : Py_False;
-      break;
-    case Py_GT:
-      result = cmp > 0 ? Py_True : Py_False;
-      break;
-    case Py_GE:
-      result = cmp >= 0 ? Py_True : Py_False;
-      break;
-    }
+    Py_RETURN_RICHCOMPARE(cmp, 0, op);
   }
-
-  Py_INCREF(result);
-  return result;
 }
 
 static PyObject* AlgebraicNumber_str(PyObject* self) {

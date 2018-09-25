@@ -51,9 +51,6 @@ Polynomial_dealloc(Polynomial* self);
 static PyObject*
 Polynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
-static int
-Polynomial_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 Polynomial_richcompare(PyObject* self, PyObject* args, int op);
 
@@ -264,7 +261,7 @@ PyTypeObject PolynomialType = {
     0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
-    Polynomial_cmp,             /*tp_compare*/
+    0,                          /*tp_compare*/
     Polynomial_str,             /*tp_repr*/
     &Polynomial_NumberMethods,  /*tp_as_number*/
     0,                          /*tp_as_sequence*/
@@ -345,8 +342,7 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
       self = PyPolynomial_FromLong_or_Int(self, ctx);
       dec_self = 1;
     } else {
-      Py_INCREF(Py_NotImplemented);
-      return Py_NotImplemented;
+      Py_RETURN_NOTIMPLEMENTED;
     }
   }
 
@@ -359,8 +355,10 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
       other = PyPolynomial_FromLong_or_Int(other, ctx);
       dec_other = 1;
     } else {
-      Py_INCREF(Py_NotImplemented);
-      return Py_NotImplemented;
+      if (dec_self) {
+        Py_DECREF(self);
+      }
+      Py_RETURN_NOTIMPLEMENTED;
     }
   }
 
@@ -369,27 +367,6 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
 
   int cmp = lp_polynomial_cmp(self_p, other_p);
 
-  switch (op) {
-  case Py_LT:
-    result = cmp < 0 ? Py_True : Py_False;
-    break;
-  case Py_LE:
-    result = cmp <= 0 ? Py_True : Py_False;
-    break;
-  case Py_EQ:
-    result = cmp == 0 ? Py_True : Py_False;
-    break;
-  case Py_NE:
-    result = cmp != 0 ? Py_True : Py_False;
-    break;
-  case Py_GT:
-    result = cmp > 0 ? Py_True : Py_False;
-    break;
-  case Py_GE:
-    result = cmp >= 0 ? Py_True : Py_False;
-    break;
-  }
-
   if (dec_self) {
     Py_DECREF(self);
   }
@@ -397,8 +374,7 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
     Py_DECREF(other);
   }
 
-  Py_INCREF(result);
-  return result;
+  Py_RETURN_RICHCOMPARE(cmp, 0, op);
 }
 
 static int

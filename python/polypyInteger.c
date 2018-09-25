@@ -31,8 +31,8 @@ CoefficientRing_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int
 CoefficientRing_init(CoefficientRing* self, PyObject* args);
 
-static int
-CoefficientRing_cmp(PyObject* self, PyObject* args);
+static PyObject*
+CoefficientRing_richcmp(PyObject* self, PyObject* args, int op);
 
 static PyObject*
 CoefficientRing_modulus(PyObject* self);
@@ -54,7 +54,7 @@ PyTypeObject CoefficientRingType = {
     0,                          /*tp_print*/
     0,                          /*tp_getattr*/
     0,                          /*tp_setattr*/
-    CoefficientRing_cmp,      /*tp_compare*/
+    0,                          /*tp_compare*/
     0,                          /*tp_repr*/
     0,                          /*tp_as_number*/
     0,                          /*tp_as_sequence*/
@@ -69,7 +69,7 @@ PyTypeObject CoefficientRingType = {
     "Coefficient ring objects", /* tp_doc */
     0,                             /* tp_traverse */
     0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
+    CoefficientRing_richcmp,   /* tp_richcompare */
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
@@ -159,29 +159,33 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
     return 0;
 }
 
-static int
-CoefficientRing_cmp(PyObject* self, PyObject* other) {
+static PyObject*
+CoefficientRing_richcmp(PyObject* self, PyObject* other, int op) {
   // Check arguments
   if (!PyCoefficientRing_CHECK(self) || !PyCoefficientRing_CHECK(other)) {
     // should return -1 and set an exception condition when an error occurred
-    return -1;
+    Py_RETURN_NOTIMPLEMENTED;
   }
   // Get arguments
   CoefficientRing* K1 = (CoefficientRing*) self;
   CoefficientRing* K2 = (CoefficientRing*) other;
-  // Are they equal
+
+  int cmp;
+
   if (K1->K == K2->K) {
-    return 0;
+    // Are they equal
+    cmp = 0;
+  } else if (K1->K == lp_Z) {
+    // Is the first of them Z
+    cmp = 1;
+  } else if (K2->K == lp_Z) {
+    // Is the second Z
+    cmp = -1;
+  } else {
+    // Compare
+    cmp = lp_integer_cmp(lp_Z, &K1->K->M, &K2->K->M);
   }
-  // Is one of them Z
-  if (K1->K == lp_Z) {
-    return 1;
-  }
-  if (K2->K == lp_Z) {
-    return -1;
-  }
-  // Compare
-  return lp_integer_cmp(lp_Z, &K1->K->M, &K2->K->M);
+  Py_RETURN_RICHCOMPARE(cmp, 0, op);
 }
 
 static PyObject*
