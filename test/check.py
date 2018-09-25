@@ -2,9 +2,13 @@
 from __future__ import print_function
 from io import open
 
+import sys
+
 import argparse
 import polypy
 import polypy_test
+
+print('Using Python', sys.version)
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--sympy', action="store_true")

@@ -4,8 +4,8 @@ notifications:
   slack: sriformalmethods:1DWq3BI30wLc3ZAc3Fc37n6x
 
 os:
-  - linux
   - osx
+  - linux
 
 compiler:
   - clang
@@ -13,8 +13,10 @@ compiler:
 
 env:
   matrix:
-    - CMAKE_BUILD_TYPE=Debug
-    - CMAKE_BUILD_TYPE=Release
+    - CMAKE_BUILD_TYPE=Debug   PY=2
+    - CMAKE_BUILD_TYPE=Release PY=2
+    - CMAKE_BUILD_TYPE=Debug   PY=3
+    - CMAKE_BUILD_TYPE=Release PY=3
 
 before_install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-key update; sudo apt-get update; fi
@@ -26,7 +28,7 @@ install:
 
 script:
   - cd build
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib ..; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_EXECUTABLE=$(which python${PY}) -DPYTHON_LIBRARY=$(python${PY}-config --prefix)/lib/libpython*.dylib ..; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_EXECUTABLE=$(which python${PY}) ..; fi
   - make
   - make check
