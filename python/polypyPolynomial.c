@@ -136,7 +136,7 @@ static PyObject*
 Polynomial_divmod(PyObject* self, PyObject* args);
 
 static PyObject*
-Polynomial_pow(PyObject* self, PyObject* args);
+Polynomial_pow(PyObject* self, PyObject* args, PyObject* ignored);
 
 static PyObject*
 Polynomial_resultant(PyObject* self, PyObject* args);
@@ -210,7 +210,7 @@ PyNumberMethods Polynomial_NumberMethods = {
      .nb_multiply = Polynomial_mul,
      .nb_remainder = Polynomial_rem_operator,
      .nb_divmod = Polynomial_divmod,
-     .nb_power = (ternaryfunc)Polynomial_pow,
+     .nb_power = Polynomial_pow,
      .nb_negative = Polynomial_neg,
      .nb_true_divide = Polynomial_div,
 #if IS_PY3
@@ -577,7 +577,7 @@ Polynomial_mul(PyObject* self, PyObject* other) {
 
 
 static PyObject*
-Polynomial_pow(PyObject* self, PyObject* other) {
+Polynomial_pow(PyObject* self, PyObject* other, PyObject* ignored) {
   // Check arguments
   if (!PyPolynomial_CHECK(self) || !PyInt_Check(other)) {
     Py_INCREF(Py_NotImplemented);

@@ -60,7 +60,7 @@ static PyObject*
 Value_mul(PyObject* self, PyObject* args);
 
 static PyObject*
-Value_pow(PyObject* self, PyObject* args);
+Value_pow(PyObject* self, PyObject* args, PyObject* ignored);
 
 static PyObject*
 Value_int(PyObject* self);
@@ -83,7 +83,7 @@ PyNumberMethods Value_NumberMethods = {
      .nb_add = Value_add,
      .nb_subtract = Value_sub,
      .nb_multiply = Value_mul,
-     .nb_power = (ternaryfunc)Value_pow,
+     .nb_power = Value_pow,
      .nb_negative = Value_neg,
      .nb_int = Value_int,
      .nb_float = Value_float,
@@ -297,7 +297,7 @@ Value_mul(PyObject* self, PyObject* other) {
 }
 
 static PyObject*
-Value_pow(PyObject* self, PyObject* other) {
+Value_pow(PyObject* self, PyObject* other, PyObject* ignored) {
   assert(0);
   return 0;
 }

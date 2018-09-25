@@ -61,7 +61,7 @@ static PyObject*
 AlgebraicNumber_mul(PyObject* self, PyObject* args);
 
 static PyObject*
-AlgebraicNumber_pow(PyObject* self, PyObject* args);
+AlgebraicNumber_pow(PyObject* self, PyObject* args, PyObject* ignored);
 
 PyMethodDef AlgebraicNumber_methods[] = {
     {"refine", (PyCFunction)AlgebraicNumber_refine, METH_NOARGS, "Refines the number to half the interval"},
@@ -73,7 +73,7 @@ PyNumberMethods AlgebraicNumber_NumberMethods = {
      .nb_add = AlgebraicNumber_add,
      .nb_subtract = AlgebraicNumber_sub,
      .nb_multiply = AlgebraicNumber_mul,
-     .nb_power = (ternaryfunc)AlgebraicNumber_pow,
+     .nb_power = AlgebraicNumber_pow,
      .nb_negative = AlgebraicNumber_neg,
 };
 
@@ -329,7 +329,7 @@ AlgebraicNumber_mul(PyObject* self, PyObject* other) {
 }
 
 static PyObject*
-AlgebraicNumber_pow(PyObject* self, PyObject* other) {
+AlgebraicNumber_pow(PyObject* self, PyObject* other, PyObject* ignored) {
   if (!PyAlgebraicNumber_CHECK(self) || !PyInt_Check(other)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;

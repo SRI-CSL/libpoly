@@ -79,13 +79,13 @@ static PyObject*
 Variable_mul(PyObject* self, PyObject* args);
 
 static PyObject*
-Variable_pow(PyObject* self, PyObject* args);
+Variable_pow(PyObject* self, PyObject* args, PyObject* ignored);
 
 PyNumberMethods Variable_NumberMethods = {
      .nb_add = Variable_add,
      .nb_subtract = Variable_sub,
      .nb_multiply = Variable_mul,
-     .nb_power = (ternaryfunc)Variable_pow,
+     .nb_power = Variable_pow,
      .nb_negative = Variable_neg,
 };
 
@@ -430,7 +430,7 @@ Variable_mul(PyObject* self, PyObject* other) {
 }
 
 static PyObject*
-Variable_pow(PyObject* self, PyObject* other) {
+Variable_pow(PyObject* self, PyObject* other, PyObject* ignored) {
   // Check arguments
   if (!PyVariable_CHECK(self) || !PyInt_Check(other)) {
     Py_INCREF(Py_NotImplemented);

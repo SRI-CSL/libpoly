@@ -103,7 +103,7 @@ static PyObject*
 UPolynomialObject_divmod(PyObject* self, PyObject* args);
 
 static PyObject*
-UPolynomialObject_pow(PyObject* self, PyObject* args);
+UPolynomialObject_pow(PyObject* self, PyObject* args, PyObject* ignored);
 
 static PyObject*
 UPolynomialObject_neg(PyObject* self);
@@ -131,7 +131,7 @@ PyNumberMethods UPolynomial_NumberMethods = {
      .nb_multiply = UPolynomialObject_mul,
      .nb_remainder = UPolynomialObject_rem,
      .nb_divmod = UPolynomialObject_divmod,
-     .nb_power = (ternaryfunc)UPolynomialObject_pow,
+     .nb_power = UPolynomialObject_pow,
      .nb_negative = UPolynomialObject_neg,
      .nb_true_divide = UPolynomialObject_div,
 #if IS_PY3
@@ -554,7 +554,7 @@ UPolynomialObject_neg(PyObject* self) {
 }
 
 static PyObject*
-UPolynomialObject_pow(PyObject* self, PyObject* other) {
+UPolynomialObject_pow(PyObject* self, PyObject* other, PyObject* ignored) {
   // Check arguments
   if (!PyUPolynomial_CHECK(self) || !PyInt_Check(other)) {
     Py_INCREF(Py_NotImplemented);
