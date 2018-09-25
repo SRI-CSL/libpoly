@@ -29,6 +29,8 @@
 #include "polypyFeasibilitySet.h"
 #include "utils.h"
 
+#include "py3c_compat.h"
+
 static PyObject*
 Trace_enable(PyObject* self, PyObject* args) {
 #ifndef NDEBUG
@@ -66,36 +68,44 @@ static PyMethodDef polypy_methods[] = {
     {NULL}  /* Sentinel */
 };
 
-#ifndef PyMODINIT_FUNC  /* declarations for DLL import/export */
-#define PyMODINIT_FUNC void
-#endif
-PyMODINIT_FUNC
-initpolypy(void)
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,  /* m_base */
+    "polypy",               /* m_name */
+    "PolyPy Libarary.",     /* m_doc */
+    -1,                     /* m_size */
+    polypy_methods          /* m_methods */
+};
+
+/*
+ * Using a macro for Python 2/3 compatibility;
+ * see https://py3c.readthedocs.io/en/latest/guide-porting.html#module-creation-entrypoint
+ */
+MODULE_INIT_FUNC(polypy)
 {
   PyObject* m;
 
   if (PyType_Ready(&CoefficientRingType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&VariableType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&VariableOrderType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&AssignmentType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&PolynomialType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&UPolynomialType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&AlgebraicNumberType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&ValueType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&IntervalType) < 0)
-    return;
+    return NULL;
   if (PyType_Ready(&FeasibilitySetType) < 0)
-    return;
+    return NULL;
 
-  m = Py_InitModule3("polypy", polypy_methods, "PolyPy Libarary.");
+  m = PyModule_Create(&moduledef);
 
   // Initialize the library
   lp_set_output_language(LP_OUTPUT_PYTHON);
@@ -164,4 +174,6 @@ initpolypy(void)
 
   Py_INCREF(&FeasibilitySetType);
   PyModule_AddObject(m, "FeasibilitySet", (PyObject*)&FeasibilitySetType);
+
+  return m;
 }
