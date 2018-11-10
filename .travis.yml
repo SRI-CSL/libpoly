@@ -28,7 +28,7 @@ install:
 
 script:
   - cd build
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_EXECUTABLE=$(which python${PY}) -DPYTHON_LIBRARY=$(python${PY}-config --prefix)/lib/libpython*.dylib ..; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_EXECUTABLE=$(which python${PY}) ..; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DLIBPOLY_BUILD_PYTHON3_API=ON ..; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..; fi
   - make
   - make check

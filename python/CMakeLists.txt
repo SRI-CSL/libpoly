@@ -13,17 +13,22 @@ set(polypy_SOURCES
     polypyFeasibilitySet.c
 )
 
-find_package(PythonInterp)
-find_package(PythonLibs)
+add_library(polypy MODULE ${polypy_SOURCES})
 
 include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
-include_directories(${PYTHON_INCLUDE_PATH})
-
-add_library(polypy MODULE ${polypy_SOURCES})
 set_target_properties(polypy PROPERTIES PREFIX "")
 target_link_libraries(polypy poly)
-target_link_libraries(polypy ${PYTHON_LIBRARIES})
+
+if (LIBPOLY_BUILD_PYTHON3_API) 
+  find_package (Python3 COMPONENTS Interpreter Development)
+  include_directories(${Python3_INCLUDE_DIRS})
+  target_link_libraries(polypy ${Python3_LIBRARIES})  
+else()
+  find_package (Python2 COMPONENTS Interpreter Development)
+  include_directories(${Python2_INCLUDE_DIRS})
+  target_link_libraries(polypy ${Python2_LIBRARIES})
+endif()
 
 string (REPLACE ";" "', '" polypy_SOURCES_STR "${polypy_SOURCES}")
 configure_file(setup.py.in ${CMAKE_CURRENT_SOURCE_DIR}/setup.py)

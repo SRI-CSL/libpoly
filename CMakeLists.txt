@@ -7,9 +7,10 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 project(libpoly C)
 
-option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON)
+option(LIBPOLY_BUILD_PYTHON_API "Build the Python API (Python 2 by default)" ON)
+option(LIBPOLY_BUILD_PYTHON3_API "Build the Python API for Python 3" OFF)
 option(LIBPOLY_BUILD_STATIC_PIC "Build the static PIC library" ON)
-option(LIBPOLY_BUILD_STATIC "Build the static libraru" ON)
+option(LIBPOLY_BUILD_STATIC "Build the static library" ON)
 
 set(LIBPOLY_VERSION_MAJOR 0)
 set(LIBPOLY_VERSION_MINOR 1)
