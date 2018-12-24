@@ -46,12 +46,12 @@ struct lp_feasibility_set_struct {
 /**
  * Create a new feasibility set [-inf, inf].
  */
-lp_feasibility_set_t* lp_feasibility_set_new_full();
+lp_feasibility_set_t* lp_feasibility_set_new_full(void);
 
 /**
  * Create a new feasibility set {}.
  */
-lp_feasibility_set_t* lp_feasibility_set_new_empty();
+lp_feasibility_set_t* lp_feasibility_set_new_empty(void);
 
 /**
  * Construct a copy.

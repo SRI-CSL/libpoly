@@ -46,7 +46,7 @@ void lp_feasibility_set_construct(lp_feasibility_set_t* s, size_t size) {
   lp_feasibility_set_ensure_capacity(s, size);
 }
 
-lp_feasibility_set_t* lp_feasibility_set_new_empty() {
+lp_feasibility_set_t* lp_feasibility_set_new_empty(void) {
   return lp_feasibility_set_new_internal(0);
 }
 
@@ -71,7 +71,7 @@ void lp_feasibility_set_destruct(lp_feasibility_set_t* s) {
   free(s->intervals);
 }
 
-lp_feasibility_set_t* lp_feasibility_set_new_full() {
+lp_feasibility_set_t* lp_feasibility_set_new_full(void) {
   lp_feasibility_set_t* result = lp_feasibility_set_new_internal(1);
   lp_value_t inf_neg, inf_pos;
   lp_value_construct(&inf_neg, LP_VALUE_MINUS_INFINITY, 0);
