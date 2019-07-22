@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 /** Where the output goes (defaults to stderr). Use the macro below */
+__thread
 extern FILE* trace_out_real;
 
 #define trace_out (trace_out_real ? trace_out_real : stderr)

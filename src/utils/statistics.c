@@ -31,6 +31,7 @@ typedef struct int_stats_struct {
 } int_stats_t;
 
 /** Integer statistics (default init all to 0) */
+__thread
 static int_stats_t int_stats;
 
 int* stats_register_int(const char* name) {

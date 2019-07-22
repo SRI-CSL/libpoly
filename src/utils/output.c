@@ -23,8 +23,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+__thread
 lp_output_language_t output_language = LP_OUTPUT_LATEX;
 
+__thread
 char* upolynomial_var_symbol = 0;
 
 void set_output_language(lp_output_language_t lang) {
