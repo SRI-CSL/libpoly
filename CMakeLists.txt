@@ -9,7 +9,8 @@ project(libpoly C)
 
 option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON)
 option(LIBPOLY_BUILD_STATIC_PIC "Build the static PIC library" ON)
-option(LIBPOLY_BUILD_STATIC "Build the static libraru" ON)
+option(LIBPOLY_BUILD_STATIC "Build the static library" ON)
+option(LIBPOLY_BUILD_STATISTICS "Build the statistics internals" OFF)
 
 set(LIBPOLY_VERSION_MAJOR 0)
 set(LIBPOLY_VERSION_MINOR 1)
@@ -37,6 +38,13 @@ else()
     MESSAGE(FATAL_ERROR "Could not the GMP number library (sudo apt-get install libgmp-dev)")
 endif()
 
+
+# statistics configuration
+if(LIBPOLY_BUILD_STATISTICS)
+
+  add_definitions(-DLIBPOLY_STATISTICS)
+
+endif()
 
 #
 # Check for open_memstream

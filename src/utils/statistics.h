@@ -21,11 +21,13 @@
 
 #include <stdio.h>
 
-/** Register a new statistic with the given name */
-int* stats_register_int(const char* name);
-
 /** Print the statistics to the given file */
 void stats_print(FILE* out);
+
+#ifdef LIBPOLY_STATISTICS
+
+/** Register a new statistic with the given name */
+int* stats_register_int(const char* name);
 
 // names and output
 #define STAT_NAME(module, name) __stat_ ## module ## _ ## name
@@ -50,3 +52,18 @@ void stats_print(FILE* out);
  * Use to reference the (previously declared) statistic.
  */
 #define STAT(module, name) (*STAT_NAME(module, name))
+
+#define STAT_INCR(module, name)  ((*STAT_NAME(module, name)) ++);
+
+#else
+
+
+#define STAT_NAME(module, name)
+#define STAT_INIT_NAME(module, name)
+#define STAT_OUT(module, name)
+#define STAT_DECLARE(type, module, name)
+#define STAT(module, name)
+#define STAT_INCR(module, name)
+
+
+#endif

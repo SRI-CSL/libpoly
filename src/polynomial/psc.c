@@ -36,7 +36,7 @@ STAT_DECLARE(int, coefficient, psc)
 void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_psc()\n");
-  STAT(coefficient, psc) ++;
+  STAT_INCR(coefficient, psc)
 
   if (trace_is_enabled("coefficient::resultant")) {
     tracef("coefficient_psc()\n");
@@ -350,7 +350,7 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
-  STAT(coefficient, psc) ++;
+  STAT_INCR(coefficient, psc)
 
   assert(P->type == COEFFICIENT_POLYNOMIAL);
   assert(Q->type == COEFFICIENT_POLYNOMIAL);

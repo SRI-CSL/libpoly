@@ -82,7 +82,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_u
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_square_free("); lp_upolynomial_print(f, trace_out); tracef(")\n");
   }
-  STAT(upolynomial, factor_square_free) ++;
+  STAT_INCR(upolynomial, factor_square_free)
 
   assert(!f->K || !f->K->is_prime || lp_upolynomial_is_monic(f));
   assert(f->K || lp_upolynomial_is_primitive(f));
@@ -276,7 +276,7 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_distinct_degree("); lp_upolynomial_print(f, trace_out); tracef(")\n");
   }
-  STAT(upolynomial, factor_distinct_degree) ++;
+  STAT_INCR(upolynomial, factor_distinct_degree)
 
   lp_int_ring_t* K = f->K;
   assert(K && K->is_prime);
@@ -589,7 +589,7 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
   if (trace_is_enabled("berlekamp")) {
     tracef("upolynomial_factor_berlekamp_square_free("); lp_upolynomial_print(f, trace_out); tracef(")\n");
   }
-  STAT(upolynomial, factor_berlekamp_square_free) ++;
+  STAT_INCR(upolynomial, factor_berlekamp_square_free)
 
   lp_upolynomial_factors_t* factors = lp_upolynomial_factors_construct();
 

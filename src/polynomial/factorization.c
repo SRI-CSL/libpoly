@@ -126,7 +126,7 @@ int coefficient_factors_print(const lp_polynomial_context_t* ctx, const coeffici
  */
 void coefficient_factor_square_free_pp(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors) {
 
-  STAT(coefficient, factor_square_free_pp) ++;
+  STAT_INCR(coefficient, factor_square_free_pp)
 
   if (trace_is_enabled("factorization")) {
     tracef("coefficient_factor_square_free_pp("); coefficient_print(ctx, C, trace_out); tracef(")\n");
@@ -262,7 +262,7 @@ int coefficient_factor_square_free_special(const lp_polynomial_context_t* ctx, c
 
 void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors) {
 
-  STAT(coefficient, factor_square_free) ++;
+  STAT_INCR(coefficient, factor_square_free)
 
   if (trace_is_enabled("factorization")) {
     tracef("coefficient_factor_square_free("); coefficient_print(ctx, C, trace_out); tracef(")\n");
@@ -307,7 +307,7 @@ void coefficient_factor_square_free(const lp_polynomial_context_t* ctx, const co
 
 void coefficient_factor_content_free(const lp_polynomial_context_t* ctx, const coefficient_t* C, coefficient_factors_t* factors)  {
 
-  STAT(coefficient, factor_square_free) ++;
+  STAT_INCR(coefficient, factor_square_free)
 
   if (trace_is_enabled("factorization")) {
     tracef("coefficient_factor_content_free("); coefficient_print(ctx, C, trace_out); tracef(")\n");

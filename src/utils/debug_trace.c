@@ -23,10 +23,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-__thread
 char* tags_to_trace[1000];
 
-__thread
 size_t tags_to_trace_size = 0;
 
 void trace_enable(const char* tag) {
@@ -61,7 +59,6 @@ void trace_disable(const char* tag) {
 #endif
 }
 
-__thread
 FILE* trace_out_real = 0;
 
 void trace_set_output(FILE* file) {

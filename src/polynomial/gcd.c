@@ -180,7 +180,7 @@ STAT_DECLARE(int, coefficient, gcd_pp_euclid)
 void coefficient_gcd_pp_euclid(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_pp()\n");
-  STAT(coefficient, gcd_pp_euclid) ++;
+  STAT_INCR(coefficient, gcd_pp_euclid)
 
   if (trace_is_enabled("coefficient::gcd")) {
     tracef("gcd\n")
@@ -254,7 +254,7 @@ STAT_DECLARE(int, coefficient, gcd_pp_subresultant)
 void coefficient_gcd_pp_subresultant(const lp_polynomial_context_t* ctx, coefficient_t* gcd, coefficient_t* P, coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_gcd_pp_euclid()\n");
-  STAT(coefficient, gcd_pp_subresultant) ++;
+  STAT_INCR(coefficient, gcd_pp_subresultant)
 
   if (trace_is_enabled("coefficient::gcd")) {
     tracef("gcd\n")
@@ -362,7 +362,7 @@ STAT_DECLARE(int, coefficient, gcd)
 
 void coefficient_gcd(const lp_polynomial_context_t* ctx, coefficient_t* gcd, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_gcd()\n");
-  STAT(coefficient, gcd) ++;
+  STAT_INCR(coefficient, gcd)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -477,7 +477,7 @@ STAT_DECLARE(int, coefficient, lcm)
 
 void coefficient_lcm(const lp_polynomial_context_t* ctx, coefficient_t* lcm, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_lcm()\n");
-  STAT(coefficient, lcm) ++;
+  STAT_INCR(coefficient, lcm)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -559,7 +559,7 @@ int coefficient_pp_cont_special(const lp_polynomial_context_t* ctx, coefficient_
 void coefficient_pp_cont(const lp_polynomial_context_t* ctx, coefficient_t* pp, coefficient_t* cont, const coefficient_t* C) {
 
   TRACE("coefficient", "coefficient_pp_cont()\n");
-  STAT(coefficient, pp_cont) ++;
+  STAT_INCR(coefficient, pp_cont)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");

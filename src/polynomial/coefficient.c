@@ -115,7 +115,7 @@ STAT_DECLARE(int, coefficient, construct)
 
 void coefficient_construct(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_construct()\n");
-  STAT(coefficient, construct) ++;
+  STAT_INCR(coefficient, construct)
 
   C->type = COEFFICIENT_NUMERIC;
   integer_construct_from_int(ctx->K, &C->value.num, 0);
@@ -125,7 +125,7 @@ STAT_DECLARE(int, coefficient, construct_from_int)
 
 void coefficient_construct_from_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long C_int) {
   TRACE("coefficient::internal", "coefficient_construct_from_int()\n");
-  STAT(coefficient, construct_from_int) ++;
+  STAT_INCR(coefficient, construct_from_int)
 
   C->type = COEFFICIENT_NUMERIC;
   integer_construct_from_int(ctx->K, &C->value.num, C_int);
@@ -135,7 +135,7 @@ STAT_DECLARE(int, coefficient, construct_from_integer)
 
 void coefficient_construct_from_integer(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* C_integer) {
   TRACE("coefficient::internal", "coefficient_construct_from_integer()\n");
-  STAT(coefficient, construct_from_integer) ++;
+  STAT_INCR(coefficient, construct_from_integer)
 
   C->type = COEFFICIENT_NUMERIC;
   integer_construct_copy(ctx->K, &C->value.num, C_integer);
@@ -145,7 +145,7 @@ STAT_DECLARE(int, coefficient, construct_rec)
 
 void coefficient_construct_rec(const lp_polynomial_context_t* ctx, coefficient_t* C, lp_variable_t x, size_t capacity) {
   TRACE("coefficient::internal", "coefficient_construct_rec()\n");
-  STAT(coefficient, construct_rec) ++;
+  STAT_INCR(coefficient, construct_rec)
 
   C->type = COEFFICIENT_POLYNOMIAL;
   C->value.rec.x = x;
@@ -159,7 +159,7 @@ STAT_DECLARE(int, coefficient, construct_simple_int)
 
 void coefficient_construct_simple_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long a, lp_variable_t x, unsigned n) {
   TRACE("coefficient::internal", "coefficient_construct_simple_int()\n");
-  STAT(coefficient, construct_simple_int) ++;
+  STAT_INCR(coefficient, construct_simple_int)
 
   if (n == 0) {
     coefficient_construct_from_int(ctx, C, a);
@@ -174,7 +174,7 @@ STAT_DECLARE(int, coefficient, construct_simple)
 
 void coefficient_construct_simple(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* a, lp_variable_t x, unsigned n) {
   TRACE("coefficient::internal", "coefficient_construct_simple()\n");
-  STAT(coefficient, construct_simple) ++;
+  STAT_INCR(coefficient, construct_simple)
 
   if (n == 0) {
     coefficient_construct_from_integer(ctx, C, a);
@@ -189,7 +189,7 @@ STAT_DECLARE(int, coefficient, construct_copy)
 
 void coefficient_construct_copy(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
   TRACE("coefficient::internal", "coefficient_construct_copy()\n");
-  STAT(coefficient, construct_copy) ++;
+  STAT_INCR(coefficient, construct_copy)
 
   size_t i;
   switch(from->type) {
@@ -216,7 +216,7 @@ void coefficient_construct_from_univariate(const lp_polynomial_context_t* ctx,
     coefficient_t* C, const lp_upolynomial_t* C_u, lp_variable_t x) {
 
   TRACE("coefficient::internal", "coefficient_construct_from_univariate()\n");
-  STAT(coefficient, construct_from_univariate) ++;
+  STAT_INCR(coefficient, construct_from_univariate)
 
   // Get the coefficients
   size_t C_u_deg = lp_upolynomial_degree(C_u);
@@ -268,7 +268,7 @@ STAT_DECLARE(int, coefficient, swap)
 
 void coefficient_swap(coefficient_t* C1, coefficient_t* C2) {
   TRACE("coefficient::internal", "coefficient_swap()\n");
-  STAT(coefficient, swap) ++;
+  STAT_INCR(coefficient, swap)
   coefficient_t tmp = *C1;
   *C1 = *C2;
   *C2 = tmp;
@@ -278,7 +278,7 @@ STAT_DECLARE(int, coefficient, assign)
 
 void coefficient_assign(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {
   TRACE("coefficient::internal", "coefficient_assign()\n");
-  STAT(coefficient, assign) ++;
+  STAT_INCR(coefficient, assign)
 
   if (C != from) {
     coefficient_t result;
@@ -306,7 +306,7 @@ STAT_DECLARE(int, coefficient, assign_int)
 
 void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long x) {
   TRACE("coefficient::internal", "coefficient_assign_int()\n");
-  STAT(coefficient, assign) ++;
+  STAT_INCR(coefficient, assign)
 
   if (C->type == COEFFICIENT_POLYNOMIAL) {
     coefficient_destruct(C);
@@ -566,21 +566,21 @@ const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_contex
 STAT_DECLARE(int, coefficient, is_zero)
 
 int coefficient_is_zero(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
-  STAT(coefficient, is_zero) ++;
+  STAT_INCR(coefficient, is_zero)
   return C->type == COEFFICIENT_NUMERIC && integer_is_zero(ctx->K, &C->value.num);
 }
 
 STAT_DECLARE(int, coefficient, is_one)
 
 int coefficient_is_one(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
-  STAT(coefficient, is_one) ++;
+  STAT_INCR(coefficient, is_one)
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, 1) == 0;
 }
 
 STAT_DECLARE(int, coefficient, is_minus_one)
 
 int coefficient_is_minus_one(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
-  STAT(coefficient, is_minus_one) ++;
+  STAT_INCR(coefficient, is_minus_one)
   return C->type == COEFFICIENT_NUMERIC && integer_cmp_int(ctx->K, &C->value.num, -1) == 0;
 }
 
@@ -726,7 +726,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
   if (trace_is_enabled("coefficient::sgn")) {
     tracef("coefficient_sgn("); coefficient_print(ctx, C, trace_out); tracef(")\n");
   }
-  STAT(coefficient, sgn) ++;
+  STAT_INCR(coefficient, sgn)
 
   assert(ctx->K == lp_Z);
 
@@ -938,7 +938,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
 STAT_DECLARE(int, coefficient, lc_sgn)
 
 int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
-  STAT(coefficient, lc_sgn) ++;
+  STAT_INCR(coefficient, lc_sgn)
 
   while (C->type != COEFFICIENT_NUMERIC) {
     C = coefficient_lc(C);
@@ -952,7 +952,7 @@ STAT_DECLARE(int, coefficient, in_order)
 
 int coefficient_in_order(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
   TRACE("coefficient::internal", "coefficient_in_order()\n");
-  STAT(coefficient, in_order) ++;
+  STAT_INCR(coefficient, in_order)
 
   size_t i;
   switch (C->type) {
@@ -1036,7 +1036,7 @@ STAT_DECLARE(int, coefficient, cmp)
 
 int coefficient_cmp(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_cmp()\n");
-  STAT(coefficient, cmp) ++;
+  STAT_INCR(coefficient, cmp)
 
   return coefficient_cmp_general(ctx, C1, C2, 1);
 }
@@ -1045,7 +1045,7 @@ STAT_DECLARE(int, coefficient, cmp_type)
 
 int coefficient_cmp_type(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::internal", "coefficient_cmp_type()\n");
-  STAT(coefficient, cmp_type) ++;
+  STAT_INCR(coefficient, cmp_type)
 
   return coefficient_cmp_general(ctx, C1, C2, 0);
 }
@@ -1145,7 +1145,7 @@ STAT_DECLARE(int, coefficient, order)
 
 void coefficient_order(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   TRACE("coefficient", "coefficient_order()\n");
-  STAT(coefficient, order) ++;
+  STAT_INCR(coefficient, order)
 
   if (C->type == COEFFICIENT_NUMERIC) {
     // Numeric coefficients are always OK
@@ -1180,7 +1180,7 @@ STAT_DECLARE(int, coefficient, add)
 
 void coefficient_add(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_add()\n");
-  STAT(coefficient, add) ++;
+  STAT_INCR(coefficient, add)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("S = "); coefficient_print(ctx, S, trace_out); tracef("\n");
@@ -1252,7 +1252,7 @@ STAT_DECLARE(int, coefficient, neg)
 
 void coefficient_neg(const lp_polynomial_context_t* ctx, coefficient_t* N, const coefficient_t* C) {
   TRACE("coefficient::arith", "coefficient_neg()\n");
-  STAT(coefficient, neg) ++;
+  STAT_INCR(coefficient, neg)
 
   size_t i;
   coefficient_t result;
@@ -1294,7 +1294,7 @@ STAT_DECLARE(int, coefficient, sub)
 
 void coefficient_sub(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_sub()\n");
-  STAT(coefficient, sub) ++;
+  STAT_INCR(coefficient, sub)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("S = "); coefficient_print(ctx, S, trace_out); tracef("\n");
@@ -1362,7 +1362,7 @@ STAT_DECLARE(int, coefficient, mul)
 
 void coefficient_mul(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_mul()\n");
-  STAT(coefficient, mul) ++;
+  STAT_INCR(coefficient, mul)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
@@ -1436,7 +1436,7 @@ STAT_DECLARE(int, coefficient, mul_int)
 
 void coefficient_mul_int(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, long a) {
   TRACE("coefficient::arith", "coefficient_mul_int()\n");
-  STAT(coefficient, mul_int) ++;
+  STAT_INCR(coefficient, mul_int)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
@@ -1479,7 +1479,7 @@ STAT_DECLARE(int, coefficient, mul_integer)
 
 void coefficient_mul_integer(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, const lp_integer_t* a) {
   TRACE("coefficient::arith", "coefficient_mul_int()\n");
-  STAT(coefficient, mul_int) ++;
+  STAT_INCR(coefficient, mul_int)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
@@ -1519,7 +1519,7 @@ STAT_DECLARE(int, coefficient, shl)
 
 void coefficient_shl(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shl()\n");
-  STAT(coefficient, shl) ++;
+  STAT_INCR(coefficient, shl)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
@@ -1550,7 +1550,7 @@ STAT_DECLARE(int, coefficient, shr)
 
 void coefficient_shr(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C, lp_variable_t x, unsigned n) {
   TRACE("coefficient::arith", "coefficient_shr()\n");
-  STAT(coefficient, shl) ++;
+  STAT_INCR(coefficient, shl)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("C = "); coefficient_print(ctx, C, trace_out); tracef("\n");
@@ -1599,7 +1599,7 @@ STAT_DECLARE(int, coefficient, pow)
 
 void coefficient_pow(const lp_polynomial_context_t* ctx, coefficient_t* P, const coefficient_t* C, unsigned n) {
   TRACE("coefficient", "coefficient_pow()\n");
-  STAT(coefficient, pow) ++;
+  STAT_INCR(coefficient, pow)
 
   if (trace_is_enabled("coefficient")) {
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
@@ -1656,7 +1656,7 @@ STAT_DECLARE(int, coefficient, add_mul)
 
 void coefficient_add_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_add_mul()\n");
-  STAT(coefficient, add_mul) ++;
+  STAT_INCR(coefficient, add_mul)
 
   if (trace_is_enabled("coefficient::arith")) {
     tracef("S = "); coefficient_print(ctx, S, trace_out); tracef("\n");
@@ -1681,7 +1681,7 @@ STAT_DECLARE(int, coefficient, sub_mul)
 
 void coefficient_sub_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient::arith", "coefficient_sub_mul()\n");
-  STAT(coefficient, sub_mul) ++;
+  STAT_INCR(coefficient, sub_mul)
 
   if (S->type == COEFFICIENT_NUMERIC && C1->type == COEFFICIENT_NUMERIC && C2->type == COEFFICIENT_NUMERIC) {
     integer_sub_mul(ctx->K, &S->value.num, &C1->value.num, &C2->value.num);
@@ -1700,7 +1700,7 @@ STAT_DECLARE(int, coefficient, derivative)
 
 void coefficient_derivative(const lp_polynomial_context_t* ctx, coefficient_t* C_d, const coefficient_t* C) {
   TRACE("coefficient", "coefficient_derivative()\n");
-  STAT(coefficient, derivative) ++;
+  STAT_INCR(coefficient, derivative)
 
   size_t i;
   coefficient_t result;
@@ -1751,7 +1751,7 @@ void coefficient_reduce(
     remaindering_type_t type)
 {
   TRACE("coefficient", "coefficient_reduce()\n");
-  STAT(coefficient, reduce) ++;
+  STAT_INCR(coefficient, reduce)
 
   if (trace_is_enabled("coefficient::reduce")) {
     tracef("A = "); coefficient_print(ctx, A, trace_out); tracef("\n");
@@ -1981,7 +1981,7 @@ STAT_DECLARE(int, coefficient, div)
 
 void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_div()\n");
-  STAT(coefficient, div) ++;
+  STAT_INCR(coefficient, div)
 
   // 0/C2 = 0
   if (coefficient_is_zero(ctx, C1)) {
@@ -2066,7 +2066,7 @@ STAT_DECLARE(int, coefficient, rem)
 
 void coefficient_rem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_rem()\n");
-  STAT(coefficient, rem) ++;
+  STAT_INCR(coefficient, rem)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -2101,7 +2101,7 @@ STAT_DECLARE(int, coefficient, sprem)
 
 void coefficient_sprem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_sprem()\n");
-  STAT(coefficient, sprem) ++;
+  STAT_INCR(coefficient, sprem)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -2136,7 +2136,7 @@ STAT_DECLARE(int, coefficient, prem)
 
 void coefficient_prem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_prem()\n");
-  STAT(coefficient, rem) ++;
+  STAT_INCR(coefficient, rem)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -2172,7 +2172,7 @@ STAT_DECLARE(int, coefficient, divrem)
 
 void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_divrem()\n");
-  STAT(coefficient, divrem) ++;
+  STAT_INCR(coefficient, divrem)
 
   if (trace_is_enabled("coefficient")) {
     tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
@@ -2222,7 +2222,7 @@ STAT_DECLARE(int, coefficient, divides)
 
 int coefficient_divides(const lp_polynomial_context_t* ctx, const coefficient_t* C1, const coefficient_t* C2) {
   TRACE("coefficient", "coefficient_divides()\n");
-  STAT(coefficient, divides) ++;
+  STAT_INCR(coefficient, divides)
 
   coefficient_t R;
   coefficient_construct(ctx, &R);
@@ -2291,7 +2291,7 @@ void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* re
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_resultant("); coefficient_print(ctx, A, trace_out); tracef(", "); coefficient_print(ctx, B, trace_out); tracef(")\n");
   }
-  STAT(coefficient, resultant) ++;
+  STAT_INCR(coefficient, resultant)
 
   if (trace_is_enabled("coefficient")) {
     tracef("A = "); coefficient_print(ctx, A, trace_out); tracef("\n");

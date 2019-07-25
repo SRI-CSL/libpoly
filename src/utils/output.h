@@ -21,7 +21,7 @@
 
 #include <output_language.h>
 
-extern __thread
+extern
 lp_output_language_t output_language;
 
 void set_output_language(lp_output_language_t lang);

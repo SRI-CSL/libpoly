@@ -84,8 +84,11 @@ lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upo
 
   int extended_gcd = (U != 0 && V != 0);
 
-  if (extended_gcd) STAT(upolynomial, gcd_euclid_extended) ++;
-  else STAT(upolynomial, gcd_euclid) ++;
+  if (extended_gcd){
+    STAT_INCR(upolynomial, gcd_euclid_extended);
+  } else {
+    STAT_INCR(upolynomial, gcd_euclid);
+  }
 
   // Degrees of p and q
   size_t deg_A = lp_upolynomial_degree(A);
@@ -214,7 +217,7 @@ lp_upolynomial_t* upolynomial_gcd_subresultant(const lp_upolynomial_t* A, const 
   if (trace_is_enabled("gcd")) {
     tracef("upolynomial_gcd_subresultant("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(")\n");
   }
-  STAT(upolynomial, gcd_subresultant) ++;
+  STAT_INCR(upolynomial, gcd_subresultant)
 
   assert(!lp_upolynomial_is_zero(B));
 
@@ -474,7 +477,7 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   if (trace_is_enabled("gcd")) {
     tracef("upolynomial_gcd_heuristic("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(")\n");
   }
-  STAT(upolynomial, gcd_heuristic) ++;
+  STAT_INCR(upolynomial, gcd_heuristic)
 
   lp_upolynomial_t* D = 0;
 
@@ -538,7 +541,7 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   }
 
   if (D) {
-    STAT(upolynomial, gcd_heuristic_success)++;
+    STAT_INCR(upolynomial, gcd_heuristic_success)
     if (trace_is_enabled("gcd")) {
       tracef("upolynomial_gcd_heuristic("); lp_upolynomial_print(A, trace_out); tracef(", "); lp_upolynomial_print(B, trace_out); tracef(") = "); lp_upolynomial_print(D, trace_out); tracef("\n");
     }
