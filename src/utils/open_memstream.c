@@ -190,9 +190,9 @@ FILE *open_memstream(char **ptr, size_t *sizeloc)
     return 0;
 }
 
-#endif 
-
 #endif /* _POSIX_C_SOURCE < 200809L */
 
 #endif /* _WIN32 */
+
+#endif /* HAVE_OPEN_MEMSTREAM */
 
