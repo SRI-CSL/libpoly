@@ -48,6 +48,20 @@
 
 #include "utils/open_memstream.h"
 
+#if _WIN32
+
+/*
+ * Placeholder for windows: just return NULL.
+ */
+FILE *open_memstream(char **ptr, size_t *sizeloc) {
+  (void) ptr;
+  (void) sizeloc;
+  return NULL;
+}
+
+
+#else
+
 #if _POSIX_C_SOURCE < 200809L
 
 #include <stddef.h>
@@ -176,6 +190,9 @@ FILE *open_memstream(char **ptr, size_t *sizeloc)
     return 0;
 }
 
+#endif 
+
 #endif /* _POSIX_C_SOURCE < 200809L */
 
-#endif
+#endif /* _WIN32 */
+
