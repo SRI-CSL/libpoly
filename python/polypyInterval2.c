@@ -18,8 +18,7 @@
  */
 
 #if PY_MAJOR_VERSION >= 3
-#include "polypyVariableOrder3.c"
+#include "polypy3.c"
 #else 
-#include "polypyVariableOrder2.c"
+#include "polypy2.c"
 #endif
-
