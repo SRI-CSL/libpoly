@@ -17,6 +17,8 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Python.h>
+
 #if PY_MAJOR_VERSION >= 3
 #include "polypyPolynomial3.c"
 #else 

@@ -211,32 +211,27 @@ PyNumberMethods Polynomial_NumberMethods = {
      Polynomial_add, // binaryfunc nb_add;
      Polynomial_sub, // binaryfunc nb_subtract;
      Polynomial_mul, // binaryfunc nb_multiply;
-     Polynomial_div, // binaryfunc nb_divide;
+     // IAM: N.B. No more divide
      Polynomial_rem_operator, // binaryfunc nb_remainder;
      Polynomial_divmod, // binaryfunc nb_divmod;
      (ternaryfunc)Polynomial_pow, // ternaryfunc nb_power;
      Polynomial_neg, // unaryfunc nb_negative;
      0, // unaryfunc nb_positive;
      0, // unaryfunc nb_absolute;
-     Polynomial_nonzero, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
+     Polynomial_nonzero, // inquiry nb_bool; IAM: FIXME: check this! Was: inquiry nb_nonzero;
      0, // unaryfunc nb_invert;
      0, // binaryfunc nb_lshift;
      0, // binaryfunc nb_rshift;
      0, // binaryfunc nb_and;
      0, // binaryfunc nb_xor;
      0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
      0, // unaryfunc nb_int;
-     0, // unaryfunc nb_long;
+     0, // void *nb_reserved;
      0, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
 
-     /* Added in release 2.0 */
      0, // binaryfunc nb_inplace_add;
      0, // binaryfunc nb_inplace_subtract;
      0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
      0, // binaryfunc nb_inplace_remainder;
      0, // ternaryfunc nb_inplace_power;
      0, // binaryfunc nb_inplace_lshift;
@@ -245,56 +240,72 @@ PyNumberMethods Polynomial_NumberMethods = {
      0, // binaryfunc nb_inplace_xor;
      0, // binaryfunc nb_inplace_or;
 
-     /* Added in release 2.2 */
      0, // binaryfunc nb_floor_divide;
      0, // binaryfunc nb_true_divide;
      0, // binaryfunc nb_inplace_floor_divide;
      0, // binaryfunc nb_inplace_true_divide;
 
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     0, // unaryfunc nb_index;
+
+     0, // binaryfunc nb_matrix_multiply;
+     0, // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject PolynomialType = {
     PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
-    "polypy.Polynomial",        /*tp_name*/
-    sizeof(Polynomial),       /*tp_basicsize*/
-    0,                          /*tp_itemsize*/
-    (destructor)Polynomial_dealloc, /*tp_dealloc*/
-    0,                          /*tp_print*/
-    0,                          /*tp_getattr*/
-    0,                          /*tp_setattr*/
-    Polynomial_cmp,             /*tp_compare*/
-    Polynomial_str,             /*tp_repr*/
-    &Polynomial_NumberMethods,  /*tp_as_number*/
-    0,                          /*tp_as_sequence*/
-    0,                          /*tp_as_mapping*/
-    Polynomial_hash,            /*tp_hash */
-    0,                          /*tp_call*/
-    Polynomial_str,             /*tp_str*/
-    0,                          /*tp_getattro*/
-    0,                          /*tp_setattro*/
-    0,                          /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "Polynomial objects",       /* tp_doc */
-    0,                          /* tp_traverse */
-    0,                          /* tp_clear */
-    Polynomial_richcompare,     /* tp_richcompare */
-    0,                          /* tp_weaklistoffset */
-    0,                          /* tp_iter */
-    0,                          /* tp_iternext */
-    Polynomial_methods,         /* tp_methods */
-    0,                          /* tp_members */
-    0,                          /* tp_getset */
-    0,                          /* tp_base */
-    0,                          /* tp_dict */
-    0,                          /* tp_descr_get */
-    0,                          /* tp_descr_set */
-    0,                          /* tp_dictoffset */
-    0,                          /* tp_init */
-    0,                          /* tp_alloc */
-    Polynomial_new,             /* tp_new */
+    "polypy.Polynomial", //const char *tp_name; /* For printing, in format "<module>.<name>" */
+    sizeof(Polynomial), //Py_ssize_t tp_basicsize;
+    0, //Py_ssize_t tp_itemsize; /* For allocation */
+    (destructor)Polynomial_dealloc, //destructor tp_dealloc;
+    0, //printfunc tp_print;
+    0, //getattrfunc tp_getattr;
+    0, //setattrfunc tp_setattr;
+    Polynomial_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    Polynomial_str, //reprfunc tp_repr;
+    &Polynomial_NumberMethods, //PyNumberMethods *tp_as_number;
+    0, //PySequenceMethods *tp_as_sequence;
+    0, //PyMappingMethods *tp_as_mapping;
+
+    Polynomial_hash, //hashfunc tp_hash;
+    0, //ternaryfunc tp_call;
+    Polynomial_str, //reprfunc tp_str;
+    0, //getattrofunc tp_getattro;
+    0, //setattrofunc tp_setattro;
+
+    0, //PyBufferProcs *tp_as_buffer;
+
+    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
+
+    "Polynomial objects", //const char *tp_doc; /* Documentation string */
+
+    0, //traverseproc tp_traverse;
+    0, //inquiry tp_clear;
+    Polynomial_richcompare,  //richcmpfunc tp_richcompare;
+    0, //Py_ssize_t tp_weaklistoffset;
+    0, //getiterfunc tp_iter;
+    0, //iternextfunc tp_iternext;
+
+    Polynomial_methods, //struct PyMethodDef *tp_methods;
+    0, //struct PyMemberDef *tp_members;
+    0, //struct PyGetSetDef *tp_getset;
+    0, //struct _typeobject *tp_base;
+    0, //PyObject *tp_dict;
+    0, //descrgetfunc tp_descr_get;
+    0, //descrsetfunc tp_descr_set;
+    0, //Py_ssize_t tp_dictoffset;
+    0, //initproc tp_init;
+    0, //allocfunc tp_alloc;
+    Polynomial_new, //newfunc tp_new;
+    0, //freefunc tp_free; /* Low-level free-memory routine */
+    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
+    0, //PyObject *tp_bases;
+    0, //PyObject *tp_mro; /* method resolution order */
+    0, //PyObject *tp_cache;
+    0, //PyObject *tp_subclasses;
+    0, //PyObject *tp_weaklist;
+    0, //destructor tp_del;
+    0, //unsigned int tp_version_tag;
+    0, //destructor tp_finalize;
 };
 
 static void
@@ -304,7 +315,7 @@ Polynomial_dealloc(Polynomial* self)
     lp_polynomial_destruct(self->p);
     free(self->p);
   }
-  self->ob_type->tp_free((PyObject*)self);
+  ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
 
 PyObject*
@@ -433,7 +444,7 @@ static PyObject* Polynomial_str(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
   if (p) {
     char* p_str = lp_polynomial_to_string(p->p);
-    PyObject* str = PyString_FromString(p_str);
+    PyObject* str = PyUnicode_FromString(p_str);
     free(p_str);
     return str;
   } else {
@@ -635,13 +646,13 @@ Polynomial_mul(PyObject* self, PyObject* other) {
 static PyObject*
 Polynomial_pow(PyObject* self, PyObject* other) {
   // Check arguments
-  if (!PyPolynomial_CHECK(self) || !PyInt_Check(other)) {
+  if (!PyPolynomial_CHECK(self) || !PyLong_Check(other)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
   // Get arguments
   Polynomial* p = (Polynomial*) self;
-  long n = PyInt_AsLong(other);
+  long n = PyLong_AsLong(other);
   if (n < 0) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
@@ -1233,7 +1244,7 @@ PyObject* factors_to_PyList(lp_polynomial_t** factors, size_t* multiplicities, s
   for (i = 0; i < size; ++ i) {
     PyObject* p_i = Polynomial_create(factors[i]);
     Py_INCREF(p_i);
-    PyObject* d = PyInt_FromSize_t(multiplicities[i]);
+    PyObject* d = PyLong_FromSize_t(multiplicities[i]);
     PyObject* pair = PyTuple_New(2);
     PyTuple_SetItem(pair, 0, p_i);
     PyTuple_SetItem(pair, 1, d);
@@ -1334,7 +1345,7 @@ Polynomial_sturm_sequence(PyObject* self) {
 static PyObject*
 Polynomial_degree(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
-  return PyInt_FromLong(lp_polynomial_degree(p->p));
+  return PyLong_FromLong(lp_polynomial_degree(p->p));
 }
 
 static PyObject*
@@ -1442,7 +1453,7 @@ Polynomial_sgn(PyObject* self, PyObject* args) {
 
   int sgn = lp_polynomial_sgn(p, assignment);
 
-  return PyInt_FromLong(sgn);
+  return PyLong_FromLong(sgn);
 }
 
 
@@ -1486,7 +1497,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   }
 
   PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
-  if (!PyInt_Check(sgn_condition_obj)) {
+  if (!PyLong_Check(sgn_condition_obj)) {
     PyErr_SetString(PyExc_RuntimeError, "feasible_intervals(): Second argument must be a sign-condition.");
     return NULL;
   }
@@ -1494,7 +1505,7 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
-  lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+  lp_sign_condition_t sgn_condition = PyLong_AsLong(sgn_condition_obj);
 
   // Check if all but the top variable are unassigned
   if (!lp_polynomial_is_univariate_m(p, assignment)) {
@@ -1535,7 +1546,7 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
   }
 
   PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
-  if (!PyInt_Check(sgn_condition_obj)) {
+  if (!PyLong_Check(sgn_condition_obj)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -1543,7 +1554,7 @@ Polynomial_feasible_set(PyObject* self, PyObject* args) {
   // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
-  lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+  lp_sign_condition_t sgn_condition = PyLong_AsLong(sgn_condition_obj);
 
   // Check if all but the top variable are unassigned
   if (!lp_polynomial_is_univariate_m(p, assignment)) {
@@ -1573,7 +1584,7 @@ Polynomial_sgn_check(PyObject* self, PyObject* args) {
   }
 
   PyObject* sgn_condition_obj = PyTuple_GetItem(args, 1);
-  if (!PyInt_Check(sgn_condition_obj)) {
+  if (!PyLong_Check(sgn_condition_obj)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
@@ -1581,7 +1592,7 @@ Polynomial_sgn_check(PyObject* self, PyObject* args) {
     // Get the arguments
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   lp_assignment_t* assignment = ((Assignment*) assignment_obj)->assignment;
-  lp_sign_condition_t sgn_condition = PyInt_AsLong(sgn_condition_obj);
+  lp_sign_condition_t sgn_condition = PyLong_AsLong(sgn_condition_obj);
 
   // Check if all but the top variable are unassigned
   if (!lp_polynomial_is_assigned(p, assignment)) {
