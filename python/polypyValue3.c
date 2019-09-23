@@ -84,97 +84,109 @@ PyNumberMethods Value_NumberMethods = {
      Value_add, // binaryfunc nb_add;
      Value_sub, // binaryfunc nb_subtract;
      Value_mul, // binaryfunc nb_multiply;
-     0, // binaryfunc nb_divide;
      0, // binaryfunc nb_remainder;
      0, // binaryfunc nb_divmod;
-     (ternaryfunc)Value_pow, // ternaryfunc nb_power;
+     (ternaryfunc)Value_pow, //ternaryfunc nb_power;
      Value_neg, // unaryfunc nb_negative;
      0, // unaryfunc nb_positive;
      0, // unaryfunc nb_absolute;
-     0, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
-     0, // unaryfunc nb_invert;
+     0, // inquiry nb_bool;
+     0, // 0, // unaryfunc nb_invert;
      0, // binaryfunc nb_lshift;
      0, // binaryfunc nb_rshift;
      0, // binaryfunc nb_and;
      0, // binaryfunc nb_xor;
      0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
-     Value_int, // unaryfunc nb_int;
-     Value_long, // unaryfunc nb_long;
+     Value_long, //unaryfunc nb_int;
+     0, // void *nb_reserved;
      Value_float, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
 
-     /* Added in release 2.0 */
      0, // binaryfunc nb_inplace_add;
      0, // binaryfunc nb_inplace_subtract;
      0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
      0, // binaryfunc nb_inplace_remainder;
      0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
+     0, //  binaryfunc nb_inplace_lshift;
      0, // binaryfunc nb_inplace_rshift;
      0, // binaryfunc nb_inplace_and;
      0, // binaryfunc nb_inplace_xor;
      0, // binaryfunc nb_inplace_or;
 
-     /* Added in release 2.2 */
      0, // binaryfunc nb_floor_divide;
      0, // binaryfunc nb_true_divide;
      0, // binaryfunc nb_inplace_floor_divide;
      0, // binaryfunc nb_inplace_true_divide;
 
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     0, // unaryfunc nb_index;
+
+     0, // binaryfunc nb_matrix_multiply;
+     0, // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject ValueType = {
     PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
-    "polypy.Value",   /*tp_name*/
-    sizeof(Value),    /*tp_basicsize*/
-    0,                          /*tp_itemsize*/
-    (destructor)Value_dealloc, /*tp_dealloc*/
-    0,                          /*tp_print*/
-    0,                          /*tp_getattr*/
-    0,                          /*tp_setattr*/
-    Value_cmp,        /*tp_compare*/
-    Value_str,        /*tp_repr*/
-    &Value_NumberMethods, /*tp_as_number*/
-    0,                          /*tp_as_sequence*/
-    0,                          /*tp_as_mapping*/
-    &Value_hash,                          /*tp_hash */
-    0,                          /*tp_call*/
-    Value_str,        /*tp_str*/
-    0,                          /*tp_getattro*/
-    0,                          /*tp_setattro*/
-    0,                          /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "Values of different kinds", /* tp_doc */
-    0,                          /* tp_traverse */
-    0,                          /* tp_clear */
-    Value_richcompare,/* tp_richcompare */
-    0,                          /* tp_weaklistoffset */
-    0,                          /* tp_iter */
-    0,                          /* tp_iternext */
-    Value_methods,    /* tp_methods */
-    0,                          /* tp_members */
-    0,                          /* tp_getset */
-    0,                          /* tp_base */
-    0,                          /* tp_dict */
-    0,                          /* tp_descr_get */
-    0,                          /* tp_descr_set */
-    0,                          /* tp_dictoffset */
-    (initproc)Value_init,/* tp_init */
-    0,                          /* tp_alloc */
-    Value_new,        /* tp_new */
+    "polypy.Value", //const char *tp_name; /* For printing, in format "<module>.<name>" */
+    sizeof(Value), //Py_ssize_t tp_basicsize;
+    0, //Py_ssize_t tp_itemsize; /* For allocation */
+
+    (destructor)Value_dealloc, //destructor tp_dealloc;
+    0, //printfunc tp_print;
+    0, //getattrfunc tp_getattr;
+    0, //setattrfunc tp_setattr;
+    Value_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    Value_str, //reprfunc tp_repr;
+
+    &Value_NumberMethods, //PyNumberMethods *tp_as_number;
+    0, //PySequenceMethods *tp_as_sequence;
+    0, //PyMappingMethods *tp_as_mapping;
+
+    &Value_hash, //hashfunc tp_hash;
+    0, //ternaryfunc tp_call;
+    Value_str,  //reprfunc tp_str;
+    0, //getattrofunc tp_getattro;
+    0, //setattrofunc tp_setattro;
+
+    0, //PyBufferProcs *tp_as_buffer;
+
+    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
+
+    "Values of different kinds", //const char *tp_doc; /* Documentation string */
+
+    0, //traverseproc tp_traverse;
+    0, //inquiry tp_clear;
+    Value_richcompare, //richcmpfunc tp_richcompare;
+    0, //Py_ssize_t tp_weaklistoffset;
+    0, //getiterfunc tp_iter;
+    0, //iternextfunc tp_iternext;
+
+    Value_methods, //struct PyMethodDef *tp_methods;
+    0, //struct PyMemberDef *tp_members;
+    0, //struct PyGetSetDef *tp_getset;
+    0, //struct _typeobject *tp_base;
+    0, //PyObject *tp_dict;
+    0, //descrgetfunc tp_descr_get;
+    0, //descrsetfunc tp_descr_set;
+    0, //Py_ssize_t tp_dictoffset;
+    (initproc)Value_init, //initproc tp_init;
+    0, //allocfunc tp_alloc;
+    Value_new, //newfunc tp_new;
+    0, //freefunc tp_free; /* Low-level free-memory routine */
+    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
+    0, //PyObject *tp_bases;
+    0, //PyObject *tp_mro; /* method resolution order */
+    0, //PyObject *tp_cache;
+    0, //PyObject *tp_subclasses;
+    0, //PyObject *tp_weaklist;
+    0, //destructor tp_del;
+    0, //unsigned int tp_version_tag;
+    0, //destructor tp_finalize;
 };
 
 static void
 Value_dealloc(Value* self)
 {
   lp_value_destruct(&self->v);
-  self->ob_type->tp_free((PyObject*)self);
+  ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
 
 PyObject*
@@ -295,7 +307,7 @@ Value_richcompare(PyObject* self, PyObject* other, int op) {
 static PyObject* Value_str(PyObject* self) {
   Value* v = (Value*) self;
   char* cstr = lp_value_to_string(&v->v);
-  PyObject* pystr = PyString_FromString(cstr);
+  PyObject* pystr = PyUnicode_FromString(cstr);
   free(cstr);
   return pystr;
 }

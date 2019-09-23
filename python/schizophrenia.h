@@ -17,10 +17,8 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Python.h"
+#pragma once
 
-#if PY_MAJOR_VERSION >= 3
-#include "utils3.c"
-#else 
-#include "utils2.c"
-#endif
+#include <Python.h>
+
+

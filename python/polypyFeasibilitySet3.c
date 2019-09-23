@@ -48,51 +48,68 @@ PyMethodDef FeasibilitySet_methods[] = {
 
 PyTypeObject FeasibilitySetType = {
     PyObject_HEAD_INIT(NULL)
-    0,                          /*ob_size*/
-    "polypy.FeasibilitySet",   /*tp_name*/
-    sizeof(FeasibilitySet), /*tp_basicsize*/
-    0,                          /*tp_itemsize*/
-    (destructor)FeasibilitySet_dealloc, /*tp_dealloc*/
-    0,                          /*tp_print*/
-    0,                          /*tp_getattr*/
-    0,                          /*tp_setattr*/
-    0                    ,      /*tp_compare*/
-    FeasibilitySet_str,               /*tp_repr*/
-    0,                          /*tp_as_number*/
-    0,                          /*tp_as_sequence*/
-    0,                          /*tp_as_mapping*/
-    0,                          /*tp_hash */
-    0,                          /*tp_call*/
-    FeasibilitySet_str,            /*tp_str*/
-    0,                          /*tp_getattro*/
-    0,                          /*tp_setattro*/
-    0,                          /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "FeasibilitySet objects", /* tp_doc */
-    0,                             /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    FeasibilitySet_methods,       /* tp_methods */
-    0,                         /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)FeasibilitySet_init,/* tp_init */
-    0,                         /* tp_alloc */
-    FeasibilitySet_new,           /* tp_new */
+    "polypy.FeasibilitySet", //const char *tp_name; /* For printing, in format "<module>.<name>" */
+    sizeof(FeasibilitySet), //Py_ssize_t tp_basicsize;
+    0, //Py_ssize_t tp_itemsize; /* For allocation */
+
+    (destructor)FeasibilitySet_dealloc, //destructor tp_dealloc;
+    0, //printfunc tp_print;
+    0, //getattrfunc tp_getattr;
+    0, //setattrfunc tp_setattr;
+    0, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    FeasibilitySet_str, //reprfunc tp_repr;
+
+    0, //PyNumberMethods *tp_as_number;
+    0, //PySequenceMethods *tp_as_sequence;
+    0, //PyMappingMethods *tp_as_mapping;
+
+    0, //hashfunc tp_hash;
+    0, //ternaryfunc tp_call;
+    FeasibilitySet_str, //reprfunc tp_str;
+    0, //getattrofunc tp_getattro;
+    0, //setattrofunc tp_setattro;
+
+    0, //PyBufferProcs *tp_as_buffer;
+
+    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
+
+    "FeasibilitySet objects", //const char *tp_doc; /* Documentation string */
+
+    0, //traverseproc tp_traverse;
+    0, //inquiry tp_clear;
+    0, //richcmpfunc tp_richcompare;
+    0, //Py_ssize_t tp_weaklistoffset;
+    0, //getiterfunc tp_iter;
+    0, //iternextfunc tp_iternext;
+
+    FeasibilitySet_methods,  //struct PyMethodDef *tp_methods;
+    0, //struct PyMemberDef *tp_members;
+    0, //struct PyGetSetDef *tp_getset;
+    0, //struct _typeobject *tp_base;
+    0, //PyObject *tp_dict;
+    0, //descrgetfunc tp_descr_get;
+    0, //descrsetfunc tp_descr_set;
+    0, //Py_ssize_t tp_dictoffset;
+    (initproc)FeasibilitySet_init, //initproc tp_init;
+    0, //allocfunc tp_alloc;
+    FeasibilitySet_new, //newfunc tp_new;
+    0, //freefunc tp_free; /* Low-level free-memory routine */
+    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
+    0, //PyObject *tp_bases;
+    0, //PyObject *tp_mro; /* method resolution order */
+    0, //PyObject *tp_cache;
+    0, //PyObject *tp_subclasses;
+    0, //PyObject *tp_weaklist;
+    0, //destructor tp_del;
+    0, //unsigned int tp_version_tag;
+    0, //destructor tp_finalize;
 };
 
 static void
 FeasibilitySet_dealloc(FeasibilitySet* self)
 {
   lp_feasibility_set_delete(self->S);
-  self->ob_type->tp_free((PyObject*)self);
+  ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
 
 PyObject*
@@ -125,7 +142,7 @@ FeasibilitySet_init(FeasibilitySet* self, PyObject* args)
 static PyObject* FeasibilitySet_str(PyObject* self) {
   FeasibilitySet* S = (FeasibilitySet*) self;
   char* I_str = lp_feasibility_set_to_string(S->S);
-  PyObject* str = PyString_FromString(I_str);
+  PyObject* str = PyUnicode_FromString(I_str);
   free(I_str);
   return str;
 }

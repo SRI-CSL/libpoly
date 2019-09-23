@@ -70,44 +70,61 @@ PyMethodDef VariableOrder_methods[] = {
 
 PyTypeObject VariableOrderType = {
     PyObject_HEAD_INIT(NULL)
-    0,                            /*ob_size*/
-    "polypy.VariableOrder",       /*tp_name*/
-    sizeof(VariableOrder),        /*tp_basicsize*/
-    0,                            /*tp_itemsize*/
-    (destructor)VariableOrder_dealloc, /*tp_dealloc*/
-    0,                            /*tp_print*/
-    0,                            /*tp_getattr*/
-    0,                            /*tp_setattr*/
-    0,                            /*tp_compare*/
-    VariableOrder_repr,           /*tp_repr*/
-    0,                            /*tp_as_number*/
-    0,                            /*tp_as_sequence*/
-    0,                            /*tp_as_mapping*/
-    0,                            /*tp_hash */
-    0,                            /*tp_call*/
-    VariableOrder_str,                 /*tp_str*/
-    0,                            /*tp_getattro*/
-    0,                            /*tp_setattro*/
-    0,                            /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "VariableOrder objects",      /* tp_doc */
-    0,                            /* tp_traverse */
-    0,                            /* tp_clear */
-    0,                            /* tp_richcompare */
-    0,                            /* tp_weaklistoffset */
-    0,                            /* tp_iter */
-    0,                            /* tp_iternext */
-    VariableOrder_methods,             /* tp_methods */
-    0,                            /* tp_members */
-    0,                            /* tp_getset */
-    0,                            /* tp_base */
-    0,                            /* tp_dict */
-    0,                            /* tp_descr_get */
-    0,                            /* tp_descr_set */
-    0,                            /* tp_dictoffset */
-    (initproc)VariableOrder_init,      /* tp_init */
-    0,                            /* tp_alloc */
-    VariableOrder_new,                 /* tp_new */
+    "polypy.VariableOrder", //const char *tp_name; /* For printing, in format "<module>.<name>" */
+    sizeof(VariableOrder),  //Py_ssize_t tp_basicsize;
+    0, //Py_ssize_t tp_itemsize; /* For allocation */
+
+    (destructor)VariableOrder_dealloc, //destructor tp_dealloc;
+    0, //printfunc tp_print;
+    0, //getattrfunc tp_getattr;
+    0, //setattrfunc tp_setattr;
+    0, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    VariableOrder_repr, //reprfunc tp_repr;
+
+    0, //PyNumberMethods *tp_as_number;
+    0, //PySequenceMethods *tp_as_sequence;
+    0, //PyMappingMethods *tp_as_mapping;
+
+    0, //hashfunc tp_hash;
+    0, //ternaryfunc tp_call;
+    VariableOrder_str, //reprfunc tp_str;
+    0, //getattrofunc tp_getattro;
+    0, //setattrofunc tp_setattro;
+
+    0, //PyBufferProcs *tp_as_buffer;
+
+    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
+
+    "VariableOrder objects", //const char *tp_doc; /* Documentation string */
+
+    0, //traverseproc tp_traverse;
+    0, //inquiry tp_clear;
+    0, //richcmpfunc tp_richcompare;
+    0, //Py_ssize_t tp_weaklistoffset;
+    0, //getiterfunc tp_iter;
+    0, //iternextfunc tp_iternext;
+
+    VariableOrder_methods, //struct PyMethodDef *tp_methods;
+    0, //struct PyMemberDef *tp_members;
+    0, //struct PyGetSetDef *tp_getset;
+    0, //struct _typeobject *tp_base;
+    0, //PyObject *tp_dict;
+    0, //descrgetfunc tp_descr_get;
+    0, //descrsetfunc tp_descr_set;
+    0, //Py_ssize_t tp_dictoffset;
+    (initproc)VariableOrder_init, //initproc tp_init;
+    0, //allocfunc tp_alloc;
+    VariableOrder_new, //newfunc tp_new;
+    0, //freefunc tp_free; /* Low-level free-memory routine */
+    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
+    0, //PyObject *tp_bases;
+    0, //PyObject *tp_mro; /* method resolution order */
+    0, //PyObject *tp_cache;
+    0, //PyObject *tp_subclasses;
+    0, //PyObject *tp_weaklist;
+    0, //destructor tp_del;
+    0, //unsigned int tp_version_tag;
+    0, //destructor tp_finalize;
 };
 
 PyObject*
@@ -191,14 +208,14 @@ VariableOrder_dealloc(VariableOrder* self)
   if (self->var_order) {
     lp_variable_order_detach(self->var_order);
   }
-  self->ob_type->tp_free((PyObject*)self);
+  ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
 
 static PyObject*
 VariableOrder_str(PyObject* self) {
   VariableOrder* var_order = (VariableOrder*) self;
   char* var_order_str = lp_variable_order_to_string(var_order->var_order, Variable_get_default_db());
-  PyObject* str = PyString_FromString(var_order_str);
+  PyObject* str = PyUnicode_FromString(var_order_str);
   free(var_order_str);
   return str;
 }
@@ -209,7 +226,7 @@ VariableOrder_repr(PyObject* self) {
   char* var_order_str = lp_variable_order_to_string(var_order->var_order, Variable_get_default_db());
   char* var_order_repr = malloc(strlen(var_order_str) + strlen(VariableOrderType.tp_name) + 3);
   sprintf(var_order_repr, "%s(%s)", VariableOrderType.tp_name, var_order_str);
-  PyObject* str = PyString_FromString(var_order_repr);
+  PyObject* str = PyUnicode_FromString(var_order_repr);
   free(var_order_repr);
   free(var_order_str);
   return str;
@@ -251,9 +268,9 @@ VariableOrder_cmp(PyObject* self, PyObject* args) {
       lp_variable_t x = ((Variable*) x_var)->x;
       lp_variable_t y = ((Variable*) y_var)->x;
       int cmp = lp_variable_order_cmp(var_order, x, y);
-      if (cmp < 0) return PyInt_FromLong(-1);
-      else if (cmp > 0) return PyInt_FromLong(1);
-      else return PyInt_FromLong(0);
+      if (cmp < 0) return PyLong_FromLong(-1);
+      else if (cmp > 0) return PyLong_FromLong(1);
+      else return PyLong_FromLong(0);
     } else {
       error = 1;
     }

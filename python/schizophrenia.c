@@ -20,7 +20,7 @@
 #include "Python.h"
 
 #if PY_MAJOR_VERSION >= 3
-#include "utils3.c"
+#include "schizophrenia3.c"
 #else 
-#include "utils2.c"
+#include "schizophrenia2.c"
 #endif

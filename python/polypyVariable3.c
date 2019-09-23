@@ -84,32 +84,26 @@ PyNumberMethods Variable_NumberMethods = {
      Variable_add, // binaryfunc nb_add;
      Variable_sub, // binaryfunc nb_subtract;
      Variable_mul, // binaryfunc nb_multiply;
-     0, // binaryfunc nb_divide;
      0, // binaryfunc nb_remainder;
      0, // binaryfunc nb_divmod;
      (ternaryfunc)Variable_pow, // ternaryfunc nb_power;
      Variable_neg,   // unaryfunc nb_negative;
      0, // unaryfunc nb_positive;
      0, // unaryfunc nb_absolute;
-     0, // inquiry nb_nonzero;       /* Used by PyObject_IsTrue */
+     0, // inquiry nb_bool;
      0, // unaryfunc nb_invert;
      0, // binaryfunc nb_lshift;
      0, // binaryfunc nb_rshift;
      0, // binaryfunc nb_and;
      0, // binaryfunc nb_xor;
      0, // binaryfunc nb_or;
-     0, // coercion nb_coerce;       /* Used by the coerce() function */
      0, // unaryfunc nb_int;
-     0, // unaryfunc nb_long;
+     0, // void *nb_reserved;
      0, // unaryfunc nb_float;
-     0, // unaryfunc nb_oct;
-     0, // unaryfunc nb_hex;
 
-     /* Added in release 2.0 */
      0, // binaryfunc nb_inplace_add;
      0, // binaryfunc nb_inplace_subtract;
      0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_divide;
      0, // binaryfunc nb_inplace_remainder;
      0, // ternaryfunc nb_inplace_power;
      0, // binaryfunc nb_inplace_lshift;
@@ -118,56 +112,74 @@ PyNumberMethods Variable_NumberMethods = {
      0, // binaryfunc nb_inplace_xor;
      0, // binaryfunc nb_inplace_or;
 
-     /* Added in release 2.2 */
      0, // binaryfunc nb_floor_divide;
      0, // binaryfunc nb_true_divide;
      0, // binaryfunc nb_inplace_floor_divide;
      0, // binaryfunc nb_inplace_true_divide;
 
-     /* Added in release 2.5 */
-     0 // unaryfunc nb_index;
+     0, // unaryfunc nb_index;
+
+     0, // binaryfunc nb_matrix_multiply;
+     0, // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject VariableType = {
     PyObject_HEAD_INIT(NULL)
-    0,                            /*ob_size*/
-    "polypy.Variable",            /*tp_name*/
-    sizeof(Variable),             /*tp_basicsize*/
-    0,                            /*tp_itemsize*/
-    (destructor)Variable_dealloc, /*tp_dealloc*/
-    0,                            /*tp_print*/
-    0,                            /*tp_getattr*/
-    0,                            /*tp_setattr*/
-    Variable_cmp,                 /*tp_compare*/
-    Variable_repr,                /*tp_repr*/
-    &Variable_NumberMethods,   /*tp_as_number*/
-    0,                            /*tp_as_sequence*/
-    0,                            /*tp_as_mapping*/
-    Variable_hash,                /*tp_hash */
-    0,                            /*tp_call*/
-    Variable_str,                 /*tp_str*/
-    0,                            /*tp_getattro*/
-    0,                            /*tp_setattro*/
-    0,                            /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "Variable objects",   /* tp_doc */
-    0,                            /* tp_traverse */
-    0,                            /* tp_clear */
-    0,                            /* tp_richcompare */
-    0,                            /* tp_weaklistoffset */
-    0,                            /* tp_iter */
-    0,                            /* tp_iternext */
-    Variable_methods,             /* tp_methods */
-    0,                            /* tp_members */
-    0,                            /* tp_getset */
-    0,                            /* tp_base */
-    0,                            /* tp_dict */
-    0,                            /* tp_descr_get */
-    0,                            /* tp_descr_set */
-    0,                            /* tp_dictoffset */
-    (initproc)Variable_init,      /* tp_init */
-    0,                            /* tp_alloc */
-    Variable_new,                 /* tp_new */
+    "polypy.Variable", //const char *tp_name; /* For printing, in format "<module>.<name>" */
+    sizeof(Variable), //Py_ssize_t tp_basicsize;
+    0, //Py_ssize_t tp_itemsize; /* For allocation */
+
+    (destructor)Variable_dealloc, //destructor tp_dealloc;
+    0, //printfunc tp_print;
+    0, //getattrfunc tp_getattr;
+    0, //setattrfunc tp_setattr;
+    Variable_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    Variable_repr, //reprfunc tp_repr;
+
+    &Variable_NumberMethods, //PyNumberMethods *tp_as_number;
+    0, //PySequenceMethods *tp_as_sequence;
+    0, //PyMappingMethods *tp_as_mapping;
+
+    Variable_hash, //hashfunc tp_hash;
+    0, //ternaryfunc tp_call;
+    Variable_str, //reprfunc tp_str;
+    0, //getattrofunc tp_getattro;
+    0, //setattrofunc tp_setattro;
+
+    0, //PyBufferProcs *tp_as_buffer;
+
+    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
+
+    "Variable objects", //const char *tp_doc; /* Documentation string */
+
+    0, //traverseproc tp_traverse;
+    0, //inquiry tp_clear;
+    0, //richcmpfunc tp_richcompare;
+    0, //Py_ssize_t tp_weaklistoffset;
+    0, //getiterfunc tp_iter;
+    0, //iternextfunc tp_iternext;
+
+    Variable_methods, //struct PyMethodDef *tp_methods;
+    0, //istruct PyMemberDef *tp_members;
+    0, //istruct PyGetSetDef *tp_getset;
+    0, //istruct _typeobject *tp_base;
+    0, //iPyObject *tp_dict;
+    0, //idescrgetfunc tp_descr_get;
+    0, //idescrsetfunc tp_descr_set;
+    0, //iPy_ssize_t tp_dictoffset;
+    (initproc)Variable_init,  //initproc tp_init;
+    0, //allocfunc tp_alloc;
+    Variable_new, //newfunc tp_new;
+    0, //freefunc tp_free; /* Low-level free-memory routine */
+    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
+    0, //PyObject *tp_bases;
+    0, //PyObject *tp_mro; /* method resolution order */
+    0, //PyObject *tp_cache;
+    0, //PyObject *tp_subclasses;
+    0, //PyObject *tp_weaklist;
+    0, //destructor tp_del;
+    0, //unsigned int tp_version_tag;
+    0, //destructor tp_finalize;
 };
 
 PyObject*
@@ -190,8 +202,8 @@ Variable_init(Variable* self, PyObject* args)
 {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 1) {
     PyObject* obj = PyTuple_GetItem(args, 0);
-    if (PyString_Check(obj)) {
-      const char* c_str = PyString_AsString(obj);
+    if (PyBytes_Check(obj)) {
+      const char* c_str = PyBytes_AsString(obj);
       lp_variable_t x = lp_variable_db_new_variable(Variable_get_default_db(), c_str);
       self->x = x;
     } else {
@@ -206,13 +218,13 @@ Variable_init(Variable* self, PyObject* args)
 static void
 Variable_dealloc(Variable* self)
 {
-  self->ob_type->tp_free((PyObject*)self);
+  ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
 
 static PyObject* Variable_str(PyObject* self) {
   Variable* x = (Variable*) self;
   const char* x_str = lp_variable_db_get_name(Variable_get_default_db(), x->x);
-  PyObject* str = PyString_FromString(x_str);
+  PyObject* str = PyUnicode_FromString(x_str);
   return str;
 }
 
@@ -238,7 +250,7 @@ static PyObject* Variable_repr(PyObject* self) {
   const char* x_str = lp_variable_db_get_name(Variable_get_default_db(), x->x);
   char* x_repr = malloc(strlen(x_str) + strlen(VariableType.tp_name) + 5);
   sprintf(x_repr, "%s('%s')", VariableType.tp_name, x_str);
-  PyObject* str = PyString_FromString(x_repr);
+  PyObject* str = PyUnicode_FromString(x_repr);
   free(x_repr);
   return str;
 }
@@ -478,11 +490,11 @@ Variable_mul(PyObject* self, PyObject* other) {
 static PyObject*
 Variable_pow(PyObject* self, PyObject* other) {
   // Check arguments
-  if (!PyVariable_CHECK(self) || !PyInt_Check(other)) {
+  if (!PyVariable_CHECK(self) || !PyLong_Check(other)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   } else {
-    long n = PyInt_AsLong(other);
+    long n = PyLong_AsLong(other);
     if (n < 0) {
       Py_INCREF(Py_NotImplemented);
       return Py_NotImplemented;
