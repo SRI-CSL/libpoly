@@ -53,7 +53,7 @@ PyTypeObject CoefficientRingType = {
     0, // printfunc tp_print;
     0, // getattrfunc tp_getattr;
     0, // setattrfunc tp_setattr;
-    CoefficientRing_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //CoefficientRing_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
     0, // reprfunc tp_repr;
     0, // PyNumberMethods *tp_as_number;
     0, // PySequenceMethods *tp_as_sequence;

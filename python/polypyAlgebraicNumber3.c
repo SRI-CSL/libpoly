@@ -122,7 +122,7 @@ PyTypeObject AlgebraicNumberType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    AlgebraicNumber_cmp, // PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //AlgebraicNumber_cmp, // PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
     AlgebraicNumber_str, // reprfunc tp_repr;
 
     /* Method suites for standard classes */

@@ -133,7 +133,7 @@ PyTypeObject VariableType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    Variable_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //Variable_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
     Variable_repr, //reprfunc tp_repr;
 
     &Variable_NumberMethods, //PyNumberMethods *tp_as_number;

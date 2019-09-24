@@ -133,7 +133,7 @@ PyTypeObject ValueType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    Value_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //Value_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
     Value_str, //reprfunc tp_repr;
 
     &Value_NumberMethods, //PyNumberMethods *tp_as_number;

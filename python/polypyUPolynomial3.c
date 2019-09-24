@@ -181,7 +181,7 @@ PyTypeObject UPolynomialType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    UPolynomial_cmp,  //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //UPolynomial_cmp,  //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
     UPolynomial_str, //reprfunc tp_repr;
 
     &UPolynomial_NumberMethods, //PyNumberMethods *tp_as_number;
