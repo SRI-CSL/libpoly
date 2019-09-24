@@ -17,5 +17,26 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "schizophrenia.h"
 
 
+const char* pythonObject2CharStar(PyObject *pyobj){
+  const char* retval = NULL;
+  if(!pyobj){
+    return retval;
+  } else if(PyBytes_Check(pyobj)){
+    retval = PyBytes_AsString(pyobj);
+    return retval;
+  } else if(PyUnicode_Check(pyobj)) {
+    PyObject* str = PyUnicode_AsEncodedString(pyobj, "utf-8", "?");
+    retval = PyBytes_AS_STRING(str);
+    Py_XDECREF(str);
+  } else {
+   PyObject* pyob_str = PyObject_Str(pyobj);
+   PyObject* str = PyUnicode_AsEncodedString(pyob_str, "utf-8", "?");
+   retval = PyBytes_AS_STRING(str);
+   Py_XDECREF(pyob_str);
+   Py_XDECREF(str);
+  }
+  return retval;
+}

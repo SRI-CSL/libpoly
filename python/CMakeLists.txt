@@ -11,6 +11,7 @@ set(polypy_SOURCES
     polypyValue.c
     polypyInterval.c
     polypyFeasibilitySet.c
+    schizophrenia.c
 )
 
 find_package(PythonInterp)

@@ -22,3 +22,14 @@
 #include <Python.h>
 
 
+/**
+ *  Returns the char* representation of the python object pyobj.
+ *  If pyobj is NULL, then NULL is returned.
+ *  If pyobj is a "string" (PyString, PyBytes, or PyUnicode), then the C string 
+ *  associated with the object is returned (using UTF-8).
+ *  If pyobj is not a string then we try and use the str, then the repr to obtain
+ *  a C string version (again using UTF-8 if necessary).
+ *  Otherwise we give up and return NULL.
+ *
+ */
+const char* pythonObject2CharStar(PyObject *pyobj);
