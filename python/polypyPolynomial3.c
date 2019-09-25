@@ -260,7 +260,7 @@ PyTypeObject PolynomialType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //Polynomial_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //Polynomial_cmp, //PyAsyncMethods *tp_as_async; 
     Polynomial_str, //reprfunc tp_repr;
     &Polynomial_NumberMethods, //PyNumberMethods *tp_as_number;
     0, //PySequenceMethods *tp_as_sequence;

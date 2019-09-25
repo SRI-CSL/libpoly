@@ -26,7 +26,7 @@ def check_factorization(p, debug=False, check_product = True):
         print("factors =", factors)
         polypy_test.check(False)
         return
-    # Check if factorization multiplys to the input
+    # Check if factorization multiplies to the input
     if check_product:
         product = C
         for (f, d) in factors:
@@ -38,11 +38,11 @@ def check_factorization(p, debug=False, check_product = True):
             product = product * f**d    
         if (p != product):
             print("Wrong factorization (product mismatch)")
-            print("p =", p)
-            print("product =", product)
-            print("factors =", factors)
+            print("p       = ", p)
+            print("product = ", product)
+            print("factors = ", factors)
             polypy_test.check(False)
-            return
+            return  
     # Done, we're OK
     polypy_test.check(True)        
 

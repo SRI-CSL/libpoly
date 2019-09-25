@@ -176,14 +176,12 @@ PyTypeObject UPolynomialType = {
     "polypy.UPolynomial", //const char *tp_name; /* For printing, in format "<module>.<name>" */
     sizeof(UPolynomialObject), //Py_ssize_t tp_basicsize;
     0, // Py_ssize_t tp_itemsize; /* For allocation */
-
     (destructor)UPolynomial_dealloc, // destructor tp_dealloc;
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //UPolynomial_cmp,  //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //UPolynomial_cmp,  // PyAsyncMethods *tp_as_async; 
     UPolynomial_str, //reprfunc tp_repr;
-
     &UPolynomial_NumberMethods, //PyNumberMethods *tp_as_number;
     0, //PySequenceMethods *tp_as_sequence;
     0, //PyMappingMethods *tp_as_mapping;
@@ -310,7 +308,7 @@ static PyObject*
 UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
   PyObject *result = 0;
 
-  if (!PyUPolynomial_CHECK(other) || !PyLong_Check(other)) {
+  if (!PyUPolynomial_CHECK(other) && !PyLong_Check(other)) {
     result = Py_NotImplemented;
   } else {
     lp_upolynomial_t* self_p = ((UPolynomialObject*) self)->p;
