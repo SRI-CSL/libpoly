@@ -20,6 +20,7 @@
 #include "polypyVariable.h"
 #include "polypyInteger.h"
 #include "polypyPolynomial.h"
+#include "schizophrenia.h"
 
 #include <structmember.h>
 
@@ -202,8 +203,8 @@ Variable_init(Variable* self, PyObject* args)
 {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 1) {
     PyObject* obj = PyTuple_GetItem(args, 0);
-    if (PyBytes_Check(obj)) {
-      const char* c_str = PyBytes_AsString(obj);
+    if (PyUnicode_Check(obj) || PyBytes_Check(obj)) {
+      const char* c_str = pythonObject2CharStar(obj);
       lp_variable_t x = lp_variable_db_new_variable(Variable_get_default_db(), c_str);
       self->x = x;
     } else {

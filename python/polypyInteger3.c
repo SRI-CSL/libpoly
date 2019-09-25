@@ -18,6 +18,7 @@
  */
 
 #include "polypyInteger.h"
+#include "schizophrenia.h"
 
 #include <structmember.h>
 
@@ -143,13 +144,11 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
           int overflow = 0;
           long M_int = PyLong_AsLongAndOverflow(modulus, &overflow);
           if (overflow) {
-            PyObject* M_str = PyObject_Str(modulus);
-            char* M_cstr = PyBytes_AS_STRING(M_str); //IAM: this is a mess; will fix when I find a decent guide
+	    const char* M_cstr = pythonObject2CharStar(modulus);
             lp_integer_t M;
             lp_integer_construct_from_string(lp_Z, &M, M_cstr, 10);
             int is_prime = lp_integer_is_prime(&M);
             self->K = lp_int_ring_create(&M, is_prime);
-            Py_DECREF(M_str);
           } else if (M_int > 0) {
             lp_integer_t M;
             lp_integer_construct_from_int(lp_Z, &M, M_int);

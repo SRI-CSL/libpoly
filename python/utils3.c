@@ -31,12 +31,6 @@ void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring_t* K, lp_integer_t* c) {
     long c_long  = PyLong_AsLong(o);
     lp_integer_construct_from_int(K, c, c_long);
   }
-  if (PyLong_Check(o)) {
-    PyObject* o_str = PyObject_Str(o);
-    char* o_cstr = PyBytes_AS_STRING(o_str);
-    lp_integer_construct_from_string(K, c, o_cstr, 10);
-    Py_DECREF(o_str);
-  }
 }
 
 //IAM: unused in the python3 world
@@ -73,9 +67,6 @@ PyObject* algebraic_number_to_PyFloat(const lp_algebraic_number_t* x) {
 }
 
 int PyLong_or_Int_or_Float_Check(PyObject* o) {
-  if (PyLong_Check(o)) {
-    return 1;
-  }
   if (PyLong_Check(o)) {
     return 1;
   }
