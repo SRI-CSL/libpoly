@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import argparse
+import sys
 import polypy
 import polypy_test
+
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--sympy', action="store_true")
@@ -25,20 +27,29 @@ tests = ["python/upolynomial_gcd.py",
          "python/polynomial_feasibility.py"]
 
 if (args.sympy):
-    print "Sympy checking enabled"
+    print("Sympy checking enabled")
     polypy_test.sympy_checker.enabled = True
 else:
-    print "Sympy checking disabled"
+    print("Sympy checking disabled")
     polypy_test.sympy_checker.enabled = False
-        
+
+
+def forkexec(test, env):
+    if sys.version_info >= (3,0):  #IAM: (3, 2) might be more accurate...
+        with open(test) as testf:
+            code = compile(testf.read(), test, 'exec') #IAM: explicit compile makes debugging easier.
+            exec(code, env, env)        
+    else:
+        execfile(test, env, env)
+    
 for test in tests:    
-    print "Running", test, ":"
+    print("Running", test, ":")
     context = dict()
-    execfile(test, context, context)
+    forkexec(test, context)
     module = context["polypy_test"]
-    print "PASS:", module.PASS
-    print "FAIL:", module.FAIL
+    print("PASS:", module.PASS)
+    print("FAIL:", module.FAIL)
 
 if (args.stats):    
-    print "Statistics:"
+    print("Statistics:")
     polypy.stats_print()

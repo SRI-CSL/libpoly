@@ -7,11 +7,11 @@ from polypy import x
 
 def check_comparison(a1, a2, cmp, result, expected):
     if (result != expected):
-        print "a1 =", a1
-        print "a2 =", a2
-        print "cmp =", cmp
-        print "result =", result
-        print "expected =", expected
+        print("a1 =", a1)
+        print("a2 =", a2)
+        print("cmp =", cmp)
+        print("result =", result)
+        print("expected =", expected)
         polypy_test.check(False)
     else:
         polypy_test.check(True)

@@ -9,7 +9,7 @@ FAIL = 0
  Call to start a unit test.
 """
 def start(description):
-    print "\t* Checking", description
+    print("\t* Checking", description)
 
 """
  Call to check a unit test.
@@ -21,14 +21,14 @@ def check(ok):
     elif ok == False:
         FAIL = FAIL + 1
     else:
-        print "Didn't get True/False"    
+        print("Didn't get True/False")
         
 """
  Make a random polynomial (degree bound and M bound on the coefficient 
  magnitude.    
 """
 def random_upolynomial(K, degree, M, lc = None):
-    coeff = [random.randint(-M, M) for _ in xrange(degree)]
+    coeff = [random.randint(-M, M) for _ in range(degree)]
     if (lc is None):
         coeff.append(random.randint(1, M))
     else:
@@ -39,7 +39,7 @@ def random_upolynomial(K, degree, M, lc = None):
 def random_monomial(degree, M, p_vars):
     m = random.randint(1, M)
     if random.randint(0, 1):
-        m_vars = [p_vars[i] for i in sorted(random.sample(xrange(len(p_vars)), random.randint(0, len(p_vars))))]
+        m_vars = [p_vars[i] for i in sorted(random.sample(range(len(p_vars)), random.randint(0, len(p_vars))))]
         for var in m_vars:
             deg = random.randint(1, degree)
             m = m*(var**deg)
@@ -51,7 +51,7 @@ def random_monomial(degree, M, p_vars):
 def random_polynomial(degree, M, p_vars, trials):
     # Generate monomials
     p = random.randint(1, M)
-    for _ in xrange(trials):
+    for _ in range(trials):
         p = p + random_monomial(degree, M, p_vars)
     while (not isinstance(p, polypy.Polynomial)) or (p.degree() == 0):
         p = p + random_monomial(degree, M, p_vars)
@@ -104,11 +104,11 @@ class SympyWrapper:
         gcd_gold = self.sympy_gcd(p, q).simplify()
         ok = self.sympy_from_upolynomial(gcd) == gcd_gold
         if (not ok):
-            print "Wrong gcd"
-            print "p =", p 
-            print "q =", q
-            print "gcd =", gcd
-            print "expected =", gcd_gold
+            print("Wrong gcd")
+            print("p =", p)
+            print("q =", q)
+            print("gcd =", gcd)
+            print("expected =", gcd_gold)
         return ok         
             
     def check_extended_gcd(self, p, q, gcd, u, v):
@@ -117,27 +117,27 @@ class SympyWrapper:
         (sympy_gcd, sympy_u, sympy_v) = self.sympy_extended_gcd(p, q)
         ok = self.sympy_from_upolynomial(gcd) == sympy_gcd
         if (not ok):
-            print "Wrong gcd"
-            print "p =", p 
-            print "q =", q
-            print "gcd =", gcd
-            print "expected =", sympy_gcd
+            print("Wrong gcd")
+            print("p =", p)
+            print("q =", q)
+            print("gcd =", gcd)
+            print("expected =", sympy_gcd)
             return False
         ok = self.sympy_from_upolynomial(u) == sympy_u
         if (not ok):
-            print "Wrong u"
-            print "p =", p 
-            print "q =", q
-            print "u =", u
-            print "expected =", sympy_u
+            print("Wrong u")
+            print("p =", p)
+            print("q =", q)
+            print("u =", u)
+            print("expected =", sympy_u)
             return False        
         ok = self.sympy_from_upolynomial(v) == sympy_v
         if (not ok):
-            print "Wrong v"
-            print "p =", p 
-            print "q =", q
-            print "v =", v
-            print "expected =", sympy_v
+            print("Wrong v")
+            print("p =", p)
+            print("q =", q)
+            print("v =", v)
+            print("expected =", sympy_v)
             return False
         return True
 

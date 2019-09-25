@@ -15,20 +15,20 @@ def check_gcd(p, q, expected):
     gcd = p.gcd(q)
     ok = gcd == expected
     if (not ok):
-        print "p =", p
-        print "q =", q
-        print "expected =", expected
-        print "gcd = ", gcd
+        print("p =", p)
+        print("q =", q)
+        print("expected =", expected)
+        print("gcd = ", gcd)
     polypy_test.check(ok)
 
 def check_lcm(p, q, expected):
     gcd = p.lcm(q)
     ok = gcd == expected
     if (not ok):
-        print "p =", p
-        print "q =", q
-        print "expected =", expected
-        print "gcd = ", gcd
+        print("p =", p)
+        print("q =", q)
+        print("expected =", expected)
+        print("gcd = ", gcd)
     polypy_test.check(ok)
 
 polypy_test.start("GCD")

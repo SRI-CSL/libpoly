@@ -8,8 +8,8 @@ polypy_test.init()
 def check_str(o, expected):
     ok = str(o) == expected
     if (not ok):
-        print "o =", o
-        print "expected =", expected
+        print("o =", o)
+        print("expected =", expected)
     polypy_test.check(ok)
 
 x = polypy.Variable("x")

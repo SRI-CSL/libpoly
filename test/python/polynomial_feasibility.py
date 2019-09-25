@@ -93,26 +93,26 @@ def check_feasible(p, var, assignment, expected):
     ok = True
     for sgn, expected in zip(sgns, expected):
         p_feasible = p.feasible_intervals(assignment, sgn)        
-#         print "p =", p
-#         print "sgn =", sgn_name[sgn]            
-#         print "expected =", expected
-#         print "p_feasible =", p_feasible        
+#         print("p =", p)
+#         print("sgn =", sgn_name[sgn])       
+#         print("expected =", expected)
+#         print("p_feasible =", p_feasible)
         ok = len(p_feasible) == expected
         if (not ok):
-            print "expected =", expected
-            print "p_feasible =", p_feasible        
+            print("expected =", expected)
+            print("p_feasible =", p_feasible)    
         if ok:
             for I in p_feasible:             
                 v = I.pick_value()
                 ok = I.contains(v)
                 if (not ok):
-                    print "I =", I
-                    print "v =", v
+                    print("I =", I
+                    print("v =", v
                     break 
         if (not ok):
-            print "p =", p
-            print "assignment =", assignment
-            print "sgn =", sgn_name[sgn]            
+            print("p =", p)
+            print("assignment =", assignment)
+            print("sgn =", sgn_name[sgn])       
         polypy_test.check(ok)
 
 assignment = polypy.Assignment()
@@ -127,15 +127,15 @@ check_feasible(p_slow, x, assignment, p_expected)
 
 p_slow = (1*y**3 + (2*z**3)*y)*x**3 + ((2*z)*y**3)*x**2 + ((2*z**2)*y**2 + 3)
 
-# for random in xrange(1000):
+# for random in range(1000):
 #     start = time.time()
 #     p = polypy_test.random_polynomial(3, 2, [x, y, z], 5)
-#     print p
+#     print(p)
 #     for sgn in sgns:
 #         p_feasible = p.feasible_intervals(assignment, sgn)        
-#         # print p_feasible
+#         # print(p_feasible)
 #     end = time.time()
-#     print end - start
+#     print(end - start)
 
 # + 0 - 0 +
 p = ((1*z)*y**2 + (1*z**2)*y)*x**2 + ((1*z**2)*y**2)*x + 1
