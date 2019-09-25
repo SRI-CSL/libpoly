@@ -31,9 +31,6 @@ CoefficientRing_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int
 CoefficientRing_init(CoefficientRing* self, PyObject* args);
 
-static int
-CoefficientRing_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 CoefficientRing_modulus(PyObject* self);
 
@@ -54,7 +51,7 @@ PyTypeObject CoefficientRingType = {
     0, // printfunc tp_print;
     0, // getattrfunc tp_getattr;
     0, // setattrfunc tp_setattr;
-    0, //CoefficientRing_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, // PyAsyncMethods *tp_as_async;
     0, // reprfunc tp_repr;
     0, // PyNumberMethods *tp_as_number;
     0, // PySequenceMethods *tp_as_sequence;
@@ -166,31 +163,6 @@ CoefficientRing_init(CoefficientRing* self, PyObject* args)
     }
 
     return 0;
-}
-
-static int
-CoefficientRing_cmp(PyObject* self, PyObject* other) {
-  // Check arguments
-  if (!PyCoefficientRing_CHECK(self) || !PyCoefficientRing_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  CoefficientRing* K1 = (CoefficientRing*) self;
-  CoefficientRing* K2 = (CoefficientRing*) other;
-  // Are they equal
-  if (K1->K == K2->K) {
-    return 0;
-  }
-  // Is one of them Z
-  if (K1->K == lp_Z) {
-    return 1;
-  }
-  if (K2->K == lp_Z) {
-    return -1;
-  }
-  // Compare
-  return lp_integer_cmp(lp_Z, &K1->K->M, &K2->K->M);
 }
 
 static PyObject*

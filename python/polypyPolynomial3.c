@@ -51,9 +51,6 @@ Polynomial_dealloc(Polynomial* self);
 static PyObject*
 Polynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
-static int
-Polynomial_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 Polynomial_richcompare(PyObject* self, PyObject* args, int op);
 
@@ -260,7 +257,7 @@ PyTypeObject PolynomialType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //Polynomial_cmp, //PyAsyncMethods *tp_as_async; 
+    0, //PyAsyncMethods *tp_as_async; 
     Polynomial_str, //reprfunc tp_repr;
     &Polynomial_NumberMethods, //PyNumberMethods *tp_as_number;
     0, //PySequenceMethods *tp_as_sequence;
@@ -411,22 +408,6 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
 
   Py_INCREF(result);
   return result;
-}
-
-static int
-Polynomial_cmp(PyObject* self, PyObject* other) {
-
-  // Check arguments
-  if (!PyPolynomial_CHECK(self) || !PyPolynomial_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  Polynomial* p1 = (Polynomial*) self;
-  Polynomial* p2 = (Polynomial*) other;
-  // Compare
-  int cmp = lp_polynomial_cmp(p1->p, p2->p);
-  return cmp > 0 ? 1 : cmp < 0 ? -1 : 0;
 }
 
 static long

@@ -35,9 +35,6 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args);
 static PyObject*
 AlgebraicNumber_to_double(PyObject* self);
 
-  static int
-AlgebraicNumber_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op);
 
@@ -122,7 +119,7 @@ PyTypeObject AlgebraicNumberType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //AlgebraicNumber_cmp, // PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //PyAsyncMethods *tp_as_async
     AlgebraicNumber_str, // reprfunc tp_repr;
 
     /* Method suites for standard classes */
@@ -293,20 +290,6 @@ AlgebraicNumber_refine(PyObject* self) {
   AlgebraicNumber* a = (AlgebraicNumber*) self;
   lp_algebraic_number_refine(&a->a);
   Py_RETURN_NONE;
-}
-
-static int
-AlgebraicNumber_cmp(PyObject* self, PyObject* other) {
-  // Check arguments
-  if (!PyAlgebraicNumber_CHECK(self) || !PyAlgebraicNumber_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  AlgebraicNumber* a1 = (AlgebraicNumber*) self;
-  AlgebraicNumber* a2 = (AlgebraicNumber*) other;
-  // Compare
-  return lp_algebraic_number_cmp(&a1->a, &a2->a);
 }
 
 static PyObject*

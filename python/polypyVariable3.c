@@ -53,9 +53,6 @@ Variable_dealloc(Variable* self);
 static PyObject*
 Variable_str(PyObject* self);
 
-static int
-Variable_cmp(PyObject* self, PyObject* other);
-
 static PyObject*
 Variable_repr(PyObject* self);
 
@@ -134,7 +131,7 @@ PyTypeObject VariableType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //Variable_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //PyAsyncMethods *tp_as_async;
     Variable_repr, //reprfunc tp_repr;
 
     &Variable_NumberMethods, //PyNumberMethods *tp_as_number;
@@ -228,23 +225,6 @@ static PyObject* Variable_str(PyObject* self) {
   PyObject* str = PyUnicode_FromString(x_str);
   return str;
 }
-
-static int Variable_cmp(PyObject* self, PyObject* other) {
-  Variable* x = (Variable*) self;
-  if (PyVariable_CHECK(other)) {
-    Variable* y = (Variable*) other;
-    if (x->x > y->x) {
-      return 1;
-    } else if (x->x == y->x) {
-      return 0;
-    } else {
-      return -1;
-    }
-  } else {
-    return -1;
-  }
-}
-
 
 static PyObject* Variable_repr(PyObject* self) {
   Variable* x = (Variable*) self;

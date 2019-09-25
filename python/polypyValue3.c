@@ -35,9 +35,6 @@ Value_init(Value* self, PyObject* args);
 static PyObject*
 Value_to_double(PyObject* self);
 
-static int
-Value_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 Value_richcompare(PyObject* self, PyObject* other, int op);
 
@@ -133,7 +130,7 @@ PyTypeObject ValueType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //Value_cmp, //PyAsyncMethods *tp_as_async; /* formerly known as tp_compare (Python 2) or tp_reserved (Python 3) */
+    0, //PyAsyncMethods *tp_as_async;
     Value_str, //reprfunc tp_repr;
 
     &Value_NumberMethods, //PyNumberMethods *tp_as_number;
@@ -249,20 +246,6 @@ Value_to_double(PyObject* self) {
   }
 
   return PyFloat_FromDouble(value);
-}
-
-static int
-Value_cmp(PyObject* self, PyObject* other) {
-  // Check arguments
-  if (!PyValue_CHECK(self) || !PyValue_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  Value* v1 = (Value*) self;
-  Value* v2 = (Value*) other;
-  // Compare
-  return lp_value_cmp(&v1->v, &v2->v);
 }
 
 static PyObject*

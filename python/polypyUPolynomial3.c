@@ -36,9 +36,6 @@ UPolynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int
 UPolynomial_init(UPolynomialObject* self, PyObject* args);
 
-static int
-UPolynomial_cmp(PyObject* self, PyObject* args);
-
 static PyObject*
 UPolynomial_richcompare(PyObject* self, PyObject* args, int op);
 
@@ -180,7 +177,7 @@ PyTypeObject UPolynomialType = {
     0, //printfunc tp_print;
     0, //getattrfunc tp_getattr;
     0, //setattrfunc tp_setattr;
-    0, //UPolynomial_cmp,  // PyAsyncMethods *tp_as_async; 
+    0, // PyAsyncMethods *tp_as_async; 
     UPolynomial_str, //reprfunc tp_repr;
     &UPolynomial_NumberMethods, //PyNumberMethods *tp_as_number;
     0, //PySequenceMethods *tp_as_sequence;
@@ -351,22 +348,6 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
 
   Py_INCREF(result);
   return result;
-}
-
-static int
-UPolynomial_cmp(PyObject* self, PyObject* other) {
-
-  // Check arguments
-  if (!PyUPolynomial_CHECK(self) || !PyUPolynomial_CHECK(other)) {
-    // should return -1 and set an exception condition when an error occurred
-    return -1;
-  }
-  // Get arguments
-  UPolynomialObject* p1 = (UPolynomialObject*) self;
-  UPolynomialObject* p2 = (UPolynomialObject*) other;
-  // Compare
-  int cmp = lp_upolynomial_cmp(p1->p, p2->p);
-  return cmp > 0 ? 1 : cmp < 0 ? -1 : 0;
 }
 
 static PyObject*
