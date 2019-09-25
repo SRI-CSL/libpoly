@@ -211,7 +211,7 @@ PyNumberMethods Polynomial_NumberMethods = {
      Polynomial_add, // binaryfunc nb_add;
      Polynomial_sub, // binaryfunc nb_subtract;
      Polynomial_mul, // binaryfunc nb_multiply;
-     // IAM: N.B. No more divide
+     // IAM: N.B. No more divide (nb_floor_divide vs nb_true_divide below)
      Polynomial_rem_operator, // binaryfunc nb_remainder;
      Polynomial_divmod, // binaryfunc nb_divmod;
      (ternaryfunc)Polynomial_pow, // ternaryfunc nb_power;
@@ -241,7 +241,7 @@ PyNumberMethods Polynomial_NumberMethods = {
      0, // binaryfunc nb_inplace_or;
 
      0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
+     Polynomial_div, // binaryfunc nb_true_divide;
      0, // binaryfunc nb_inplace_floor_divide;
      0, // binaryfunc nb_inplace_true_divide;
 

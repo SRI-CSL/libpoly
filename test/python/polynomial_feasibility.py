@@ -106,8 +106,8 @@ def check_feasible(p, var, assignment, expected):
                 v = I.pick_value()
                 ok = I.contains(v)
                 if (not ok):
-                    print("I =", I
-                    print("v =", v
+                    print("I =", I)
+                    print("v =", v)
                     break 
         if (not ok):
             print("p =", p)

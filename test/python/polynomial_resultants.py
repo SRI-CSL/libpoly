@@ -10,9 +10,12 @@ w = polypy.Variable("w");
 
 polypy.variable_order.set([w, z, y, x]);
 
+def cmp3(lhs, rhs):
+    return ((lhs > rhs) - (lhs < rhs))
+
 def check_psc(p, q, expected):
     psc = p.psc(q)
-    ok = cmp(psc, expected) == 0
+    ok = cmp3(psc, expected) == 0
     if (not ok):
         print("p =", p)
         print("q =", q)

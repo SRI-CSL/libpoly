@@ -161,7 +161,7 @@ PyNumberMethods UPolynomial_NumberMethods = {
      0, // binaryfunc nb_inplace_or;
 
      0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
+     UPolynomialObject_div, // binaryfunc nb_true_divide;
      0, // binaryfunc nb_inplace_floor_divide;
      0, // binaryfunc nb_inplace_true_divide;
 
