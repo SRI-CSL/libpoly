@@ -66,126 +66,93 @@ PyMethodDef AlgebraicNumber_methods[] = {
 };
 
 PyNumberMethods AlgebraicNumber_NumberMethods = {
-     AlgebraicNumber_add, // binaryfunc nb_add;
-     AlgebraicNumber_sub, // binaryfunc nb_subtract;
-     AlgebraicNumber_mul, // binaryfunc nb_multiply;
-     0, // binaryfunc nb_remainder;
-     0, // binaryfunc nb_divmod;
+     AlgebraicNumber_add,              // binaryfunc nb_add;
+     AlgebraicNumber_sub,              // binaryfunc nb_subtract;
+     AlgebraicNumber_mul,              // binaryfunc nb_multiply;
+     0,                                // binaryfunc nb_remainder;
+     0,                                // binaryfunc nb_divmod;
      (ternaryfunc)AlgebraicNumber_pow, // ternaryfunc nb_power;
-     AlgebraicNumber_neg, // unaryfunc nb_negative;
-     0, // unaryfunc nb_positive;
-     0, // unaryfunc nb_absolute;
-     0, // inquiry nb_bool;
-     0, // unaryfunc nb_invert;
-     0, // binaryfunc nb_lshift;
-     0, // binaryfunc nb_rshift;
-     0, // binaryfunc nb_and;
-     0, // binaryfunc nb_xor;
-     0, // binaryfunc nb_or;
-     0, // unaryfunc nb_int;
-     0, // void *nb_reserved;
-     0, // unaryfunc nb_float;
-
-     0, // binaryfunc nb_inplace_add;
-     0, // binaryfunc nb_inplace_subtract;
-     0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_remainder;
-     0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
-     0, // binaryfunc nb_inplace_rshift;
-     0, // binaryfunc nb_inplace_and;
-     0, // binaryfunc nb_inplace_xor;
-     0, // binaryfunc nb_inplace_or;
-
-     0, // binaryfunc nb_floor_divide;
-     0, // binaryfunc nb_true_divide;
-     0, // binaryfunc nb_inplace_floor_divide;
-     0, // binaryfunc nb_inplace_true_divide;
-
-     0, // unaryfunc nb_index;
-
-     0, // binaryfunc nb_matrix_multiply;
-     0, // binaryfunc nb_inplace_matrix_multiply;
+     AlgebraicNumber_neg,              // unaryfunc nb_negative;
+     0,                                // unaryfunc nb_positive;
+     0,                                // unaryfunc nb_absolute;
+     0,                                // inquiry nb_bool;
+     0,                                // unaryfunc nb_invert;
+     0,                                // binaryfunc nb_lshift;
+     0,                                // binaryfunc nb_rshift;
+     0,                                // binaryfunc nb_and;
+     0,                                // binaryfunc nb_xor;
+     0,                                // binaryfunc nb_or;
+     0,                                // unaryfunc nb_int;
+     0,                                // void *nb_reserved;
+     0,                                // unaryfunc nb_float;
+     0,                                // binaryfunc nb_inplace_add;
+     0,                                // binaryfunc nb_inplace_subtract;
+     0,                                // binaryfunc nb_inplace_multiply;
+     0,                                // binaryfunc nb_inplace_remainder;
+     0,                                // ternaryfunc nb_inplace_power;
+     0,                                // binaryfunc nb_inplace_lshift;
+     0,                                // binaryfunc nb_inplace_rshift;
+     0,                                // binaryfunc nb_inplace_and;
+     0,                                // binaryfunc nb_inplace_xor;
+     0,                                // binaryfunc nb_inplace_or;
+     0,                                // binaryfunc nb_floor_divide;
+     0,                                // binaryfunc nb_true_divide;
+     0,                                // binaryfunc nb_inplace_floor_divide;
+     0,                                // binaryfunc nb_inplace_true_divide;
+     0,                                // unaryfunc nb_index;
+     0,                                // binaryfunc nb_matrix_multiply;
+     0,                                // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject AlgebraicNumberType = {
-    PyObject_HEAD_INIT(NULL) // PyObject_VAR_HEAD
-    "polypy.AlgebraicNumber", // const char *tp_name; /* For printing, in format "<module>.<name>" */
-    sizeof(AlgebraicNumber),  // Py_ssize_t tp_basicsize; /* For allocation */
-    0, // Py_ssize_t tp_itemsize;  /* For allocation */
-
-    /* Methods to implement standard operations */
-    (destructor)AlgebraicNumber_dealloc, //destructor tp_dealloc;
-    0, //printfunc tp_print;
-    0, //getattrfunc tp_getattr;
-    0, //setattrfunc tp_setattr;
-    0, //PyAsyncMethods *tp_as_async
-    AlgebraicNumber_str, // reprfunc tp_repr;
-
-    /* Method suites for standard classes */
-
-    &AlgebraicNumber_NumberMethods, // PyNumberMethods *tp_as_number;
-    0, //PySequenceMethods *tp_as_sequence;
-    0, //PyMappingMethods *tp_as_mapping;
-
-    /* More standard operations (here for binary compatibility) */
-
-    0, //hashfunc tp_hash;
-    0, //ternaryfunc tp_call;
-    AlgebraicNumber_str, //reprfunc tp_str;
-    0, //getattrofunc tp_getattro;
-    0, //setattrofunc tp_setattro;
-
-    /* Functions to access object as input/output buffer */
-    0, //PyBufferProcs *tp_as_buffer;
-
-    /* Flags to define presence of optional/expanded features */
-    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
-
-    "Algebraic number objects", //const char *tp_doc; /* Documentation string */
-
-    /* call function for all accessible objects */
-    0, //traverseproc tp_traverse;
-
-    /* delete references to contained objects */
-    0, //inquiry tp_clear;
-
-    /* rich comparisons */
-    AlgebraicNumber_richcompare, //richcmpfunc tp_richcompare;
-
-    /* weak reference enabler */
-    0, //Py_ssize_t tp_weaklistoffset;
-
-    /* Iterators */
-    0, //getiterfunc tp_iter;
-    0, //iternextfunc tp_iternext;
-
-    /* Attribute descriptor and subclassing stuff */
-    AlgebraicNumber_methods, //struct PyMethodDef *tp_methods;
-    0, //struct PyMemberDef *tp_members;
-    0, //struct PyGetSetDef *tp_getset;
-    0, //struct _typeobject *tp_base;
-    0, //PyObject *tp_dict;
-    0, //descrgetfunc tp_descr_get;
-    0, //descrsetfunc tp_descr_set;
-    0, //Py_ssize_t tp_dictoffset;
-    (initproc)AlgebraicNumber_init, //initproc tp_init;
-    0, //Pallocfunc tp_alloc;
-    AlgebraicNumber_new, //newfunc tp_new;
-    0, //freefunc tp_free; /* Low-level free-memory routine */
-    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
-    0, //PyObject *tp_bases;
-    0, //PyObject *tp_mro; /* method resolution order */
-    0, //PyObject *tp_cache;
-    0, //PyObject *tp_subclasses;
-    0, //PyObject *tp_weaklist;
-    0, //destructor tp_del;
-
-    /* Type attribute cache version tag. Added in version 2.6 */
-    0, //unsigned int tp_version_tag;
-
-    0, //destructor tp_finalize;
-
+    PyObject_HEAD_INIT(NULL)             // PyObject_VAR_HEAD
+    "polypy.AlgebraicNumber",            // const char *tp_name;
+    sizeof(AlgebraicNumber),             // Py_ssize_t tp_basicsize; 
+    0,                                   // Py_ssize_t tp_itemsize; 
+    (destructor)AlgebraicNumber_dealloc, // destructor tp_dealloc;
+    0,                                   // printfunc tp_print;
+    0,                                   // getattrfunc tp_getattr;
+    0,                                   // setattrfunc tp_setattr;
+    0,                                   // PyAsyncMethods *tp_as_async
+    AlgebraicNumber_str,                 // reprfunc tp_repr;
+    &AlgebraicNumber_NumberMethods,      // PyNumberMethods *tp_as_number;
+    0,                                   // PySequenceMethods *tp_as_sequence;
+    0,                                   // PyMappingMethods *tp_as_mapping;
+    0,                                   // hashfunc tp_hash;
+    0,                                   // ternaryfunc tp_call;
+    AlgebraicNumber_str,                 // reprfunc tp_str;
+    0,                                   // getattrofunc tp_getattro;
+    0,                                   // setattrofunc tp_setattro;
+    0,                                   // PyBufferProcs *tp_as_buffer;
+    Py_TPFLAGS_DEFAULT,                  // unsigned long tp_flags;
+    "Algebraic number objects",          // const char *tp_doc; 
+    0,                                   // traverseproc tp_traverse;
+    0,                                   // inquiry tp_clear;
+    AlgebraicNumber_richcompare,         // richcmpfunc tp_richcompare;
+    0,                                   // Py_ssize_t tp_weaklistoffset;
+    0,                                   // getiterfunc tp_iter;
+    0,                                   // iternextfunc tp_iternext;
+    AlgebraicNumber_methods,             // struct PyMethodDef *tp_methods;
+    0,                                   // struct PyMemberDef *tp_members;
+    0,                                   // struct PyGetSetDef *tp_getset;
+    0,                                   // struct _typeobject *tp_base;
+    0,                                   // PyObject *tp_dict;
+    0,                                   // descrgetfunc tp_descr_get;
+    0,                                   // descrsetfunc tp_descr_set;
+    0,                                   // Py_ssize_t tp_dictoffset;
+    (initproc)AlgebraicNumber_init,      // initproc tp_init;
+    0,                                   // Pallocfunc tp_alloc;
+    AlgebraicNumber_new,                 // newfunc tp_new;
+    0,                                   // freefunc tp_free; 
+    0,                                   // inquiry tp_is_gc; 
+    0,                                   // PyObject *tp_bases;
+    0,                                   // PyObject *tp_mro; 
+    0,                                   // PyObject *tp_cache;
+    0,                                   // PyObject *tp_subclasses;
+    0,                                   // PyObject *tp_weaklist;
+    0,                                   // destructor tp_del;
+    0,                                   // unsigned int tp_version_tag;
+    0,                                   // destructor tp_finalize;
 };
 
 static void

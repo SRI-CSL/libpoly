@@ -19,6 +19,20 @@
 
 #include "utils.h"
 
+const char* pythonObject2CharStar(PyObject *pyobj){
+  const char* retval = NULL;
+  if(!pyobj){
+    return retval;
+  } else if(PyString_Check(pyobj)){
+    retval = PyString_AsString(pyobj);
+    return retval;
+  } else {
+    PyObject* pyobj_str = PyObject_Str(pyobj);
+    retval = PyString_AsString(pyobj_str);
+  }
+  return retval;
+}
+
 int PyLong_or_Int_Check(PyObject* o) {
   if (PyInt_Check(o)) {
     return 1;

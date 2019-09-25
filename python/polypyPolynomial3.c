@@ -205,104 +205,93 @@ PyMethodDef Polynomial_methods[] = {
 };
 
 PyNumberMethods Polynomial_NumberMethods = {
-     Polynomial_add, // binaryfunc nb_add;
-     Polynomial_sub, // binaryfunc nb_subtract;
-     Polynomial_mul, // binaryfunc nb_multiply;
-     // IAM: N.B. No more divide (nb_floor_divide vs nb_true_divide below)
-     Polynomial_rem_operator, // binaryfunc nb_remainder;
-     Polynomial_divmod, // binaryfunc nb_divmod;
+     Polynomial_add,              // binaryfunc nb_add;
+     Polynomial_sub,              // binaryfunc nb_subtract;
+     Polynomial_mul,              // binaryfunc nb_multiply;
+     Polynomial_rem_operator,     // binaryfunc nb_remainder;
+     Polynomial_divmod,           // binaryfunc nb_divmod;
      (ternaryfunc)Polynomial_pow, // ternaryfunc nb_power;
-     Polynomial_neg, // unaryfunc nb_negative;
-     0, // unaryfunc nb_positive;
-     0, // unaryfunc nb_absolute;
-     Polynomial_nonzero, // inquiry nb_bool; IAM: FIXME: check this! Was: inquiry nb_nonzero;
-     0, // unaryfunc nb_invert;
-     0, // binaryfunc nb_lshift;
-     0, // binaryfunc nb_rshift;
-     0, // binaryfunc nb_and;
-     0, // binaryfunc nb_xor;
-     0, // binaryfunc nb_or;
-     0, // unaryfunc nb_int;
-     0, // void *nb_reserved;
-     0, // unaryfunc nb_float;
-
-     0, // binaryfunc nb_inplace_add;
-     0, // binaryfunc nb_inplace_subtract;
-     0, // binaryfunc nb_inplace_multiply;
-     0, // binaryfunc nb_inplace_remainder;
-     0, // ternaryfunc nb_inplace_power;
-     0, // binaryfunc nb_inplace_lshift;
-     0, // binaryfunc nb_inplace_rshift;
-     0, // binaryfunc nb_inplace_and;
-     0, // binaryfunc nb_inplace_xor;
-     0, // binaryfunc nb_inplace_or;
-
-     0, // binaryfunc nb_floor_divide;
-     Polynomial_div, // binaryfunc nb_true_divide;
-     0, // binaryfunc nb_inplace_floor_divide;
-     0, // binaryfunc nb_inplace_true_divide;
-
-     0, // unaryfunc nb_index;
-
-     0, // binaryfunc nb_matrix_multiply;
-     0, // binaryfunc nb_inplace_matrix_multiply;
+     Polynomial_neg,              // unaryfunc nb_negative;
+     0,                           // unaryfunc nb_positive;
+     0,                           // unaryfunc nb_absolute;
+     Polynomial_nonzero,          // inquiry nb_bool;
+     0,                           // unaryfunc nb_invert;
+     0,                           // binaryfunc nb_lshift;
+     0,                           // binaryfunc nb_rshift;
+     0,                           // binaryfunc nb_and;
+     0,                           // binaryfunc nb_xor;
+     0,                           // binaryfunc nb_or;
+     0,                           // unaryfunc nb_int;
+     0,                           // void *nb_reserved;
+     0,                           // unaryfunc nb_float;
+     0,                           // binaryfunc nb_inplace_add;
+     0,                           // binaryfunc nb_inplace_subtract;
+     0,                           // binaryfunc nb_inplace_multiply;
+     0,                           // binaryfunc nb_inplace_remainder;
+     0,                           // ternaryfunc nb_inplace_power;
+     0,                           // binaryfunc nb_inplace_lshift;
+     0,                           // binaryfunc nb_inplace_rshift;
+     0,                           // binaryfunc nb_inplace_and;
+     0,                           // binaryfunc nb_inplace_xor;
+     0,                           // binaryfunc nb_inplace_or;
+     0,                           // binaryfunc nb_floor_divide;
+     Polynomial_div,              // binaryfunc nb_true_divide;
+     0,                           // binaryfunc nb_inplace_floor_divide;
+     0,                           // binaryfunc nb_inplace_true_divide;
+     0,                           // unaryfunc nb_index;
+     0,                           // binaryfunc nb_matrix_multiply;
+     0,                           // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject PolynomialType = {
     PyObject_HEAD_INIT(NULL)
-    "polypy.Polynomial", //const char *tp_name; /* For printing, in format "<module>.<name>" */
-    sizeof(Polynomial), //Py_ssize_t tp_basicsize;
-    0, //Py_ssize_t tp_itemsize; /* For allocation */
-    (destructor)Polynomial_dealloc, //destructor tp_dealloc;
-    0, //printfunc tp_print;
-    0, //getattrfunc tp_getattr;
-    0, //setattrfunc tp_setattr;
-    0, //PyAsyncMethods *tp_as_async; 
-    Polynomial_str, //reprfunc tp_repr;
-    &Polynomial_NumberMethods, //PyNumberMethods *tp_as_number;
-    0, //PySequenceMethods *tp_as_sequence;
-    0, //PyMappingMethods *tp_as_mapping;
-
-    Polynomial_hash, //hashfunc tp_hash;
-    0, //ternaryfunc tp_call;
-    Polynomial_str, //reprfunc tp_str;
-    0, //getattrofunc tp_getattro;
-    0, //setattrofunc tp_setattro;
-
-    0, //PyBufferProcs *tp_as_buffer;
-
-    Py_TPFLAGS_DEFAULT, //unsigned long tp_flags;
-
-    "Polynomial objects", //const char *tp_doc; /* Documentation string */
-
-    0, //traverseproc tp_traverse;
-    0, //inquiry tp_clear;
-    Polynomial_richcompare,  //richcmpfunc tp_richcompare;
-    0, //Py_ssize_t tp_weaklistoffset;
-    0, //getiterfunc tp_iter;
-    0, //iternextfunc tp_iternext;
-
-    Polynomial_methods, //struct PyMethodDef *tp_methods;
-    0, //struct PyMemberDef *tp_members;
-    0, //struct PyGetSetDef *tp_getset;
-    0, //struct _typeobject *tp_base;
-    0, //PyObject *tp_dict;
-    0, //descrgetfunc tp_descr_get;
-    0, //descrsetfunc tp_descr_set;
-    0, //Py_ssize_t tp_dictoffset;
-    0, //initproc tp_init;
-    0, //allocfunc tp_alloc;
-    Polynomial_new, //newfunc tp_new;
-    0, //freefunc tp_free; /* Low-level free-memory routine */
-    0, //inquiry tp_is_gc; /* For PyObject_IS_GC */
-    0, //PyObject *tp_bases;
-    0, //PyObject *tp_mro; /* method resolution order */
-    0, //PyObject *tp_cache;
-    0, //PyObject *tp_subclasses;
-    0, //PyObject *tp_weaklist;
-    0, //destructor tp_del;
-    0, //unsigned int tp_version_tag;
-    0, //destructor tp_finalize;
+    "polypy.Polynomial",            // const char *tp_name;
+    sizeof(Polynomial),             // Py_ssize_t tp_basicsize;
+    0,                              // Py_ssize_t tp_itemsize;
+    (destructor)Polynomial_dealloc, // destructor tp_dealloc;
+    0,                              // printfunc tp_print;
+    0,                              // getattrfunc tp_getattr;
+    0,                              // setattrfunc tp_setattr;
+    0,                              // PyAsyncMethods *tp_as_async; 
+    Polynomial_str,                 // reprfunc tp_repr;
+    &Polynomial_NumberMethods,      // PyNumberMethods *tp_as_number;
+    0,                              // PySequenceMethods *tp_as_sequence;
+    0,                              // PyMappingMethods *tp_as_mapping;
+    Polynomial_hash,                // hashfunc tp_hash;
+    0,                              // ternaryfunc tp_call;
+    Polynomial_str,                 // reprfunc tp_str;
+    0,                              // getattrofunc tp_getattro;
+    0,                              // setattrofunc tp_setattro;
+    0,                              // PyBufferProcs *tp_as_buffer;
+    Py_TPFLAGS_DEFAULT,             // unsigned long tp_flags;
+    "Polynomial objects",           // const char *tp_doc;
+    0,                              // traverseproc tp_traverse;
+    0,                              // inquiry tp_clear;
+    Polynomial_richcompare,         // richcmpfunc tp_richcompare;
+    0,                              // Py_ssize_t tp_weaklistoffset;
+    0,                              // getiterfunc tp_iter;
+    0,                              // iternextfunc tp_iternext;
+    Polynomial_methods,             // struct PyMethodDef *tp_methods;
+    0,                              // struct PyMemberDef *tp_members;
+    0,                              // struct PyGetSetDef *tp_getset;
+    0,                              // struct _typeobject *tp_base;
+    0,                              // PyObject *tp_dict;
+    0,                              // descrgetfunc tp_descr_get;
+    0,                              // descrsetfunc tp_descr_set;
+    0,                              // Py_ssize_t tp_dictoffset;
+    0,                              // initproc tp_init;
+    0,                              // allocfunc tp_alloc;
+    Polynomial_new,                 // newfunc tp_new;
+    0,                              // freefunc tp_free;
+    0,                              // inquiry tp_is_gc;
+    0,                              // PyObject *tp_bases;
+    0,                              // PyObject *tp_mro;
+    0,                              // PyObject *tp_cache;
+    0,                              // PyObject *tp_subclasses;
+    0,                              // PyObject *tp_weaklist;
+    0,                              // destructor tp_del;
+    0,                              // unsigned int tp_version_tag;
+    0,                              // destructor tp_finalize;
 };
 
 static void

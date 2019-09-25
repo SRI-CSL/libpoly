@@ -298,7 +298,7 @@ static PyObject*
 UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
   PyObject *result = 0;
 
-  if (!PyUPolynomial_CHECK(other) || !PyInt_Check(other)) {
+  if (!PyUPolynomial_CHECK(other) && !PyInt_Check(other)) {
     result = Py_NotImplemented;
   } else {
     lp_upolynomial_t* self_p = ((UPolynomialObject*) self)->p;
