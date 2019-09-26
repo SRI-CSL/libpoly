@@ -40,9 +40,6 @@ CoefficientRing_str(PyObject* self);
 static PyObject *
 CoefficientRing_richcompare(PyObject *self, PyObject *other, int op);
 
-
-
-
 PyMethodDef CoefficientRing_methods[] = {
     {"modulus", (PyCFunction)CoefficientRing_modulus, METH_NOARGS, "Returns the degree of the polynomial"},
     {NULL}  /* Sentinel */
@@ -207,12 +204,8 @@ CoefficientRing_richcompare(PyObject *self, PyObject *other, int op){
 
   if(!PyCoefficientRing_CHECK(other)){
     //IAM: Unless I am violating some sacrosanct python contract, this seems like a no-brainer.
-    switch(op){
-    case Py_EQ:
-      return Py_False;
-    case Py_NE:
-      return Py_True;
-    }
+    if(op == Py_EQ){ return Py_False; }
+    if(op == Py_NE){ return Py_True; }
   } else {
     // Get arguments
     CoefficientRing* K1 = (CoefficientRing*) self;

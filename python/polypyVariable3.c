@@ -59,6 +59,9 @@ Variable_repr(PyObject* self);
 static long
 Variable_hash(PyObject* self);
 
+static PyObject *
+Variable_richcompare(PyObject *self, PyObject *other, int op);
+
 PyMethodDef Variable_methods[] = {
     {NULL}  /* Sentinel */
 };
@@ -141,7 +144,7 @@ PyTypeObject VariableType = {
     "Variable objects",           // const char *tp_doc;
     0,                            // traverseproc tp_traverse;
     0,                            // inquiry tp_clear;
-    0,                            // richcmpfunc tp_richcompare;
+    Variable_richcompare,         // richcmpfunc tp_richcompare;
     0,                            // Py_ssize_t tp_weaklistoffset;
     0,                            // getiterfunc tp_iter;
     0,                            // iternextfunc tp_iternext;
@@ -479,3 +482,39 @@ Variable_pow(PyObject* self, PyObject* other) {
     }
   }
 }
+
+static PyObject *
+Variable_richcompare(PyObject *self, PyObject *other, int op){
+  PyObject *result = Py_NotImplemented;
+
+  if (!PyVariable_CHECK(other)) {
+    if(op == Py_EQ){ return Py_False; }
+    if(op == Py_NE){ return Py_True; }
+  } else {
+    Variable* x = (Variable*) self;
+    Variable* y = (Variable*) other;
+
+    switch (op) {
+    case Py_LT:
+      result = (x->x < y->x ? Py_True : Py_False);
+      break;
+    case Py_LE:
+      result = (x->x <= y->x ? Py_True : Py_False);
+      break;
+    case Py_EQ:
+      result = (x->x == y->x ? Py_True : Py_False);
+      break;
+    case Py_NE:
+      result = (x->x != y->x ? Py_True : Py_False);
+      break;
+    case Py_GT:
+      result = (x->x > y->x ? Py_True : Py_False);
+      break;
+    case Py_GE:
+      result = (x->x >= y->x ? Py_True : Py_False);
+      break;
+    }
+  }
+  return result;
+}
+
