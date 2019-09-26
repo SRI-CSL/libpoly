@@ -37,6 +37,12 @@ CoefficientRing_modulus(PyObject* self);
 static PyObject*
 CoefficientRing_str(PyObject* self);
 
+static PyObject *
+CoefficientRing_richcompare(PyObject *self, PyObject *other, int op);
+
+
+
+
 PyMethodDef CoefficientRing_methods[] = {
     {"modulus", (PyCFunction)CoefficientRing_modulus, METH_NOARGS, "Returns the degree of the polynomial"},
     {NULL}  /* Sentinel */
@@ -66,7 +72,7 @@ PyTypeObject CoefficientRingType = {
     "Coefficient ring objects",          // const char *tp_doc;
     0,                                   // traverseproc tp_traverse;
     0,                                   // inquiry tp_clear;
-    0,                                   // richcmpfunc tp_richcompare;
+    CoefficientRing_richcompare,         // richcmpfunc tp_richcompare;
     0,                                   // Py_ssize_t tp_weaklistoffset;
     0,                                   // getiterfunc tp_iter;
     0,                                   // iternextfunc tp_iternext;
@@ -193,4 +199,71 @@ static PyObject* CoefficientRing_str(PyObject* self) {
   } else {
     Py_RETURN_NONE;
   }
+}
+
+static PyObject *
+CoefficientRing_richcompare(PyObject *self, PyObject *other, int op){
+  PyObject *result = Py_NotImplemented;
+
+  if(!PyCoefficientRing_CHECK(other)){
+    //IAM: Unless I am violating some sacrosanct python contract, this seems like a no-brainer.
+    switch(op){
+    case Py_EQ:
+      return Py_False;
+    case Py_NE:
+      return Py_True;
+    }
+  } else {
+    // Get arguments
+    CoefficientRing* K1 = (CoefficientRing*) self;
+    CoefficientRing* K2 = (CoefficientRing*) other;
+
+    //Are they equal?
+    if (K1->K == K2->K) {
+      if( op == Py_LE || op == Py_EQ || op == Py_GE){
+	return Py_True;
+      }
+      return Py_False;
+    } 
+
+    // Is one of them Z
+    if (K1->K == lp_Z) {
+      // self > other
+      if( op == Py_LT || op == Py_LE || op == Py_EQ){
+	return Py_False;
+      }
+      return Py_True;
+    }
+    if (K2->K == lp_Z) {
+      //self < other
+      if( op == Py_LT || op == Py_LE){
+	return Py_True;
+      }
+      return Py_False;
+    }
+    
+    int cmp = lp_integer_cmp(lp_Z, &K1->K->M, &K2->K->M);
+
+    switch (op) {
+    case Py_LT:
+      result = cmp < 0 ? Py_True : Py_False;
+      break;
+    case Py_LE:
+      result = cmp <= 0 ? Py_True : Py_False;
+      break;
+    case Py_EQ:
+      result = cmp == 0 ? Py_True : Py_False;
+      break;
+    case Py_NE:
+      result = cmp != 0 ? Py_True : Py_False;
+      break;
+    case Py_GT:
+      result = cmp > 0 ? Py_True : Py_False;
+      break;
+    case Py_GE:
+      result = cmp >= 0 ? Py_True : Py_False;
+      break;
+    }
+  }
+  return result;
 }

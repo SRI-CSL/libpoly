@@ -296,6 +296,11 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
   PyObject *result = 0;
 
   if (!PyUPolynomial_CHECK(other) && !PyLong_Check(other)) {
+    //IAM: Surely we can be braver here?
+    // if op == Py_EQ we could return Py_False
+    // if op == Py_NE we could return Py_True
+    // I am sure this holds for other versions of:
+    // _cmp AND _richcompare in this codebase.
     result = Py_NotImplemented;
   } else {
     lp_upolynomial_t* self_p = ((UPolynomialObject*) self)->p;
