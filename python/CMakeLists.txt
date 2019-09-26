@@ -22,8 +22,10 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 add_library(polypy MODULE ${polypy_SOURCES})
 set_target_properties(polypy PROPERTIES PREFIX "")
+if (APPLE)
+  set_target_properties(polypy PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+endif()
 target_link_libraries(polypy poly)
-target_link_libraries(polypy ${PYTHON_LIBRARIES})
 
 string (REPLACE ";" "', '" polypy_SOURCES_STR "${polypy_SOURCES}")
 configure_file(setup.py.in ${CMAKE_CURRENT_SOURCE_DIR}/setup.py)
