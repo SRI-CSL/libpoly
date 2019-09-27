@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import polypy
 import cad
@@ -32,7 +32,7 @@ class PolyPlot2D(cad.CylinderNotify):
     # Notifications on sylinders
     def cylinder_notify(self, cylinder, assignment):
         self.cylinders.append(cylinder)
-        print "Cylinder:\n", cylinder
+        print("Cylinder:\n", cylinder)
 
 if __name__ == "__main__":
     # Some variables

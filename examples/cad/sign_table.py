@@ -1,7 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from sys import stdout
 import polypy
 import itertools
+from builtins import zip
 
 def output(item, width = 15):
   if (isinstance(item, tuple)):
@@ -25,7 +26,7 @@ def sign_table(x, polys, m):
   # Print intervals and signs in the intervals
   root_i, root_j = itertools.tee(roots)
   next(root_j)
-  for r1, r2 in itertools.izip(root_i, root_j):
+  for r1, r2 in zip(root_i, root_j):
     output((r1.to_double(), r2.to_double()))
     # The interval (r1, r2)
     v = r1.get_value_between(r2);
