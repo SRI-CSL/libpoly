@@ -1,4 +1,4 @@
-set(polypy_SOURCES
+set(polypy_SOURCES 
     polypyAlgebraicNumber.c
     polypyAssignment.c
     polypyInteger.c
@@ -14,12 +14,7 @@ set(polypy_SOURCES
 )
 
 find_package(PythonInterp)
-execute_process(COMMAND
-  "${PYTHON_EXECUTABLE}" "-c" "from sysconfig import get_paths; print(get_paths()['include'])"
-  OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(STATUS "Using python headers at: ${PYTHON_INCLUDE_PATH}")
+find_package(PythonLibs)
 
 include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
