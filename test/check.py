@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import argparse
 import sys
 import polypy
@@ -38,11 +36,11 @@ def forkexec(test, env):
     if sys.version_info >= (3,0):  #IAM: (3, 2) might be more accurate...
         with open(test) as testf:
             code = compile(testf.read(), test, 'exec') #IAM: explicit compile makes debugging easier.
-            exec(code, env, env)        
+            exec(code, env, env)
     else:
         execfile(test, env, env)
-    
-for test in tests:    
+
+for test in tests:
     print("Running", test, ":")
     context = dict()
     forkexec(test, context)
@@ -50,6 +48,6 @@ for test in tests:
     print("PASS:", module.PASS)
     print("FAIL:", module.FAIL)
 
-if (args.stats):    
+if (args.stats):
     print("Statistics:")
     polypy.stats_print()
