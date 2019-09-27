@@ -165,7 +165,7 @@ PyNumberMethods UPolynomial_NumberMethods = {
 };
 
 PyTypeObject UPolynomialType = {
-    PyObject_HEAD_INIT(NULL)
+    {PyObject_HEAD_INIT(NULL)},      // PyObject_VAR_HEAD
     "polypy.UPolynomial",            // const char *tp_name;
     sizeof(UPolynomialObject),       // Py_ssize_t tp_basicsize;
     0,                               // Py_ssize_t tp_itemsize;
@@ -357,7 +357,7 @@ UPolynomial_degree(PyObject* self) {
 
 static PyObject*
 UPolynomial_coefficients(PyObject* self) {
-  int i;
+  size_t i;
 
   lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
   size_t size = lp_upolynomial_degree(p) + 1;
@@ -693,7 +693,7 @@ static PyObject* factors_to_PyList(lp_upolynomial_factors_t* factors) {
   PyList_SetItem(factors_list, 0, constant); // Steals the reference
 
   // Copy over the factors
-  int i;
+  size_t i;
   for (i = 0; i < size; ++ i) {
     size_t degree;
     PyObject* p_i = PyUPolynomial_create(lp_upolynomial_factors_get_factor(factors, i, &degree));
@@ -812,7 +812,7 @@ UPolynomial_roots_isolate(PyObject* self) {
   // Generate a list of floats
   PyObject* list = PyList_New(roots_size);
 
-  int i;
+  size_t i;
   for (i = 0; i < roots_size; ++ i) {
     PyObject* c = PyAlgebraicNumber_create(&roots[i]);
     PyList_SetItem(list, i, c);

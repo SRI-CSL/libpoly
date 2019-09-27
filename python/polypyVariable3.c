@@ -121,7 +121,7 @@ PyNumberMethods Variable_NumberMethods = {
 };
 
 PyTypeObject VariableType = {
-    PyObject_HEAD_INIT(NULL)
+    {PyObject_HEAD_INIT(NULL)},   // PyObject_VAR_HEAD
     "polypy.Variable",            // const char *tp_name;
     sizeof(Variable),             // Py_ssize_t tp_basicsize;
     0,                            // Py_ssize_t tp_itemsize;

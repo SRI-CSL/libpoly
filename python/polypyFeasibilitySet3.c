@@ -47,7 +47,7 @@ PyMethodDef FeasibilitySet_methods[] = {
 };
 
 PyTypeObject FeasibilitySetType = {
-    PyObject_HEAD_INIT(NULL)
+    {PyObject_HEAD_INIT(NULL)},         // PyObject_VAR_HEAD
     "polypy.FeasibilitySet",            // const char *tp_name;
     sizeof(FeasibilitySet),             // Py_ssize_t tp_basicsize;
     0,                                  // Py_ssize_t tp_itemsize;
@@ -152,7 +152,6 @@ FeasibilitySet_pick_value(PyObject* self) {
 
 static PyObject*
 FeasibilitySet_intersect(PyObject* self, PyObject* args) {
-  FeasibilitySet* S = (FeasibilitySet*) self;
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);

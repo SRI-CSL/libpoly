@@ -244,7 +244,7 @@ PyNumberMethods Polynomial_NumberMethods = {
 };
 
 PyTypeObject PolynomialType = {
-    PyObject_HEAD_INIT(NULL)
+    {PyObject_HEAD_INIT(NULL)},     // PyObject_VAR_HEAD
     "polypy.Polynomial",            // const char *tp_name;
     sizeof(Polynomial),             // Py_ssize_t tp_basicsize;
     0,                              // Py_ssize_t tp_itemsize;
@@ -1210,7 +1210,7 @@ PyObject* factors_to_PyList(lp_polynomial_t** factors, size_t* multiplicities, s
 
   // Copy the constant
     // Copy over the factors
-  int i;
+  size_t i;
   for (i = 0; i < size; ++ i) {
     PyObject* p_i = Polynomial_create(factors[i]);
     Py_INCREF(p_i);
@@ -1251,7 +1251,7 @@ Polynomial_roots_count(PyObject* self, PyObject* args) {
 static PyObject*
 Polynomial_roots_isolate(PyObject* self, PyObject* args) {
 
-  int i;
+  size_t i;
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
@@ -1320,7 +1320,7 @@ Polynomial_degree(PyObject* self) {
 
 static PyObject*
 Polynomial_coefficients(PyObject* self) {
-  int i;
+  size_t i;
 
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   size_t size = lp_polynomial_degree(p) + 1;

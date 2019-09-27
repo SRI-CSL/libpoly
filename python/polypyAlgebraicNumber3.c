@@ -105,7 +105,7 @@ PyNumberMethods AlgebraicNumber_NumberMethods = {
 };
 
 PyTypeObject AlgebraicNumberType = {
-    PyObject_HEAD_INIT(NULL)             // PyObject_VAR_HEAD
+    {PyObject_HEAD_INIT(NULL)},          // PyObject_VAR_HEAD
     "polypy.AlgebraicNumber",            // const char *tp_name;
     sizeof(AlgebraicNumber),             // Py_ssize_t tp_basicsize; 
     0,                                   // Py_ssize_t tp_itemsize; 
@@ -203,7 +203,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       }
       // Check the roots
       size_t roots_count = lp_upolynomial_roots_count(f_u, 0);
-      if (root_index < 0 || root_index >= roots_count) {
+      if (root_index < 0 || root_index >= (long)roots_count) {
         // Not enough roots
         lp_upolynomial_delete(f_u);
         return -1;
@@ -212,7 +212,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       lp_upolynomial_roots_isolate(f_u, roots, &roots_count);
       lp_algebraic_number_destruct(&self->a);
       lp_algebraic_number_construct_copy(&self->a, roots + root_index);
-      int i;
+      size_t i;
       for (i = 0; i < roots_count; ++ i) {
         lp_algebraic_number_destruct(roots + i);
       }
@@ -222,7 +222,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       lp_upolynomial_t* f = ((UPolynomialObject*) f_obj)->p;
       long root_index = PyLong_AsLong(root_index_obj);
       size_t roots_count = lp_upolynomial_roots_count(f, 0);
-      if (root_index < 0 || root_index >= roots_count) {
+      if (root_index < 0 || root_index >= (long)roots_count) {
         // Not enough roots
         return -1;
       }
@@ -230,7 +230,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       lp_upolynomial_roots_isolate(f, roots, &roots_count);
       lp_algebraic_number_destruct(&self->a);
       lp_algebraic_number_construct_copy(&self->a, roots + root_index);
-      int i;
+      size_t i;
       for (i = 0; i < roots_count; ++i) {
         lp_algebraic_number_destruct(roots + i);
       }

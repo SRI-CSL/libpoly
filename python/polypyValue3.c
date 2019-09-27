@@ -63,9 +63,6 @@ static PyObject*
 Value_pow(PyObject* self, PyObject* args);
 
 static PyObject*
-Value_int(PyObject* self);
-
-static PyObject*
 Value_long(PyObject* self);
 
 static PyObject*
@@ -117,7 +114,7 @@ PyNumberMethods Value_NumberMethods = {
 };
 
 PyTypeObject ValueType = {
-    PyObject_HEAD_INIT(NULL)
+    {PyObject_HEAD_INIT(NULL)},   // PyObject_VAR_HEAD
     "polypy.Value",              // const char *tp_name;
     sizeof(Value),               // Py_ssize_t tp_basicsize;
     0,                           // Py_ssize_t tp_itemsize;
@@ -360,23 +357,9 @@ Value_pow(PyObject* self, PyObject* other) {
   return 0;
 }
 
-// Returns the o converted to an integer object on success, or NULL on failure.
-// If the argument is outside the integer range a long object will be returned
-// instead. This is the equivalent of the Python expression int(o).
-// Return value: New reference.
-static PyObject*
-Value_int(PyObject* self) {
-  Value* value_obj = (Value*) self;
-  lp_integer_t int_cast;
-  lp_integer_construct(&int_cast);
-  lp_value_floor(&value_obj->v, &int_cast);
-  PyObject* py_int_cast = integer_to_PyInt(&int_cast);
-  lp_integer_destruct(&int_cast);
-  return py_int_cast;
-}
 
 // Returns the o converted to a long integer object on success, or NULL on
-// failure. This is the equivalent of the Python expression long(o).
+// failure. This is the equivalent of the Python 3 expression int(o).
 // Return value: New reference.
 static PyObject*
 Value_long(PyObject* self) {

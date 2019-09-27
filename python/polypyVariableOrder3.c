@@ -69,7 +69,7 @@ PyMethodDef VariableOrder_methods[] = {
 };
 
 PyTypeObject VariableOrderType = {
-    PyObject_HEAD_INIT(NULL)
+    {PyObject_HEAD_INIT(NULL)},        // PyObject_VAR_HEAD
     "polypy.VariableOrder",            // const char *tp_name;
     sizeof(VariableOrder),             // Py_ssize_t tp_basicsize;
     0,                                 // Py_ssize_t tp_itemsize;
