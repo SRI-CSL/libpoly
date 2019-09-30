@@ -143,7 +143,6 @@ FeasibilitySet_pick_value(PyObject* self) {
 
 static PyObject*
 FeasibilitySet_intersect(PyObject* self, PyObject* args) {
-  FeasibilitySet* S = (FeasibilitySet*) self;
 
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
