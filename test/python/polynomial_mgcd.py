@@ -4,9 +4,9 @@ import polypy
 import polypy_test
 
 import sys
- 
+
 polypy_test.init()
- 
+
 x = polypy.Variable("x");
 y = polypy.Variable("y");
 
@@ -40,9 +40,9 @@ A = (1*x3)*x4**4 + ((-2*x0)*x3 + (2*x1))*x4**3 + ((1*x0**2)*x3 + (2*x2 + ((-2*x0
 B = A.derivative()
 
 PSC = A.psc(B)
-print("PSC =", PSC)
+print("PSC = {0}".format(PSC))
 MGCD = A.mgcd(B, m)
-print("MGCD =", MGCD)
+print("MGCD = {0}".format(MGCD))
 
 sys.exit()
 
@@ -72,18 +72,18 @@ B = A.derivative()
 PSC = A.psc(B)
 MGCD = A.mgcd(B, m)
 
-print("A =", A)
-print("B =", B)
-print("PSC =", PSC)
-print("MGCD =", MGCD)
+print("A = {0}".format(A))
+print("B = {0}".format(B))
+print("PSC = {0}".format(PSC))
+print("MGCD = {0}".format(MGCD))
 
 sys.exit(0)
 
-x5 = polypy.Variable("x5")     
-x9 = polypy.Variable("x9")     
-x10 = polypy.Variable("x10")     
-x11 = polypy.Variable("x11")     
-x12 = polypy.Variable("x12")     
+x5 = polypy.Variable("x5")
+x9 = polypy.Variable("x9")
+x10 = polypy.Variable("x10")
+x11 = polypy.Variable("x11")
+x12 = polypy.Variable("x12")
 
 polypy.variable_order.set([x9, x12, x11, x10, x5]);
 
@@ -108,4 +108,3 @@ q = x - 1
 
 print(p.gcd(q))
 print(p.mgcd(q, m))
-

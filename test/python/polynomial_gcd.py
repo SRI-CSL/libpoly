@@ -2,12 +2,12 @@
 
 import polypy
 import polypy_test
- 
+
 polypy_test.init()
- 
+
 x = polypy.Variable("x");
 y = polypy.Variable("y");
-z = polypy.Variable("z"); 
+z = polypy.Variable("z");
 
 polypy.variable_order.set([z, y, x])
 
@@ -15,20 +15,20 @@ def check_gcd(p, q, expected):
     gcd = p.gcd(q)
     ok = gcd == expected
     if (not ok):
-        print("p =", p)
-        print("q =", q)
-        print("expected =", expected)
-        print("gcd = ", gcd)
+        print("p = {0}".format(p))
+        print("q = {0}".format(q))
+        print("expected = {0}".format(expected))
+        print("gcd = {0}".format(gcd))
     polypy_test.check(ok)
 
 def check_lcm(p, q, expected):
     gcd = p.lcm(q)
     ok = gcd == expected
     if (not ok):
-        print("p =", p)
-        print("q =", q)
-        print("expected =", expected)
-        print("gcd = ", gcd)
+        print("p = {0}".format(p))
+        print("q = {0}".format(q))
+        print("expected = {0}".format(expected))
+        print("gcd = {0}".format(gcd))
     polypy_test.check(ok)
 
 polypy_test.start("GCD")

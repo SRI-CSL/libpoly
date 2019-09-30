@@ -9,12 +9,12 @@ FAIL = 0
  Call to start a unit test.
 """
 def start(description):
-    print("\t* Checking", description)
+    print("\t* Checking {0}".format(description))
 
 """
  Call to check a unit test.
 """
-def check(ok):    
+def check(ok):
     global PASS, FAIL
     if ok == True:
         PASS = PASS + 1
@@ -22,10 +22,10 @@ def check(ok):
         FAIL = FAIL + 1
     else:
         print("Didn't get True/False")
-        
+
 """
- Make a random polynomial (degree bound and M bound on the coefficient 
- magnitude.    
+ Make a random polynomial (degree bound and M bound on the coefficient
+ magnitude.
 """
 def random_upolynomial(K, degree, M, lc = None):
     coeff = [random.randint(-M, M) for _ in range(degree)]
@@ -58,18 +58,18 @@ def random_polynomial(degree, M, p_vars, trials):
     return p
 
 class SympyWrapper:
-    
+
     enabled = True
-                
-    def sympy_from_upolynomial(self, p):    
+
+    def sympy_from_upolynomial(self, p):
         coeffs = p.coefficients()
         sympy_p = 0
-        x = sympy.symbols('x') 
+        x = sympy.symbols('x')
         for d, c in enumerate(coeffs):
             sympy_p = sympy_p + c*x**d
         sympy_p = sympy.simplify(sympy_p)
         return sympy_p
-   
+
     def sympy_factor(self, p):
         sympy_p = self.sympy_from_upolynomial(p)
         if (p.ring().modulus() is None):
@@ -93,7 +93,7 @@ class SympyWrapper:
         else:
             (u, v, d) = sympy.gcdex(sympy_p, sympy_q, modulus=p.ring().modulus())
         return (d.simplify(), u.simplify(), v.simplify())
-  
+
     def sympy_factor_count(self, p):
         factors = self.sympy_factor(p)
         return len(factors[1])
@@ -105,12 +105,12 @@ class SympyWrapper:
         ok = self.sympy_from_upolynomial(gcd) == gcd_gold
         if (not ok):
             print("Wrong gcd")
-            print("p =", p)
-            print("q =", q)
-            print("gcd =", gcd)
-            print("expected =", gcd_gold)
-        return ok         
-            
+            print("p = {0}".format(p))
+            print("q = {0}".format(q))
+            print("gcd = {0}".format(gcd))
+            print("expected = {0}".format(gcd_gold))
+        return ok
+
     def check_extended_gcd(self, p, q, gcd, u, v):
         if not self.enabled:
             return True;
@@ -118,26 +118,26 @@ class SympyWrapper:
         ok = self.sympy_from_upolynomial(gcd) == sympy_gcd
         if (not ok):
             print("Wrong gcd")
-            print("p =", p)
-            print("q =", q)
-            print("gcd =", gcd)
-            print("expected =", sympy_gcd)
+            print("p = {0}".format(p))
+            print("q = {0}".format(q))
+            print("gcd = {0}".format(gcd))
+            print("expected = {0}".format(sympy_gcd))
             return False
         ok = self.sympy_from_upolynomial(u) == sympy_u
         if (not ok):
             print("Wrong u")
-            print("p =", p)
-            print("q =", q)
-            print("u =", u)
-            print("expected =", sympy_u)
-            return False        
+            print("p = {0}".format(p))
+            print("q = {0}".format(q))
+            print("u = {0}".format(u))
+            print("expected = {0}".format(sympy_u))
+            return False
         ok = self.sympy_from_upolynomial(v) == sympy_v
         if (not ok):
             print("Wrong v")
-            print("p =", p)
-            print("q =", q)
-            print("v =", v)
-            print("expected =", sympy_v)
+            print("p = {0}".format(p))
+            print("q = {0}".format(q))
+            print("v = {0}".format(v))
+            print("expected = {0}".format(sympy_v))
             return False
         return True
 
@@ -146,7 +146,7 @@ class SympyWrapper:
  By default sympy is enabled.
 """
 sympy_checker = SympyWrapper();
-    
+
 """
  Initialize the testing.
 """
@@ -171,5 +171,3 @@ class NoBufferWrapper(object):
         return getattr(self.stream, attr)
 
 sys.stdout = NoBufferWrapper(sys.stdout)
-
-

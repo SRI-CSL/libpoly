@@ -2,9 +2,9 @@
 
 import polypy
 import polypy_test
- 
+
 polypy_test.init()
- 
+
 [x, y, z] = [polypy.Variable(name) for name in ['x', 'y', 'z']]
 polypy.variable_order.set([z, y, x])
 
@@ -12,11 +12,11 @@ def check_value(p, assignment, value, expected_value):
     value_double = value.to_double()
     ok = abs(value_double - expected_value) < 0.000001
     if (not ok):
-        print("p =", p)
-        print("assignment =", assignment)
-        print("value =", value)
-        print("value_double =", value_double)
-        print("expected_value =", expected_value)
+        print("p = {0}".format(p))
+        print("assignment = {0}".format(assignment))
+        print("value = {0}".format(value))
+        print("value_double = {0}".format(value_double))
+        print("expected_value = {0}".format(expected_value))
     polypy_test.check(ok)
 
 polypy_test.start("Polynomial Evaluation")
@@ -55,4 +55,3 @@ check_value(p, assignment, p_value, 4)
 p = x**2 + y**4 + z**2
 p_value = p.evaluate(assignment)
 check_value(p, assignment, p_value, 7)
-

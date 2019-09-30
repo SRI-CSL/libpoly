@@ -41,12 +41,12 @@ def forkexec(test, env):
         execfile(test, env, env)
 
 for test in tests:
-    print("Running", test, ":")
+    print("Running {0}:".format(test))
     context = dict()
     forkexec(test, context)
     module = context["polypy_test"]
-    print("PASS:", module.PASS)
-    print("FAIL:", module.FAIL)
+    print("PASS: {0}".format(module.PASS))
+    print("FAIL: {0}".format(module.FAIL))
 
 if (args.stats):
     print("Statistics:")

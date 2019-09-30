@@ -7,15 +7,15 @@ from polypy import x
 
 def check_comparison(a1, a2, cmp, result, expected):
     if (result != expected):
-        print("a1 =", a1)
-        print("a2 =", a2)
-        print("cmp =", cmp)
-        print("result =", result)
-        print("expected =", expected)
+        print("a1 = {0}".format(a1))
+        print("a2 = {0}".format(a2))
+        print("cmp = {0}".format(cmp))
+        print("result = {0}".format(result))
+        print("expected = {0}".format(expected))
         polypy_test.check(False)
     else:
         polypy_test.check(True)
-        
+
 polypy_test.init()
 polypy_test.start("Construction and order")
 
@@ -103,7 +103,7 @@ a2 = polypy.AlgebraicNumber(x**2 - 4, 1)
 mul = a * a
 check_comparison(mul, a2, "==", (mul == a2), True)
 
-a_pow = a**2 
+a_pow = a**2
 check_comparison(a_pow, a2, "==", (a_pow == a2), True)
 
 b = polypy.AlgebraicNumber(x**2 - 3, 1)
