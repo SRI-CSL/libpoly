@@ -1,34 +1,34 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import polypy
 import polypy_test
- 
+
 def check_binary(op, op_name, p, q, expected):
     result = op(p, q)
     ok = result == expected
     if (not ok):
-        print "p =", p
-        print "q =", q
-        print op_name, "=", result
-        print "expected =", expected
+        print("p = {0}".format(p))
+        print("q = {0}".format(q))
+        print("{0} = {1}".format(op_name, result))
+        print("expected = {0}".format(expected))
     polypy_test.check(ok)
 
 def check_unary(op, op_name, p, expected):
     result = op(p)
     ok = result == expected
     if (not ok):
-        print "p =", p
-        print op_name, "=", result
-        print "expected =", expected
+        print("p = {0}".format(p))
+        print("{0} = {1}".format(op_name, result))
+        print("expected = {0}".format(expected))
     polypy_test.check(ok)
-        
+
 polypy_test.init()
- 
+
 polypy_test.start("Addition")
 
 x = polypy.Variable("x");
 y = polypy.Variable("y");
-z = polypy.Variable("z"); 
+z = polypy.Variable("z");
 
 polypy.variable_order.set([z, y, x])
 
@@ -142,7 +142,7 @@ expected = [1,
 
 for k in range(0, 16):
     check_binary(poly_pow, "pow", (x + 1), k, expected[k])
-        
+
 polypy_test.start("Derivative");
 
 def poly_d(p):
@@ -150,7 +150,7 @@ def poly_d(p):
 
 polypy.variable_order.set([z, y, x]);
 
-p = (x + y + z + 1)**3 
+p = (x + y + z + 1)**3
 expected = 3*x**2 + 6*x*y + 3*y**2 + 6*x*z + 6*y*z + 3*z**2 + 6*x + 6*y + 6*z + 3
 check_unary(poly_d, "derivative", p, expected)
 
@@ -200,7 +200,7 @@ expected = 2*y
 check_binary(poly_div, "div", p, q, expected)
 
 q = x + 1
-expected = 6*y 
+expected = 6*y
 check_binary(poly_div, "div", p, q, expected)
 
 p = 2*x**2 + 4*x + 6
@@ -217,4 +217,3 @@ p = (x + 6) - x
 q = (x + 3) - x
 expected = 2
 check_binary(poly_div, "div", p, q, expected)
-

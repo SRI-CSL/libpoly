@@ -1,8 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import polypy
+
 import itertools
-            
+from builtins import zip
+
 # Get all the reductums (including the polynomial itself), but not the constants
 def get_reductums(f, x):
   R = []
@@ -63,7 +65,7 @@ def lift_first_var(poly_map, vars, m):
   # Select values in the regions, and go recursive
   r_i, r_j = itertools.tee(roots)
   next(r_j)
-  for r1, r2 in itertools.izip(r_i, r_j):
+  for r1, r2 in zip(r_i, r_j):
     # Get the sector (r1, r2)          
     v = r1.get_value_between(r2);
     m.set_value(x, v)

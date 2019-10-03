@@ -1,28 +1,28 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sys
 import polypy
 import polypy_test
- 
+
 polypy_test.init()
 
 def check_roots(p, assignment, roots, expected_roots):
     ok = len(roots) == len(expected_roots)
-    if ok: 
+    if ok:
         for root, expected_root in zip(roots, expected_roots):
             root_double = root.to_double()
             ok = abs(root_double - expected_root) < 0.000001
             if (not ok):
-                print "p =", p
-                print "assignment =", assignment
-                print "root =", root
-                print "expected_root =", expected_root
+                print("p = {0}".format(p))
+                print("assignment = {0}".format(assignment))
+                print("root = {0}".format(root))
+                print("expected_root = {0}".format(expected_root))
                 break
     else:
-        print "p =", p
-        print "assignment =", assignment
-        print "roots =", roots
-        print "expected_roots =", expected_roots
+        print("p = {0}".format(p))
+        print("assignment = {0}".format(assignment))
+        print("roots = {0}".format(roots))
+        print("expected_roots = {0}".format(expected_roots))
     polypy_test.check(ok)
 
 # polypy.trace_enable("polynomial")
@@ -33,21 +33,21 @@ def check_roots(p, assignment, roots, expected_roots):
 # polypy.trace_enable("coefficient::sgn")
 # polypy.trace_enable("coefficient::roots")
 # polypy.trace_enable("roots")
- 
-  
+
+
 [x, y, z, w] = [polypy.Variable(name) for name in ['x', 'y', 'z', 'w']]
 [x0, x1, x2, x3, x4, x5, x6, x7] = [polypy.Variable(name) for name in ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7']]
 
 # polypy_test.start("Polynomial Root Isolation: Speed")
-# 
+#
 # polypy.variable_order.set([y, x])
-# 
+#
 # y_value_poly = 8192*x**6 + (-14336*x**5) + 75376*x**4 + (-32736*x**3) + 109496*x**2 + 133752*x + (-32441)
 # y_value = polypy.AlgebraicNumber(y_value_poly, 1)
-# 
+#
 # assignment = polypy.Assignment()
 # assignment.set_value(y, y_value)
-# 
+#
 # p = (1*y**2 + 3)*x**6 + (4*y**2 + 24*y + 20)*x**5 + (36*y**2 + 112*y + 44)*x**4 + (8*y**3 + 114*y**2 + 144*y + 30)*x**3 + (1*y**4 + 24*y**3 + 142*y**2 + 40*y - 15)*x**2 + (2*y**4 + 40*y**3 + 64*y**2 - 32*y - 26)*x + (5*y**4 + 16*y**3 + 7*y**2 - 16*y - 8)
 # roots = p.roots_isolate(assignment)
 
@@ -68,7 +68,7 @@ assignment.set_value(x4, 277771, 4096)
 assignment.set_value(x5, 786743, 20480)
 assignment.set_value(x6, -6437)
 
-roots = p.roots_isolate(assignment); 
+roots = p.roots_isolate(assignment);
 check_roots(p, assignment, roots, [-8503.31536081940])
 
 polypy.variable_order.set([x, w, y, z])
@@ -124,4 +124,3 @@ check_roots(p, assignment, roots, [-1, 1])
 p = x + y + z
 roots = p.roots_isolate(assignment)
 check_roots(p, assignment, roots, [0])
-

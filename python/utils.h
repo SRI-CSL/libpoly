@@ -19,6 +19,7 @@
 
 #pragma once
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include "integer.h"
@@ -26,6 +27,18 @@
 #include "dyadic_rational.h"
 #include "algebraic_number.h"
 #include "value.h"
+
+
+/**
+ *  Returns the char* representation of the python object pyobj.
+ *  If pyobj is NULL, then NULL is returned.
+ *  If pyobj is a "string" (PyString, PyBytes, or PyUnicode), then the C string 
+ *  associated with the object is returned (using UTF-8).
+ *  If pyobj is not a string then we use the str method to obtain
+ *  a C string version (again using UTF-8 if necessary).
+ *
+ */
+const char* pythonObject2CharStar(PyObject *pyobj);
 
 /**
  * Check if o is long or int.

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import polypy
 import polypy_test
@@ -10,41 +10,41 @@ polypy_test.init()
 def check_factorization(p, debug=False, check_product = True):
     global polypy_test
     if debug:
-        print "check_factorization:"
-        print "p =", p
+        print("check_factorization:")
+        print("p = {0}".format(p))
     # Do the factorization
     factorization = p.factor()
     C, factors = factorization[0], factorization[1:]
     if debug:
-        print "C =", C
-        print "factors =", factors
+        print("C = {0}".format(C))
+        print("factors = {0}".format(factors))
     # The constant should always be positive
     if C <= 0:
-        print "Wrong factorization (constant)"
-        print "p =", p
-        print "C =", C
-        print "factors =", factors
+        print("Wrong factorization (constant)")
+        print("p = {0}".format(p))
+        print("C = {0}".format(C))
+        print("factors = {0}".format(factors))
         polypy_test.check(False)
         return
-    # Check if factorization multiplys to the input
+    # Check if factorization multiplies to the input
     if check_product:
         product = C
         for (f, d) in factors:
             if (f.degree() == 0):
-                print "Wrong factorization (constant factor)"
-                print "p =", p 
-                print "factors =", factors
+                print("Wrong factorization (constant factor)")
+                print("p = {0}".format(p))
+                print("factors = {0}".format(factors))
                 polypy_test.check(False)
-            product = product * f**d    
+            product = product * f**d
         if (p != product):
-            print "Wrong factorization (product mismatch)"
-            print "p =", p 
-            print "product =", product
-            print "factors =", factors
+            print("Wrong factorization (product mismatch)")
+            print("p       =  {0}".format(p))
+            print("product =  {0}".format(product))
+            print("factors =  {0}".format(factors))
             polypy_test.check(False)
             return
     # Done, we're OK
-    polypy_test.check(True)        
+    polypy_test.check(True)
 
 
 """
@@ -64,9 +64,9 @@ def cyclotomic(n):
                 Pn = Pn / Pd
         L.append(Pn)
         return L
-        
+
 polypy_test.start("Factorization in Z (Regressions)")
-    
+
 # polypy.trace_enable("factorization")
 # polypy.trace_enable("hensel")
 # polypy.trace_enable("arithmetic")
@@ -99,7 +99,7 @@ check_factorization(p)
 
 p = (x - 1)*(x - 2)
 check_factorization(p)
-            
+
 polypy_test.start("Berlekamp in Z_13 (Knuth)")
 
 K = polypy.CoefficientRing(13)
@@ -145,7 +145,7 @@ for factors_count in range(1, 11):
 polypy_test.start("Cyclotomic (Z)")
 
 #for p in cyclotomic(100):
-#    print p
+#    print(p)
 
 # http://mathworld.wolfram.com/Swinnerton-DyerPolynomial.html
 polypy_test.start("Swinnerton-Dyer (Z)")

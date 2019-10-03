@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import polypy
 import polypy_test
@@ -8,8 +8,8 @@ polypy_test.init()
 def check_str(o, expected):
     ok = str(o) == expected
     if (not ok):
-        print "o =", o
-        print "expected =", expected
+        print("o = {0}".format(o))
+        print("expected = {0}".format(expected))
     polypy_test.check(ok)
 
 x = polypy.Variable("x")
@@ -50,7 +50,7 @@ p = 1 + x
 check_str(p, "1*x + 1")
 
 p = 1 + y
-check_str(p, "1*y + 1") 
+check_str(p, "1*y + 1")
 
 p = x + y
 check_str(p, "1*y + (1*x)")
@@ -106,7 +106,7 @@ polypy_test.start("Variable Multiplication")
 p = x*2
 check_str(p, "2*x")
 
-p = y*2 
+p = y*2
 check_str(p, "2*y")
 
 p = 2*x
@@ -124,7 +124,7 @@ check_str(p, "(1*y)*x")
 order.set([x, y])
 check_str(p, "(1*x)*y")
 
-p = x*x 
+p = x*x
 check_str(p, "1*x**2")
 
 p = y*y
@@ -140,6 +140,3 @@ check_str(p, "1*x")
 
 p = x**2
 check_str(p, "1*x**2")
-
-
-

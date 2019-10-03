@@ -1,4 +1,4 @@
-set(polypy_SOURCES 
+set(polypy_SOURCES
     polypyAlgebraicNumber.c
     polypyAssignment.c
     polypyInteger.c
@@ -13,7 +13,6 @@ set(polypy_SOURCES
     polypyFeasibilitySet.c
 )
 
-find_package(PythonInterp)
 find_package(PythonLibs)
 
 include_directories(${GMP_INCLUDE_DIR})

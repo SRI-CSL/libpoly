@@ -19,12 +19,13 @@
 
 #pragma once
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include "utils.h"
 #include "polynomial.h"
 
-/** Definition of the python UPolynomial object */
+/** Definition of the python Polynomial object */
 typedef struct {
   PyObject_HEAD
   lp_polynomial_t* p;
