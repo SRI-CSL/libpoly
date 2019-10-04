@@ -1,10 +1,10 @@
-from distutils.core import setup, Extension
+from setuptools import setup, Extension, find_packages
 
-polypy = Extension('polypy', 
+polypy = Extension('polypy',
                     sources = ['${polypy_SOURCES_STR}'],
-                    include_dirs = ['/usr/local/include/poly/'], #IAM: Dejan is this a cmake macro?
+                    include_dirs = ['../include'],
                     libraries = ['poly'],
-                    library_dirs = ['/usr/local/lib/'] #IAM: Dejan is this a cmake macro?
+                    library_dirs = ['${CMAKE_INSTALL_PREFIX}/lib']
 )
 
 setup (name = 'polypy',
@@ -14,4 +14,3 @@ setup (name = 'polypy',
        author_email = 'dejan@csl.sri.com',
        url = 'https://github.com/SRI-CSL/libpoly',
        ext_modules = [polypy])
-
