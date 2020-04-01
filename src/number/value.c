@@ -163,6 +163,7 @@ void lp_value_approx(const lp_value_t* v, lp_rational_interval_t* out) {
     lp_rational_t point;
     rational_construct_from_integer(&point, &v->value.z);
     lp_rational_interval_construct_point(&approx, &point);
+    rational_destruct(&point);
     break;
   }
   case LP_VALUE_RATIONAL:
