@@ -809,7 +809,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
         // We estimate the bound L on the smallest *non-zero* root of B. We
         // then estimate C_rat until either
         // * it doesn't contain 0, when we can return the sign
-        // * it doens't belong to (-L, L) => doesn't contain 0 => return the sign
+        // * it doesn't belong to (-L, L) => doesn't contain 0 => return the sign
         // * it belongs to (-L, L), and therefore the sign must be 0
 
         // The temporary variable, we'll be using
@@ -892,7 +892,7 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
           }
 
           // Approximate the value by doing interval computation
-          coefficient_value_approx(ctx, C, m, &C_rat_approx);
+          coefficient_value_approx(ctx, &C_rat, m, &C_rat_approx);
         }
 
         // Restore the cache (will free the cache)
