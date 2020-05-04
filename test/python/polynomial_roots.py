@@ -69,7 +69,7 @@ assignment.set_value(x5, 786743, 20480)
 assignment.set_value(x6, -6437)
 
 roots = p.roots_isolate(assignment);
-check_roots(p, assignment, roots, [-8503.31536081940])
+check_roots(p, assignment, roots, [-166318.899794716301953293454440, -8961.48539760581031126063921576])
 
 polypy.variable_order.set([x, w, y, z])
 
