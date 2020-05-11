@@ -1268,3 +1268,4 @@ lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const 
     }
   }
 }
+

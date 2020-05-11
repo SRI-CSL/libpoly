@@ -69,6 +69,9 @@ void lp_value_construct(lp_value_t* v, lp_value_type_t type, const void* data);
 /** Construct a zero value */
 void lp_value_construct_zero(lp_value_t* v);
 
+/** Consruct and integer */
+void lp_value_construct_int(lp_value_t* v, long x);
+
 /** Construct the null value */
 void lp_value_construct_none(lp_value_t* v);
 
@@ -120,6 +123,10 @@ int lp_value_print(const lp_value_t* v, FILE* out);
 /** Return a string representation */
 char* lp_value_to_string(const lp_value_t* v);
 
+/** Sign of the value */
+int lp_value_sgn(const lp_value_t* v);
+
+
 /**
  * Check if the value is a rational number: either an integer, dyadic rational,
  * a rational, or a algebraic number that has reduced to a point.
@@ -131,6 +138,12 @@ int lp_value_is_rational(const lp_value_t* v);
  * a rational, or a algebraic number that has reduced to a point.
  */
 int lp_value_is_integer(const lp_value_t* v);
+
+
+/**
+ * Check if the value is +/- infinity.
+ */
+int lp_value_is_infinity(const lp_value_t* v);
 
 /** Get the floor of the value */
 void lp_value_floor(const lp_value_t* v, lp_integer_t* v_floor);

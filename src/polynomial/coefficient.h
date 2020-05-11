@@ -182,6 +182,10 @@ int coefficient_is_assigned(const lp_polynomial_context_t* ctx, const coefficien
 /** Returns the sign of the coefficient in the model */
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
 
+/** Returns the interval approximation of the value of the polynomial */
+void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_interval_assignment_t* m, lp_interval_t* result);
+
+
 /**
  * Returns the approximation of value of the coefficient (is either zero or
  * does not contain zero.

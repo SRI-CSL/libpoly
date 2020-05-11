@@ -226,8 +226,17 @@ void lp_algebraic_number_restore_interval_const(const lp_algebraic_number_t* a_c
   lp_algebraic_number_restore_interval((lp_algebraic_number_t* ) a_const, I);
 }
 
+
+int lp_algebraic_number_sgn(const lp_algebraic_number_t* a) {
+  lp_integer_t zero;
+  lp_integer_construct_from_int(lp_Z, &zero, 0);
+  int sgn = lp_algebraic_number_cmp_integer(a, &zero);
+  lp_integer_destruct(&zero);
+  return sgn;
+}
+
 /**
- * The "proper" algebraic numberis always a1.
+ * The "proper" algebraic number is always a1.
  */
 int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2) {
 

@@ -136,8 +136,11 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A);
 /** Returns true if all of polynomial's variables are assigned */
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m);
 
-/** returns the sign of the polynomial in the model (-1, 0, +1), or -2 if not all variables assigned */
+/** Returns the sign of the polynomial in the model (-1, 0, +1), or -2 if not all variables assigned */
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m);
+
+/** Returns the interval approximation of the polynomial value */
+void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_assignment_t* m, lp_interval_t* result);
 
 /** returns the sign of the polynomial in the model */
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);

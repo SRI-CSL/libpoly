@@ -152,6 +152,19 @@ lp_interval_cmp_t lp_interval_cmp(const lp_interval_t* I1, const lp_interval_t* 
  */
 lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const lp_interval_t* I2, lp_interval_t* P);
 
+/** Returns the "sign" of the interval: 0 in 0 in I, negative if I < 0, positive if I > 0. */
+int lp_interval_sgn(const lp_interval_t* I);
+
+/** Approximate pow = I^n */
+void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n);
+
+/** Approximate mul = I1 * I2 */
+void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_interval_t* I2);
+
+/** Approximate add = I1 + I2 */
+void lp_interval_add(lp_interval_t* add, const lp_interval_t* I1, const lp_interval_t* I2);
+
+
 #ifdef __cplusplus
 } /* close extern "C" { */
 #endif

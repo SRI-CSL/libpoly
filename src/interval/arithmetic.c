@@ -17,10 +17,13 @@
  * along with LibPoly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <interval.h>
+
 #include "interval/arithmetic.h"
 
 #include "number/rational.h"
 #include "number/dyadic_rational.h"
+#include "number/value.h"
 
 int rational_interval_endpoint_lt(const lp_rational_t* a, int a_open, const lp_rational_t* b, int b_open) {
   int cmp = rational_cmp(a, b);
@@ -33,6 +36,15 @@ int rational_interval_endpoint_lt(const lp_rational_t* a, int a_open, const lp_r
 
 int dyadic_interval_endpoint_lt(const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t*b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
+  if (cmp == 0) {
+    return (!a_open && b_open);
+  } else {
+    return cmp < 0;
+  }
+}
+
+int lp_interval_endpoint_lt(const lp_value_t* a, int a_open, const lp_value_t* b, int b_open) {
+  int cmp = lp_value_cmp(a, b);
   if (cmp == 0) {
     return (!a_open && b_open);
   } else {
@@ -120,6 +132,293 @@ void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1
 
   lp_dyadic_interval_swap(&result, S);
   lp_dyadic_interval_destruct(&result);
+}
+
+static
+int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
+    lp_value_t* v1_new, lp_value_t* v2_new,
+    const lp_value_t** v1_to_use, const lp_value_t** v2_to_use) {
+
+  assert(v1->type != v2->type);
+
+  lp_rational_t tmp_rat;
+  lp_dyadic_rational_t tmp_dy;
+
+  // Unsupported cases
+  switch (v1->type) {
+  case LP_VALUE_INTEGER:
+    switch (v2->type) {
+    case LP_VALUE_DYADIC_RATIONAL:
+      // v1: integer
+      // v2: dyadic rational
+      lp_dyadic_rational_construct_from_integer(&tmp_dy, &v1->value.z);
+      lp_value_construct(v1_new, LP_VALUE_DYADIC_RATIONAL, &tmp_dy);
+      lp_dyadic_rational_destruct(&tmp_dy);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    case LP_VALUE_RATIONAL:
+      // v1: integer
+      // v2: rational
+      lp_rational_construct_from_integer(&tmp_rat, &v1->value.z);
+      lp_value_construct(v1_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    default:
+      return 0;
+    }
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    switch (v2->type) {
+    case LP_VALUE_INTEGER:
+      // v1: dyadic rational
+      // v2: integer
+      lp_dyadic_rational_construct_from_integer(&tmp_dy, &v2->value.z);
+      lp_value_construct(v2_new, LP_VALUE_DYADIC_RATIONAL, &tmp_dy);
+      lp_dyadic_rational_destruct(&tmp_dy);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_RATIONAL:
+      // v1: dyadic rational
+      // v2: rational
+      lp_rational_construct_from_dyadic(&tmp_rat, &v1->value.dy_q);
+      lp_value_construct(v1_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    default:
+      return 0;
+    }
+    break;
+  case LP_VALUE_RATIONAL:
+    switch (v2->type) {
+    case LP_VALUE_INTEGER:
+      // v1: rational
+      // v2: integer
+      lp_rational_construct_from_integer(&tmp_rat, &v2->value.z);
+      lp_value_construct(v2_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_DYADIC_RATIONAL:
+      // v1: rational
+      // v2: dyadic rational
+      lp_rational_construct_from_dyadic(&tmp_rat, &v2->value.dy_q);
+      lp_value_construct(v2_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    default:
+      return 0;
+    }
+    break;
+  default:
+    return 0;
+  }
+
+  return 1;
+}
+
+
+static
+int lp_value_add(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_value_t* ub) {
+  lp_integer_t add_int;
+  lp_rational_t add_rat;
+  lp_dyadic_rational_t add_dy;
+  lp_dyadic_interval_t add_dy_interval;
+
+  int is_point = 1;
+
+  assert(v1->type != LP_VALUE_NONE);
+  assert(v2->type != LP_VALUE_NONE);
+
+  if (v1->type == v2->type) {
+    switch (v1->type) {
+    case LP_VALUE_MINUS_INFINITY:
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_MINUS_INFINITY, 0);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_MINUS_INFINITY, 0);
+      }
+      break;
+    case LP_VALUE_PLUS_INFINITY:
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_PLUS_INFINITY, 0);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_PLUS_INFINITY, 0);
+      }
+      break;
+    case LP_VALUE_INTEGER:
+      lp_integer_construct(&add_int);
+      lp_integer_add(lp_Z, &add_int, &v1->value.z, &v2->value.z);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_INTEGER, &add_int);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_INTEGER, &add_int);
+      }
+      lp_integer_destruct(&add_int);
+      break;
+    case LP_VALUE_RATIONAL:
+      lp_rational_construct(&add_rat);
+      lp_rational_add(&add_rat, &v1->value.q, &v2->value.q);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_RATIONAL, &add_rat);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_RATIONAL, &add_rat);
+      }
+      lp_rational_destruct(&add_rat);
+      break;
+    case LP_VALUE_DYADIC_RATIONAL:
+      lp_dyadic_rational_construct(&add_dy);
+      lp_dyadic_rational_add(&add_dy, &v1->value.dy_q, &v2->value.dy_q);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &add_dy);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &add_dy);
+      }
+      lp_dyadic_rational_destruct(&add_dy);
+      break;
+    case LP_VALUE_ALGEBRAIC:
+      lp_dyadic_interval_construct_zero(&add_dy_interval);
+      dyadic_interval_add(&add_dy_interval, &v1->value.a.I, &v2->value.a.I);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &add_dy_interval.a);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &add_dy_interval.b);
+      }
+      is_point = 0;
+      break;
+    case LP_VALUE_NONE:
+      assert(0);
+      break;
+    }
+  } else {
+
+    lp_value_t v1_tmp, v2_tmp;
+    const lp_value_t* v1_to_use;
+    const lp_value_t* v2_to_use;
+
+    // Cast to the same type
+    int cast = lp_value_to_same_type(v1, v2, &v1_tmp, &v2_tmp, &v1_to_use, &v2_to_use);
+    if (cast) {
+      // Cast successful, just add as usual
+      lp_value_add(v1_to_use, v2_to_use, lb, ub);
+      // If a fesh value was used, delete it
+      if (v1_to_use != v1) {
+        lp_value_destruct(&v1_tmp);
+      }
+      if (v2_to_use != v2) {
+        lp_value_destruct(&v2_tmp);
+      }
+    } else {
+      // Cast failed, check the cases
+      int undefined = 0;
+      lp_value_type_t result = LP_VALUE_NONE;
+
+      // Check infinity cases
+      if (v1->type == LP_VALUE_MINUS_INFINITY) {
+        if (v2->type != LP_VALUE_PLUS_INFINITY) {
+          result = LP_VALUE_MINUS_INFINITY;
+        } else {
+          undefined = 1;
+        }
+      }
+      if (v1->type == LP_VALUE_PLUS_INFINITY) {
+        if (v2->type != LP_VALUE_MINUS_INFINITY) {
+          result = LP_VALUE_PLUS_INFINITY;
+        } else {
+          undefined = 1;
+        }
+      }
+      if (v2->type == LP_VALUE_MINUS_INFINITY) {
+        if (v1->type != LP_VALUE_PLUS_INFINITY) {
+          result = LP_VALUE_MINUS_INFINITY;
+        } else {
+          undefined = 1;
+        }
+      }
+      if (v2->type == LP_VALUE_PLUS_INFINITY) {
+        if (v1->type != LP_VALUE_MINUS_INFINITY) {
+          result = LP_VALUE_PLUS_INFINITY;
+        } else {
+          undefined = 1;
+        }
+      }
+
+      // If infinity handled, we're done
+      if (result != LP_VALUE_NONE) {
+        if (lb) {
+          lp_value_assign_raw(lb, result, 0);
+        }
+        if (ub) {
+          lp_value_assign_raw(ub, result, 0);
+        }
+        return 1;
+      }
+      // If undefined, return NONE
+      if (undefined) {
+        if (lb) {
+          lp_value_assign_raw(lb, LP_VALUE_NONE, 0);
+        }
+        if (ub) {
+          lp_value_assign_raw(ub, LP_VALUE_NONE, 0);
+        }
+        return 0;
+      }
+
+      // OK, now deal with algebraic numbers, assume v1 is algebraic
+      if (v2->type == LP_VALUE_ALGEBRAIC) {
+        const lp_value_t* tmp = v1; v1 = v2; v2 = tmp;
+      }
+
+      assert(v1->type == LP_VALUE_ALGEBRAIC);
+      assert(v2->type != LP_VALUE_MINUS_INFINITY);
+      assert(v2->type != LP_VALUE_PLUS_INFINITY);
+      assert(v2->type != LP_VALUE_ALGEBRAIC);
+
+      // v1 is of the form (dy1, dy2), v2 is a proper non-algebraic value
+      // we add them into (dy1 + v2, dy2 + v2)
+
+      lp_value_t v1_lb, v1_ub;
+      lp_value_construct(&v1_lb, LP_VALUE_DYADIC_RATIONAL, &v1->value.a.I.a);
+      lp_value_construct(&v1_ub, LP_VALUE_DYADIC_RATIONAL, &v1->value.a.I.b);
+      lp_value_add(&v1_lb, v2, lb, 0);
+      lp_value_add(&v1_ub, v2, ub, 0);
+      is_point = 0;
+      lp_value_destruct(&v1_lb);
+      lp_value_destruct(&v1_ub);
+    }
+  }
+
+  return is_point;
+}
+
+void lp_interval_add(lp_interval_t* add, const lp_interval_t* I1, const lp_interval_t* I2) {
+  if (I1->is_point && I2->is_point) {
+    int is_point = lp_value_add(&I1->a, &I2->a, &add->a, &add->b);
+    add->b_open = add->a_open = !is_point;
+    add->is_point = is_point;
+    return;
+  }
+
+  // [a, b] + [c, d] = [a + c, b + d]
+  int a_point = lp_value_add(&I1->a, &I2->a, &add->a, 0);
+  int b_point = lp_value_add(&I2->b, &I2->b, 0, &add->b);
+  add->a_open = I1->a_open || I2->a_open || !a_point;
+  add->b_open = I1->b_open || I2->b_open || !b_point;
+  add->is_point = 0;
 }
 
 void rational_interval_neg(lp_rational_interval_t* N, const lp_rational_interval_t* I) {
@@ -255,7 +554,7 @@ void rational_interval_mul(lp_rational_interval_t* P, const lp_rational_interval
     //
     // I1 x I2 = { x*y | x in I1, y in I2 }
     //         = { x*y | I1.a < x < I1.b, I2.a < y < I2.b }
-    //         = { x*y |
+    //
 
     lp_rational_interval_t result;
     lp_rational_interval_construct_zero(&result);
@@ -365,7 +664,7 @@ void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1
     //
     // I1 x I2 = { x*y | x in I1, y in I2 }
     //         = { x*y | I1.a < x < I1.b, I2.a < y < I2.b }
-    //         = { x*y |
+    //
 
     lp_dyadic_interval_t result;
     lp_dyadic_interval_construct_zero(&result);
@@ -418,6 +717,415 @@ void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1
   }
 }
 
+static
+int lp_value_mul(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_value_t* ub) {
+  int is_point = 1;
+
+  lp_integer_t mul_int;
+  lp_rational_t mul_rat;
+  lp_dyadic_rational_t mul_dy;
+  lp_dyadic_interval_t mul_dy_interval;
+
+  if (v1->type == v2->type) {
+    switch (v1->type) {
+    case LP_VALUE_MINUS_INFINITY:
+    case LP_VALUE_PLUS_INFINITY:
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_PLUS_INFINITY, 0);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_PLUS_INFINITY, 0);
+      }
+      break;
+    case LP_VALUE_INTEGER:
+      lp_integer_construct(&mul_int);
+      lp_integer_mul(lp_Z, &mul_int, &v1->value.z, &v2->value.z);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_INTEGER, &mul_int);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_INTEGER, &mul_int);
+      }
+      lp_integer_destruct(&mul_int);
+      break;
+    case LP_VALUE_RATIONAL:
+      lp_rational_construct(&mul_rat);
+      lp_rational_mul(&mul_rat, &v1->value.q, &v2->value.q);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_RATIONAL, &mul_rat);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_RATIONAL, &mul_rat);
+      }
+      lp_rational_destruct(&mul_rat);
+      break;
+    case LP_VALUE_DYADIC_RATIONAL:
+      lp_dyadic_rational_construct(&mul_dy);
+      lp_dyadic_rational_mul(&mul_dy, &v1->value.dy_q, &v2->value.dy_q);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &mul_dy);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &mul_dy);
+      }
+      lp_dyadic_rational_destruct(&mul_dy);
+      break;
+    case LP_VALUE_ALGEBRAIC:
+      lp_dyadic_interval_construct_zero(&mul_dy_interval);
+      dyadic_interval_mul(&mul_dy_interval, &v1->value.a.I, &v2->value.a.I);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &mul_dy_interval.a);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &mul_dy_interval.b);
+      }
+      is_point = 0;
+      lp_dyadic_interval_destruct(&mul_dy_interval);
+      break;
+    case LP_VALUE_NONE:
+      assert(0);
+      break;
+    }
+  } else {
+
+    lp_value_t v1_tmp, v2_tmp;
+    const lp_value_t* v1_to_use;
+    const lp_value_t* v2_to_use;
+
+    // Cast to the same type
+    int cast = lp_value_to_same_type(v1, v2, &v1_tmp, &v2_tmp, &v1_to_use, &v2_to_use);
+    if (cast) {
+      // Cast successful, just add as usual
+      lp_value_mul(v1_to_use, v2_to_use, lb, ub);
+      // If a fesh value was used, delete it
+      if (v1_to_use != v1) {
+        lp_value_destruct(&v1_tmp);
+      }
+      if (v2_to_use != v2) {
+        lp_value_destruct(&v2_tmp);
+      }
+    } else {
+      // Cast failed, check the cases
+      int v1_sgn = lp_value_sgn(v1);
+      int v2_sgn = lp_value_sgn(v2);
+
+      if (v1_sgn == 0 || v2_sgn == 0) {
+        if (lb) {
+          lp_value_assign_zero(lb);
+        }
+        if (ub) {
+          lp_value_assign_zero(ub);
+        }
+        return 1;
+      } else {
+        if (lp_value_is_infinity(v1) || lp_value_is_infinity(v2)) {
+          int sgn = v1_sgn*v2_sgn;
+          lp_value_type_t result = LP_VALUE_NONE;
+          if (sgn > 0) {
+            result = LP_VALUE_PLUS_INFINITY;
+          } else if (sgn < 0) {
+            result = LP_VALUE_MINUS_INFINITY;
+          } else {
+            assert(0);
+          }
+          if (lb) {
+            lp_value_assign_raw(lb, result, 0);
+          }
+          if (ub) {
+            lp_value_assign_raw(ub, result, 0);
+          }
+          return 1;
+        }
+      }
+
+       // OK, now deal with algebraic numbers, assume v1 is algebraic
+      if (v2->type == LP_VALUE_ALGEBRAIC) {
+        const lp_value_t* tmp = v1; v1 = v2; v2 = tmp;
+      }
+
+      assert(v1->type == LP_VALUE_ALGEBRAIC);
+      assert(v2->type != LP_VALUE_MINUS_INFINITY);
+      assert(v2->type != LP_VALUE_PLUS_INFINITY);
+      assert(v2->type != LP_VALUE_ALGEBRAIC);
+
+      // v1 is of the form (dy1, dy2), v2 is a proper non-algebraic value
+      // we add them into (dy1 * v2, dy2 * v2). if v2 is negative, we swap the bounds
+
+      lp_value_t v1_lb, v1_ub;
+      lp_value_construct(&v1_lb, LP_VALUE_DYADIC_RATIONAL, &v1->value.a.I.a);
+      lp_value_construct(&v1_ub, LP_VALUE_DYADIC_RATIONAL, &v1->value.a.I.b);
+      lp_value_mul(&v1_lb, v2, lb, 0);
+      lp_value_mul(&v1_ub, v2, ub, 0);
+      if (v2_sgn < 0) {
+        lp_value_swap(lb, ub);
+      }
+      is_point = 0;
+      lp_value_destruct(&v1_lb);
+      lp_value_destruct(&v1_ub);
+    }
+  }
+
+  return is_point;
+  return is_point;
+}
+
+void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_interval_t* I2) {
+  if (I1->is_point) {
+    if (I2->is_point) {
+      // Just multiply the points
+      mul->is_point = lp_value_mul(&I1->a, &I2->b, &mul->a, &mul->b);
+      mul->a_open = mul->b_open = !mul->is_point;
+    } else {
+      // Depending on the sign of a, we might have to flip
+      int a_sgn = lp_value_sgn(&I1->a);
+      if (a_sgn == 0) {
+        // It's just 0
+        mul->is_point = 1;
+        mul->a_open = mul->b_open = 0;
+        lp_value_assign_zero(&mul->a);
+        lp_value_assign_zero(&mul->b);
+      } else if (a_sgn > 0) {
+        // Regular multiplication
+        lp_interval_t result;
+        lp_interval_construct_zero(&result);
+        int a_is_point = lp_value_mul(&I1->a, &I2->a, &result.a, 0);
+        int b_is_point = lp_value_mul(&I1->a, &I2->b, 0, &result.b);
+        result.is_point = 0;
+        result.a_open = I2->a_open || !a_is_point;
+        result.b_open = I2->b_open || !b_is_point;
+        lp_interval_swap(&result, mul);
+        lp_interval_destruct(&result);
+      } else {
+        lp_interval_t result;
+        lp_interval_construct_zero(&result);
+        int a_is_point = lp_value_mul(&I1->a, &I2->b, &result.a, 0);
+        int b_is_point = lp_value_mul(&I1->a, &I2->a, 0, &result.b);
+        result.is_point = 0;
+        result.a_open = I2->b_open || !a_is_point;
+        result.b_open = I2->a_open || !b_is_point;
+        lp_interval_swap(&result, mul);
+        lp_interval_destruct(&result);
+      }
+    }
+  } else if (I2->is_point) {
+    return lp_interval_mul(mul, I2, I1);
+  } else {
+
+    mul->is_point = 0;
+
+    //
+    // I1 x I2 = { x*y | x in I1, y in I2 }
+    //         = { x*y | I1.a < x < I1.b, I2.a < y < I2.b }
+    //
+
+    lp_interval_t result;
+    lp_interval_construct_zero(&result);
+
+    lp_value_t tmp_lb, tmp_ub;
+    lp_value_construct_zero(&tmp_lb);
+    lp_value_construct_zero(&tmp_ub);
+
+    int mul_is_point = 0;
+
+    // I1.a x I2.a
+    mul_is_point = lp_value_mul(&I1->a, &I2->a, &result.a, &result.b);
+    result.a_open = result.b_open = I1->a_open || I2->a_open || !mul_is_point;
+    result.is_point = 0;
+
+    // I1.a x I2.b
+    mul_is_point = lp_value_mul(&I1->a, &I2->b, &tmp_lb, &tmp_ub);
+    int tmp_open = I1->a_open || I2->b_open || !mul_is_point;
+    if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
+      lp_value_swap(&tmp_lb, &result.a);
+      result.a_open = tmp_open;
+    } else if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
+      lp_value_swap(&tmp_ub, &result.b);
+      result.b_open = tmp_open;
+    }
+
+    // I1.b x I2.a
+    mul_is_point = lp_value_mul(&I1->b, &I2->a, &tmp_lb, &tmp_ub);
+    tmp_open = I1->b_open || I2->a_open || !mul_is_point;
+    if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
+      lp_value_swap(&tmp_lb, &result.a);
+      result.a_open = tmp_open;
+    } else if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
+      lp_value_swap(&tmp_ub, &result.b);
+      result.b_open = tmp_open;
+    }
+
+    // I1.b x I2.b
+    lp_value_mul(&I1->b, &I2->b, &tmp_lb, &tmp_ub);
+    tmp_open = I1->b_open || I2->b_open || !mul_is_point;
+    if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
+      lp_value_swap(&tmp_lb, &result.a);
+      result.a_open = tmp_open;
+    } else if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
+      lp_value_swap(&tmp_ub, &result.b);
+      result.b_open = tmp_open;
+    }
+
+    lp_interval_swap(&result, mul);
+    lp_interval_destruct(&result);
+    lp_value_destruct(&tmp_lb);
+    lp_value_destruct(&tmp_ub);
+  }
+}
+
+static
+int lp_value_pow(const lp_value_t* v, unsigned n, lp_value_t* lb, lp_value_t* ub) {
+  lp_integer_t pow_int;
+  lp_rational_t pow_rat;
+  lp_dyadic_rational_t pow_dy;
+  lp_dyadic_interval_t pow_dy_interval;
+
+  int is_point = 1;
+
+  switch (v->type) {
+  case LP_VALUE_INTEGER:
+    lp_integer_construct(&pow_int);
+    integer_pow(lp_Z, &pow_int, &v->value.z, n);
+    if (lb) {
+      lp_value_assign_raw(lb, LP_VALUE_INTEGER, &pow_int);
+    }
+    if (ub) {
+      lp_value_assign_raw(ub, LP_VALUE_INTEGER, &pow_int);
+    }
+    lp_integer_destruct(&pow_int);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_construct(&pow_rat);
+    rational_pow(&pow_rat, &v->value.q, n);
+    if (lb) {
+      lp_value_assign_raw(lb, LP_VALUE_RATIONAL, &pow_rat);
+    }
+    if (ub) {
+      lp_value_assign_raw(ub, LP_VALUE_RATIONAL, &pow_rat);
+    }
+    lp_rational_destruct(&pow_rat);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_construct(&pow_dy);
+    dyadic_rational_pow(&pow_dy, &v->value.dy_q, n);
+    if (lb) {
+      lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &pow_dy);
+    }
+    if (ub) {
+      lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &pow_dy);
+    }
+    lp_dyadic_rational_destruct(&pow_dy);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_dyadic_interval_construct_zero(&pow_dy_interval);
+    dyadic_interval_pow(&pow_dy_interval, &v->value.a.I, n);
+    if (lb) {
+      lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &pow_dy_interval.a);
+    }
+    if (ub) {
+      lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &pow_dy_interval.b);
+    }
+    lp_dyadic_interval_destruct(&pow_dy_interval);
+
+    is_point = 0;
+    break;
+  case LP_VALUE_MINUS_INFINITY:
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_NONE:
+    assert(0);
+  }
+
+  return is_point;
+}
+
+int lp_interval_sgn(const lp_interval_t* I) {
+  int a_sgn = lp_value_sgn(&I->a);
+  if (I->is_point) {
+    return a_sgn;
+  }
+  int b_sgn = lp_value_sgn(&I->b);
+
+  if (a_sgn < 0 && b_sgn > 0) {
+    // Definitively contains 0
+    return 0;
+  }
+  if (a_sgn == 0) {
+    if (!I->a_open) {
+      // Left contains zero
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+  if (b_sgn == 0) {
+    if (!I->b_open) {
+      // Right contains zero
+      return 0;
+    } else {
+      return -1;
+    }
+  }
+
+  // Doesn't contain zero
+  if (a_sgn < 0) {
+    return -1;
+  }
+
+  assert(b_sgn > 0);
+  return 1;
+}
+
+void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
+  if (n == 0) {
+    // I^0 = [1]
+    lp_value_t one;
+    lp_interval_t point;
+    lp_value_construct_int(&one, 1);
+    lp_interval_construct_point(&point, &one);
+    lp_interval_swap(pow, &point);
+    lp_interval_destruct(&point);
+    lp_value_destruct(&one);
+  } else if (I->is_point) {
+    // Plain power
+    pow->is_point = 1;
+    pow->a_open = pow->b_open = 0;
+    lp_value_pow(&I->a, n, &pow->a, &pow->b);
+  } else {
+    pow->is_point = 0;
+    if (n % 2) {
+      // For odd powers we are monotonic, i.e. [a, b]^n = [a^n, b^n]
+      int a_point = lp_value_pow(&I->a, n, &pow->a, 0);
+      int b_point = lp_value_pow(&I->b, n, 0, &pow->b);
+      pow->a_open = I->a_open || !a_point;
+      pow->b_open = I->b_open || !b_point;
+    } else {
+      // Even powers depend on whether 0 is in the interval
+      int sgn = lp_interval_sgn(I);
+      int a_point = lp_value_pow(&I->a, n, &pow->a, 0);
+      int b_point = lp_value_pow(&I->b, n, 0, &pow->b);
+      if (sgn == 0) {
+        // P = [0, max(a, b)^n]
+        if (lp_interval_endpoint_lt(&pow->b, I->b_open, &pow->a, I->a_open)) {
+          lp_value_swap(&pow->b, &pow->a);
+          pow->b_open = I->a_open || !a_point;
+        } else {
+          pow->b_open = I->b_open || !b_point;
+        }
+        lp_value_assign_zero(&pow->a);
+        pow->a_open = 0;
+      } else if (sgn > 0) {
+        // P = I^n
+        pow->a_open = I->a_open;
+        pow->b_open = I->b_open;
+      } else {
+        // negative turns positive, so we flip
+        lp_value_swap(&pow->a, &pow->b);
+        pow->a_open = I->b_open;
+        pow->b_open = I->a_open;
+      }
+    }
+  }
+}
+
 void rational_interval_pow(lp_rational_interval_t* P, const lp_rational_interval_t* I, unsigned n) {
   if (n == 0) {
     // I^0 = [1]
@@ -457,6 +1165,8 @@ void rational_interval_pow(lp_rational_interval_t* P, const lp_rational_interval
         if (rational_interval_endpoint_lt(&P->b, I->b_open, &P->a, I->a_open)) {
           rational_swap(&P->b, &P->a);
           P->b_open = I->a_open;
+        } else {
+          P->b_open = I->b_open;
         }
         rational_assign_int(&P->a, 0, 1);
         P->a_open = 0;
@@ -513,6 +1223,8 @@ void dyadic_interval_pow(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I,
         if (dyadic_interval_endpoint_lt(&P->b, I->b_open, &P->a, I->a_open)) {
           dyadic_rational_swap(&P->b, &P->a);
           P->b_open = I->a_open;
+        } else {
+          P->b_open = I->b_open;
         }
         dyadic_rational_assign_int(&P->a, 0, 1);
         P->a_open = 0;

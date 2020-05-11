@@ -58,6 +58,11 @@ void lp_value_construct_zero(lp_value_t* v) {
   integer_construct(&v->value.z);
 }
 
+void lp_value_construct_int(lp_value_t* v, long x) {
+  v->type = LP_VALUE_INTEGER;
+  integer_construct_from_int(lp_Z, &v->value.z, x);
+}
+
 void lp_value_construct_none(lp_value_t* v) {
   lp_value_construct(v, LP_VALUE_NONE, 0);
 }
@@ -223,6 +228,27 @@ int lp_value_print(const lp_value_t* v, FILE* out) {
   return ret;
 }
 
+int lp_value_sgn(const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_NONE:
+    assert(0);
+    return 0;
+  case LP_VALUE_PLUS_INFINITY:
+    return 1;
+  case LP_VALUE_MINUS_INFINITY:
+    return -1;
+  case LP_VALUE_INTEGER:
+    return lp_integer_sgn(lp_Z, &v->value.z);
+  case LP_VALUE_RATIONAL:
+    return lp_rational_sgn(&v->value.q);
+  case LP_VALUE_DYADIC_RATIONAL:
+    return lp_dyadic_rational_sgn(&v->value.dy_q);
+  case LP_VALUE_ALGEBRAIC:
+    return lp_algebraic_number_sgn(&v->value.a);
+  }
+  return 0;
+}
+
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
 
   if (trace_is_enabled("value::cmp")) {
@@ -371,6 +397,16 @@ int lp_value_is_integer(const lp_value_t* v) {
     break;
   case LP_VALUE_ALGEBRAIC:
     return lp_algebraic_number_is_integer(&v->value.a);
+  default:
+    return 0;
+  }
+}
+
+int lp_value_is_infinity(const lp_value_t* v) {
+  switch (v->type) {
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_MINUS_INFINITY:
+    return 1;
   default:
     return 0;
   }

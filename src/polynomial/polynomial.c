@@ -296,6 +296,11 @@ int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m) {
   return coefficient_sgn(A->ctx, &A->data, m);
 }
 
+void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_assignment_t* m, lp_interval_t* result) {
+  lp_polynomial_external_clean(A);
+  coefficient_interval_value(A->ctx, &A->data, m, result);
+}
+
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m) {
   lp_polynomial_external_clean(A);
 

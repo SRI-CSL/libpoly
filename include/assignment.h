@@ -68,6 +68,44 @@ void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, l
 /** Get the sign of the polynomial in the model */
 int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A);
 
+struct lp_interval_assignment_struct {
+  /** Size of the map */
+  size_t size;
+  /** The intervals */
+  lp_interval_t* intervals;
+  /** The variable database */
+  const lp_variable_db_t* var_db;
+};
+
+
+/** Construct an empty assignment of intervals */
+void lp_interval_assignment_construct(lp_interval_assignment_t* m, const lp_variable_db_t* var_db);
+
+/** Construct an empty assignment */
+lp_interval_assignment_t* lp_interval_assignment_new(const lp_variable_db_t* var_db);
+
+/** Destruct the assignment */
+void lp_interval_assignment_destruct(lp_interval_assignment_t* m);
+
+/** Destruct and free the assignment */
+void lp_interval_assignment_delete(lp_interval_assignment_t* m);
+
+/** Print the model */
+int lp_interval_assignment_print(const lp_interval_assignment_t* m, FILE* out);
+
+/** Get the string representation of the model */
+char* lp_interval_assignment_to_string(const lp_interval_assignment_t* m);
+
+/**
+ * Set the interval of a variable (value is copied over). If value is 0 (pointer)
+ * the value is set to (-inf, +inf).
+ */
+void lp_interval_assignment_set_interval(lp_interval_assignment_t* m, lp_variable_t x, const lp_interval_t* value);
+
+/** Get the value of a variable */
+const lp_interval_t* lp_interval_assignment_get_interval(const lp_interval_assignment_t* m, lp_variable_t x);
+
+
 #ifdef __cplusplus
 } /* close extern "C" { */
 #endif
