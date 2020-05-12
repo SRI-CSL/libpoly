@@ -457,6 +457,8 @@ void rational_interval_pow(lp_rational_interval_t* P, const lp_rational_interval
         if (rational_interval_endpoint_lt(&P->b, I->b_open, &P->a, I->a_open)) {
           rational_swap(&P->b, &P->a);
           P->b_open = I->a_open;
+        } else {
+          P->b_open = I->b_open;
         }
         rational_assign_int(&P->a, 0, 1);
         P->a_open = 0;
@@ -513,6 +515,8 @@ void dyadic_interval_pow(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I,
         if (dyadic_interval_endpoint_lt(&P->b, I->b_open, &P->a, I->a_open)) {
           dyadic_rational_swap(&P->b, &P->a);
           P->b_open = I->a_open;
+        } else {
+          P->b_open = I->b_open;
         }
         dyadic_rational_assign_int(&P->a, 0, 1);
         P->a_open = 0;
