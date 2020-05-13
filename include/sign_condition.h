@@ -53,6 +53,11 @@ typedef enum lp_sign_condition_enum lp_sign_condition_t;
 int lp_sign_condition_consistent(lp_sign_condition_t sgn_condition, int sign);
 
 /**
+ * CHeck if the sign condition is consistent with the given interval.
+ */
+int lp_sign_condition_consistent_interval(lp_sign_condition_t sgn_condition, const lp_interval_t* I);
+
+/**
  * Negate the sign condition.
  */
 lp_sign_condition_t lp_sign_condition_negate(lp_sign_condition_t sgn_condition);

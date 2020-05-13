@@ -939,7 +939,7 @@ STAT_DECLARE(int, coefficient, interval_value)
 
 void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_interval_assignment_t* m, lp_interval_t* out) {
 
-  if (trace_is_enabled("coefficient")) {
+  if (trace_is_enabled("coefficient::interval")) {
     tracef("coefficient_interval_value("); coefficient_print(ctx, C, trace_out);  tracef(", "); lp_interval_assignment_print(m, trace_out); tracef(")\n");
   }
 
@@ -960,7 +960,7 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
     lp_interval_construct_zero(&tmp1);
     lp_interval_construct_zero(&tmp2);
 
-    if (trace_is_enabled("coefficient")) {
+    if (trace_is_enabled("coefficient::interval")) {
       tracef("coefficient_interval_value(): x = %s\n", lp_variable_db_get_name(ctx->var_db, VAR(C)));
       tracef("assignment = "); lp_interval_assignment_print(m, trace_out); tracef("\n");
     }
@@ -968,7 +968,7 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
     const lp_interval_t* x_value = lp_interval_assignment_get_interval(m, VAR(C));
 
     // Get the value of x
-    if (trace_is_enabled("coefficient")) {
+    if (trace_is_enabled("coefficient::interval")) {
       tracef("coefficient_interval_value(): x_value = ");
       lp_interval_print(x_value, trace_out);
       tracef("\n");
@@ -1002,7 +1002,7 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
     lp_interval_destruct(&result);
   }
 
-  if (trace_is_enabled("coefficient")) {
+  if (trace_is_enabled("coefficient::interval")) {
     tracef("coefficient_value_approx() => "); lp_interval_print(out, trace_out); tracef("\n");
   }
 }

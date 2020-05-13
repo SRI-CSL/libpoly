@@ -175,6 +175,9 @@ int lp_interval_assignment_print(const lp_interval_assignment_t* m, FILE* out) {
   size_t i, j, ret = 0;
   ret += fprintf(out, "[");
   for (i = 0, j = 0; i < m->size; ++ i) {
+    if (lp_interval_is_full(m->intervals + i)) {
+      continue;
+    }
     if (j ++) {
       ret += fprintf(out, ", ");
     }

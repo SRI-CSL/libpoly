@@ -80,3 +80,10 @@ int lp_sign_condition_consistent(lp_sign_condition_t sgn_condition, int sign) {
   }
   return 0;
 }
+
+int lp_sign_condition_consistent_interval(lp_sign_condition_t sgn_condition, const lp_interval_t* I) {
+  (void) I;
+  (void) sgn_condition;
+  return 0;
+}
+

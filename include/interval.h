@@ -28,7 +28,8 @@ extern "C" {
 
 /**
  * An interval (a, b) with both point being values. This side is open is _open
- * is true.
+ * is true. If interval is a point [a,a], then the value b is not used (it is
+ * not constructed).
  */
 struct lp_interval_struct {
   /** Is the end at the point a open */
@@ -90,6 +91,9 @@ char* lp_interval_to_string(const lp_interval_t* I);
 
 /** Is this interval a point */
 int lp_interval_is_point(const lp_interval_t* I);
+
+/** Is this interval a full interval (-inf, +inf) */
+int lp_interval_is_full(const lp_interval_t* I);
 
 /** Get the point value (it has to be a point) */
 const lp_value_t* lp_interval_get_point(const lp_interval_t* I);
