@@ -1037,17 +1037,28 @@ int lp_value_pow(const lp_value_t* v, unsigned n, lp_value_t* lb, lp_value_t* ub
     lp_dyadic_rational_destruct(&pow_dy);
     break;
   case LP_VALUE_ALGEBRAIC:
-    lp_dyadic_interval_construct_zero(&pow_dy_interval);
-    dyadic_interval_pow(&pow_dy_interval, &v->value.a.I, n);
-    if (lb) {
-      lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &pow_dy_interval.a);
+    if (v->value.a.I.is_point) {
+      lp_dyadic_rational_construct(&pow_dy);
+      dyadic_rational_pow(&pow_dy, &v->value.a.I.a, n);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &pow_dy);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &pow_dy);
+      }
+      lp_dyadic_rational_destruct(&pow_dy);
+    } else {
+      lp_dyadic_interval_construct_zero(&pow_dy_interval);
+      dyadic_interval_pow(&pow_dy_interval, &v->value.a.I, n);
+      if (lb) {
+        lp_value_assign_raw(lb, LP_VALUE_DYADIC_RATIONAL, &pow_dy_interval.a);
+      }
+      if (ub) {
+        lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &pow_dy_interval.b);
+      }
+      lp_dyadic_interval_destruct(&pow_dy_interval);
+      is_point = 0;
     }
-    if (ub) {
-      lp_value_assign_raw(ub, LP_VALUE_DYADIC_RATIONAL, &pow_dy_interval.b);
-    }
-    lp_dyadic_interval_destruct(&pow_dy_interval);
-
-    is_point = 0;
     break;
   case LP_VALUE_MINUS_INFINITY:
   case LP_VALUE_PLUS_INFINITY: {

@@ -571,9 +571,11 @@ void lp_feasibility_set_to_interval(const lp_feasibility_set_t* set, lp_interval
   assert(set);
   assert(set->size > 0);
   const lp_interval_t* first = set->intervals;
+  const lp_value_t* a = &first->a;
   const lp_interval_t* last = set->intervals + set->size - 1;
+  const lp_value_t* b = last->is_point ? &last->a : &last->b;
   lp_interval_t tmp;
-  lp_interval_construct(&tmp, &first->a, first->a_open, &last->b, last->b_open);
+  lp_interval_construct(&tmp, a, first->a_open, b, last->b_open);
   lp_interval_swap(result, &tmp);
   lp_interval_destruct(&tmp);
 }
