@@ -955,7 +955,6 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
 
     lp_interval_t result, tmp1, tmp2;
 
-    lp_interval_destruct(&result);
     lp_interval_construct_zero(&result);
     lp_interval_construct_zero(&tmp1);
     lp_interval_construct_zero(&tmp2);
