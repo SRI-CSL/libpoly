@@ -985,13 +985,13 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         coefficient_interval_value(ctx, COEFF(C, i), m, &tmp1);
         lp_interval_pow(&tmp2, x_value, i);
-        // tracef("tmp2 = "); lp_rational_interval_print(&tmp2, trace_out); tracef("\n");
-        // tracef("tmp1 = "); lp_rational_interval_print(&tmp1, trace_out); tracef("\n");
+//        tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+//        tracef("tmp1 = "); lp_interval_print(&tmp1, trace_out); tracef("\n");
         lp_interval_mul(&tmp2, &tmp2, &tmp1);
-        // tracef("tmp2 = "); lp_rational_interval_print(&tmp2, trace_out); tracef("\n");
-        // tracef("result = "); lp_rational_interval_print(&result, trace_out); tracef("\n");
+//        tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+//        tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
         lp_interval_add(&result, &result, &tmp2);
-        // tracef("result = "); lp_rational_interval_print(&result, trace_out); tracef("\n");
+//        tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
       }
     }
 
