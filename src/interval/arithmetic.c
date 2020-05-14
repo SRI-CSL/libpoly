@@ -918,7 +918,6 @@ int lp_value_mul(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_
   }
 
   return is_point;
-  return is_point;
 }
 
 void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_interval_t* I2) {
@@ -983,7 +982,8 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
       lp_value_swap(&tmp_lb, &result.a);
       result.a_open = tmp_open;
-    } else if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
+    }
+    if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
       lp_value_swap(&tmp_ub, &result.b);
       result.b_open = tmp_open;
     }
@@ -994,20 +994,46 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
       lp_value_swap(&tmp_lb, &result.a);
       result.a_open = tmp_open;
-    } else if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
+    }
+    if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
       lp_value_swap(&tmp_ub, &result.b);
       result.b_open = tmp_open;
     }
 
     // I1.b x I2.b
-    lp_value_mul(&I1->b, &I2->b, &tmp_lb, &tmp_ub);
+    mul_is_point = lp_value_mul(&I1->b, &I2->b, &tmp_lb, &tmp_ub);
     tmp_open = I1->b_open || I2->b_open || !mul_is_point;
     if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
       lp_value_swap(&tmp_lb, &result.a);
       result.a_open = tmp_open;
-    } else if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
+    }
+    if (lp_interval_endpoint_lt(&result.b, result.b_open, &tmp_ub, tmp_open)) {
       lp_value_swap(&tmp_ub, &result.b);
       result.b_open = tmp_open;
+    }
+
+    // Final check: if an endpoint is 0, it must have come from another zero
+    // endpoint. If that endpoint is closed, then the resulting endpoint must
+    // be closed too.
+    int sgn_a = lp_value_sgn(&result.a);
+    if (sgn_a == 0) {
+      int c1_a = (lp_value_sgn(&I1->a) == 0) && !I1->a_open;
+      int c1_b = (lp_value_sgn(&I1->b) == 0) && !I1->a_open;
+      int c2_a = (lp_value_sgn(&I2->a) == 0) && !I2->b_open;
+      int c2_b = (lp_value_sgn(&I2->b) == 0) && !I2->b_open;
+      if (c1_a || c1_b || c2_a || c2_b) {
+        result.a_open = 0;
+      }
+    }
+    int sgn_b = lp_value_sgn(&result.b);
+    if (sgn_b == 0) {
+      int c1_a = (lp_value_sgn(&I1->a) == 0) && !I1->a_open;
+      int c1_b = (lp_value_sgn(&I1->b) == 0) && !I1->a_open;
+      int c2_a = (lp_value_sgn(&I2->a) == 0) && !I2->b_open;
+      int c2_b = (lp_value_sgn(&I2->b) == 0) && !I2->b_open;
+      if (c1_a || c1_b || c2_a || c2_b) {
+        result.b_open = 0;
+      }
     }
 
     lp_value_destruct(&tmp_lb);
