@@ -313,7 +313,7 @@ int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
     case LP_VALUE_INTEGER:
       return rational_cmp_integer(&v1->value.q, &v2->value.z);
     case LP_VALUE_DYADIC_RATIONAL:
-      return rational_cmp_dyadic_rational(&v1->value.q, &v1->value.dy_q);
+      return rational_cmp_dyadic_rational(&v1->value.q, &v2->value.dy_q);
     default:
       assert(0);
     }

@@ -983,9 +983,11 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
     size_t i;
     for (i = 0; i < SIZE(C); ++ i) {
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+//        tracef("i = %zu\n", i);
+//        tracef("x = "); lp_interval_print(x_value, trace_out); tracef("\n");
         coefficient_interval_value(ctx, COEFF(C, i), m, &tmp1);
         lp_interval_pow(&tmp2, x_value, i);
-//        tracef("tmp2 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+//        tracef("tmp2 = x^i = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
 //        tracef("tmp1 = "); lp_interval_print(&tmp1, trace_out); tracef("\n");
         lp_interval_mul(&tmp2, &tmp2, &tmp1);
 //        tracef("tmp2 = tmp2 * tmp1 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");

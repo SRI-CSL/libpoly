@@ -1018,8 +1018,8 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     int sgn_a = lp_value_sgn(&result.a);
     if (sgn_a == 0) {
       int c1_a = (lp_value_sgn(&I1->a) == 0) && !I1->a_open;
-      int c1_b = (lp_value_sgn(&I1->b) == 0) && !I1->a_open;
-      int c2_a = (lp_value_sgn(&I2->a) == 0) && !I2->b_open;
+      int c1_b = (lp_value_sgn(&I1->b) == 0) && !I1->b_open;
+      int c2_a = (lp_value_sgn(&I2->a) == 0) && !I2->a_open;
       int c2_b = (lp_value_sgn(&I2->b) == 0) && !I2->b_open;
       if (c1_a || c1_b || c2_a || c2_b) {
         result.a_open = 0;
@@ -1028,8 +1028,8 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     int sgn_b = lp_value_sgn(&result.b);
     if (sgn_b == 0) {
       int c1_a = (lp_value_sgn(&I1->a) == 0) && !I1->a_open;
-      int c1_b = (lp_value_sgn(&I1->b) == 0) && !I1->a_open;
-      int c2_a = (lp_value_sgn(&I2->a) == 0) && !I2->b_open;
+      int c1_b = (lp_value_sgn(&I1->b) == 0) && !I1->b_open;
+      int c2_a = (lp_value_sgn(&I2->a) == 0) && !I2->a_open;
       int c2_b = (lp_value_sgn(&I2->b) == 0) && !I2->b_open;
       if (c1_a || c1_b || c2_a || c2_b) {
         result.b_open = 0;
@@ -1203,7 +1203,7 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
     } else {
       // Even powers depend on whether 0 is in the interval
       int sgn = lp_interval_sgn(I);
-      int a_point = lp_value_pow(&I->a, n, &result.a, 0);
+      int a_point = lp_value_pow(&I->a, n, 0, &result.a);
       int b_point = lp_value_pow(&I->b, n, 0, &result.b);
       if (sgn == 0) {
         // P = [0, max(a, b)^n]
