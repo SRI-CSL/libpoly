@@ -1203,10 +1203,10 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
     } else {
       // Even powers depend on whether 0 is in the interval
       int sgn = lp_interval_sgn(I);
-      int a_point = lp_value_pow(&I->a, n, 0, &result.a);
-      int b_point = lp_value_pow(&I->b, n, 0, &result.b);
       if (sgn == 0) {
         // P = [0, max(a, b)^n]
+        int a_point = lp_value_pow(&I->a, n, 0, &result.a);
+        int b_point = lp_value_pow(&I->b, n, 0, &result.b);
         if (lp_interval_endpoint_lt(&result.b, I->b_open, &result.a, I->a_open)) {
           lp_value_swap(&result.b, &result.a);
           result.b_open = I->a_open || !a_point;
@@ -1215,15 +1215,19 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
         }
         lp_value_assign_zero(&result.a);
         result.a_open = 0;
-      } else if (sgn > 0) {
-        // P = I^n
-        result.a_open = I->a_open;
-        result.b_open = I->b_open;
       } else {
-        // negative turns positive, so we flip
-        lp_value_swap(&result.a, &result.b);
-        result.a_open = I->b_open;
-        result.b_open = I->a_open;
+        int a_point = lp_value_pow(&I->a, n, &result.a, 0);
+        int b_point = lp_value_pow(&I->b, n, 0, &result.b);
+        if (sgn > 0) {
+          // P = I^n
+          result.a_open = I->a_open || !a_point;
+          result.b_open = I->b_open || !b_point;
+        } else {
+          // negative turns positive, so we flip
+          lp_value_swap(&result.a, &result.b);
+          result.a_open = I->b_open || !b_point;
+          result.b_open = I->a_open || !a_point;
+        }
       }
     }
   }
