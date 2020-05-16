@@ -1460,6 +1460,7 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
     }
   }
 
+  int conflict = 0;
   if (ok) {
     // D = d^2
     lp_rational_t tmp_q;
@@ -1499,14 +1500,14 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
       lp_interval_t x_interval;
       if (roots_size == 0) {
         // No roots, inconsistent
-        assert(0);
+        conflict = 1;
         break;
       } else if (roots_size == 1) {
         // One root, if <=, then interval is [r,r]
         if (sgn_condition == LP_SGN_LE_0) {
           lp_interval_construct_point(&x_interval, roots);
         } else {
-          assert(0);
+          conflict = 1;
           break;
         }
       } else if (roots_size == 2) {
@@ -1531,7 +1532,11 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
   rational_destruct(&D);
 
   if (ok) {
-    return 1;
+    if (conflict) {
+      return -1;
+    } else {
+      return 1;
+    }
   } else {
     return 0;
   }

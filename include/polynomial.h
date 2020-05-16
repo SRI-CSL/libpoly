@@ -317,7 +317,7 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
  *
  * If negated is true, the constraint is considered negated.
  *
- * Returns true if something has been inferred.
+ * Returns 1 if something has been inferred, 0 if no bounds inferred, and -1 if there is no solutions.
  */
 int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_interval_assignment_t* M);
 
