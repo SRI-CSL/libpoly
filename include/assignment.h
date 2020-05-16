@@ -73,10 +73,13 @@ struct lp_interval_assignment_struct {
   size_t size;
   /** The intervals */
   lp_interval_t* intervals;
+  /** Timestamps */
+  size_t* timestamps;
   /** The variable database */
   const lp_variable_db_t* var_db;
+  /** Current timestamp */
+  size_t timestamp;
 };
-
 
 /** Construct an empty assignment of intervals */
 void lp_interval_assignment_construct(lp_interval_assignment_t* m, const lp_variable_db_t* var_db);
@@ -104,6 +107,9 @@ void lp_interval_assignment_set_interval(lp_interval_assignment_t* m, lp_variabl
 
 /** Get the value of a variable */
 const lp_interval_t* lp_interval_assignment_get_interval(const lp_interval_assignment_t* m, lp_variable_t x);
+
+/** Reset the assignment (no values) */
+void lp_interval_assignment_reset(lp_interval_assignment_t* m);
 
 
 #ifdef __cplusplus

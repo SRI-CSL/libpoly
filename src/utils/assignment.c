@@ -133,9 +133,11 @@ void lp_interval_assignment_ensure_size(const lp_interval_assignment_t* m_const,
   lp_interval_assignment_t* m = (lp_interval_assignment_t*) m_const;
   if (size >= m->size) {
     m->intervals = realloc(m->intervals, sizeof(lp_interval_t)*size);
+    m->timestamps = realloc(m->timestamps, sizeof(size_t)*size);
     size_t i;
     for (i = m->size; i < size; ++ i) {
       lp_interval_construct_full(m->intervals + i);
+      m->timestamps[i] = m->timestamp;
     }
     m->size = size;
   }
@@ -145,6 +147,8 @@ void lp_interval_assignment_construct(lp_interval_assignment_t* m, const lp_vari
   m->size = 0;
   m->intervals = 0;
   m->var_db = var_db;
+  m->timestamp = 1;
+  m->timestamps = 0;
   lp_variable_db_attach((lp_variable_db_t*)var_db);
   lp_interval_assignment_ensure_size(m, DEFAULT_ASSIGNMENT_SIZE);
 }
@@ -162,6 +166,7 @@ void lp_interval_assignment_destruct(lp_interval_assignment_t* m) {
       lp_interval_destruct(m->intervals + i);
     }
     free(m->intervals);
+    free(m->timestamps);
   }
   lp_variable_db_detach((lp_variable_db_t*)m->var_db);
 }
@@ -175,7 +180,7 @@ int lp_interval_assignment_print(const lp_interval_assignment_t* m, FILE* out) {
   size_t i, j, ret = 0;
   ret += fprintf(out, "[");
   for (i = 0, j = 0; i < m->size; ++ i) {
-    if (lp_interval_is_full(m->intervals + i)) {
+    if (m->timestamps[i] < m->timestamp) {
       continue;
     }
     if (j ++) {
@@ -205,10 +210,18 @@ void lp_interval_assignment_set_interval(lp_interval_assignment_t* m, lp_variabl
   } else {
     lp_interval_construct_full(m->intervals + x);
   }
+  m->timestamps[x] = m->timestamp;
 }
 
 const lp_interval_t* lp_interval_assignment_get_interval(const lp_interval_assignment_t* m, lp_variable_t x) {
   lp_interval_assignment_ensure_size(m, x + 1);
-  return m->intervals + x;
+  if (m->timestamps[x] == m->timestamp) {
+    return m->intervals + x;
+  } else {
+    return NULL;
+  }
 }
 
+void lp_interval_assignment_reset(lp_interval_assignment_t* m) {
+  m->timestamp ++;
+}

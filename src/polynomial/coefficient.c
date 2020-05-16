@@ -306,13 +306,29 @@ STAT_DECLARE(int, coefficient, assign_int)
 
 void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long x) {
   TRACE("coefficient::internal", "coefficient_assign_int()\n");
-  STAT_INCR(coefficient, assign)
+  STAT_INCR(coefficient, assign_int)
 
   if (C->type == COEFFICIENT_POLYNOMIAL) {
     coefficient_destruct(C);
     coefficient_construct_from_int(ctx, C, x);
   } else {
     integer_assign_int(ctx->K, &C->value.num, x);
+  }
+
+  assert(coefficient_is_normalized(ctx, C));
+}
+
+STAT_DECLARE(int, coefficient, assign_integer)
+
+void coefficient_assign_integer(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* x) {
+  TRACE("coefficient::internal", "coefficient_assign_int()\n");
+  STAT_INCR(coefficient, assign_integer)
+
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    coefficient_destruct(C);
+    coefficient_construct_from_integer(ctx, C, x);
+  } else {
+    integer_assign(ctx->K, &C->value.num, x);
   }
 
   assert(coefficient_is_normalized(ctx, C));
@@ -2704,7 +2720,6 @@ void coefficient_get_variables(const coefficient_t* C, lp_variable_list_t* vars)
 /**
  * Isolate out the roots of a univariate polynomial.
  */
-static
 void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* A, lp_value_t* roots, size_t* roots_size) {
 
   if (trace_is_enabled("coefficient::roots")) {

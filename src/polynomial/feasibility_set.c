@@ -101,6 +101,18 @@ lp_feasibility_set_t* lp_feasibility_set_new_copy(const lp_feasibility_set_t* se
   return result;
 }
 
+void lp_feasibility_set_construct_from_interval(lp_feasibility_set_t* set, const lp_interval_t* from) {
+  lp_feasibility_set_construct(set, 1);
+  lp_interval_construct_copy(set->intervals, from);
+  set->size = 1;
+}
+
+lp_feasibility_set_t* lp_feasibility_set_new_from_interval(const lp_interval_t* I) {
+  lp_feasibility_set_t* result = malloc(sizeof(lp_feasibility_set_t));
+  lp_feasibility_set_construct_from_interval(result, I);
+  return result;
+}
+
 void lp_feasibiliy_set_assign(lp_feasibility_set_t* set, const lp_feasibility_set_t* from) {
   if (set != from) {
     lp_feasibility_set_destruct(set);

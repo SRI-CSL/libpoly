@@ -211,8 +211,18 @@ void rational_get_num(const lp_rational_t* q, lp_integer_t* num) {
 }
 
 static inline
+const lp_integer_t* rational_get_num_ref(const lp_rational_t* q) {
+  return mpq_numref(q);
+}
+
+static inline
 void rational_get_den(const lp_rational_t* q, lp_integer_t* den) {
   mpq_get_den(den, q);
+}
+
+static inline
+const lp_integer_t* rational_get_den_ref(const lp_rational_t* q) {
+  return mpq_denref(q);
 }
 
 static inline

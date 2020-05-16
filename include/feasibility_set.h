@@ -59,6 +59,11 @@ lp_feasibility_set_t* lp_feasibility_set_new_empty(void);
 lp_feasibility_set_t* lp_feasibility_set_new_copy(const lp_feasibility_set_t* set);
 
 /**
+ * Construct from interval.
+ */
+lp_feasibility_set_t* lp_feasibility_set_new_from_interval(const lp_interval_t* I);
+
+/**
  * Delete the given feasibility set.
  */
 void lp_feasibility_set_delete(lp_feasibility_set_t* set);
