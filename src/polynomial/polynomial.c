@@ -1430,6 +1430,7 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
     // Check if Ak = (ax - b)^2 + Ak-1 = Ax^2 - Bx + ...
     if (trace_is_enabled("polynomial::bounds")) {
       tracef("A_k = "); coefficient_print(ctx, Ak, trace_out); tracef("\n");
+      tracef("D = "); rational_print(&D, trace_out); tracef("\n");
     }
     size_t Ak_degree = coefficient_degree(Ak);
     if (Ak_degree == 2) {
@@ -1482,15 +1483,28 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
 
       if (trace_is_enabled("polynomial::bounds")) {
         tracef("f = "); coefficient_print(ctx, &f, trace_out); tracef("\n");
+        tracef("D = "); rational_print(&D, trace_out); tracef("\n");
       }
-      // Solve Ax^2 + Bx - D == 0, but, since D is rational p/q we solve
-      // qAx^2 + qBx^2 - p == 0
-      const lp_integer_t* p = rational_get_num_ref(&D);
-      const lp_integer_t* q = rational_get_den_ref(&D);
+      // Solve Ax^2 + Bx + b^2 - D == 0
+      // D is rational p/q we solve
+      // B = -2ab => b^2 = B^2/4a^2 = B^2/4A
+      // b^2 = B^2/4*A
+      const coefficient_t* A = COEFF(&f, 2);
+      const coefficient_t* B = COEFF(&f, 1);
+      integer_mul(lp_Z, &B_sq, &B->value.num, &B->value.num);
+      integer_mul_int(lp_Z, &A4, &A->value.num, 4);
+      rational_construct_from_div(&tmp_q, &B_sq, &A4);
+      rational_sub(&tmp_q, &tmp_q, &D);
+      // Add p/q to polynomial to solve
+      const lp_integer_t* p = rational_get_num_ref(&tmp_q);
+      const lp_integer_t* q = rational_get_den_ref(&tmp_q);
       coefficient_assign_int(ctx, COEFF(&f, 0), 0);
       coefficient_mul_integer(ctx, &f, &f, q);
       coefficient_assign_integer(ctx, COEFF(&f, 0), p);
-      coefficient_neg(ctx, COEFF(&f, 0), COEFF(&f, 0));
+      rational_destruct(&tmp_q);
+      if (trace_is_enabled("polynomial::bounds")) {
+        tracef("f = "); coefficient_print(ctx, &f, trace_out); tracef("\n");
+      }
       // Get the roots
       lp_value_t roots[2];
       size_t roots_size = 0;
