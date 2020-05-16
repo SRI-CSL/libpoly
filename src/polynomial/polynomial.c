@@ -1363,7 +1363,15 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
   case LP_SGN_LT_0: // |x| - d < 0 => d < x < d
   case LP_SGN_LE_0: // |x| - d <= 0 => d <= x <= d
     break;
-  case LP_SGN_EQ_0: // |x| - d == 0 => ?
+  case LP_SGN_EQ_0: {
+    // |x| - d == 0 == both <=, >=
+    int r = lp_polynomial_constraint_infer_bounds(A, LP_SGN_LE_0, 0, M);
+    if (r) {
+      return r;
+    }
+    r = lp_polynomial_constraint_infer_bounds(A, LP_SGN_LE_0, 0, M);
+    return r;
+  }
   case LP_SGN_NE_0: // |x| - d != 0 => ?
     return 0;
   case LP_SGN_GT_0: {
