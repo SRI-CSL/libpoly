@@ -1369,8 +1369,7 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
     if (r) {
       return r;
     }
-    r = lp_polynomial_constraint_infer_bounds(A, LP_SGN_LE_0, 0, M);
-    return r;
+    return lp_polynomial_constraint_infer_bounds(A, LP_SGN_LE_0, 0, M);
   }
   case LP_SGN_NE_0: // |x| - d != 0 => ?
     return 0;
@@ -1564,6 +1563,187 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
   }
 }
 
+lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_variable_t x) {
+
+  // Same as in infer, just return the polynomial for x
+
+  // Negate the constraint if negated
+  if (negated) {
+    sgn_condition = lp_sign_condition_negate(sgn_condition);
+  }
+
+  const lp_polynomial_context_t* ctx = A->ctx;
+
+  switch (sgn_condition) {
+  case LP_SGN_LT_0: // |x| - d < 0 => d < x < d
+  case LP_SGN_LE_0: // |x| - d <= 0 => d <= x <= d
+    break;
+  case LP_SGN_EQ_0: {
+    // |x| - d == 0 == both <=, >=
+    lp_polynomial_t* p = lp_polynomial_constraint_explain_infer_bounds(A, LP_SGN_LE_0, 0, x);
+    if (p) {
+      return p;
+    }
+    return lp_polynomial_constraint_explain_infer_bounds(A, LP_SGN_LE_0, 0, x);
+  }
+  case LP_SGN_NE_0: // |x| - d != 0 => ?
+    return 0;
+  case LP_SGN_GT_0: {
+    lp_polynomial_t* A_neg = lp_polynomial_new(ctx);
+    lp_polynomial_neg(A_neg, A);
+    lp_polynomial_t* p = lp_polynomial_constraint_explain_infer_bounds(A_neg, LP_SGN_LT_0, 0, x);
+    lp_polynomial_delete(A_neg);
+    return p;
+  }
+  case LP_SGN_GE_0: {
+    lp_polynomial_t* A_neg = lp_polynomial_new(ctx);
+    lp_polynomial_neg(A_neg, A);
+    lp_polynomial_t* p = lp_polynomial_constraint_explain_infer_bounds(A_neg, LP_SGN_LE_0, 0, x);
+    lp_polynomial_delete(A_neg);
+    return p;
+  }
+  }
+
+  if (trace_is_enabled("polynomial::bounds")) {
+    tracef("lp_polynomial_constraint_explain_infer_bounds("); lp_polynomial_print(A, trace_out); tracef(", "); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
+  }
+
+  lp_polynomial_t* result = 0;
+
+  // Make sure we're in the right order
+  lp_polynomial_external_clean(A);
+
+  // For each variable in A, see A(x). If
+  //
+  //    A(x) = Ax^2 + Bx + C,
+  //
+  // with A and B appropriate constants, then we can write this as
+  //
+  //   A(x) = a^2 x - 2ab x + b^2 + C - b^2
+  //        = (ax - b)^2 + C - b^2
+  //
+  // If this is the case, and we can recursively rewrite the C further into
+  //
+  //  (a1 x1 - b1)^2 + ... + (an xn - bn)^2 + C0 - b1^2 - ... - bn^2
+  //
+  // With D = (b1^2 + ... + bn^2) - C0, and d = sqrt(D), we can infer bounds
+  //
+  //    (ak x - bk)^2 <= D => -(d + bk)/ak <= x <= (d + bk)/ak
+  //
+  // In fact, we can just solve
+  //
+  //    ak^2 - 2akabk x - D^2 == 0
+  //
+  // and make the interval (r1, r2), [r1], or 0, depending on the number of
+  // roots and the sign condition.
+  //
+  // We can do this easily in the original polynomial, but D is rational so we need
+  // to multiply it out.
+
+  lp_integer_t tmp_z, B_sq, A4;
+  integer_construct(&tmp_z);
+  integer_construct(&B_sq);
+  integer_construct(&A4);
+
+  lp_rational_t D;
+  rational_construct(&D);
+
+  int ok = 1;
+  const coefficient_t* Ak = &A->data;
+  while (ok && Ak->type != COEFFICIENT_NUMERIC) {
+    // Check if Ak = (ax - b)^2 + Ak-1 = Ax^2 - Bx + ...
+    if (trace_is_enabled("polynomial::bounds")) {
+      tracef("A_k = "); coefficient_print(ctx, Ak, trace_out); tracef("\n");
+      tracef("D = "); rational_print(&D, trace_out); tracef("\n");
+    }
+    size_t Ak_degree = coefficient_degree(Ak);
+    if (Ak_degree == 2) {
+      const coefficient_t* A = coefficient_get_coefficient(Ak, 2);
+      const coefficient_t* B = coefficient_get_coefficient(Ak, 1);
+      if (A->type != COEFFICIENT_NUMERIC || B->type != COEFFICIENT_NUMERIC) {
+        ok = 0;
+      } else if (integer_sgn(lp_Z, &A->value.num) > 0) {
+        //  A(x) = (ax - b)^2 + ...
+        //  A = a^2, B=-2ab
+        //  A(x) = Ax^2 + Bx + (b^2 + ...)
+        //  b = -B/2*a
+        //  b^2 = B^2/4*A
+        integer_mul(lp_Z, &B_sq, &B->value.num, &B->value.num);
+        integer_mul_int(lp_Z, &A4, &A->value.num, 4);
+        lp_rational_t tmp_q;
+        rational_construct_from_div(&tmp_q, &B_sq, &A4);
+        rational_add(&D, &D, &tmp_q);
+        rational_destruct(&tmp_q);
+        // Go to the next one
+        Ak = COEFF(Ak, 0);
+      } else {
+        // Cannot do square root, must be positive
+        ok = 0;
+      }
+    } else {
+      ok = 0;
+    }
+  }
+
+  if (ok) {
+    // D = d^2
+    lp_rational_t tmp_q;
+    rational_construct_from_integer(&tmp_q, &Ak->value.num);
+    rational_sub(&D, &D, &tmp_q);
+    rational_destruct(&tmp_q);
+
+    // Construct a polynomial for root finding
+    coefficient_t f, next;
+    coefficient_construct_copy(ctx, &next, &A->data);
+    coefficient_construct(ctx, &f);
+
+    // Now, we traverse again, and get the intervals
+    while (next.type != COEFFICIENT_NUMERIC) {
+      // Continue to the next one
+      coefficient_swap(&f, &next);
+      coefficient_assign_int(ctx, &next, 0);
+      coefficient_swap(&next, COEFF(&f, 0));
+      if (VAR(&f) == x) {
+        if (trace_is_enabled("polynomial::bounds")) {
+          tracef("f = "); coefficient_print(ctx, &f, trace_out); tracef("\n");
+          tracef("D = "); rational_print(&D, trace_out); tracef("\n");
+        }
+        // Solve Ax^2 + Bx + b^2 - D == 0
+        // D is rational p/q we solve
+        // B = -2ab => b^2 = B^2/4a^2 = B^2/4A
+        // b^2 = B^2/4*A
+        const coefficient_t* A = COEFF(&f, 2);
+        const coefficient_t* B = COEFF(&f, 1);
+        integer_mul(lp_Z, &B_sq, &B->value.num, &B->value.num);
+        integer_mul_int(lp_Z, &A4, &A->value.num, 4);
+        rational_construct_from_div(&tmp_q, &B_sq, &A4);
+        rational_sub(&tmp_q, &tmp_q, &D);
+        // Add p/q to polynomial to solve
+        const lp_integer_t* p = rational_get_num_ref(&tmp_q);
+        const lp_integer_t* q = rational_get_den_ref(&tmp_q);
+        coefficient_assign_int(ctx, COEFF(&f, 0), 0);
+        coefficient_mul_integer(ctx, &f, &f, q);
+        coefficient_assign_integer(ctx, COEFF(&f, 0), p);
+        rational_destruct(&tmp_q);
+        if (trace_is_enabled("polynomial::bounds")) {
+          tracef("f = "); coefficient_print(ctx, &f, trace_out); tracef("\n");
+        }
+        result = lp_polynomial_new_from_coefficient(ctx, &f);
+        break;
+      }
+    }
+
+    coefficient_destruct(&f);
+    coefficient_destruct(&next);
+  }
+
+  integer_destruct(&tmp_z);
+  integer_destruct(&B_sq);
+  integer_destruct(&A4);
+  rational_destruct(&D);
+
+  return result;
+}
 
 lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_polynomial_t* A, size_t root_index, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
 

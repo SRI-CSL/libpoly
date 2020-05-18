@@ -322,6 +322,11 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
 int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_interval_assignment_t* M);
 
 /**
+ * Explains the bound inference by providing a bounding polynomial.
+ */
+lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_variable_t x);
+
+/**
  * Given a polynomial constraint, as above, evaluate its truth value.
  */
 int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
