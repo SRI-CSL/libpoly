@@ -1527,7 +1527,9 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
         // One root, if <=, then interval is [r,r]
         if (sgn_condition == LP_SGN_LE_0) {
           lp_interval_construct_point(&x_interval, roots);
+          lp_value_destruct(roots);
         } else {
+          lp_value_destruct(roots);
           conflict = 1;
           break;
         }
@@ -1535,6 +1537,8 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
         // Two roots, the interval is either (r0, r1), or [r1, r2]
         int open = sgn_condition == LP_SGN_LT_0;
         lp_interval_construct(&x_interval, roots, open, roots + 1, open);
+        lp_value_destruct(roots);
+        lp_value_destruct(roots + 1);
       }
       if (trace_is_enabled("polynomial::bounds")) {
         tracef("x_interval = "); lp_interval_print(&x_interval, trace_out); tracef("\n");
