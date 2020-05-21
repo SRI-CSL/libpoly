@@ -361,6 +361,21 @@ void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f
 /** Check the integrity of the polynomial */
 int lp_polynomial_check_integrity(const lp_polynomial_t* A);
 
+/**
+ * Try to resolve the two constraints with Fourier-Motzkin. We use the model M to check if
+ * the polynomials are univariate. Then we resolve. All assumption polynomials (a) are added to
+ * the polynomial vector (sgn(a) == sgn(m(a))). Result is returned as (p R2 0) if it is
+ * defined and 1 is returned. Otherwise 0 is returned.
+ */
+int lp_polynomial_constraint_resolve_fm(
+    const lp_polynomial_t* p1, lp_sign_condition_t p1_sgn,
+    const lp_polynomial_t* p2, lp_sign_condition_t p2_sgn,
+    const lp_assignment_t* M,
+    lp_polynomial_t* R, lp_sign_condition_t* R_sgn,
+    lp_polynomial_vector_t* assumptions);
+
+
+
 #ifdef __cplusplus
 } /* close extern "C" { */
 #endif
