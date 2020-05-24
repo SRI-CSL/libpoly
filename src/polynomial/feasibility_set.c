@@ -101,6 +101,18 @@ lp_feasibility_set_t* lp_feasibility_set_new_copy(const lp_feasibility_set_t* se
   return result;
 }
 
+void lp_feasibility_set_construct_from_interval(lp_feasibility_set_t* set, const lp_interval_t* from) {
+  lp_feasibility_set_construct(set, 1);
+  lp_interval_construct_copy(set->intervals, from);
+  set->size = 1;
+}
+
+lp_feasibility_set_t* lp_feasibility_set_new_from_interval(const lp_interval_t* I) {
+  lp_feasibility_set_t* result = malloc(sizeof(lp_feasibility_set_t));
+  lp_feasibility_set_construct_from_interval(result, I);
+  return result;
+}
+
 void lp_feasibiliy_set_assign(lp_feasibility_set_t* set, const lp_feasibility_set_t* from) {
   if (set != from) {
     lp_feasibility_set_destruct(set);
@@ -565,4 +577,17 @@ void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t*
       lp_interval_print(s->intervals + i, trace_out); tracef("\n");
     }
   }
+}
+
+void lp_feasibility_set_to_interval(const lp_feasibility_set_t* set, lp_interval_t* result) {
+  assert(set);
+  assert(set->size > 0);
+  const lp_interval_t* first = set->intervals;
+  const lp_value_t* a = &first->a;
+  const lp_interval_t* last = set->intervals + set->size - 1;
+  const lp_value_t* b = last->is_point ? &last->a : &last->b;
+  lp_interval_t tmp;
+  lp_interval_construct(&tmp, a, first->a_open, b, last->b_open);
+  lp_interval_swap(result, &tmp);
+  lp_interval_destruct(&tmp);
 }

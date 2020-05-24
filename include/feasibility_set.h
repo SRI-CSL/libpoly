@@ -59,6 +59,11 @@ lp_feasibility_set_t* lp_feasibility_set_new_empty(void);
 lp_feasibility_set_t* lp_feasibility_set_new_copy(const lp_feasibility_set_t* set);
 
 /**
+ * Construct from interval.
+ */
+lp_feasibility_set_t* lp_feasibility_set_new_from_interval(const lp_interval_t* I);
+
+/**
  * Delete the given feasibility set.
  */
 void lp_feasibility_set_delete(lp_feasibility_set_t* set);
@@ -138,6 +143,11 @@ int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out);
  * Return the string representation of the set.
  */
 char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set);
+
+/**
+ * Return the interval approximation of the set.
+ */
+void lp_feasibility_set_to_interval(const lp_feasibility_set_t* set, lp_interval_t* result);
 
 #ifdef __cplusplus
 } /* close extern "C" { */

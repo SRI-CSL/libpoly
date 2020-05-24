@@ -60,6 +60,9 @@ void lp_algebraic_number_destruct(lp_algebraic_number_t* a);
 /** Swap the two numbers */
 void lp_algebraic_number_swap(lp_algebraic_number_t* a, lp_algebraic_number_t* b);
 
+/** Get the sign of the algebraic number */
+int lp_algebraic_number_sgn(const lp_algebraic_number_t* a);
+
 /** Compare two algebraic numbers */
 int lp_algebraic_number_cmp(const lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
 

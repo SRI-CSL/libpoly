@@ -116,6 +116,9 @@ void coefficient_assign(const lp_polynomial_context_t* ctx, coefficient_t* C, co
 /** Assign the coefficient a give integer */
 void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long x);
 
+/** Assign the coefficient a give integer */
+void coefficient_assign_integer(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* x);
+
 /** Check if the coefficient is univariate */
 int coefficient_is_univariate(const coefficient_t* C);
 
@@ -181,6 +184,10 @@ int coefficient_is_assigned(const lp_polynomial_context_t* ctx, const coefficien
 
 /** Returns the sign of the coefficient in the model */
 int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
+
+/** Returns the interval approximation of the value of the polynomial */
+void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_interval_assignment_t* m, lp_interval_t* result);
+
 
 /**
  * Returns the approximation of value of the coefficient (is either zero or
@@ -340,9 +347,14 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
 void coefficient_get_variables(const coefficient_t* C, lp_variable_list_t* vars);
 
 /**
- * Isolate the roots.
+ * Isolate the roots (multivariate with model).
  */
 void coefficient_roots_isolate(const lp_polynomial_context_t* ctx, const coefficient_t* A, const lp_assignment_t* M, lp_value_t* roots, size_t* roots_size);
+
+/**
+ * Isolate the roots (univaraite no model).
+ */
+void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* A, lp_value_t* roots, size_t* roots_size);
 
 /**
  * Get the hash of the polynomial. The hash is simple to ensure we keep the hash across different

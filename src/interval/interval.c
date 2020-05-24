@@ -984,6 +984,9 @@ int lp_dyadic_interval_is_point(const lp_dyadic_interval_t* I) {
   return I->is_point;
 }
 
+int lp_interval_is_full(const lp_interval_t* I) {
+  return I->a.type == LP_VALUE_MINUS_INFINITY && I->b.type == LP_VALUE_PLUS_INFINITY;
+}
 int lp_rational_interval_is_point(const lp_rational_interval_t* I) {
   return I->is_point;
 }
@@ -1268,3 +1271,4 @@ lp_interval_cmp_t lp_interval_cmp_with_intersect(const lp_interval_t* I1, const 
     }
   }
 }
+

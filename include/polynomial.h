@@ -136,8 +136,11 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A);
 /** Returns true if all of polynomial's variables are assigned */
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m);
 
-/** returns the sign of the polynomial in the model (-1, 0, +1), or -2 if not all variables assigned */
+/** Returns the sign of the polynomial in the model (-1, 0, +1), or -2 if not all variables assigned */
 int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m);
+
+/** Returns the interval approximation of the polynomial value */
+void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_assignment_t* m, lp_interval_t* result);
 
 /** returns the sign of the polynomial in the model */
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);
@@ -308,6 +311,22 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M);
 
 /**
+ * Given a polynomial A(x1, ..., xn) and a sign condition,  the function returns
+ * tries to infer bounds on the variables and stores them into the given interval
+ * model.
+ *
+ * If negated is true, the constraint is considered negated.
+ *
+ * Returns 1 if something has been inferred, 0 if no bounds inferred, and -1 if there is no solutions.
+ */
+int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_interval_assignment_t* M);
+
+/**
+ * Explains the bound inference by providing a bounding polynomial.
+ */
+lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_variable_t x);
+
+/**
  * Given a polynomial constraint, as above, evaluate its truth value.
  */
 int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
@@ -341,6 +360,21 @@ void lp_polynomial_traverse(const lp_polynomial_t* A, lp_polynomial_traverse_f f
 
 /** Check the integrity of the polynomial */
 int lp_polynomial_check_integrity(const lp_polynomial_t* A);
+
+/**
+ * Try to resolve the two constraints with Fourier-Motzkin. We use the model M to check if
+ * the polynomials are univariate. Then we resolve. All assumption polynomials (a) are added to
+ * the polynomial vector (sgn(a) == sgn(m(a))). Result is returned as (p R2 0) if it is
+ * defined and 1 is returned. Otherwise 0 is returned.
+ */
+int lp_polynomial_constraint_resolve_fm(
+    const lp_polynomial_t* p1, lp_sign_condition_t p1_sgn,
+    const lp_polynomial_t* p2, lp_sign_condition_t p2_sgn,
+    const lp_assignment_t* M,
+    lp_polynomial_t* R, lp_sign_condition_t* R_sgn,
+    lp_polynomial_vector_t* assumptions);
+
+
 
 #ifdef __cplusplus
 } /* close extern "C" { */

@@ -306,13 +306,29 @@ STAT_DECLARE(int, coefficient, assign_int)
 
 void coefficient_assign_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long x) {
   TRACE("coefficient::internal", "coefficient_assign_int()\n");
-  STAT_INCR(coefficient, assign)
+  STAT_INCR(coefficient, assign_int)
 
   if (C->type == COEFFICIENT_POLYNOMIAL) {
     coefficient_destruct(C);
     coefficient_construct_from_int(ctx, C, x);
   } else {
     integer_assign_int(ctx->K, &C->value.num, x);
+  }
+
+  assert(coefficient_is_normalized(ctx, C));
+}
+
+STAT_DECLARE(int, coefficient, assign_integer)
+
+void coefficient_assign_integer(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* x) {
+  TRACE("coefficient::internal", "coefficient_assign_int()\n");
+  STAT_INCR(coefficient, assign_integer)
+
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    coefficient_destruct(C);
+    coefficient_construct_from_integer(ctx, C, x);
+  } else {
+    integer_assign(ctx->K, &C->value.num, x);
   }
 
   assert(coefficient_is_normalized(ctx, C));
@@ -933,6 +949,79 @@ int coefficient_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C, 
   if (sgn > 0) { return  1; }
 
   return 0;
+}
+
+STAT_DECLARE(int, coefficient, interval_value)
+
+void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_interval_assignment_t* m, lp_interval_t* out) {
+
+  if (trace_is_enabled("coefficient::interval")) {
+    tracef("coefficient_interval_value("); coefficient_print(ctx, C, trace_out);  tracef(", "); lp_interval_assignment_print(m, trace_out); tracef(")\n");
+  }
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    lp_value_t value;
+    lp_value_construct(&value, LP_VALUE_INTEGER, &C->value.num);
+    lp_interval_t value_interval;
+    lp_interval_construct_point(&value_interval, &value);
+    lp_interval_swap(out, &value_interval);
+    lp_interval_destruct(&value_interval);
+    lp_value_destruct(&value);
+  } else {
+
+    lp_interval_t result, tmp1, tmp2;
+
+    lp_interval_construct_zero(&result);
+    lp_interval_construct_zero(&tmp1);
+    lp_interval_construct_zero(&tmp2);
+
+    if (trace_is_enabled("coefficient::interval")) {
+      tracef("coefficient_interval_value(): x = %s\n", lp_variable_db_get_name(ctx->var_db, VAR(C)));
+      tracef("assignment = "); lp_interval_assignment_print(m, trace_out); tracef("\n");
+    }
+
+    const lp_interval_t* x_value = lp_interval_assignment_get_interval(m, VAR(C));
+
+    // Get the value of x
+    if (trace_is_enabled("coefficient::interval")) {
+      tracef("coefficient_interval_value(): x_value = ");
+      lp_interval_print(x_value, trace_out);
+      tracef("\n");
+    }
+
+    // We compute using powers, just an attempt to compute better. For example
+    // if p = x^2 + x and x = [-1, 1] then
+    //  a) x(x + 1) = [-1, 1]*[0, 2] = [-2, 2]
+    //  b) x^2 + x = [0, 1] + [-1, 1] = [-1, 2]
+    // we choose to do it b) way
+
+    // Compute
+    size_t i;
+    for (i = 0; i < SIZE(C); ++ i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+//        tracef("i = %zu\n", i);
+//        tracef("x = "); lp_interval_print(x_value, trace_out); tracef("\n");
+        coefficient_interval_value(ctx, COEFF(C, i), m, &tmp1);
+        lp_interval_pow(&tmp2, x_value, i);
+//        tracef("tmp2 = x^i = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+//        tracef("tmp1 = "); lp_interval_print(&tmp1, trace_out); tracef("\n");
+        lp_interval_mul(&tmp2, &tmp2, &tmp1);
+//        tracef("tmp2 = tmp2 * tmp1 = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
+//        tracef("result = "); lp_interval_print(&result, trace_out); tracef("\n");
+        lp_interval_add(&result, &result, &tmp2);
+//        tracef("result = result + tmp2 = "); lp_interval_print(&result, trace_out); tracef("\n");
+      }
+    }
+
+    lp_interval_swap(&result, out);
+    lp_interval_destruct(&tmp1);
+    lp_interval_destruct(&tmp2);
+    lp_interval_destruct(&result);
+  }
+
+  if (trace_is_enabled("coefficient::interval")) {
+    tracef("coefficient_value_approx() => "); lp_interval_print(out, trace_out); tracef("\n");
+  }
 }
 
 STAT_DECLARE(int, coefficient, lc_sgn)
@@ -2631,7 +2720,6 @@ void coefficient_get_variables(const coefficient_t* C, lp_variable_list_t* vars)
 /**
  * Isolate out the roots of a univariate polynomial.
  */
-static
 void coefficient_roots_isolate_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* A, lp_value_t* roots, size_t* roots_size) {
 
   if (trace_is_enabled("coefficient::roots")) {

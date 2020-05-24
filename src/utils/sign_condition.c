@@ -18,6 +18,7 @@
  */
 
 #include <sign_condition.h>
+#include <interval.h>
 
 lp_sign_condition_t lp_sign_condition_negate(lp_sign_condition_t sgn_condition) {
   switch (sgn_condition) {
@@ -80,3 +81,40 @@ int lp_sign_condition_consistent(lp_sign_condition_t sgn_condition, int sign) {
   }
   return 0;
 }
+
+int lp_sign_condition_consistent_interval(lp_sign_condition_t sgn_condition, const lp_interval_t* I) {
+  int sgn;
+  if (I->is_point) {
+    int sgn = lp_value_sgn(&I->a);
+    return lp_sign_condition_consistent(sgn_condition, sgn);
+  } else {
+    switch (sgn_condition) {
+    case LP_SGN_LT_0:
+      sgn = lp_value_sgn(&I->b);
+      return (sgn < 0) || (sgn == 0 && I->b_open);
+    case LP_SGN_LE_0:
+      sgn = lp_value_sgn(&I->b);
+      return (sgn <= 0);
+    case LP_SGN_EQ_0:
+      return 0;
+    case LP_SGN_NE_0:
+      sgn = lp_value_sgn(&I->b);
+      if ((sgn < 0) || (sgn == 0 && I->b_open)) {
+        return 1;
+      }
+      sgn = lp_value_sgn(&I->a);
+      if ((sgn > 0) || (sgn == 0 && I->a_open)) {
+        return 1;
+      }
+      return 0;
+    case LP_SGN_GT_0:
+      sgn = lp_value_sgn(&I->a);
+      return (sgn > 0) || (sgn == 0 && I->a_open);
+    case LP_SGN_GE_0:
+      sgn = lp_value_sgn(&I->a);
+      return sgn >= 0;
+    }
+  }
+  return 0;
+}
+

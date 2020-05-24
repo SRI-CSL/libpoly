@@ -345,6 +345,11 @@ void integer_sqrt_Z(lp_integer_t* sqrt, const lp_integer_t* a) {
 }
 
 static inline
+void integer_sqrt_rem_Z(lp_integer_t* sqrt, lp_integer_t* rem, const lp_integer_t* a) {
+  mpz_sqrtrem(sqrt, rem, a);
+}
+
+static inline
 void integer_add_mul(lp_int_ring_t* K, lp_integer_t* sum_product, const lp_integer_t* a, const lp_integer_t* b) {
   assert(integer_in_ring(K, sum_product) && integer_in_ring(K, a) && integer_in_ring(K, b));
   mpz_addmul(sum_product, a, b);
