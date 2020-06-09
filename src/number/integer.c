@@ -71,7 +71,7 @@ void lp_int_ring_detach(lp_int_ring_t* K) {
   }
 }
 
-int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2) {
+int lp_int_ring_equal(const lp_int_ring_t* K1, const lp_int_ring_t* K2) {
   if (K1 == K2) {
     return 1;
   } else if (K1 && K2) {
