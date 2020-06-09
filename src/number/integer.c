@@ -71,7 +71,7 @@ void lp_int_ring_detach(lp_int_ring_t* K) {
   }
 }
 
-int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2) {
+int lp_int_ring_equal(const lp_int_ring_t* K1, const lp_int_ring_t* K2) {
   if (K1 == K2) {
     return 1;
   } else if (K1 && K2) {
@@ -82,7 +82,7 @@ int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2) {
 }
 
 
-int lp_int_ring_print(lp_int_ring_t* K, FILE* out) {
+int lp_int_ring_print(const lp_int_ring_t* K, FILE* out) {
   int len = 0;
   len += fprintf(out, "Z");
   if (K) {
@@ -92,7 +92,7 @@ int lp_int_ring_print(lp_int_ring_t* K, FILE* out) {
   return len;
 }
 
-char* lp_int_ring_to_string(lp_int_ring_t* K) {
+char* lp_int_ring_to_string(const lp_int_ring_t* K) {
   char* str = 0;
   size_t size = 0;
   FILE* f = open_memstream(&str, &size);

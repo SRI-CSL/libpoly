@@ -57,13 +57,13 @@ void lp_int_ring_attach(lp_int_ring_t* K);
 void lp_int_ring_detach(lp_int_ring_t* K);
 
 /** Are the two rings equal */
-int lp_int_ring_equal(lp_int_ring_t* K1, lp_int_ring_t* K2);
+int lp_int_ring_equal(const lp_int_ring_t* K1, const lp_int_ring_t* K2);
 
 /** Print */
-int lp_int_ring_print(lp_int_ring_t* K, FILE* out);
+int lp_int_ring_print(const lp_int_ring_t* K, FILE* out);
 
 /** Get the string representation */
-char* lp_int_ring_to_string(lp_int_ring_t* K);
+char* lp_int_ring_to_string(const lp_int_ring_t* K);
 
 /** Construct a 0 integer. */
 void lp_integer_construct(lp_integer_t* c);
