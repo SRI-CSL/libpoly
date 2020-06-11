@@ -84,6 +84,10 @@ int lp_dyadic_rational_cmp_integer(const lp_dyadic_rational_t* q1, const lp_inte
   return dyadic_rational_cmp_integer(q1, q2);
 }
 
+int lp_dyadic_rational_cmp_rational(const lp_dyadic_rational_t* q1, const lp_rational_t* q2) {
+  return -rational_cmp_dyadic_rational(q2, q1);
+}
+
 void lp_dyadic_rational_swap(lp_dyadic_rational_t* q1, lp_dyadic_rational_t* q2) {
   dyadic_rational_swap(q1, q2);
 }
