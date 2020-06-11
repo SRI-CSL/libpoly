@@ -63,6 +63,10 @@ add_subdirectory(src)
 # Configure the headers
 add_subdirectory(include)
 
+# Configure the tests
+enable_testing()
+add_subdirectory(test)
+
 if(LIBPOLY_BUILD_PYTHON_API)
 
   # Need the python binary to run tests
@@ -70,8 +74,5 @@ if(LIBPOLY_BUILD_PYTHON_API)
 
   # Configure the python bindings
   add_subdirectory(python)
-
-  # Configure the tests
-  add_subdirectory(test)
-
+  
 endif()
