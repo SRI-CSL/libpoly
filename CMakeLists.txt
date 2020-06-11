@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.6)
 #
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
-project(libpoly C)
+project(libpoly C CXX)
 
 option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON)
 option(LIBPOLY_BUILD_STATIC_PIC "Build the static PIC library" ON)
