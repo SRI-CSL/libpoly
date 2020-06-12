@@ -1,4 +1,6 @@
 set(polyxx_tests
+    test_integer
+    test_rational
     test_variable
 )
 
