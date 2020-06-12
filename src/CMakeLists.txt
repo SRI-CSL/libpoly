@@ -1,42 +1,45 @@
 set(poly_SOURCES 
-    utils/debug_trace.c
-    utils/assignment.c
-    utils/statistics.c
-    utils/output.c
-    utils/sign_condition.c
-    utils/open_memstream.c
-    number/integer.c
-    number/rational.c
-    number/dyadic_rational.c
-    number/algebraic_number.c
-    number/value.c
-    interval/interval.c
-    interval/arithmetic.c
-    variable/variable_db.c
-    variable/variable_list.c
-    variable/variable_order.c
-    upolynomial/umonomial.c
-    upolynomial/upolynomial.c
-    upolynomial/output.c
-    upolynomial/upolynomial_dense.c
-    upolynomial/bounds.c
-    upolynomial/gcd.c
-    upolynomial/factors.c
-    upolynomial/factorization.c
-    upolynomial/root_finding.c
-    polynomial/monomial.c
-    polynomial/coefficient.c
-    polynomial/output.c
-    polynomial/gcd.c
-    polynomial/psc.c
-    polynomial/factorization.c
-    polynomial/polynomial.c
-    polynomial/polynomial_context.c
-    polynomial/feasibility_set.c
-    polynomial/polynomial_hash_set.c
-    polynomial/polynomial_vector.c
-    poly.c
+  utils/debug_trace.c
+  utils/assignment.c
+  utils/statistics.c
+  utils/output.c
+  utils/sign_condition.c
+  number/integer.c
+  number/rational.c
+  number/dyadic_rational.c
+  number/algebraic_number.c
+  number/value.c
+  interval/interval.c
+  interval/arithmetic.c
+  variable/variable_db.c
+  variable/variable_list.c
+  variable/variable_order.c
+  upolynomial/umonomial.c
+  upolynomial/upolynomial.c
+  upolynomial/output.c
+  upolynomial/upolynomial_dense.c
+  upolynomial/bounds.c
+  upolynomial/gcd.c
+  upolynomial/factors.c
+  upolynomial/factorization.c
+  upolynomial/root_finding.c
+  polynomial/monomial.c
+  polynomial/coefficient.c
+  polynomial/output.c
+  polynomial/gcd.c
+  polynomial/psc.c
+  polynomial/factorization.c
+  polynomial/polynomial.c
+  polynomial/polynomial_context.c
+  polynomial/feasibility_set.c
+  polynomial/polynomial_hash_set.c
+  polynomial/polynomial_vector.c
+  poly.c
 )
+
+if (NOT HAVE_OPEN_MEMSTREAM) 
+  set(poly_SOURCES "utils/open_memstream.c ${poly_SOURCES}")
+endif()
 
 set(polyxx_SOURCES
   polyxx/context.cpp
