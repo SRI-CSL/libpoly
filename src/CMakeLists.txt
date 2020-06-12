@@ -38,8 +38,14 @@ set(poly_SOURCES
     poly.c
 )
 
+set(polyxx_SOURCES
+  polyxx/context.cpp
+  polyxx/variable.cpp
+)
+
 # Add warnings as errors for good practice
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra -std=gnu99")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -std=c++11")
 
 include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
@@ -47,12 +53,20 @@ include_directories(${libpoly_SOURCE_DIR}/src)
 
 add_library(poly SHARED ${poly_SOURCES})
 
-set_target_properties(poly PROPERTIES 
+set_target_properties(poly PROPERTIES
+  VERSION ${LIBPOLY_VERSION}
+  SOVERSION ${LIBPOLY_VERSION_MAJOR}
+)
+
+target_link_libraries(poly ${GMP_LIBRARY})
+
+add_library(polyxx SHARED ${polyxx_SOURCES})
+set_target_properties(polyxx PROPERTIES 
   VERSION ${LIBPOLY_VERSION} 
   SOVERSION ${LIBPOLY_VERSION_MAJOR}
 ) 
 
-target_link_libraries(poly ${GMP_LIBRARY})
+target_link_libraries(polyxx poly ${GMP_LIBRARY})
 
 #
 # For windows and friends: the DLL goes into <install>/bin
@@ -61,8 +75,10 @@ target_link_libraries(poly ${GMP_LIBRARY})
 #
 if (CYGWIN OR WIN32 OR MINGW)
  install(TARGETS poly LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+ install(TARGETS polyxx LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
 else()
  install(TARGETS poly LIBRARY DESTINATION lib)
+ install(TARGETS polyxx LIBRARY DESTINATION lib)
 endif()
 
 #
@@ -72,6 +88,11 @@ if (LIBPOLY_BUILD_STATIC)
   add_library(static_poly STATIC ${poly_SOURCES})
   set_target_properties(static_poly PROPERTIES OUTPUT_NAME poly)
   install(TARGETS static_poly ARCHIVE DESTINATION lib)
+
+  add_library(static_polyxx STATIC ${polyxx_SOURCES})
+  set_target_properties(static_polyxx PROPERTIES OUTPUT_NAME polyxx)
+  install(TARGETS static_polyxx ARCHIVE DESTINATION lib)
+  target_link_libraries(static_polyxx static_poly)
 endif()
 
 #
@@ -85,4 +106,8 @@ endif()
 if(LIBPOLY_BUILD_STATIC_PIC AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
+
+  add_library(static_pic_polyxx STATIC ${polyxx_SOURCES})
+  set_target_properties(static_pic_polyxx PROPERTIES OUTPUT_NAME picpolyxx POSITION_INDEPENDENT_CODE true)
+  target_link_libraries(static_pic_polyxx static_pic_poly)
 endif()

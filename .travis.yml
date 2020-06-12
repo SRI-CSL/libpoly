@@ -37,3 +37,4 @@ script:
   - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
   - make
   - make check
+  - make test
