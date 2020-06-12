@@ -891,7 +891,7 @@ void lp_dyadic_interval_scale(lp_dyadic_interval_t* I, int n) {
     dyadic_rational_mul_2exp(&I->b, &I->b, n);
   } else {
     dyadic_rational_div_2exp(&I->a, &I->a, -n);
-    dyadic_rational_div_2exp(&I->a, &I->a, -n);
+    dyadic_rational_div_2exp(&I->b, &I->b, -n);
   }
 }
 
