@@ -384,8 +384,8 @@ static PyObject*
 UPolynomial_ring(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
-    const lp_int_ring_t* K = lp_upolynomial_ring(p->p);
-    lp_int_ring_attach((lp_int_ring_t*)K);
+    lp_int_ring_t* K = (lp_int_ring_t*) lp_upolynomial_ring(p->p);
+    lp_int_ring_attach(K);
     return PyCoefficientRing_create(K);
   } else {
     Py_RETURN_NONE;
