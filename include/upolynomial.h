@@ -291,9 +291,15 @@ lp_upolynomial_t* lp_upolynomial_primitive_part_Z(const lp_upolynomial_t* p);
 lp_upolynomial_t* lp_upolynomial_gcd(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 
 /**
- * Computes the extended gcd of p and q. The rings of p
- * and q are assumed to be the same. The lc(gcd) > 0, and if the ring of p
- * and q is a field, it will be normalized to monic -- lc(gcd) == 1.
+ * Computes the extended gcd of p and q, i.e.
+ *
+ *   u*p + v*q = gcd(p, q).
+ *
+ * The coefficient rings of p and q are assumed to be the same. In addition
+ * they are assumed to be prime fields. The function ensures a monic
+ * GCD -- lc(gcd) == 1.
+ *
+ * All resulting polynomials (gcd, *u, *v) will be freshly allocated.
  */
 lp_upolynomial_t* lp_upolynomial_extended_gcd(const lp_upolynomial_t* p, const lp_upolynomial_t* q, lp_upolynomial_t** u, lp_upolynomial_t** v);
 
@@ -305,6 +311,9 @@ lp_upolynomial_t* lp_upolynomial_extended_gcd(const lp_upolynomial_t* p, const l
  * for u and v. Assumes that gcd(p, q) divides r. Result such that
  *
  *   deg(u) < deg(q), deg(v) < deg(p)
+ *
+ * The coefficient rings of p, q, and r, are assumed to be the same. In
+ * addition they are assumed to be a prime field.
  */
 void lp_upolynomial_solve_bezout(const lp_upolynomial_t* p, const lp_upolynomial_t* q, const lp_upolynomial_t* r,
     lp_upolynomial_t** u, lp_upolynomial_t** v);

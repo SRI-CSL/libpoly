@@ -188,7 +188,6 @@ lp_upolynomial_t* upolynomial_gcd_euclid(const lp_upolynomial_t* A, const lp_upo
       upolynomial_dense_swap(&r_0, &r_1);
       upolynomial_dense_swap(&r_1, &r_2);
 
-
     }
 
   } while (D == 0);
