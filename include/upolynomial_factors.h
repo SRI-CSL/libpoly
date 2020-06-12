@@ -58,13 +58,13 @@ void lp_upolynomial_factors_add(lp_upolynomial_factors_t* f, lp_upolynomial_t* p
 int lp_upolynomial_factors_print(const lp_upolynomial_factors_t* f, FILE* out);
 
 /** Get the ring */
-lp_int_ring_t* lp_upolynomial_factors_ring(const lp_upolynomial_factors_t* f);
+const lp_int_ring_t* lp_upolynomial_factors_ring(const lp_upolynomial_factors_t* f);
 
 /**
  * Set the ring of all polynomials to K. This is only possible if K is
  * "larger" than the existing ring.
  */
-void lp_upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, lp_int_ring_t* K);
+void lp_upolynomial_factors_set_ring(lp_upolynomial_factors_t* f, const lp_int_ring_t* K);
 
 #ifdef __cplusplus
 } /* close extern "C" { */

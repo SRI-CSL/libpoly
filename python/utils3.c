@@ -47,7 +47,7 @@ int PyLong_or_Int_Check(PyObject* o) {
   return 0;
 }
 
-void PyLong_or_Int_to_integer(PyObject* o, lp_int_ring_t* K, lp_integer_t* c) {
+void PyLong_or_Int_to_integer(PyObject* o, const lp_int_ring_t* K, lp_integer_t* c) {
   if (PyLong_Check(o)) {
     long c_long  = PyLong_AsLong(o);
     lp_integer_construct_from_int(K, c, c_long);

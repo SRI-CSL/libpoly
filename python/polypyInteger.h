@@ -37,7 +37,7 @@ extern PyMethodDef CoefficientRing_methods[];
 extern PyTypeObject CoefficientRingType;
 
 /** Create a ring object */
-PyObject* PyCoefficientRing_create(lp_int_ring_t* K);
+PyObject* PyCoefficientRing_create(const lp_int_ring_t* K);
 
 /** Check if the object is a polynomial */
 #define PyCoefficientRing_CHECK(arg) \

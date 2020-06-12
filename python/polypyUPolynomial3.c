@@ -309,7 +309,7 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
       other_p = ((UPolynomialObject*) other)->p;
     } else {
       long c = PyLong_AsLong(other);
-      lp_int_ring_t* K = lp_upolynomial_ring(self_p);
+      const lp_int_ring_t* K = lp_upolynomial_ring(self_p);
       other_p = lp_upolynomial_construct_from_long(K, 0, &c);
     }
 
@@ -384,8 +384,8 @@ static PyObject*
 UPolynomial_ring(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
-    lp_int_ring_t* K = lp_upolynomial_ring(p->p);
-    lp_int_ring_attach(K);
+    const lp_int_ring_t* K = lp_upolynomial_ring(p->p);
+    lp_int_ring_attach((lp_int_ring_t*)K);
     return PyCoefficientRing_create(K);
   } else {
     Py_RETURN_NONE;
@@ -432,7 +432,7 @@ static PyObject*
 UPolynomialObject_add_number(PyObject* self, PyObject* other) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   lp_integer_t c;
-  lp_int_ring_t* K = lp_upolynomial_ring(p1->p);
+  const lp_int_ring_t* K = lp_upolynomial_ring(p1->p);
   PyLong_or_Int_to_integer(other, K, &c);
   lp_upolynomial_t* c_p = lp_upolynomial_construct(K, 0, &c);
   lp_upolynomial_t* sum = lp_upolynomial_add(p1->p, c_p);
@@ -468,7 +468,7 @@ static PyObject*
 UPolynomialObject_sub_int(PyObject* self, PyObject* other, int negate) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   lp_integer_t c;
-  lp_int_ring_t* K = lp_upolynomial_ring(p1->p);
+  const lp_int_ring_t* K = lp_upolynomial_ring(p1->p);
   PyLong_or_Int_to_integer(other, K, &c);
   lp_upolynomial_t* c_p = lp_upolynomial_construct(K, 0, &c);
   lp_upolynomial_t* sub =
