@@ -1,5 +1,3 @@
-add_subdirectory(polyxx)
-
 if(LIBPOLY_BUILD_PYTHON_API)
     add_custom_target(check
         COMMAND

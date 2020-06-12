@@ -21,19 +21,19 @@ def main():
 
     args = parser.parse_args()
 
-    tests = ["python/upolynomial_gcd.py",
-             "python/upolynomial_factor.py",
-             "python/upolynomial_roots.py",
-             "python/algebraic_number.py",
-             "python/variable.py",
-             "python/polynomial_arithmetic.py",
-             "python/polynomial_sgn.py",
-             "python/polynomial_gcd.py",
-             "python/polynomial_factorization.py",
-             "python/polynomial_eval.py",
-             "python/polynomial_roots.py",
-             "python/polynomial_resultants.py",
-             "python/polynomial_feasibility.py"]
+    tests = ["tests/upolynomial_gcd.py",
+             "tests/upolynomial_factor.py",
+             "tests/upolynomial_roots.py",
+             "tests/algebraic_number.py",
+             "tests/variable.py",
+             "tests/polynomial_arithmetic.py",
+             "tests/polynomial_sgn.py",
+             "tests/polynomial_gcd.py",
+             "tests/polynomial_factorization.py",
+             "tests/polynomial_eval.py",
+             "tests/polynomial_roots.py",
+             "tests/polynomial_resultants.py",
+             "tests/polynomial_feasibility.py"]
 
     if (args.sympy):
         print("Sympy checking enabled")

@@ -65,14 +65,18 @@ add_subdirectory(include)
 
 if(LIBPOLY_BUILD_PYTHON_API)
 
-  # Need the python binary to run tests
+  # Need the Python binary to run tests
   find_package(PythonInterp)
 
-  # Configure the python bindings
+  # Configure the Python bindings
   add_subdirectory(python)
-  
+
+  # Configure the Python tests
+  add_subdirectory(test/python)
+
 endif()
 
-# Configure the tests
+# Configure the C++ tests
 enable_testing()
-add_subdirectory(test)
+add_subdirectory(test/polyxx)
+
