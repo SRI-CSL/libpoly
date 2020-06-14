@@ -278,7 +278,7 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
   }
   STAT_INCR(upolynomial, factor_distinct_degree)
 
-  lp_int_ring_t* K = f->K;
+  const lp_int_ring_t* K = f->K;
   assert(K && K->is_prime);
   assert(lp_upolynomial_is_monic(f));
 
@@ -363,7 +363,7 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
 
 static void Q_construct(lp_integer_t* Q, size_t size, const lp_upolynomial_t* u) {
 
-  lp_int_ring_t* K = lp_upolynomial_ring(u);
+  const lp_int_ring_t* K = lp_upolynomial_ring(u);
   size_t p = (size_t) integer_to_int(&K->M);
 
   size_t k;
@@ -393,7 +393,7 @@ static void Q_construct(lp_integer_t* Q, size_t size, const lp_upolynomial_t* u)
   integer_destruct(&tmp); integer_destruct(&one);
 }
 
-static void Q_column_multiply(lp_int_ring_t* K, lp_integer_t* Q, size_t size, int j, const lp_integer_t* m) {
+static void Q_column_multiply(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, int j, const lp_integer_t* m) {
 
   if (trace_is_enabled("nullspace")) {
     tracef("Multiplying column %d of Q with ", j); integer_print(m, trace_out); tracef("\n");
@@ -417,7 +417,7 @@ static void Q_column_multiply(lp_int_ring_t* K, lp_integer_t* Q, size_t size, in
 }
 
 // add column j into i multiplied by m
-static void Q_column_add(lp_int_ring_t* K, lp_integer_t* Q, size_t size, int i, const lp_integer_t* m, int j) {
+static void Q_column_add(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, int i, const lp_integer_t* m, int j) {
 
   assert(i != j);
 
@@ -453,7 +453,7 @@ static void Q_column_add(lp_int_ring_t* K, lp_integer_t* Q, size_t size, int i, 
   }
 }
 
-static void Q_null_space(lp_int_ring_t* K, lp_integer_t* Q, size_t size, lp_integer_t** v, size_t* v_size) {
+static void Q_null_space(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, lp_integer_t** v, size_t* v_size) {
 
   *v_size = 0;
 
@@ -595,7 +595,7 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
 
   // Polynomial to factor and it's degree
   size_t deg_f = lp_upolynomial_degree(f);
-  lp_int_ring_t* K = lp_upolynomial_ring(f);
+  const lp_int_ring_t* K = lp_upolynomial_ring(f);
 
   // If degree < 2 we're done
   if (deg_f < 2) {
@@ -721,7 +721,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
     tracef("upolynomial_factor_Zp("); lp_upolynomial_print(f, trace_out); tracef(")\n");
   }
 
-  lp_int_ring_t* K = f->K;
+  const lp_int_ring_t* K = f->K;
 
   assert(K && K->is_prime);
   assert(lp_upolynomial_degree(f) > 0);
@@ -857,7 +857,7 @@ void hensel_lift_initialize(const lp_upolynomial_factors_t* A, lp_upolynomial_fa
   // The number of factors
   const int r = A->size;
 
-  lp_int_ring_t* K = lp_upolynomial_factors_ring(A);
+  const lp_int_ring_t* K = lp_upolynomial_factors_ring(A);
 
   // All the Q_i = A_i*...*A_r
   lp_upolynomial_t* Q[r];
@@ -1018,7 +1018,7 @@ void hensel_lift_quadratic(const lp_upolynomial_t* F,
   assert(V->size == 0);
 
   // The ring we are lifting
-  lp_int_ring_t* Zq = A->factors[0]->K;
+  const lp_int_ring_t* Zq = A->factors[0]->K;
   // The modulus
   const lp_integer_t* q = &Zq->M;
 

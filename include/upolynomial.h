@@ -33,24 +33,24 @@ extern "C" {
  * Construct the polynomial given its coefficients. Coefficients should be
  * indexed by degree and they will be normalized according to the given ring.
  */
-lp_upolynomial_t* lp_upolynomial_construct(lp_int_ring_t* K, size_t degree, const lp_integer_t* coefficients);
+lp_upolynomial_t* lp_upolynomial_construct(const lp_int_ring_t* K, size_t degree, const lp_integer_t* coefficients);
 
 /**
  * Construct the polynomial c*x^d.
  */
-lp_upolynomial_t* lp_upolynomial_construct_power(lp_int_ring_t* K, size_t degree, long c);
+lp_upolynomial_t* lp_upolynomial_construct_power(const lp_int_ring_t* K, size_t degree, long c);
 
 /**
  * Construct the polynomial given its coefficients. Coefficients should be
  * indexed by degree and they will be normalize according to the given ring.
  */
-lp_upolynomial_t* lp_upolynomial_construct_from_int(lp_int_ring_t* K, size_t degree, const int* coefficients);
+lp_upolynomial_t* lp_upolynomial_construct_from_int(const lp_int_ring_t* K, size_t degree, const int* coefficients);
 
 /**
  * Construct the polynomial given its coefficients. Coefficients should be
  * indexed by degree and they will be normalize according to the given ring.
  */
-lp_upolynomial_t* lp_upolynomial_construct_from_long(lp_int_ring_t* K, size_t degree, const long* coefficients);
+lp_upolynomial_t* lp_upolynomial_construct_from_long(const lp_int_ring_t* K, size_t degree, const long* coefficients);
 
 /**
  * Construct a copy of the polynomial.
@@ -60,7 +60,7 @@ lp_upolynomial_t* lp_upolynomial_construct_copy(const lp_upolynomial_t* p);
 /**
  * Construct a copy of the polynomial, but change the ring.
  */
-lp_upolynomial_t* lp_upolynomial_construct_copy_K(lp_int_ring_t* K, const lp_upolynomial_t* p);
+lp_upolynomial_t* lp_upolynomial_construct_copy_K(const lp_int_ring_t* K, const lp_upolynomial_t* p);
 
 /**
  * Frees the polynomial data and detaches the ring. */
@@ -75,12 +75,12 @@ size_t lp_upolynomial_degree(const lp_upolynomial_t* p);
 /**
  * Returns the field of the polynomial (unatached).
  */
-lp_int_ring_t* lp_upolynomial_ring(const lp_upolynomial_t* p);
+const lp_int_ring_t* lp_upolynomial_ring(const lp_upolynomial_t* p);
 
 /**
  * Sets the ring to given ring (has to be "larger" than existing).
  */
-void lp_upolynomial_set_ring(lp_upolynomial_t* p, lp_int_ring_t* K);
+void lp_upolynomial_set_ring(lp_upolynomial_t* p, const lp_int_ring_t* K);
 
 /**
  * Returns the lead coefficient of the given polynomial.

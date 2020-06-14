@@ -108,7 +108,7 @@ PyCoefficientRing_create(lp_int_ring_t* K) {
   CoefficientRing *self;
   self = (CoefficientRing*)CoefficientRingType.tp_alloc(&CoefficientRingType, 0);
   if (self != NULL) {
-    self->K = K;
+    self->K = (lp_int_ring_t*)K;
   }
   return (PyObject *)self;
 }
