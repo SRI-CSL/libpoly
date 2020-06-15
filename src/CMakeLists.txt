@@ -43,6 +43,8 @@ endif()
 
 set(polyxx_SOURCES
   polyxx/context.cpp
+  polyxx/dyadic_interval.cpp
+  polyxx/dyadic_rational.cpp
   polyxx/integer_ring.cpp
   polyxx/integer.cpp
   polyxx/rational.cpp
