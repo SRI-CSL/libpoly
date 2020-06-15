@@ -43,6 +43,9 @@ endif()
 
 set(polyxx_SOURCES
   polyxx/context.cpp
+  polyxx/integer_ring.cpp
+  polyxx/integer.cpp
+  polyxx/rational.cpp
   polyxx/variable.cpp
 )
 
