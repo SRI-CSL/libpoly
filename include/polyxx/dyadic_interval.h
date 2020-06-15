@@ -66,6 +66,29 @@ namespace poly {
     void scale(int n);
   };
 
+  /** Make sure that we can cast between DyadicInterval and
+   * lp_dyadic_interval_t. */
+  static_assert(sizeof(DyadicInterval) == sizeof(lp_dyadic_interval_t),
+                "Please check the size of DyadicInterval.");
+  namespace detail {
+    /** Non-const cast from an DyadicInterval to a lp_dyadic_interval_t. */
+    inline lp_dyadic_interval_t* cast_to(DyadicInterval* i) {
+      return reinterpret_cast<lp_dyadic_interval_t*>(i);
+    }
+    /** Const cast from an DyadicInterval to a lp_dyadic_interval_t. */
+    inline const lp_dyadic_interval_t* cast_to(const DyadicInterval* i) {
+      return reinterpret_cast<const lp_dyadic_interval_t*>(i);
+    }
+    /** Non-const cast from a lp_dyadic_interval_t to an DyadicInterval. */
+    inline DyadicInterval* cast_from(lp_dyadic_interval_t* i) {
+      return reinterpret_cast<DyadicInterval*>(i);
+    }
+    /** Const cast from a lp_dyadic_interval_t to an DyadicInterval. */
+    inline const DyadicInterval* cast_from(const lp_dyadic_interval_t* i) {
+      return reinterpret_cast<const DyadicInterval*>(i);
+    }
+  }  // namespace detail
+
   /** Stream the given DyadicInterval to an output stream. */
   std::ostream& operator<<(std::ostream& os, const DyadicInterval& i);
 
