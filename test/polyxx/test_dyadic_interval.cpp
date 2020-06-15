@@ -36,8 +36,7 @@ TEST_CASE("dyadic_interval::scale") {
   {
     DyadicInterval di(-1, 1);
     di.scale(-2);
-    // TODO: https://github.com/SRI-CSL/libpoly/pull/26
-    // CHECK(di == DyadicInterval(DyadicRational(-1,2), DyadicRational(1,2)));
+    CHECK(di == DyadicInterval(DyadicRational(-1,2), DyadicRational(1,2)));
   }
   {
     DyadicInterval di(-1, 1);
