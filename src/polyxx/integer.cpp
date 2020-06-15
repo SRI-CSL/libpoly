@@ -253,7 +253,7 @@ namespace poly {
   }
 
   Integer sqrt(const Integer& i) {
-    assert(i >= 0);
+    assert(i >= Integer());
     Integer res;
     lp_integer_sqrt_Z(res.get_internal(), i.get_internal());
     return res;

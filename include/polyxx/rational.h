@@ -18,7 +18,7 @@ namespace poly {
     /** Construct as zero. */
     Rational();
     /** Construct from an int. */
-    Rational(int i);
+    explicit Rational(int i);
     /** Copy from a rational. */
     Rational(const Rational& r);
     /** Move from a rational. */
@@ -29,9 +29,12 @@ namespace poly {
     /** Copy from numerator and denominator. */
     Rational(const Integer& num, const Integer& denom);
     /** Copy from Integer. */
-    Rational(const Integer& i);
+    explicit Rational(const Integer& i);
     /** Construct as d. */
-    Rational(double d);
+    explicit Rational(double d);
+    /** Construct from a mpq_class, which is the underlying representation
+     * anyway. */
+    explicit Rational(const mpq_class& m);
 
     /** Custom destructor. */
     ~Rational();
