@@ -48,6 +48,7 @@ set(polyxx_SOURCES
   polyxx/integer_ring.cpp
   polyxx/integer.cpp
   polyxx/rational.cpp
+  polyxx/sign_condition.cpp
   polyxx/variable.cpp
 )
 
@@ -69,7 +70,7 @@ set_target_properties(poly PROPERTIES
 target_link_libraries(poly ${GMP_LIBRARY})
 
 add_library(polyxx SHARED ${polyxx_SOURCES})
-set_target_properties(polyxx PROPERTIES 
+set_target_properties(polyxx PROPERTIES
   VERSION ${LIBPOLY_VERSION} 
   SOVERSION ${LIBPOLY_VERSION_MAJOR}
 ) 
