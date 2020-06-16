@@ -18,11 +18,11 @@ namespace poly {
   };
 
   /** Casts from SignCondition to lp_sign_condition_t. */
-  lp_sign_condition_t to_sign_condition(SignCondition sc) {
+  inline lp_sign_condition_t to_sign_condition(SignCondition sc) {
     return static_cast<lp_sign_condition_t>(sc);
   }
   /** Casts from lp_sign_condition_t to SignCondition. */
-  SignCondition to_sign_condition(lp_sign_condition_t sc) {
+  inline SignCondition to_sign_condition(lp_sign_condition_t sc) {
     return static_cast<SignCondition>(sc);
   }
 
