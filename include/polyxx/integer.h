@@ -77,6 +77,8 @@ namespace poly {
   /** Make sure that we can cast between Integer and lp_integer_t. */
   static_assert(sizeof(Integer) == sizeof(lp_integer_t),
                 "Please check the size of Integer.");
+  static_assert(sizeof(Integer) == sizeof(mpz_class),
+                "Please check the size of Integer.");
   namespace detail {
     /** Non-const cast from an Integer to a lp_integer_t. */
     inline lp_integer_t* cast_to(Integer* i) {
@@ -86,12 +88,28 @@ namespace poly {
     inline const lp_integer_t* cast_to(const Integer* i) {
       return reinterpret_cast<const lp_integer_t*>(i);
     }
+    /** Non-const cast from an Integer to a mpz_class. */
+    inline mpz_class* cast_to_gmp(Integer* i) {
+      return reinterpret_cast<mpz_class*>(i);
+    }
+    /** Const cast from an Integer to a mpz_class. */
+    inline const mpz_class* cast_to_gmp(const Integer* i) {
+      return reinterpret_cast<const mpz_class*>(i);
+    }
     /** Non-const cast from a lp_integer_t to an Integer. */
     inline Integer* cast_from(lp_integer_t* i) {
       return reinterpret_cast<Integer*>(i);
     }
     /** Const cast from a lp_integer_t to an Integer. */
     inline const Integer* cast_from(const lp_integer_t* i) {
+      return reinterpret_cast<const Integer*>(i);
+    }
+    /** Non-const cast from a mpz_class to an Integer. */
+    inline Integer* cast_from(mpz_class* i) {
+      return reinterpret_cast<Integer*>(i);
+    }
+    /** Const cast from a mpz_class to an Integer. */
+    inline const Integer* cast_from(const mpz_class* i) {
       return reinterpret_cast<const Integer*>(i);
     }
   }  // namespace detail
