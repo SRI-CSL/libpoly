@@ -10,4 +10,5 @@
 #include "polyxx/integer_ring.h"
 #include "polyxx/rational.h"
 #include "polyxx/upolynomial.h"
+#include "polyxx/value.h"
 #include "polyxx/variable.h"

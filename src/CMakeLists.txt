@@ -50,6 +50,7 @@ set(polyxx_SOURCES
   polyxx/integer.cpp
   polyxx/rational.cpp
   polyxx/upolynomial.cpp
+  polyxx/value.cpp
   polyxx/variable.cpp
 )
 
