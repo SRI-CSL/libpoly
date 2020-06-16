@@ -54,6 +54,8 @@ namespace poly {
   /** Make sure that we can cast between Rational and lp_rational_t. */
   static_assert(sizeof(Rational) == sizeof(lp_rational_t),
                 "Please check the size of Rational.");
+  static_assert(sizeof(Rational) == sizeof(mpq_class),
+                "Please check the size of Rational.");
   namespace detail {
     /** Non-const cast from a Rational to a lp_rational_t. */
     inline lp_rational_t* cast_to(Rational* i) {
@@ -63,12 +65,28 @@ namespace poly {
     inline const lp_rational_t* cast_to(const Rational* i) {
       return reinterpret_cast<const lp_rational_t*>(i);
     }
+    /** Non-const cast from an Rational to a mpz_class. */
+    inline mpq_class* cast_to_gmp(Rational* i) {
+      return reinterpret_cast<mpq_class*>(i);
+    }
+    /** Const cast from an Rational to a mpz_class. */
+    inline const mpq_class* cast_to_gmp(const Rational* i) {
+      return reinterpret_cast<const mpq_class*>(i);
+    }
     /** Non-const cast from a lp_rational_t to a Rational. */
     inline Rational* cast_from(lp_rational_t* i) {
       return reinterpret_cast<Rational*>(i);
     }
     /** Const cast from a lp_rational_t to a Rational. */
     inline const Rational* cast_from(const lp_rational_t* i) {
+      return reinterpret_cast<const Rational*>(i);
+    }
+    /** Non-const cast from a mpq_class to a Rational. */
+    inline Rational* cast_from(mpq_class* i) {
+      return reinterpret_cast<Rational*>(i);
+    }
+    /** Const cast from a mpq_class to a Rational. */
+    inline const Rational* cast_from(const mpq_class* i) {
       return reinterpret_cast<const Rational*>(i);
     }
   }  // namespace detail
