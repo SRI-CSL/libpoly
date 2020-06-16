@@ -42,12 +42,14 @@ if (NOT HAVE_OPEN_MEMSTREAM)
 endif()
 
 set(polyxx_SOURCES
+  polyxx/algebraic_number.cpp
   polyxx/context.cpp
   polyxx/dyadic_interval.cpp
   polyxx/dyadic_rational.cpp
   polyxx/integer_ring.cpp
   polyxx/integer.cpp
   polyxx/rational.cpp
+  polyxx/upolynomial.cpp
   polyxx/variable.cpp
 )
 
