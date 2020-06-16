@@ -1,8 +1,10 @@
 set(polyxx_tests
+    test_algebraic_number
     test_dyadic_interval
     test_dyadic_rational
     test_integer
     test_rational
+    test_upolynomial
     test_variable
 )
 
