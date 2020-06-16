@@ -42,6 +42,7 @@ if (NOT HAVE_OPEN_MEMSTREAM)
 endif()
 
 set(polyxx_SOURCES
+  polyxx/algebraic_number.cpp
   polyxx/context.cpp
   polyxx/dyadic_interval.cpp
   polyxx/dyadic_rational.cpp
@@ -49,6 +50,7 @@ set(polyxx_SOURCES
   polyxx/integer.cpp
   polyxx/rational.cpp
   polyxx/sign_condition.cpp
+  polyxx/upolynomial.cpp
   polyxx/variable.cpp
 )
 
