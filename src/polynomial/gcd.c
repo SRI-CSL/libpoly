@@ -734,6 +734,13 @@ lp_polynomial_vector_t* coefficient_mgcd_primitive(const lp_polynomial_context_t
     }
   } while (1);
 
+  // Remove temps
+  coefficient_destruct(&A);
+  coefficient_destruct(&B);
+  coefficient_destruct(&P);
+  coefficient_destruct(&R);
+  coefficient_destruct(&cont);
+
   // Return the assumptions
   return assumptions;
 }
