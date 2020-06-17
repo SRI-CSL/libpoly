@@ -107,7 +107,7 @@ namespace poly {
   }
 
   std::ostream& operator<<(std::ostream& os, const Value& v) {
-    return os << lp_value_to_string(v.get_internal());
+    return stream_ptr(os, lp_value_to_string(v.get_internal()));
   }
 
   void swap(Value& lhs, Value& rhs) {
