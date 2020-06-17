@@ -18,14 +18,7 @@ TEST_CASE("value::constructors") {
 
 TEST_CASE("value::operator==") {
     CHECK(Value() == Value());
-    CHECK_FALSE(Value() == Value::minus_infty());
-    CHECK_FALSE(Value() == Value(-20));
-    CHECK_FALSE(Value() == Value(Integer(-15)));
-    CHECK_FALSE(Value() == Value(DyadicRational(-6,2)));
-    CHECK_FALSE(Value() == Value(Rational(1,2)));
-    CHECK_FALSE(Value() == Value(AlgebraicNumber(5)));
-    CHECK_FALSE(Value() == Value::plus_infty());
-
+    
     CHECK(Value::minus_infty() == Value::minus_infty());
     CHECK_FALSE(Value::minus_infty() == Value(-20));
     CHECK_FALSE(Value::minus_infty() == Value(Integer(-15)));
@@ -64,14 +57,7 @@ TEST_CASE("value::operator==") {
 
 TEST_CASE("value::operator!=") {
     CHECK_FALSE(Value() != Value());
-    CHECK(Value() != Value::minus_infty());
-    CHECK(Value() != Value(-20));
-    CHECK(Value() != Value(Integer(-15)));
-    CHECK(Value() != Value(DyadicRational(-6,2)));
-    CHECK(Value() != Value(Rational(1,2)));
-    CHECK(Value() != Value(AlgebraicNumber(5)));
-    CHECK(Value() != Value::plus_infty());
-
+    
     CHECK_FALSE(Value::minus_infty() != Value::minus_infty());
     CHECK(Value::minus_infty() != Value(-20));
     CHECK(Value::minus_infty() != Value(Integer(-15)));
@@ -110,14 +96,7 @@ TEST_CASE("value::operator!=") {
 
 TEST_CASE("value::operator<") {
     CHECK_FALSE(Value() < Value());
-    CHECK(Value() < Value::minus_infty());
-    CHECK(Value() < Value(-20));
-    CHECK(Value() < Value(Integer(-15)));
-    CHECK(Value() < Value(DyadicRational(-6,2)));
-    CHECK(Value() < Value(Rational(1,2)));
-    CHECK(Value() < Value(AlgebraicNumber(5)));
-    CHECK(Value() < Value::plus_infty());
-
+    
     CHECK_FALSE(Value::minus_infty() < Value::minus_infty());
     CHECK(Value::minus_infty() < Value(-20));
     CHECK(Value::minus_infty() < Value(Integer(-15)));
@@ -156,14 +135,7 @@ TEST_CASE("value::operator<") {
 
 TEST_CASE("value::operator<=") {
     CHECK(Value() <= Value());
-    CHECK(Value() <= Value::minus_infty());
-    CHECK(Value() <= Value(-20));
-    CHECK(Value() <= Value(Integer(-15)));
-    CHECK(Value() <= Value(DyadicRational(-6,2)));
-    CHECK(Value() <= Value(Rational(1,2)));
-    CHECK(Value() <= Value(AlgebraicNumber(5)));
-    CHECK(Value() <= Value::plus_infty());
-
+    
     CHECK(Value::minus_infty() <= Value::minus_infty());
     CHECK(Value::minus_infty() <= Value(-20));
     CHECK(Value::minus_infty() <= Value(Integer(-15)));
@@ -202,14 +174,7 @@ TEST_CASE("value::operator<=") {
 
 TEST_CASE("value::operator>") {
     CHECK_FALSE(Value() > Value());
-    CHECK_FALSE(Value() > Value::minus_infty());
-    CHECK_FALSE(Value() > Value(-20));
-    CHECK_FALSE(Value() > Value(Integer(-15)));
-    CHECK_FALSE(Value() > Value(DyadicRational(-6,2)));
-    CHECK_FALSE(Value() > Value(Rational(1,2)));
-    CHECK_FALSE(Value() > Value(AlgebraicNumber(5)));
-    CHECK_FALSE(Value() > Value::plus_infty());
-
+    
     CHECK_FALSE(Value::minus_infty() > Value::minus_infty());
     CHECK_FALSE(Value::minus_infty() > Value(-20));
     CHECK_FALSE(Value::minus_infty() > Value(Integer(-15)));
@@ -248,14 +213,7 @@ TEST_CASE("value::operator>") {
 
 TEST_CASE("value::operator>=") {
     CHECK(Value() >= Value());
-    CHECK_FALSE(Value() >= Value::minus_infty());
-    CHECK_FALSE(Value() >= Value(-20));
-    CHECK_FALSE(Value() >= Value(Integer(-15)));
-    CHECK_FALSE(Value() >= Value(DyadicRational(-6,2)));
-    CHECK_FALSE(Value() >= Value(Rational(1,2)));
-    CHECK_FALSE(Value() >= Value(AlgebraicNumber(5)));
-    CHECK_FALSE(Value() >= Value::plus_infty());
-
+    
     CHECK(Value::minus_infty() >= Value::minus_infty());
     CHECK_FALSE(Value::minus_infty() >= Value(-20));
     CHECK_FALSE(Value::minus_infty() >= Value(Integer(-15)));
