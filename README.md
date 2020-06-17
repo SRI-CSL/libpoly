@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/SRI-CSL/libpoly.svg?branch=master)](https://travis-ci.org/SRI-CSL/libpoly)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/5716/badge.svg)](https://scan.coverity.com/projects/5716)
-
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/SRI-CSL/libpoly)
 
 # LibPoly
 
