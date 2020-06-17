@@ -728,9 +728,73 @@ void lp_algebraic_number_add_interval_op(lp_dyadic_interval_t* I, const lp_dyadi
   dyadic_interval_add(I, I1, I2);
 }
 
+lp_upolynomial_t* lp_upolynomial_shift(const lp_upolynomial_t* poly, const lp_integer_t* shift_num, unsigned long shift_den_exp) {
+  lp_integer_t shift_den;
+  lp_integer_construct_from_int(lp_Z, &shift_den, -1);
+  lp_integer_mul_pow2(lp_Z, &shift_den, &shift_den, shift_den_exp);
+  lp_integer_t multcoeffs[2] = { *shift_num, shift_den };
+  lp_upolynomial_t* basemult = lp_upolynomial_construct(lp_Z, 1, multcoeffs);
+  lp_upolynomial_t* curmult = lp_upolynomial_construct_copy(basemult);
+
+  lp_integer_t coeffs[lp_upolynomial_degree(poly) + 1];
+  for (size_t i = 0; i <= lp_upolynomial_degree(poly); ++i) {
+    lp_integer_construct(&coeffs[i]);
+  }
+  lp_upolynomial_unpack(poly, coeffs);
+
+  lp_upolynomial_t* out = lp_upolynomial_construct(lp_Z, 0, coeffs);
+  
+  for (size_t i = 1; i <= lp_upolynomial_degree(poly); ++i) {
+    lp_upolynomial_t* cur = lp_upolynomial_mul_c(curmult, &coeffs[i]);
+    
+    lp_upolynomial_t* tout = lp_upolynomial_add(out, cur);
+    lp_upolynomial_t* tcurmult = lp_upolynomial_mul(curmult, basemult);
+    lp_upolynomial_delete(cur);
+    lp_upolynomial_delete(curmult);
+    lp_upolynomial_delete(out);
+    out = tout;
+    curmult = tcurmult;
+  }
+  for (size_t i = 0; i <= lp_upolynomial_degree(poly); ++i) {
+    lp_integer_destruct(&coeffs[i]);
+  }
+  lp_integer_destruct(&shift_den);
+
+  lp_upolynomial_delete(basemult);
+  lp_upolynomial_delete(curmult);
+  return out;
+}
+
+void lp_algebraic_number_add_dyadic_rational(lp_algebraic_number_t* sum, const lp_algebraic_number_t* an, const lp_dyadic_rational_t* dr) {
+  lp_upolynomial_t* newf = lp_upolynomial_shift(an->f, &dr->a, dr->n);
+  lp_algebraic_number_destruct(sum);
+  lp_dyadic_interval_t di;
+  lp_dyadic_interval_construct_copy(&di, &an->I);
+  lp_dyadic_rational_add(&di.b, &di.b, dr);
+  lp_dyadic_rational_add(&di.a, &di.a, dr);
+  lp_algebraic_number_construct(sum, newf, &di);
+  lp_dyadic_interval_destruct(&di);
+}
+
 void lp_algebraic_number_add(lp_algebraic_number_t* sum, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b) {
-  assert(a->f && b->f);
-  lp_algebraic_number_op(sum, a, b, lp_algebraic_number_add_construct_op, lp_algebraic_number_add_interval_op, 0);
+  if (!a->f && !b->f) {
+    assert(lp_dyadic_interval_is_point(&a->I) && lp_dyadic_interval_is_point(&b->I));
+    sum->f = 0;
+    lp_dyadic_interval_construct_copy(&sum->I, &a->I);
+    lp_dyadic_rational_add(&sum->I.a, &sum->I.a, &b->I.a);
+    return;
+  } else if (!a->f) {
+    assert(lp_dyadic_interval_is_point(&a->I));
+    lp_algebraic_number_add_dyadic_rational(sum, b, &a->I.a);
+    return;
+  } else if (!b->f) {
+    assert(lp_dyadic_interval_is_point(&b->I));
+    lp_algebraic_number_add_dyadic_rational(sum, a, &b->I.a);
+    return;
+  } else {
+    assert(a->f && b->f);
+    lp_algebraic_number_op(sum, a, b, lp_algebraic_number_add_construct_op, lp_algebraic_number_add_interval_op, 0);
+  }
 }
 
 void lp_algebraic_number_sub_construct_op(coefficient_t* f_r, void* data) {

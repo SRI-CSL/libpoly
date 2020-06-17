@@ -29,7 +29,7 @@ namespace poly {
   }
 
   std::ostream& operator<<(std::ostream& os, const IntegerRing& ir) {
-    return os << lp_int_ring_to_string(ir.get_internal());
+    return stream_ptr(os, lp_int_ring_to_string(ir.get_internal()));
   }
 
 }  // namespace poly
