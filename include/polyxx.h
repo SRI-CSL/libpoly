@@ -11,6 +11,7 @@
 #include "polyxx/interval.h"
 #include "polyxx/interval_assignment.h"
 #include "polyxx/rational.h"
+#include "polyxx/rational_interval.h"
 #include "polyxx/sign_condition.h"
 #include "polyxx/upolynomial.h"
 #include "polyxx/value.h"
