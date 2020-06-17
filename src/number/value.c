@@ -280,12 +280,7 @@ int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
   }
 
   // Different types
-  if (v1->type == LP_VALUE_NONE) {
-    return -1;
-  }
-  if (v2->type == LP_VALUE_NONE) {
-    return 1;
-  }
+  assert(v1->type != LP_VALUE_NONE && v2->type != LP_VALUE_NONE);
   if (v1->type == LP_VALUE_MINUS_INFINITY) {
     return -1;
   }
