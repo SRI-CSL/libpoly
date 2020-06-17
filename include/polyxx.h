@@ -3,6 +3,7 @@
 #include "poly.h"
 
 #include "polyxx/algebraic_number.h"
+#include "polyxx/assignment.h"
 #include "polyxx/context.h"
 #include "polyxx/dyadic_interval.h"
 #include "polyxx/dyadic_rational.h"

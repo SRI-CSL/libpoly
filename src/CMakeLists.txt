@@ -43,6 +43,7 @@ endif()
 
 set(polyxx_SOURCES
   polyxx/algebraic_number.cpp
+  polyxx/assignment.cpp
   polyxx/context.cpp
   polyxx/dyadic_interval.cpp
   polyxx/dyadic_rational.cpp
