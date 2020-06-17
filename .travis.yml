@@ -11,6 +11,18 @@ compiler:
   - clang
   - gcc
 
+addons:
+  apt:
+    packages:
+      - cmake
+      - libgmp-dev
+      - make
+  homebrew:
+    packages:
+      - cmake
+      - gmp
+      - pyenv
+
 env:
   matrix:
     # iam: the precise versions are need, so we know whether we have to install
@@ -20,10 +32,6 @@ env:
     - CMAKE_BUILD_TYPE=Debug PYTHON=3.6.7
     - CMAKE_BUILD_TYPE=Release PYTHON=2.7.15
     - CMAKE_BUILD_TYPE=Release PYTHON=3.6.7
-
-before_install:
-   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-key update; sudo apt-get update; fi
-   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
 
 install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/ubuntu.deps.sh; fi

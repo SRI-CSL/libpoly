@@ -1,19 +1,15 @@
 #!/bin/bash
-brew outdated cmake || brew upgrade cmake
-brew outdated gmp || brew upgrade gmp
 
+echo 'eval "$(pyenv init -)"' >> ${HOME}/.bash_profile
 
-brew outdated pyenv || brew upgrade pyenv;
+source ${HOME}/.bash_profile
 
-echo $PYTHON
+pyenv versions | grep ${PYTHON}
+if [[ $? != 0 ]]; then
+    pyenv install ${PYTHON}
+fi
 
-echo 'eval "$(pyenv init -)"' >> ${HOME}/.bash_profile;
-
-source ${HOME}/.bash_profile;
-
-# no python 2.7.15 or 3.6.7 on osx as of 10/2019;
-pyenv install ${PYTHON};
-pyenv global ${PYTHON};
-
+echo "Using ${PYTHON}"
+pyenv global ${PYTHON}
 
 pip install sympy
