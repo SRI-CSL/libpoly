@@ -52,6 +52,7 @@ set(polyxx_SOURCES
   polyxx/sign_condition.cpp
   polyxx/upolynomial.cpp
   polyxx/utils.cpp
+  polyxx/value.cpp
   polyxx/variable.cpp
 )
 

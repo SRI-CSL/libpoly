@@ -5,6 +5,7 @@ set(polyxx_tests
     test_integer
     test_rational
     test_upolynomial
+    test_value
     test_variable
 )
 
