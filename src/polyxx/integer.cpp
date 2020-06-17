@@ -70,7 +70,7 @@ namespace poly {
   const lp_integer_t* Integer::get_internal() const { return &mInt; }
 
   std::ostream& operator<<(std::ostream& os, const Integer& i) {
-    return os << lp_integer_to_string(i.get_internal());
+    return stream_ptr(os, lp_integer_to_string(i.get_internal()));
   }
 
   std::size_t bit_size(const Integer& i) {

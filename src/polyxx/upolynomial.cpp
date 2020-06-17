@@ -111,7 +111,7 @@ namespace poly {
   }
 
   std::ostream& operator<<(std::ostream& os, const UPolynomial& p) {
-    return os << lp_upolynomial_to_string(p.get_internal());
+    return stream_ptr(os, lp_upolynomial_to_string(p.get_internal()));
   }
 
   bool is_zero(const UPolynomial& p) {

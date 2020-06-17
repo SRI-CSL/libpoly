@@ -50,7 +50,7 @@ namespace poly {
   }
 
   std::ostream& operator<<(std::ostream& os, const AlgebraicNumber& v) {
-    return os << lp_algebraic_number_to_string(v.get_internal());
+    return stream_ptr(os, lp_algebraic_number_to_string(v.get_internal()));
   }
 
   void swap(AlgebraicNumber& lhs, AlgebraicNumber& rhs) {
