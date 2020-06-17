@@ -53,7 +53,7 @@ namespace poly {
   }
 
   std::ostream& operator<<(std::ostream& os, const DyadicRational& r) {
-    return os << lp_dyadic_rational_to_string(r.get_internal());
+    return stream_ptr(os, lp_dyadic_rational_to_string(r.get_internal()));
   }
 
   double to_double(const DyadicRational& r) {

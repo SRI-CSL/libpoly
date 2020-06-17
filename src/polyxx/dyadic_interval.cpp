@@ -74,8 +74,9 @@ namespace poly {
 
   std::ostream& operator<<(std::ostream& os, const DyadicInterval& i) {
     os << (i.get_internal()->a_open ? "( " : "[ ");
-    os << lp_dyadic_rational_to_string(&(i.get_internal()->a)) << " ; "
-       << lp_dyadic_rational_to_string(&(i.get_internal()->b));
+    stream_ptr(os, lp_dyadic_rational_to_string(&(i.get_internal()->a)));
+    os << " ; ";
+    stream_ptr(os, lp_dyadic_rational_to_string(&(i.get_internal()->b)));
     os << (i.get_internal()->b_open ? " )" : " ]");
     return os;
   }
