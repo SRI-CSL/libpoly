@@ -48,7 +48,10 @@ set(polyxx_SOURCES
   polyxx/dyadic_rational.cpp
   polyxx/integer_ring.cpp
   polyxx/integer.cpp
+  polyxx/interval_assignment.cpp
+  polyxx/interval.cpp
   polyxx/rational.cpp
+  polyxx/rational_interval.cpp
   polyxx/sign_condition.cpp
   polyxx/upolynomial.cpp
   polyxx/utils.cpp
