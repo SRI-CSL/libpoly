@@ -30,6 +30,10 @@ namespace poly {
   Value::Value(const Rational& r)
       : Value(lp_value_type_t::LP_VALUE_RATIONAL, r.get_internal()) {}
 
+  Value::~Value() {
+    lp_value_destruct(get_internal());
+  }
+
   Value& Value::operator=(const Value& v) {
     lp_value_assign(get_internal(), v.get_internal());
     return *this;

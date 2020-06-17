@@ -44,6 +44,9 @@ namespace poly {
     /** Construct from a rational. */
     Value(const Rational& r);
 
+    /** Custom destructor. */
+    ~Value();
+
     /** Copy from the given Value. */
     Value& operator=(const Value& v);
     /** Move from the given Value. */
