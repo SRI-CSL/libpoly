@@ -15,7 +15,7 @@
 namespace poly {
 
   /**
-   * Implements a wrapper for lp_upolynomial_t from libpoly.
+   * Implements a wrapper for lp_upolynomial_t.
    */
   class UPolynomial {
     /** The actual univariate polynomial. */
@@ -37,7 +37,8 @@ namespace poly {
     /** Create from integer coefficients. */
     explicit UPolynomial(const std::vector<Integer>& coefficients);
     /** Create from integer coefficients into the given integer ring. */
-    UPolynomial(const IntegerRing& ir, const std::vector<Integer>& coefficients);
+    UPolynomial(const IntegerRing& ir,
+                const std::vector<Integer>& coefficients);
     /** Create from integer coefficients. */
     explicit UPolynomial(const std::vector<long>& coefficients);
     /** Create from integer coefficients into the given integer ring. */
@@ -46,7 +47,8 @@ namespace poly {
     /** Create from integer coefficients. */
     explicit UPolynomial(std::initializer_list<long> coefficients);
     /** Create from integer coefficients into the given integer ring. */
-    UPolynomial(const IntegerRing& ir, std::initializer_list<long> coefficients);
+    UPolynomial(const IntegerRing& ir,
+                std::initializer_list<long> coefficients);
 
     /** Construct c * x^degree. */
     UPolynomial(std::size_t degree, long c);
@@ -220,5 +222,17 @@ namespace poly {
 
   /** Compute the sturm sequence of a polynomial. */
   std::vector<UPolynomial> sturm_sequence(const UPolynomial& p);
+
+  class AlgebraicNumber;
+  class RationalInterval;
+
+  /** Count the real roots of a polynomial within a rational interval.*/
+  std::size_t count_real_roots(const UPolynomial& p,
+                               const RationalInterval& ri);
+
+  /** Isolate the real roots of a UPolynomial, returning them as algebraic
+   * numbers. The roots are sorted in increasing numerical order.
+   */
+  std::vector<AlgebraicNumber> isolate_real_roots(const UPolynomial& p);
 
 }  // namespace poly
