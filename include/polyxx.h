@@ -15,6 +15,5 @@
 #include "polyxx/rational_interval.h"
 #include "polyxx/sign_condition.h"
 #include "polyxx/upolynomial.h"
-#include "polyxx/upolynomial_roots.h"
 #include "polyxx/value.h"
 #include "polyxx/variable.h"
