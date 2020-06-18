@@ -9,7 +9,7 @@
 namespace poly {
 
   /**
-   * Implements a wrapper for lp_dyadic_interval_t from libpoly.
+   * Implements a wrapper for lp_dyadic_interval_t.
    */
   class DyadicInterval {
    private:

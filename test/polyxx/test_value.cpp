@@ -18,7 +18,7 @@ TEST_CASE("value::constructors") {
 
 TEST_CASE("value::operator==") {
     CHECK(Value() == Value());
-    
+
     CHECK(Value::minus_infty() == Value::minus_infty());
     CHECK_FALSE(Value::minus_infty() == Value(-20));
     CHECK_FALSE(Value::minus_infty() == Value(Integer(-15)));

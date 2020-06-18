@@ -8,7 +8,7 @@
 namespace poly {
 
   /**
-   * Implements a wrapper for lp_variable_t from libpoly.
+   * Implements a wrapper for lp_variable_t.
    */
   class Variable {
     /** The actual variable. */

@@ -124,13 +124,13 @@ namespace poly {
   bool operator==(const Integer& lhs, const Integer& rhs);
   /** Compare two integers. */
   bool operator!=(const Integer& lhs, const Integer& rhs);
-  /** Compare two integers. */
+  /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator<(const Integer& lhs, const Integer& rhs);
-  /** Compare two integers. */
+  /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator<=(const Integer& lhs, const Integer& rhs);
-  /** Compare two integers. */
+  /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator>(const Integer& lhs, const Integer& rhs);
-  /** Compare two integers. */
+  /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator>=(const Integer& lhs, const Integer& rhs);
 
   /** Compare two integers over the given ring. */

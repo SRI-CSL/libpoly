@@ -11,7 +11,7 @@
 namespace poly {
 
   /**
-   * Implements a wrapper for lp_algebraic_number_t from libpoly.
+   * Implements a wrapper for lp_algebraic_number_t.
    */
   class AlgebraicNumber {
     /** The actual algebraic number. */
