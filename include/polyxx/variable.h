@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <iosfwd>
 
 #include "../variable_db.h"
 #include "context.h"
@@ -38,10 +38,7 @@ namespace poly {
       lp_variable_t var;
     };
     /** Actually stream a variable_printer object. */
-    inline std::ostream& operator<<(std::ostream& os,
-                                    const variable_printer& v) {
-      return os << lp_variable_db_get_name(v.var_db, v.var);
-    }
+    std::ostream& operator<<(std::ostream& os, const variable_printer& v);
   }  // namespace detail
 
   /** Stream the given Variable to an output stream from the default context. */

@@ -1,5 +1,7 @@
 #include "polyxx/variable.h"
 
+#include <iostream>
+
 namespace poly {
 
   Variable::Variable() : mVariable(lp_variable_null) {}
@@ -10,6 +12,12 @@ namespace poly {
       : Variable(Context::get_context(), name) {}
 
   lp_variable_t Variable::get_internal() const { return mVariable; }
+
+  namespace detail {
+    std::ostream& operator<<(std::ostream& os, const variable_printer& v) {
+      return os << lp_variable_db_get_name(v.var_db, v.var);
+    }
+  }  // namespace detail
 
   std::ostream& operator<<(std::ostream& os, const Variable& v) {
     return os << lp_variable_db_get_name(
