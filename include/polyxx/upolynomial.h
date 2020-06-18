@@ -15,7 +15,7 @@
 namespace poly {
 
   /**
-   * Implements a wrapper for lp_upolynomial_t from libpoly.
+   * Implements a wrapper for lp_upolynomial_t.
    */
   class UPolynomial {
     /** The actual univariate polynomial. */

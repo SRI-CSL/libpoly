@@ -71,7 +71,7 @@ namespace poly {
     return *this;
   }
   UPolynomial& UPolynomial::operator=(UPolynomial&& poly) {
-    mPoly.reset(lp_upolynomial_construct_copy(poly.get_internal()));
+    mPoly.reset(poly.release());
     return *this;
   }
   UPolynomial& UPolynomial::operator=(lp_upolynomial_t* poly) {
