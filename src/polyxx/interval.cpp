@@ -25,6 +25,9 @@ namespace poly {
   Interval::Interval(const Interval& i) {
     lp_interval_construct_copy(get_internal(), i.get_internal());
   }
+  Interval::Interval(Interval&& i) {
+    lp_interval_construct_copy(get_internal(), i.get_internal());
+  }
 
   Interval::~Interval() { lp_interval_destruct(get_internal()); }
 
