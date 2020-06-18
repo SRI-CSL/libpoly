@@ -221,11 +221,18 @@ namespace poly {
     return res;
   }
 
+  UPolynomial get_defining_polynomial(const AlgebraicNumber& an) {
+    return UPolynomial(static_cast<const lp_upolynomial_t*>(an.get_internal()->f));
+  }
+
+  const DyadicInterval& get_isolating_interval(const AlgebraicNumber& an) {
+    return *detail::cast_from(&an.get_internal()->I);
+  }
   const DyadicRational& get_lower_bound(const AlgebraicNumber& an) {
-    return get_lower(*detail::cast_from(&an.get_internal()->I));
+    return get_lower(get_isolating_interval(an));
   }
   const DyadicRational& get_upper_bound(const AlgebraicNumber& an) {
-    return get_upper(*detail::cast_from(&an.get_internal()->I));
+    return get_upper(get_isolating_interval(an));
   }
 
   DyadicRational midpoint_dyadic(const AlgebraicNumber& an) {
