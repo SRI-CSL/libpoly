@@ -51,6 +51,8 @@ set(polyxx_SOURCES
   polyxx/integer.cpp
   polyxx/interval_assignment.cpp
   polyxx/interval.cpp
+  polyxx/polynomial.cpp
+  polyxx/polynomial_utils.cpp
   polyxx/rational.cpp
   polyxx/rational_interval.cpp
   polyxx/sign_condition.cpp
