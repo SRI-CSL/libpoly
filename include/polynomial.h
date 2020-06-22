@@ -36,14 +36,14 @@ extern "C" {
  * Polynomials incorporate the context and coefficient data. The also carry
  * flags so as not to re-do any computation.
  *
- * If the external flag is on during construction, the polynomial
- * is marked as external. This means that the context data will be attached and
- * before every operation, the polynomial will be reordered to in the right
- * order. The non-external polynomials are useful if you are doing lots of
- * intermediate computation to produce a final (external) polynomial.
+ * A polynomial can be marked as *external* with the lp_polynomial_set_external
+ * function. This means that the context data will be attached and before every
+ * operation, the polynomial will be reordered to in the right order. The non-external
+ * polynomials are useful if you are doing lots of intermediate computation to produce a
+ * final (external) polynomial. By default polynomials are not external.
  *
  * For non-external polynomials no checks are done during operations, so if the
- * order has changed the operations might fail or produce wrong results.
+ * order has changed the operations will fail or produce wrong results.
  *
  * In any case, the polynomial context should not be changed externally during
  * any operations.
@@ -73,8 +73,14 @@ lp_polynomial_t* lp_polynomial_new(const lp_polynomial_context_t* ctx);
 /** Allocate and construct a copy of the given polynomial */
 lp_polynomial_t* lp_polynomial_new_copy(const lp_polynomial_t* A);
 
-/** Make the polynomial as external */
+/** Make the polynomial as external (automatic reordering) */
 void lp_polynomial_set_external(lp_polynomial_t* A);
+
+/** Check if the polynomial is ordered properly according to the context order (useful for non-external polynomials) */
+int lp_polynomial_check_order(const lp_polynomial_t* A);
+
+/** Make sure that the polynomial is in the context order (useful for non-external polynomials) */
+void lp_polynomial_ensure_order(lp_polynomial_t* A);
 
 /** Swap two polynomials. */
 void lp_polynomial_swap(lp_polynomial_t* A1, lp_polynomial_t* A2);

@@ -74,6 +74,14 @@ void lp_polynomial_external_clean(const lp_polynomial_t* A_const) {
   }
 }
 
+int lp_polynomial_check_order(const lp_polynomial_t* A) {
+  return coefficient_in_order(A->ctx, &A->data);
+}
+
+void lp_polynomial_ensure_order(lp_polynomial_t* A) {
+  coefficient_order(A->ctx, &A->data);
+}
+
 void lp_polynomial_set_context(lp_polynomial_t* A, const lp_polynomial_context_t* ctx) {
   if (A->ctx != ctx) {
     if (A->ctx && A->external) {
