@@ -54,5 +54,13 @@ namespace poly {
   bool operator==(const Variable& lhs, const Variable& rhs);
   /** Compare two variables for inequality. */
   bool operator!=(const Variable& lhs, const Variable& rhs);
+  /** Compare two variables. */
+  bool operator<(const Variable& lhs, const Variable& rhs);
+  /** Compare two variables. */
+  bool operator<=(const Variable& lhs, const Variable& rhs);
+  /** Compare two variables. */
+  bool operator>(const Variable& lhs, const Variable& rhs);
+  /** Compare two variables. */
+  bool operator>=(const Variable& lhs, const Variable& rhs);
 
 }  // namespace poly

@@ -35,5 +35,17 @@ namespace poly {
   bool operator!=(const Variable& lhs, const Variable& rhs) {
     return lhs.get_internal() != rhs.get_internal();
   }
+  bool operator<(const Variable& lhs, const Variable& rhs) {
+    return lhs.get_internal() < rhs.get_internal();
+  }
+  bool operator<=(const Variable& lhs, const Variable& rhs) {
+    return lhs.get_internal() <= rhs.get_internal();
+  }
+  bool operator>(const Variable& lhs, const Variable& rhs) {
+    return lhs.get_internal() > rhs.get_internal();
+  }
+  bool operator>=(const Variable& lhs, const Variable& rhs) {
+    return lhs.get_internal() >= rhs.get_internal();
+  }
 
 }  // namespace poly
