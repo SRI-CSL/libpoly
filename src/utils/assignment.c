@@ -28,12 +28,11 @@
 #include <stdlib.h>
 
 #define DEFAULT_ASSIGNMENT_SIZE 100
-#define DEFAULT_ASSIGNMENT_SIZE 100
 
 static
 void lp_assignment_ensure_size(const lp_assignment_t* m_const, size_t size) {
   lp_assignment_t* m = (lp_assignment_t*) m_const;
-  if (size >= m->size) {
+  if (size > m->size) {
     m->values = realloc(m->values, sizeof(lp_value_t)*size);
     size_t i;
     for (i = m->size; i < size; ++ i) {
@@ -131,7 +130,7 @@ int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A) {
 static
 void lp_interval_assignment_ensure_size(const lp_interval_assignment_t* m_const, size_t size) {
   lp_interval_assignment_t* m = (lp_interval_assignment_t*) m_const;
-  if (size >= m->size) {
+  if (size > m->size) {
     m->intervals = realloc(m->intervals, sizeof(lp_interval_t)*size);
     m->timestamps = realloc(m->timestamps, sizeof(size_t)*size);
     size_t i;

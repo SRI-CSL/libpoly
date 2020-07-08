@@ -980,6 +980,9 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
       tracef("assignment = "); lp_interval_assignment_print(m, trace_out); tracef("\n");
     }
 
+    /*
+     * BD: this may have a side effect on m and realloc m->intervals.
+     */
     const lp_interval_t* x_value = lp_interval_assignment_get_interval(m, VAR(C));
 
     // Get the value of x
@@ -1001,6 +1004,10 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
 //        tracef("i = %zu\n", i);
 //        tracef("x = "); lp_interval_print(x_value, trace_out); tracef("\n");
+	/*
+	 * BD: this may have a side-effect on m (via lp_assignment_ensure_size)
+	 * which make x_value an invalid pointer.
+	 */
         coefficient_interval_value(ctx, COEFF(C, i), m, &tmp1);
         lp_interval_pow(&tmp2, x_value, i);
 //        tracef("tmp2 = x^i = "); lp_interval_print(&tmp2, trace_out); tracef("\n");
