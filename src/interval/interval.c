@@ -166,6 +166,19 @@ void lp_interval_construct_full(lp_interval_t* I) {
   I->is_point = 0;
 }
 
+/** Full interval definition */
+lp_interval_t full_interval = {
+    .a_open = 1,
+    .b_open = 1,
+    .is_point = 0,
+    .a.type = LP_VALUE_MINUS_INFINITY,
+    .b.type = LP_VALUE_PLUS_INFINITY
+};
+
+const lp_interval_t* lp_interval_full() {
+  return &full_interval;
+}
+
 void lp_rational_interval_construct_from_dyadic(lp_rational_interval_t* I, const lp_dyadic_rational_t* a, int a_open, const lp_dyadic_rational_t* b, int b_open) {
   int cmp = dyadic_rational_cmp(a, b);
   assert(cmp <= 0);

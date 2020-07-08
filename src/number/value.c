@@ -67,6 +67,30 @@ void lp_value_construct_none(lp_value_t* v) {
   lp_value_construct(v, LP_VALUE_NONE, 0);
 }
 
+lp_value_t value_none = {
+    .type = LP_VALUE_NONE
+};
+
+const lp_value_t* lp_value_none() {
+  return &value_none;
+}
+
+lp_value_t value_minus_inf = {
+    .type = LP_VALUE_MINUS_INFINITY
+};
+
+const lp_value_t* lp_value_minus_infinity() {
+  return &value_minus_inf;
+}
+
+lp_value_t value_plus_inf = {
+    .type = LP_VALUE_PLUS_INFINITY
+};
+
+const lp_value_t* lp_value_plus_infinity() {
+  return &value_plus_inf;
+}
+
 void lp_value_assign_raw(lp_value_t* v, lp_value_type_t type, const void* data) {
   lp_value_destruct(v);
   lp_value_construct(v, type, data);

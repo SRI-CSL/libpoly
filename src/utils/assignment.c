@@ -30,8 +30,7 @@
 #define DEFAULT_ASSIGNMENT_SIZE 100
 
 static
-void lp_assignment_ensure_size(const lp_assignment_t* m_const, size_t size) {
-  lp_assignment_t* m = (lp_assignment_t*) m_const;
+void lp_assignment_ensure_size(lp_assignment_t* m, size_t size) {
   if (size > m->size) {
     m->values = realloc(m->values, sizeof(lp_value_t)*size);
     size_t i;
@@ -113,8 +112,11 @@ void lp_assignment_set_value(lp_assignment_t* m, lp_variable_t x, const lp_value
 }
 
 const lp_value_t* lp_assignment_get_value(const lp_assignment_t* m, lp_variable_t x) {
-  lp_assignment_ensure_size(m, x + 1);
-  return m->values + x;
+  if (x < m->size) {
+    return m->values + x;
+  } else {
+    return lp_value_none();
+  }
 }
 
 void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, lp_rational_interval_t* approx) {
@@ -128,7 +130,7 @@ int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A) {
 }
 
 static
-void lp_interval_assignment_ensure_size(const lp_interval_assignment_t* m_const, size_t size) {
+void lp_interval_assignment_ensure_size(lp_interval_assignment_t* m_const, size_t size) {
   lp_interval_assignment_t* m = (lp_interval_assignment_t*) m_const;
   if (size > m->size) {
     m->intervals = realloc(m->intervals, sizeof(lp_interval_t)*size);
@@ -213,11 +215,13 @@ void lp_interval_assignment_set_interval(lp_interval_assignment_t* m, lp_variabl
 }
 
 const lp_interval_t* lp_interval_assignment_get_interval(const lp_interval_assignment_t* m, lp_variable_t x) {
-  lp_interval_assignment_ensure_size(m, x + 1);
+  if (x >= m->size) {
+    return lp_interval_full();
+  }
   if (m->timestamps[x] == m->timestamp) {
     return m->intervals + x;
   } else {
-    return NULL;
+    return lp_interval_full();
   }
 }
 

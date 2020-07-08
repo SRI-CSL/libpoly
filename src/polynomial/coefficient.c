@@ -980,10 +980,8 @@ void coefficient_interval_value(const lp_polynomial_context_t* ctx, const coeffi
       tracef("assignment = "); lp_interval_assignment_print(m, trace_out); tracef("\n");
     }
 
-    /*
-     * BD: this may have a side effect on m and realloc m->intervals.
-     */
     const lp_interval_t* x_value = lp_interval_assignment_get_interval(m, VAR(C));
+    assert(x_value);
 
     // Get the value of x
     if (trace_is_enabled("coefficient::interval")) {

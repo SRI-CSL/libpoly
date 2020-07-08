@@ -59,6 +59,9 @@ void lp_interval_construct_copy(lp_interval_t* I, const lp_interval_t* from);
 /** Construct the interval (-inf, +inf) */
 void lp_interval_construct_full(lp_interval_t* I);
 
+/** Get the full interval */
+const lp_interval_t* lp_interval_full();
+
 /** Assign from another interval */
 void lp_interval_assign(lp_interval_t* I, const lp_interval_t* from);
 
