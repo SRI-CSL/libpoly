@@ -794,34 +794,50 @@ void lp_interval_collapse_to(lp_interval_t* I, const lp_value_t* v) {
 }
 
 void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_t* a, int a_open) {
-  int cmp = dyadic_rational_cmp(a, &I->b);
-  assert(cmp <= 0);
-  if (cmp != 0) {
-    if (I->is_point) {
+  if (I->is_point) {
+    int cmp = dyadic_rational_cmp(a, &I->a);
+    assert(cmp <= 0);
+    if (cmp < 0) {
       dyadic_rational_construct_copy(&I->b, &I->a);
+      dyadic_rational_construct_copy(&I->a, a);
       I->is_point = 0;
+      I->a_open = a_open;
+      I->b_open = 0;
     }
-    dyadic_rational_assign(&I->a, a);
-    I->a_open = a_open;
   } else {
-    assert(!a_open && !I->b_open);
-    lp_dyadic_interval_collapse_to(I, a);
+    int cmp = dyadic_rational_cmp(a, &I->b);
+    assert(cmp <= 0);
+    if (cmp != 0) {
+      dyadic_rational_assign(&I->a, a);
+      I->a_open = a_open;
+    } else {
+      assert(!a_open && !I->b_open);
+      lp_dyadic_interval_collapse_to(I, a);
+    }
   }
 }
 
 void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open) {
-  int cmp = lp_value_cmp(a, &I->b);
-  assert(cmp <= 0);
-  if (cmp != 0) {
-    if (I->is_point) {
+  if (I->is_point) {
+    int cmp = lp_value_cmp(a, &I->a);
+    assert(cmp <= 0);
+    if (cmp < 0) {
       lp_value_construct_copy(&I->b, &I->a);
+      lp_value_construct_copy(&I->a, a);
       I->is_point = 0;
+      I->a_open = a_open;
+      I->b_open = 0;
     }
-    lp_value_assign(&I->a, a);
-    I->a_open = a_open;
   } else {
-    assert(!a_open && !I->b_open);
-    lp_interval_collapse_to(I, a);
+    int cmp = lp_value_cmp(a, &I->b);
+    assert(cmp <= 0);
+    if (cmp != 0) {
+      lp_value_assign(&I->a, a);
+      I->a_open = a_open;
+    } else {
+      assert(!a_open && !I->b_open);
+      lp_interval_collapse_to(I, a);
+    }
   }
 }
 
