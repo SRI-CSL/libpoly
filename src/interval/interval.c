@@ -801,6 +801,8 @@ void lp_dyadic_interval_set_a(lp_dyadic_interval_t* I, const lp_dyadic_rational_
       dyadic_rational_construct_copy(&I->b, &I->a);
       dyadic_rational_construct_copy(&I->a, a);
       I->is_point = 0;
+      I->a_open = a_open;
+      I->b_open = 0;
     }
   } else {
     int cmp = dyadic_rational_cmp(a, &I->b);
@@ -823,6 +825,8 @@ void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open) {
       lp_value_construct_copy(&I->b, &I->a);
       lp_value_construct_copy(&I->a, a);
       I->is_point = 0;
+      I->a_open = a_open;
+      I->b_open = 0;
     }
   } else {
     int cmp = lp_value_cmp(a, &I->b);
