@@ -95,8 +95,12 @@ namespace poly {
   const Value& get_point(const Interval& i);
   /** Get the lower bound of an interval. */
   const Value& get_lower(const Interval& i);
+  /** Get the lower bound type of an interval. */
+  bool get_lower_open(const Interval& i);
   /** Get the upper bound of an interval. */
   const Value& get_upper(const Interval& i);
+  /** Get the upper bound type of an interval. */
+  bool get_upper_open(const Interval& i);
 
   /** Pick some value from an interval. */
   Value pick_value(const Interval& i);

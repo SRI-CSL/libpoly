@@ -87,8 +87,14 @@ namespace poly {
   const Value& get_lower(const Interval& i) {
     return *detail::cast_from(lp_interval_get_lower_bound(i.get_internal()));
   }
+  bool get_lower_open(const Interval& i) {
+    return !i.get_internal()->is_point && i.get_internal()->a_open;
+  }
   const Value& get_upper(const Interval& i) {
     return *detail::cast_from(lp_interval_get_upper_bound(i.get_internal()));
+  }
+  bool get_upper_open(const Interval& i) {
+    return !i.get_internal()->is_point && i.get_internal()->b_open;
   }
 
   Value pick_value(const Interval& i) {
