@@ -1215,19 +1215,18 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
         }
         lp_value_assign_zero(&result.a);
         result.a_open = 0;
-      } else {
+      } else if (sgn > 0) {
+        // P = I^n
         int a_point = lp_value_pow(&I->a, n, &result.a, 0);
         int b_point = lp_value_pow(&I->b, n, 0, &result.b);
-        if (sgn > 0) {
-          // P = I^n
-          result.a_open = I->a_open || !a_point;
-          result.b_open = I->b_open || !b_point;
-        } else {
-          // negative turns positive, so we flip
-          lp_value_swap(&result.a, &result.b);
-          result.a_open = I->b_open || !b_point;
-          result.b_open = I->a_open || !a_point;
-        }
+        result.a_open = I->a_open || !a_point;
+        result.b_open = I->b_open || !b_point;
+      } else {
+        // P = I^n, but swappeed
+        int a_point = lp_value_pow(&I->a, n, 0, &result.b);
+        int b_point = lp_value_pow(&I->b, n, &result.a, 0);
+        result.a_open = I->b_open || !b_point;
+        result.b_open = I->a_open || !a_point;
       }
     }
   }
