@@ -175,7 +175,7 @@ lp_interval_t full_interval = {
     .b.type = LP_VALUE_PLUS_INFINITY
 };
 
-const lp_interval_t* lp_interval_full() {
+const lp_interval_t* lp_interval_full(void) {
   return &full_interval;
 }
 

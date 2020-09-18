@@ -71,7 +71,7 @@ lp_value_t value_none = {
     .type = LP_VALUE_NONE
 };
 
-const lp_value_t* lp_value_none() {
+const lp_value_t* lp_value_none(void) {
   return &value_none;
 }
 
@@ -79,7 +79,7 @@ lp_value_t value_minus_inf = {
     .type = LP_VALUE_MINUS_INFINITY
 };
 
-const lp_value_t* lp_value_minus_infinity() {
+const lp_value_t* lp_value_minus_infinity(void) {
   return &value_minus_inf;
 }
 
@@ -87,7 +87,7 @@ lp_value_t value_plus_inf = {
     .type = LP_VALUE_PLUS_INFINITY
 };
 
-const lp_value_t* lp_value_plus_infinity() {
+const lp_value_t* lp_value_plus_infinity(void) {
   return &value_plus_inf;
 }
 
