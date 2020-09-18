@@ -76,13 +76,13 @@ void lp_value_construct_int(lp_value_t* v, long x);
 void lp_value_construct_none(lp_value_t* v);
 
 /** Returns a null value */
-const lp_value_t* lp_value_none();
+const lp_value_t* lp_value_none(void);
 
 /** Returns -inf */
-const lp_value_t* lp_value_minus_infinity();
+const lp_value_t* lp_value_minus_infinity(void);
 
 /** Returns +inf */
-const lp_value_t* lp_value_plus_infinity();
+const lp_value_t* lp_value_plus_infinity(void);
 
 /** Construct a copy of the given value */
 void lp_value_construct_copy(lp_value_t* v, const lp_value_t* from);
