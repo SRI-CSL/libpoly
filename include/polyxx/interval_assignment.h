@@ -21,8 +21,13 @@ namespace poly {
     IntervalAssignment(const Context& c);
     /** Construct an empty assignment. */
     IntervalAssignment();
+    IntervalAssignment(const IntervalAssignment&) = delete;
+    IntervalAssignment(IntervalAssignment&& ia);
     /** Custom destructor. */
     ~IntervalAssignment();
+
+    IntervalAssignment& operator=(const IntervalAssignment&) = delete;
+    IntervalAssignment& operator=(IntervalAssignment&& ia);
 
     /** Get a non-const pointer to the internal lp_interval_assignment_t. Handle
      * with care!

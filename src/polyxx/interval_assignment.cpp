@@ -7,8 +7,17 @@ namespace poly {
   }
   IntervalAssignment::IntervalAssignment()
       : IntervalAssignment(Context::get_context()) {}
+  IntervalAssignment::IntervalAssignment(IntervalAssignment&& ia): mAssignment(ia.mAssignment) {
+    lp_interval_assignment_construct(ia.get_internal(), ia.mAssignment.var_db);
+  }
   IntervalAssignment::~IntervalAssignment() {
     lp_interval_assignment_destruct(get_internal());
+  }
+  IntervalAssignment& IntervalAssignment::operator=(IntervalAssignment&& ia) {
+    // Copy internals, reconstruct argument to be empty
+    mAssignment = ia.mAssignment;
+    lp_interval_assignment_construct(ia.get_internal(), ia.mAssignment.var_db);
+    return *this;
   }
 
   lp_interval_assignment_t* IntervalAssignment::get_internal() {
