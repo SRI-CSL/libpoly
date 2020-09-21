@@ -62,6 +62,7 @@ add_subdirectory(src)
 # Configure the headers
 add_subdirectory(include)
 
+# Build the Python API (and test)
 if(LIBPOLY_BUILD_PYTHON_API)
 
   # Need the Python binary to run tests
@@ -76,8 +77,7 @@ if(LIBPOLY_BUILD_PYTHON_API)
 endif()
 
 # Configure the C++ tests
-enable_testing()
-
 if (LIBPOLY_BUILD_CPP_API)
+  enable_testing()
   add_subdirectory(test/polyxx)
 endif()

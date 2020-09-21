@@ -17,11 +17,13 @@ addons:
       - cmake
       - libgmp-dev
       - make
+      - mingw-w64
   homebrew:
     packages:
       - cmake
       - gmp
       - pyenv
+      - mingw-w64
 
 env:
   matrix:
@@ -32,17 +34,19 @@ env:
     - CMAKE_BUILD_TYPE=Debug PYTHON=3.6.7
     - CMAKE_BUILD_TYPE=Release PYTHON=2.7.15
     - CMAKE_BUILD_TYPE=Release PYTHON=3.6.7
+    - CMAKE_BUILD_TYPE=Release CROSS_COMPILE=On CMAKE_ADDITIONAL_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../scripts/toolchain-mingw64-cross-compile.cmake -DLIBPOLY_BUILD_PYTHON_API=Off"
 
 install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/ubuntu.deps.sh; fi
    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./scripts/osx.deps.sh; fi
+   - if [ "$CROSS_COMPILE" = "On" ]; then ./scripts/mingw32.deps; fi
 
 script:
   # iam: need to make sure the shims intercept (osx is the culprit here)
   - source ${HOME}/.bash_profile;
   - mkdir -p build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
+  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CMAKE_ADDITIONAL_OPTIONS} ..
   - make
   - make check
   - make test

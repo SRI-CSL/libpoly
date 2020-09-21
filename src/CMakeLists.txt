@@ -86,9 +86,6 @@ if (LIBPOLY_BUILD_CPP_API)
     VERSION ${LIBPOLY_VERSION}
     SOVERSION ${LIBPOLY_VERSION_MAJOR}
   )
-endif()
-
-if (LIBPOLY_BUILD_CPP_API)
   target_link_libraries(polyxx poly ${GMP_LIBRARY})
 endif()
 
