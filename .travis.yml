@@ -39,7 +39,7 @@ env:
 install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/ubuntu.deps.sh; fi
    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./scripts/osx.deps.sh; fi
-   - if [ "$CROSS_COMPILE" = "On" ]; then ./scripts/mingw32.deps; fi
+   - if [ "$CROSS_COMPILE" = "On" ]; then ./scripts/mingw32.deps.sh; fi
 
 script:
   # iam: need to make sure the shims intercept (osx is the culprit here)
