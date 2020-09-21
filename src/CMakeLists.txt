@@ -1,4 +1,4 @@
-set(poly_SOURCES 
+set(poly_SOURCES
   utils/debug_trace.c
   utils/assignment.c
   utils/statistics.c
@@ -37,8 +37,11 @@ set(poly_SOURCES
   poly.c
 )
 
-if (NOT HAVE_OPEN_MEMSTREAM) 
-  set(poly_SOURCES "utils/open_memstream.c ${poly_SOURCES}")
+if (NOT HAVE_OPEN_MEMSTREAM)
+  set(poly_SOURCES
+    utils/open_memstream.c
+    ${poly_SOURCES}
+  )
 endif()
 
 set(polyxx_SOURCES
@@ -71,21 +74,23 @@ include_directories(${libpoly_SOURCE_DIR}/include)
 include_directories(${libpoly_SOURCE_DIR}/src)
 
 add_library(poly SHARED ${poly_SOURCES})
-
 set_target_properties(poly PROPERTIES
   VERSION ${LIBPOLY_VERSION}
   SOVERSION ${LIBPOLY_VERSION_MAJOR}
 )
-
 target_link_libraries(poly ${GMP_LIBRARY})
 
-add_library(polyxx SHARED ${polyxx_SOURCES})
-set_target_properties(polyxx PROPERTIES
-  VERSION ${LIBPOLY_VERSION} 
-  SOVERSION ${LIBPOLY_VERSION_MAJOR}
-) 
+if (LIBPOLY_BUILD_CPP_API)
+  add_library(polyxx SHARED ${polyxx_SOURCES})
+  set_target_properties(polyxx PROPERTIES
+    VERSION ${LIBPOLY_VERSION}
+    SOVERSION ${LIBPOLY_VERSION_MAJOR}
+  )
+endif()
 
-target_link_libraries(polyxx poly ${GMP_LIBRARY})
+if (LIBPOLY_BUILD_CPP_API)
+  target_link_libraries(polyxx poly ${GMP_LIBRARY})
+endif()
 
 #
 # For windows and friends: the DLL goes into <install>/bin
@@ -93,11 +98,15 @@ target_link_libraries(polyxx poly ${GMP_LIBRARY})
 # cmake complains if the RUNTIME DESTINATION bin is missing
 #
 if (CYGWIN OR WIN32 OR MINGW)
- install(TARGETS poly LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
- install(TARGETS polyxx LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+  install(TARGETS poly LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+  if (LIBPOLY_BUILD_CPP_API)
+    install(TARGETS polyxx LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+  endif()
 else()
- install(TARGETS poly LIBRARY DESTINATION lib)
- install(TARGETS polyxx LIBRARY DESTINATION lib)
+  install(TARGETS poly LIBRARY DESTINATION lib)
+  if (LIBPOLY_BUILD_CPP_API)
+    install(TARGETS polyxx LIBRARY DESTINATION lib)
+  endif()
 endif()
 
 #
@@ -108,10 +117,12 @@ if (LIBPOLY_BUILD_STATIC)
   set_target_properties(static_poly PROPERTIES OUTPUT_NAME poly)
   install(TARGETS static_poly ARCHIVE DESTINATION lib)
 
-  add_library(static_polyxx STATIC ${polyxx_SOURCES})
-  set_target_properties(static_polyxx PROPERTIES OUTPUT_NAME polyxx)
-  install(TARGETS static_polyxx ARCHIVE DESTINATION lib)
-  target_link_libraries(static_polyxx static_poly)
+  if (LIBPOLY_BUILD_CPP_API)
+    add_library(static_polyxx STATIC ${polyxx_SOURCES})
+    set_target_properties(static_polyxx PROPERTIES OUTPUT_NAME polyxx)
+    install(TARGETS static_polyxx ARCHIVE DESTINATION lib)
+    target_link_libraries(static_polyxx static_poly)
+  endif()
 endif()
 
 #
@@ -121,12 +132,14 @@ endif()
 #
 # Linux, FreeBSD, and old versions of Darwin (and probably other systems) don't use fPIC by default.
 # We just check for Linux and FreeBSD here.
-# 
+#
 if(LIBPOLY_BUILD_STATIC_PIC AND ${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
 
-  add_library(static_pic_polyxx STATIC ${polyxx_SOURCES})
-  set_target_properties(static_pic_polyxx PROPERTIES OUTPUT_NAME picpolyxx POSITION_INDEPENDENT_CODE true)
-  target_link_libraries(static_pic_polyxx static_pic_poly)
+  if (LIBPOLY_BUILD_CPP_API)
+    add_library(static_pic_polyxx STATIC ${polyxx_SOURCES})
+    set_target_properties(static_pic_polyxx PROPERTIES OUTPUT_NAME picpolyxx POSITION_INDEPENDENT_CODE true)
+    target_link_libraries(static_pic_polyxx static_pic_poly)
+  endif()
 endif()

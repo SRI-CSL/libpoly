@@ -11,6 +11,7 @@ option(LIBPOLY_BUILD_PYTHON_API "Build the Python API" ON)
 option(LIBPOLY_BUILD_STATIC_PIC "Build the static PIC library" ON)
 option(LIBPOLY_BUILD_STATIC "Build the static library" ON)
 option(LIBPOLY_BUILD_STATISTICS "Build the statistics internals" OFF)
+option(LIBPOLY_BUILD_CPP_API "Build the C++ API" ON)
 
 set(LIBPOLY_VERSION_MAJOR 0)
 set(LIBPOLY_VERSION_MINOR 1)
@@ -38,21 +39,19 @@ else()
     MESSAGE(FATAL_ERROR "Could not the GMP number library (sudo apt-get install libgmp-dev)")
 endif()
 
+# MINGW cross compile needs this for printing
+add_definitions(-D__USE_MINGW_ANSI_STDIO)
 
 # statistics configuration
 if(LIBPOLY_BUILD_STATISTICS)
-
   add_definitions(-DLIBPOLY_STATISTICS)
-
 endif()
 
 #
 # Check for open_memstream
 #
 include(CheckFunctionExists)
-
 check_function_exists(open_memstream HAVE_OPEN_MEMSTREAM)
-
 if(HAVE_OPEN_MEMSTREAM)
   add_definitions(-DHAVE_OPEN_MEMSTREAM)
 endif()
@@ -78,5 +77,7 @@ endif()
 
 # Configure the C++ tests
 enable_testing()
-add_subdirectory(test/polyxx)
 
+if (LIBPOLY_BUILD_CPP_API)
+  add_subdirectory(test/polyxx)
+endif()
