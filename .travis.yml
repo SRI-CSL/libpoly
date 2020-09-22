@@ -38,7 +38,7 @@ env:
     - CMAKE_BUILD_TYPE=Debug PYTHON=3.6.7
     - CMAKE_BUILD_TYPE=Release PYTHON=2.7.15
     - CMAKE_BUILD_TYPE=Release PYTHON=3.6.7
-    - CMAKE_BUILD_TYPE=Release CROSS_COMPILE=On CMAKE_ADDITIONAL_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../scripts/toolchain-mingw64-cross-compile.cmake -DLIBPOLY_BUILD_PYTHON_API=Off"
+    - CMAKE_BUILD_TYPE=Release CROSS_COMPILE=On CMAKE_ADDITIONAL_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../scripts/toolchain-mingw64-cross-compile.cmake -DLIBPOLY_BUILD_PYTHON_API=Off -DLIBPOLY_BUILD_CPP_API=Off"
 
 install:
    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./scripts/ubuntu.deps.sh; fi
