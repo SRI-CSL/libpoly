@@ -46,7 +46,8 @@ script:
   - source ${HOME}/.bash_profile;
   - mkdir -p build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CMAKE_ADDITIONAL_OPTIONS} ..
+  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${CMAKE_ADDITIONAL_OPTIONS} -DCMAKE_INSTALL_PREFIX=$HOME/prefix ..
   - make
   - make check
   - make test
+  - make install
