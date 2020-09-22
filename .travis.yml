@@ -18,7 +18,6 @@ addons:
       - libgmp-dev
       - make
       - mingw-w64
-      - g++-mingw-w64
   homebrew:
     packages:
       - cmake
