@@ -28,6 +28,7 @@ addons:
       - gmp
       - pyenv
       - mingw-w64
+    update: true
 
 env:
   matrix:
