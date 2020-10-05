@@ -138,7 +138,7 @@ void lp_interval_assignment_ensure_size(lp_interval_assignment_t* m_const, size_
     size_t i;
     for (i = m->size; i < size; ++ i) {
       lp_interval_construct_full(m->intervals + i);
-      m->timestamps[i] = m->timestamp;
+      m->timestamps[i] = 0;
     }
     m->size = size;
   }
