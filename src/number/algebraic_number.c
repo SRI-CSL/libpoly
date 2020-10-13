@@ -826,11 +826,15 @@ void lp_algebraic_number_sub(lp_algebraic_number_t* sub, const lp_algebraic_numb
 }
 
 void lp_algebraic_number_neg(lp_algebraic_number_t* neg, const lp_algebraic_number_t* a) {
-  assert(a->f);
-  lp_upolynomial_t* f_neg_x = lp_upolynomial_subst_x_neg(a->f);
-  if (integer_sgn(lp_Z, lp_upolynomial_lead_coeff(f_neg_x)) < 0) {
-    lp_upolynomial_neg_in_place(f_neg_x);
+  lp_upolynomial_t* f_neg_x = 0;
+
+  if (a->f) {
+    f_neg_x = lp_upolynomial_subst_x_neg(a->f);
+    if (integer_sgn(lp_Z, lp_upolynomial_lead_coeff(f_neg_x)) < 0) {
+      lp_upolynomial_neg_in_place(f_neg_x);
+    }
   }
+
   lp_dyadic_interval_t I_neg; // To destroy
   lp_dyadic_interval_construct_copy(&I_neg, &a->I);
   dyadic_interval_neg(&I_neg, &I_neg);
