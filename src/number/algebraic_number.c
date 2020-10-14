@@ -717,7 +717,7 @@ void lp_algebraic_number_op(
   *op = *f_roots;
 
   if (trace_is_enabled("algebraic_number")) {
-    tracef("op = "); lp_algebraic_number_print(op, trace_out);
+    tracef("op = "); lp_algebraic_number_print(op, trace_out); tracef("\n");
   }
 
   // Remove temps
@@ -870,6 +870,143 @@ void lp_algebraic_number_mul_interval_op(lp_dyadic_interval_t* I, const lp_dyadi
 void lp_algebraic_number_mul(lp_algebraic_number_t* mul, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b) {
   lp_algebraic_number_op(mul, a, b, lp_algebraic_number_mul_construct_op, lp_algebraic_number_mul_interval_op, 0);
 }
+
+/**
+ * Multiplicative inverse (a != 0)
+ *
+ * f(x) = a_n x^n + ... + a_0
+ *
+ * with f(a) = 0, a only root in (l, u), 0 not in [l, u]
+ *
+ * g(x) = x^n*f(1/x) = x^n*(a_n/x^n + ... + a_0)
+ *      = a_n + ... + a_0 x^n
+ *
+ * with g(1/a) = 0, only root in 1/u < 1/a < 1/l
+ *
+ * but, 1/u, 1/l are not dyadic rationals...
+ *
+ * g(x) is square-free otherwise g(x) = h1(x)^2*h2(x) and so
+ * f(x) = x^n*g(1/x) would not be square free
+ */
+void lp_algebraic_number_inv(lp_algebraic_number_t* inv, const lp_algebraic_number_t* a) {
+
+  assert(lp_algebraic_number_sgn(a) != 0);
+
+  if (trace_is_enabled("algebraic_number")) {
+    tracef("a = "); lp_algebraic_number_print(a, trace_out); tracef("\n");
+  }
+
+  if (a->f == 0) {
+    // inverse of dyadic rational is not dyadic, so we construct a
+    // linear polynomial and find the root (not ideal but is cheap)
+    // otherwise we have to deal with the special case of inverting
+    // an interval that doesn't contain any dyadic rationals
+
+    // x = p/q -> p*(1/x) - q = 0
+    // set the coefficients and make the polynomial
+    lp_integer_t c[2];
+    lp_integer_t* p = c+1;
+    lp_integer_t* q_neg = c;
+    integer_construct_copy(lp_Z, p, &a->I.a.a);
+    integer_construct(q_neg);
+    lp_dyadic_rational_get_den(&a->I.a, q_neg);
+    integer_neg(lp_Z, q_neg, q_neg);
+    lp_upolynomial_t* f_a_inv = lp_upolynomial_construct(lp_Z, 1, c);
+
+    // find the root (can be only one)
+    size_t a_inv_roots = 0; // should be 1
+    lp_algebraic_number_t a_inv;
+    lp_upolynomial_roots_isolate(f_a_inv, &a_inv, &a_inv_roots);
+    assert(a_inv_roots == 1);
+
+    // store result
+    lp_algebraic_number_swap(inv, &a_inv);
+
+    // remove temps
+    lp_upolynomial_delete(f_a_inv);
+    lp_integer_destruct(p);
+    lp_integer_destruct(q_neg);
+    lp_algebraic_number_destruct(&a_inv);
+  } else {
+    // construct the inverse polynomial
+    lp_upolynomial_t* f_a_inv = lp_upolynomial_construct_copy(a->f);
+    lp_upolynomial_reverse_in_place(f_a_inv);
+    // Make the polynomial primitive
+    if (integer_sgn(lp_Z, lp_upolynomial_lead_coeff(f_a_inv)) < 0) {
+      lp_upolynomial_neg_in_place(f_a_inv);
+    }
+
+    // we need to construct the interval within (1/u, 1/l) and refine it
+    // until we find dyadic end-points sufficient to represent the number
+    lp_dyadic_interval_t I;
+    lp_dyadic_rational_t I_lb_dy, I_ub_dy;
+
+    // we find sub-intervals in (1/u, 1/l) that are of constant sign
+    int sgn;
+    lp_rational_t m, I_lb, I_ub;
+    rational_construct(&m);
+    rational_construct_from_dyadic(&I_lb, &a->I.b);
+    rational_construct_from_dyadic(&I_ub, &a->I.a);
+    rational_inv(&I_lb, &I_lb);
+    rational_inv(&I_ub, &I_ub);
+
+    // find subinterval (I_lb, m) of the same sign as I_lb
+    sgn = lp_upolynomial_sgn_at_rational(f_a_inv, &I_lb);
+    assert(sgn != 0);
+    rational_assign(&m, &I_ub);
+    do {
+      rational_add(&m, &I_lb, &m);
+      rational_div_2exp(&m, &m, 1);
+    } while (lp_upolynomial_sgn_at_rational(f_a_inv, &m) * sgn <= 0);
+    // pick a dyadic in (I_lb, m)
+    dyadic_rational_construct(&I_lb_dy);
+    dyadic_rational_get_value_between(&I_lb_dy, &I_lb, &m);
+
+    // find subinterval (m, I_ub) of the same sign as I_ub
+    sgn = lp_upolynomial_sgn_at_rational(f_a_inv, &I_ub);
+    assert(sgn != 0);
+    rational_assign(&m, &I_lb);
+    do {
+      rational_add(&m, &m, &I_ub);
+      rational_div_2exp(&m, &m, 1);
+    } while (lp_upolynomial_sgn_at_rational(f_a_inv, &m) * sgn <= 0);
+    // oick a dyadic in (m, I_ub)
+    dyadic_rational_construct(&I_ub_dy);
+    dyadic_rational_get_value_between(&I_ub_dy, &m, &I_ub);
+
+    // construct the root interval
+    lp_dyadic_interval_construct(&I, &I_lb_dy, 1, &I_ub_dy, 1);
+
+    // construct the result
+    lp_algebraic_number_t a_inv;
+    lp_algebraic_number_construct(&a_inv, f_a_inv, &I);
+
+    // store result
+    lp_algebraic_number_swap(&a_inv, inv);
+
+    // remove temps
+    lp_dyadic_interval_destruct(&I);
+    dyadic_rational_destruct(&I_ub_dy);
+    dyadic_rational_destruct(&I_lb_dy);
+    rational_destruct(&m);
+    rational_destruct(&I_lb);
+    rational_destruct(&I_ub);
+    lp_algebraic_number_destruct(&a_inv);
+  }
+
+  if (trace_is_enabled("algebraic_number")) {
+    tracef("inv = "); lp_algebraic_number_print(inv, trace_out); tracef("\n");
+  }
+}
+
+void lp_algebraic_number_div(lp_algebraic_number_t* div, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b) {
+  lp_algebraic_number_t inv;
+  lp_algebraic_number_construct_zero(&inv);
+  lp_algebraic_number_inv(&inv, b);
+  lp_algebraic_number_mul(div, a, &inv);
+  lp_algebraic_number_destruct(&inv);
+}
+
 
 void lp_algebraic_number_pow_construct_op(coefficient_t* f_r, void* data) {
   const lp_polynomial_context_t* ctx = lp_algebraic_pctx();

@@ -57,6 +57,9 @@ static PyObject*
 AlgebraicNumber_mul(PyObject* self, PyObject* args);
 
 static PyObject*
+AlgebraicNumber_div(PyObject* self, PyObject* args);
+
+static PyObject*
 AlgebraicNumber_pow(PyObject* self, PyObject* args);
 
 PyMethodDef AlgebraicNumber_methods[] = {
@@ -96,7 +99,7 @@ PyNumberMethods AlgebraicNumber_NumberMethods = {
      0,                                // binaryfunc nb_inplace_xor;
      0,                                // binaryfunc nb_inplace_or;
      0,                                // binaryfunc nb_floor_divide;
-     0,                                // binaryfunc nb_true_divide;
+     AlgebraicNumber_div,              // binaryfunc nb_true_divide;
      0,                                // binaryfunc nb_inplace_floor_divide;
      0,                                // binaryfunc nb_inplace_true_divide;
      0,                                // unaryfunc nb_index;
@@ -383,6 +386,25 @@ AlgebraicNumber_mul(PyObject* self, PyObject* other) {
   lp_algebraic_number_t mul;
   lp_algebraic_number_construct_zero(&mul);
   lp_algebraic_number_mul(&mul, &a1->a, &a2->a);
+  PyObject* result = PyAlgebraicNumber_create(&mul);
+  lp_algebraic_number_destruct(&mul);
+
+  return result;
+}
+
+static PyObject*
+AlgebraicNumber_div(PyObject* self, PyObject* other) {
+  if (!PyAlgebraicNumber_CHECK(self) || !PyAlgebraicNumber_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  AlgebraicNumber* a1 = (AlgebraicNumber*) self;
+  AlgebraicNumber* a2 = (AlgebraicNumber*) other;
+
+  lp_algebraic_number_t mul;
+  lp_algebraic_number_construct_zero(&mul);
+  lp_algebraic_number_div(&mul, &a1->a, &a2->a);
   PyObject* result = PyAlgebraicNumber_create(&mul);
   lp_algebraic_number_destruct(&mul);
 

@@ -149,3 +149,82 @@ void lp_dyadic_rational_ceiling(const lp_dyadic_rational_t* q, lp_integer_t* q_c
 void lp_dyadic_rational_floor(const lp_dyadic_rational_t* q, lp_integer_t* q_floor) {
   dyadic_rational_floor_int(q, q_floor);
 }
+
+void dyadic_rational_get_value_between(lp_dyadic_rational_t* v, const lp_rational_t* a, const lp_rational_t* b) {
+
+  int cmp;
+  lp_dyadic_rational_t result;
+
+  assert(rational_cmp(a, b) < 0);
+
+  // a <= a_ub < b_lb <= b
+  // m = (a_ub + b_lb)/2 so a < m < b
+  lp_rational_t m_q;
+  rational_construct(&m_q);
+  rational_add(&m_q, a, b);
+  rational_div_2exp(&m_q, &m_q, 1);
+
+  // floor(m) <= m <= ceil(m)
+  lp_integer_t m_floor, m_ceil;
+  integer_construct(&m_floor);
+  rational_floor(&m_q, &m_floor);
+  integer_construct_copy(lp_Z, &m_ceil, &m_floor);
+  integer_inc(lp_Z, &m_ceil);
+
+  // If a < m_floor (or equal and bound allows it), we can take this value
+  cmp = rational_cmp_integer(a, &m_floor);
+  if (cmp < 0) {
+    lp_dyadic_rational_construct_from_integer(&result, &m_floor);
+  } else {
+    // If m_ceil < b_lb (or equal and bound allows it), we can take this value
+    cmp = rational_cmp_integer(b, &m_ceil);
+    if (cmp > 0) {
+      lp_dyadic_rational_construct_from_integer(&result, &m_ceil);
+    } else {
+
+      lp_dyadic_rational_t m_dy, lb, ub;
+      lp_dyadic_rational_construct(&m_dy);
+      lp_dyadic_rational_construct_from_integer(&lb, &m_floor);
+      lp_dyadic_rational_construct_from_integer(&ub, &m_ceil);
+
+      // We have to do the search
+      for (;;) {
+
+        // always: lb < a < b < ub
+        dyadic_rational_add(&m_dy, &lb, &ub);
+        dyadic_rational_div_2exp(&m_dy, &m_dy, 1);
+
+        // lb < m < a => move lb to m
+        cmp = rational_cmp_dyadic_rational(a, &m_dy);
+        if (cmp >= 0) {
+          dyadic_rational_swap(&m_dy, &lb);
+          continue;
+        }
+
+        // b < m < ub => move ub to m
+        cmp = rational_cmp_dyadic_rational(b, &m_dy);
+        if (cmp <= 0) {
+          dyadic_rational_swap(&ub, &m_dy);
+          continue;
+        }
+
+        // Got it l <= m <= u
+        dyadic_rational_construct_copy(&result, &m_dy);
+        break;
+      }
+
+      dyadic_rational_destruct(&lb);
+      dyadic_rational_destruct(&ub);
+      dyadic_rational_destruct(&m_dy);
+    }
+  }
+
+  // Store result
+  dyadic_rational_swap(v, &result);
+
+  // Remove temps
+  dyadic_rational_destruct(&result);
+  integer_destruct(&m_ceil);
+  integer_destruct(&m_floor);
+  rational_destruct(&m_q);
+}

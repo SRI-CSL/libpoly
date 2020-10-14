@@ -124,6 +124,12 @@ void lp_algebraic_number_neg(lp_algebraic_number_t* neg, const lp_algebraic_numb
 /** Multiplication */
 void lp_algebraic_number_mul(lp_algebraic_number_t* mul, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
 
+/** Multiplicative inverse 1/a (a != 0) */
+void lp_algebraic_number_inv(lp_algebraic_number_t* inv, const lp_algebraic_number_t* a);
+
+/** Division (b != 0) */
+void lp_algebraic_number_div(lp_algebraic_number_t* div, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b);
+
 /** Exponentiation */
 void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n);
 

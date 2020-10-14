@@ -67,7 +67,7 @@ lp_upolynomial_t* lp_upolynomial_construct_copy_K(const lp_int_ring_t* K, const 
 void lp_upolynomial_delete(lp_upolynomial_t* p);
 
 /**
- * Returns the degree of the polynomial. Note that the degree of the constat
+ * Returns the degree of the polynomial. Note that the degree of the constant
  * 0 is 0.
  */
 size_t lp_upolynomial_degree(const lp_upolynomial_t* p);
@@ -351,6 +351,13 @@ int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_rational_inte
  * an estimate of the number of roots.
  */
 void lp_upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
+
+/**
+ * Reverses the coefficient of p in place. The result polynomial is
+ * p'(x) = x^n * p(1/x) = a_n + ... + a_0 * x^n
+ */
+void lp_upolynomial_reverse_in_place(lp_upolynomial_t* p);
+
 
 #ifdef __cplusplus
 } /* close extern "C" { */

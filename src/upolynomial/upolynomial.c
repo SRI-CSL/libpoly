@@ -1168,6 +1168,24 @@ void lp_upolynomial_neg_in_place(lp_upolynomial_t* p) {
   }
 }
 
+void lp_upolynomial_reverse_in_place(lp_upolynomial_t* p) {
+  size_t p_deg;
+  ulp_monomial_t tmp, *m_i, *m_j;
+
+  // reverse order and update degrees
+  assert(p->size > 0);
+  p_deg = lp_upolynomial_degree(p);
+  m_i = p->monomials;
+  m_j = p->monomials + p->size - 1;
+  for (; m_i <= m_j; ++ m_i, -- m_j) {
+    m_i->degree = p_deg - m_i->degree;
+    if (m_i < m_j) {
+      m_j->degree = p_deg - m_j->degree;
+      tmp = *m_i; *m_i = *m_j; *m_j = tmp;
+    }
+  }
+}
+
 lp_upolynomial_t* lp_upolynomial_subst_x_neg(const lp_upolynomial_t* f) {
 
   lp_upolynomial_t* neg = lp_upolynomial_construct_copy(f);
