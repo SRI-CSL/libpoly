@@ -185,6 +185,20 @@ void coefficient_construct_simple(const lp_polynomial_context_t* ctx, coefficien
   }
 }
 
+STAT_DECLARE(int, coefficient, construt_linear)
+
+void coefficient_construct_linear(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* a, const lp_integer_t* b, lp_variable_t x) {
+  TRACE("coefficient::internal", "coefficient_construct_simple()\n");
+  STAT_INCR(coefficient, coefficient_construct_linear)
+
+  assert(integer_sgn(lp_Z, a) != 0);
+
+  // a*x + b
+  coefficient_construct_rec(ctx, C, x, 2);
+  integer_assign(ctx->K, &COEFF(C, 1)->value.num, a);
+  integer_assign(ctx->K, &COEFF(C, 0)->value.num, b);
+}
+
 STAT_DECLARE(int, coefficient, construct_copy)
 
 void coefficient_construct_copy(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from) {

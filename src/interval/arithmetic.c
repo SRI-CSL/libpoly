@@ -117,7 +117,6 @@ void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1
     lp_dyadic_interval_construct_copy(&result, I2);
     dyadic_rational_add(&result.a, &result.a, &I1->a);
     dyadic_rational_add(&result.b, &result.b, &I1->a);
-    return;
   } else {
     // Both non-points
     // [a, b] + [c, d] = [a + c, b + d]

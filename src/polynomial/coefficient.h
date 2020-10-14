@@ -101,6 +101,9 @@ void coefficient_construct_simple(const lp_polynomial_context_t* ctx, coefficien
 /** Construct a simple monomial coefficient a*x^n */
 void coefficient_construct_simple_int(const lp_polynomial_context_t* ctx, coefficient_t* C, long a, lp_variable_t x, unsigned n);
 
+/** Construcut a simple linear polynomial a*x + b */
+void coefficient_construct_linear(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_integer_t* a, const lp_integer_t* b, lp_variable_t x);
+
 /** Construct a copy of the given coefficient. */
 void coefficient_construct_copy(const lp_polynomial_context_t* ctx, coefficient_t* C, const coefficient_t* from);
 
