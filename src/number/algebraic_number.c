@@ -876,7 +876,9 @@ void lp_algebraic_number_mul(lp_algebraic_number_t* mul, const lp_algebraic_numb
  *
  * f(x) = a_n x^n + ... + a_0
  *
- * with f(a) = 0, a only root in (l, u), 0 not in [l, u]
+ * with f(a) = 0, a only root in (l, u), 0 not in (l, u)
+ *
+ * NOTE: l, u could be 0
  *
  * g(x) = x^n*f(1/x) = x^n*(a_n/x^n + ... + a_0)
  *      = a_n + ... + a_0 x^n
@@ -928,6 +930,16 @@ void lp_algebraic_number_inv(lp_algebraic_number_t* inv, const lp_algebraic_numb
     lp_integer_destruct(q_neg);
     lp_algebraic_number_destruct(&a_inv);
   } else {
+
+    // refine the number until 0 is not an endpoint of the interval
+    while (lp_dyadic_rational_sgn(&a->I.a) == 0 || lp_dyadic_rational_sgn(&a->I.b) == 0) {
+      lp_algebraic_number_refine_const(a);
+      if (a->f == 0) {
+        lp_algebraic_number_inv(inv, a);
+        return;
+      }
+    }
+
     // construct the inverse polynomial
     lp_upolynomial_t* f_a_inv = lp_upolynomial_construct_copy(a->f);
     lp_upolynomial_reverse_in_place(f_a_inv);

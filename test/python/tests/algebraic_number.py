@@ -3,6 +3,9 @@
 import polypy
 import polypy_test
 
+import random
+import itertools
+
 from polypy import x
 
 def check_comparison(a1, a2, cmp, result, expected):
@@ -121,3 +124,22 @@ b = polypy.AlgebraicNumber(x**2 - 3, 1)
 ab = polypy.AlgebraicNumber(x**4 + -10*x**2 + 1, 3)
 add = a + b
 check_comparison(add, ab, "==", (add == ab), True)
+
+polypy_test.start("Division")
+
+one = polypy.AlgebraicNumber(x-1, 0)
+
+a_list = [sqrt3_pos, sqrt3_neg, sqrt2_pos, sqrt2_neg]
+z_list = [polypy.AlgebraicNumber(x - k, 0) for k in [-3, -1, 1, 3]]
+q_list = [polypy.AlgebraicNumber(2*x - k, 0) for k in [-3, -1, 1, 3]]
+numbers = a_list + z_list + q_list
+sum_list = [a + b for (a, b) in itertools.product(numbers, numbers)]
+todo = [a for a in (numbers + sum_list) if a != zero]
+
+for k in range(1, 500):
+    sample = random.sample(todo, 3)
+    random.shuffle(sample)
+    p = reduce(lambda x, y: x*y, sample, one)
+    random.shuffle(sample)
+    p = reduce(lambda x, y: x/x, sample, p)
+    polypy_test.check(p == 1)
