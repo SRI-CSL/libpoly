@@ -5,6 +5,7 @@ import polypy_test
 
 import random
 import itertools
+import functools
 
 from polypy import x
 
@@ -139,7 +140,7 @@ todo = [a for a in (numbers + sum_list) if a != zero]
 for k in range(1, 500):
     sample = random.sample(todo, 3)
     random.shuffle(sample)
-    p = reduce(lambda x, y: x*y, sample, one)
+    p = functools.reduce(lambda x, y: x*y, sample, one)
     random.shuffle(sample)
-    p = reduce(lambda x, y: x/x, sample, p)
+    p = functools.reduce(lambda x, y: x/x, sample, p)
     polypy_test.check(p == 1)
