@@ -85,6 +85,59 @@ void lp_algebraic_number_construct_copy(lp_algebraic_number_t* a1, const lp_alge
   a1->sgn_at_b = a2->sgn_at_b;
 }
 
+void lp_algebraic_number_construct_from_integer(lp_algebraic_number_t* a, const lp_integer_t* z) {
+  lp_dyadic_rational_t z_dy;
+  lp_dyadic_rational_construct_from_integer(&z_dy, z);
+  lp_algebraic_number_construct_from_dyadic_rational(a, &z_dy);
+  lp_dyadic_rational_destruct(&z_dy);
+}
+
+void lp_algebraic_number_construct_from_rational(lp_algebraic_number_t* a, const lp_rational_t* rat) {
+
+  // if the rational is integer, we just return it
+  if (rational_is_integer(rat)) {
+    lp_algebraic_number_construct_from_integer(a, rational_get_num_ref(rat));
+    return;
+  }
+
+  // x = p/q -> q*x - p = 0
+  lp_integer_t c[2];
+  lp_integer_t* p_neg = c;
+  lp_integer_t* q = c + 1;
+
+  // set the coefficients
+  integer_construct(p_neg);
+  rational_get_num(rat, p_neg);
+  integer_neg(lp_Z, p_neg, p_neg);
+  integer_construct(q);
+  rational_get_den(rat, q);
+
+  // make the polynomial
+  lp_upolynomial_t* f = lp_upolynomial_construct(lp_Z, 1, c);
+
+  // get the floor and ceiling
+  lp_integer_t rat_floor, rat_ceil;
+  integer_construct(&rat_floor);
+  integer_construct(&rat_ceil);
+  rational_floor(rat, &rat_floor);
+  rational_ceiling(rat, &rat_ceil);
+
+  // since rat is not an integer, we're ok to take these as endpoints
+  lp_dyadic_interval_t I;
+  lp_dyadic_interval_construct_from_integer(&I, &rat_floor, 1, &rat_ceil, 1);
+
+  // construct the number
+  lp_algebraic_number_construct(a, f, &I);
+
+  // remove temps
+  lp_dyadic_interval_destruct(&I);
+  integer_destruct(&rat_floor);
+  integer_destruct(&rat_ceil);
+  integer_destruct(q);
+  integer_destruct(p_neg);
+}
+
+
 void lp_algebraic_number_construct_from_dyadic_rational(lp_algebraic_number_t* a, const lp_dyadic_rational_t* q) {
   a->f = 0;
   lp_dyadic_interval_construct_point(&a->I, q);
@@ -899,36 +952,20 @@ void lp_algebraic_number_inv(lp_algebraic_number_t* inv, const lp_algebraic_numb
   }
 
   if (a->f == 0) {
-    // inverse of dyadic rational is not dyadic, so we construct a
-    // linear polynomial and find the root (not ideal but is cheap)
-    // otherwise we have to deal with the special case of inverting
-    // an interval that doesn't contain any dyadic rationals
-
-    // x = p/q -> p*(1/x) - q = 0
-    // set the coefficients and make the polynomial
-    lp_integer_t c[2];
-    lp_integer_t* p = c+1;
-    lp_integer_t* q_neg = c;
-    integer_construct_copy(lp_Z, p, &a->I.a.a);
-    integer_construct(q_neg);
-    lp_dyadic_rational_get_den(&a->I.a, q_neg);
-    integer_neg(lp_Z, q_neg, q_neg);
-    lp_upolynomial_t* f_a_inv = lp_upolynomial_construct(lp_Z, 1, c);
-
-    // find the root (can be only one)
-    size_t a_inv_roots = 0; // should be 1
+    // inverse of dyadic rational is not necessarily dyadic, we just
+    // invert the rational and construct from there
+    lp_rational_t a_inv_q;
     lp_algebraic_number_t a_inv;
-    lp_upolynomial_roots_isolate(f_a_inv, &a_inv, &a_inv_roots);
-    assert(a_inv_roots == 1);
+    lp_rational_construct_from_dyadic(&a_inv_q, &a->I.a);
+    rational_inv(&a_inv_q, &a_inv_q);
+    lp_algebraic_number_construct_from_rational(&a_inv, &a_inv_q);
 
     // store result
     lp_algebraic_number_swap(inv, &a_inv);
 
     // remove temps
-    lp_upolynomial_delete(f_a_inv);
-    lp_integer_destruct(p);
-    lp_integer_destruct(q_neg);
     lp_algebraic_number_destruct(&a_inv);
+    lp_rational_destruct(&a_inv_q);
   } else {
 
     // refine the number until 0 is not an endpoint of the interval

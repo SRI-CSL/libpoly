@@ -51,8 +51,14 @@ void lp_algebraic_number_construct_zero(lp_algebraic_number_t* a);
 /** Construct a copy of the algebraic number. */
 void lp_algebraic_number_construct_copy(lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
 
+/** Construct the algebraic number from an integerl */
+void lp_algebraic_number_construct_from_integer(lp_algebraic_number_t* a, const lp_integer_t* z);
+
 /** Construct the algebraic number from a dyadic rational */
 void lp_algebraic_number_construct_from_dyadic_rational(lp_algebraic_number_t* a, const lp_dyadic_rational_t* q);
+
+/** Construct the algebraic number from a rational */
+void lp_algebraic_number_construct_from_rational(lp_algebraic_number_t* a, const lp_rational_t* q);
 
 /** Destruct the number */
 void lp_algebraic_number_destruct(lp_algebraic_number_t* a);
