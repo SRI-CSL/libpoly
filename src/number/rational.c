@@ -18,6 +18,8 @@
  */
 
 #include "number/rational.h"
+#include "number/integer.h"
+#include "utils/hash.h"
 
 void lp_rational_construct(lp_rational_t* q) {
   rational_construct(q);
@@ -150,4 +152,10 @@ void lp_rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling) {
 
 void lp_rational_floor(const lp_rational_t* q, lp_integer_t* q_floor) {
   rational_floor(q, q_floor);
+}
+
+size_t lp_rational_hash(const lp_rational_t* q) {
+  size_t h1 = integer_hash(rational_get_num_ref(q));
+  size_t h2 = integer_hash(rational_get_den_ref(q));
+  return hash_combine(h1, h2);
 }

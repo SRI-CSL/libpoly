@@ -18,6 +18,7 @@
  */
 
 #include "number/dyadic_rational.h"
+#include "utils/hash.h"
 
 void lp_dyadic_rational_construct(lp_dyadic_rational_t* q) {
   dyadic_rational_construct(q);
@@ -228,3 +229,9 @@ void dyadic_rational_get_value_between(lp_dyadic_rational_t* v, const lp_rationa
   integer_destruct(&m_floor);
   rational_destruct(&m_q);
 }
+
+size_t lp_dyadic_rational_hash(const lp_dyadic_rational_t* q) {
+  size_t h1 = lp_integer_hash(&q->a);
+  return hash_combine(h1, q->n);
+}
+

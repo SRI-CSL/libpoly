@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include "utils/open_memstream.h"
+#include "utils/hash.h"
 
 #define __var_unused(x) ((void)x)
 
@@ -444,11 +445,6 @@ unsigned integer_log2_abs(lp_integer_t* a) {
   // a = 2 => size = 2 => 2^1 <= a < 2^2 => return 2
   // a = 3 => size = 2 => 2^1 <= a < 2^3 => return 2
   return mpz_sizeinbase(a, 2);
-}
-
-static inline
-size_t hash_combine(size_t seed, size_t h) {
-  return h + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 static inline

@@ -194,6 +194,11 @@ void lp_rational_ceiling(const lp_rational_t* q, lp_integer_t* q_ceiling);
  */
 void lp_rational_floor(const lp_rational_t* q, lp_integer_t* q_floor);
 
+/**
+ * Return the hash of the rational.
+ */
+size_t lp_rational_hash(const lp_rational_t* q);
+
 #ifdef __cplusplus
 } /* close extern "C" { */
 #endif

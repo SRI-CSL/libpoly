@@ -99,7 +99,7 @@ void lp_value_destruct(lp_value_t* v);
 /** Destruct and free the value */
 void lp_value_delete(lp_value_t* v);
 
-/** Get a hash of the value */
+/** Get a hash of the value (not a good hash == hash(floor(v))) */
 size_t lp_value_hash(const lp_value_t* v);
 
 /** Assign */

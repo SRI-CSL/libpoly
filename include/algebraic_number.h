@@ -151,6 +151,9 @@ void lp_algebraic_number_ceiling(const lp_algebraic_number_t* a, lp_integer_t* a
 /** Returns the floor of the number */
 void lp_algebraic_number_floor(const lp_algebraic_number_t* a, lp_integer_t* a_floor);
 
+/** Returns a hash of the number (is not stored, computed every time) */
+size_t lp_algebraic_number_hash(const lp_algebraic_number_t* a);
+
 #ifdef __cplusplus
 } /* close extern "C" { */
 #endif

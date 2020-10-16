@@ -915,7 +915,7 @@ int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t*
 // of the same number have the same hash. This is impossible since we don't
 // have a canonical representation of algebraic numbers -- even if the number
 // is rational we sometimes miss it. For example a = <x*(2x-1), (0,1)> is 1/2.
-// To hack this, we just take the floor of the number and return that.
+// To hack this, we just take the floor of the number and return the hash of that.
 //
 size_t lp_value_hash(const lp_value_t* v) {
   switch (v->type) {
@@ -929,7 +929,7 @@ size_t lp_value_hash(const lp_value_t* v) {
     lp_integer_t floor;
     lp_integer_construct(&floor);
     lp_value_floor(v, &floor);
-    size_t hash = lp_integer_to_int(&floor);
+    size_t hash = lp_integer_hash(&floor);
     lp_integer_destruct(&floor);
     return hash;
   }
