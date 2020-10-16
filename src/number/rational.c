@@ -159,3 +159,54 @@ size_t lp_rational_hash(const lp_rational_t* q) {
   size_t h2 = integer_hash(rational_get_den_ref(q));
   return hash_combine(h1, h2);
 }
+
+size_t lp_rational_hash_approx(const lp_rational_t* q, unsigned precision) {
+
+  if (rational_is_integer(q)) {
+    return integer_hash(rational_get_num_ref(q));
+  }
+
+  unsigned i;
+  size_t hash;
+  lp_integer_t a_floor, a_ceil;
+  lp_dyadic_rational_t lb, m, ub;
+
+  integer_construct(&a_floor);
+  integer_construct(&a_ceil);
+
+  rational_floor(q, &a_floor);
+  rational_ceiling(q, &a_ceil);
+
+  lp_dyadic_rational_construct_from_integer(&lb, &a_floor);
+  lp_dyadic_rational_construct_from_integer(&ub, &a_ceil);
+  lp_dyadic_rational_construct_from_integer(&m, &a_floor);
+
+  // refine to precision or until a dyadic rational is found
+  for (i = 0; i < precision; ++ i) {
+    // m = (lb + ub) / 2
+    lp_dyadic_rational_add(&m, &lb, &ub);
+    lp_dyadic_rational_div_2exp(&m, &m, 1);
+    int cmp = rational_cmp_dyadic_rational(q, &m);
+    if (cmp == 0) {
+      break;
+    } else if (cmp < 0) {
+      // lb < a < m < ub, set m = ub
+      lp_dyadic_rational_swap(&m, &ub);
+    } else {
+      // lb < m < a < ub, set m = lb
+      lp_dyadic_rational_swap(&m, &lb);
+    }
+  }
+
+  // just hash the approximation
+  hash = lp_dyadic_rational_hash(&m);
+
+  // remove temps
+  lp_dyadic_rational_destruct(&m);
+  lp_dyadic_rational_destruct(&ub);
+  lp_dyadic_rational_destruct(&lb);
+  integer_destruct(&a_ceil);
+  integer_destruct(&a_floor);
+
+  return hash;
+}

@@ -99,8 +99,11 @@ void lp_value_destruct(lp_value_t* v);
 /** Destruct and free the value */
 void lp_value_delete(lp_value_t* v);
 
-/** Get a hash of the value (not a good hash == hash(floor(v))) */
+/** Get a hash of the value (not a good hash == lp_value_hash_approx(v, 0) */
 size_t lp_value_hash(const lp_value_t* v);
+
+/** Returns a hash of the of the dyadic approximation of v */
+size_t lp_value_hash_approx(const lp_value_t* v, unsigned precision);
 
 /** Assign */
 void lp_value_assign(lp_value_t* v, const lp_value_t* from);

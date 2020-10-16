@@ -199,6 +199,12 @@ void lp_rational_floor(const lp_rational_t* q, lp_integer_t* q_floor);
  */
 size_t lp_rational_hash(const lp_rational_t* q);
 
+/**
+ * Returns a hash of the of the dyadic approximation of q
+ */
+size_t lp_rational_hash_approx(const lp_rational_t* q, unsigned precision);
+
+
 #ifdef __cplusplus
 } /* close extern "C" { */
 #endif

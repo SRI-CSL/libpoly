@@ -1139,54 +1139,53 @@ void lp_algebraic_number_floor(const lp_algebraic_number_t* a, lp_integer_t* a_f
   dyadic_rational_floor_int(&a->I.a, a_floor);
 }
 
-size_t lp_algebraic_number_hash(const lp_algebraic_number_t* a) {
-  size_t hash;
+size_t lp_algebraic_number_hash_approx(const lp_algebraic_number_t* a, unsigned precision) {
 
-  // integers are always hashes as integers
-  if (lp_dyadic_interval_is_point(&a->I)) {
-    hash = lp_dyadic_rational_hash(&a->I.a);
-  } else {
-    unsigned i;
-    lp_integer_t a_floor, a_ceil;
-    lp_dyadic_rational_t lb, m, ub;
-
-    integer_construct(&a_floor);
-    integer_construct(&a_ceil);
-
-    lp_algebraic_number_floor(a, &a_floor);
-    lp_algebraic_number_ceiling(a, &a_ceil);
-
-    lp_dyadic_rational_construct_from_integer(&lb, &a_floor);
-    lp_dyadic_rational_construct_from_integer(&ub, &a_ceil);
-    lp_dyadic_rational_construct(&m);
-
-    // refine to 1/2^16 or until a dyadic rational is found
-    for (i = 0; i < 16; ++ i) {
-      // m = (lb + ub) / 2
-      lp_dyadic_rational_add(&m, &lb, &ub);
-      lp_dyadic_rational_div_2exp(&m, &m, 1);
-      int cmp = lp_algebraic_number_cmp_dyadic_rational(a, &m);
-      if (cmp == 0) {
-        break;
-      } else if (cmp < 0) {
-        // lb < a < m < ub, set m = ub
-        lp_dyadic_rational_swap(&m, &ub);
-      } else {
-        // lb < m < a < ub, set m = lb
-        lp_dyadic_rational_swap(&m, &lb);
-      }
-    }
-
-    // just hash the approximation
-    hash = lp_dyadic_rational_hash(&m);
-
-    // remove temps
-    lp_dyadic_rational_destruct(&m);
-    lp_dyadic_rational_destruct(&ub);
-    lp_dyadic_rational_destruct(&lb);
-    integer_destruct(&a_ceil);
-    integer_destruct(&a_floor);
+  if (lp_algebraic_number_is_integer(a)) {
+    return integer_hash(&a->I.a.a);
   }
+
+  unsigned i;
+  size_t hash;
+  lp_integer_t a_floor, a_ceil;
+  lp_dyadic_rational_t lb, m, ub;
+
+  integer_construct(&a_floor);
+  integer_construct(&a_ceil);
+
+  lp_algebraic_number_floor(a, &a_floor);
+  lp_algebraic_number_ceiling(a, &a_ceil);
+
+  lp_dyadic_rational_construct_from_integer(&lb, &a_floor);
+  lp_dyadic_rational_construct_from_integer(&ub, &a_ceil);
+  lp_dyadic_rational_construct_from_integer(&m, &a_floor);
+
+  // refine to precision or until a dyadic rational is found
+  for (i = 0; i < precision; ++ i) {
+    // m = (lb + ub) / 2
+    lp_dyadic_rational_add(&m, &lb, &ub);
+    lp_dyadic_rational_div_2exp(&m, &m, 1);
+    int cmp = lp_algebraic_number_cmp_dyadic_rational(a, &m);
+    if (cmp == 0) {
+      break;
+    } else if (cmp < 0) {
+      // lb < a < m < ub, set m = ub
+      lp_dyadic_rational_swap(&m, &ub);
+    } else {
+      // lb < m < a < ub, set m = lb
+      lp_dyadic_rational_swap(&m, &lb);
+    }
+  }
+
+  // just hash the approximation
+  hash = lp_dyadic_rational_hash(&m);
+
+  // remove temps
+  lp_dyadic_rational_destruct(&m);
+  lp_dyadic_rational_destruct(&ub);
+  lp_dyadic_rational_destruct(&lb);
+  integer_destruct(&a_ceil);
+  integer_destruct(&a_floor);
 
   return hash;
 }

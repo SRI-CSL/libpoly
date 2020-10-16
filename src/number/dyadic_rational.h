@@ -410,4 +410,3 @@ int dyadic_rational_is_integer(const lp_dyadic_rational_t* a) {
 
 /** Returns a dyadic rational in the interval (a, b) */
 void dyadic_rational_get_value_between(lp_dyadic_rational_t* v, const lp_rational_t* a, const lp_rational_t* b);
-

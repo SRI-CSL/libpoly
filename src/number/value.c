@@ -910,14 +910,11 @@ int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t*
   return size;
 }
 
-//
-// Hash the value. The main problem is to make sure that different representations
-// of the same number have the same hash. This is impossible since we don't
-// have a canonical representation of algebraic numbers -- even if the number
-// is rational we sometimes miss it. For example a = <x*(2x-1), (0,1)> is 1/2.
-// To hack this, we just take the floor of the number and return the hash of that.
-//
 size_t lp_value_hash(const lp_value_t* v) {
+  return lp_value_hash_approx(v, 0);
+}
+
+size_t lp_value_hash_approx(const lp_value_t* v, unsigned precision) {
   switch (v->type) {
   case LP_VALUE_NONE:
     return 0;
@@ -925,16 +922,20 @@ size_t lp_value_hash(const lp_value_t* v) {
     return SIZE_MAX-1;
   case LP_VALUE_MINUS_INFINITY:
     return SIZE_MAX;
-  default: {
-    lp_integer_t floor;
-    lp_integer_construct(&floor);
-    lp_value_floor(v, &floor);
-    size_t hash = lp_integer_hash(&floor);
-    lp_integer_destruct(&floor);
-    return hash;
-  }
+  case LP_VALUE_INTEGER:
+    return lp_integer_hash(&v->value.z);
+  case LP_VALUE_DYADIC_RATIONAL:
+    return lp_dyadic_rational_hash_approx(&v->value.dy_q, precision);
+  case LP_VALUE_RATIONAL:
+    return lp_rational_hash_approx(&v->value.q, precision);
+  case LP_VALUE_ALGEBRAIC:
+    return lp_algebraic_number_hash_approx(&v->value.a, precision);
+  default:
+    assert(0);
+    return 0;
   }
 }
+
 
 double lp_value_to_double(const lp_value_t* v) {
   switch (v->type) {
@@ -953,7 +954,7 @@ double lp_value_to_double(const lp_value_t* v) {
   case LP_VALUE_ALGEBRAIC:
     return lp_algebraic_number_to_double(&v->value.a);
   default:
-    return 0;
     assert(0);
+    return 0;
   }
 }
