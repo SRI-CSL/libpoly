@@ -63,6 +63,9 @@ static PyObject*
 Value_mul(PyObject* self, PyObject* args);
 
 static PyObject*
+Value_div(PyObject* self, PyObject* args);
+
+static PyObject*
 Value_pow(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -84,7 +87,7 @@ PyNumberMethods Value_NumberMethods = {
      Value_add, // binaryfunc nb_add;
      Value_sub, // binaryfunc nb_subtract;
      Value_mul, // binaryfunc nb_multiply;
-     0, // binaryfunc nb_divide;
+     Value_div, // binaryfunc nb_divide;
      0, // binaryfunc nb_remainder;
      0, // binaryfunc nb_divmod;
      (ternaryfunc)Value_pow, // ternaryfunc nb_power;
@@ -349,32 +352,116 @@ Value_get_value_between(PyObject* self, PyObject* args) {
 
 static PyObject*
 Value_add(PyObject* self, PyObject* other) {
-  assert(0);
-  return 0;
+  if (!PyValue_CHECK(self) || !PyValue_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  Value* v1 = (Value*) self;
+  Value* v2 = (Value*) other;
+
+  lp_value_t add;
+  lp_value_construct_none(&add);
+  lp_value_add(&add, &v1->v, &v2->v);
+  PyObject* result = PyValue_create(&add);
+  lp_value_destruct(&add);
+
+  return result;
 }
 
 static PyObject*
 Value_neg(PyObject* self) {
-  assert(0);
-  return 0;
+  if (!PyValue_CHECK(self)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  Value* v = (Value*) self;
+
+  lp_value_t neg;
+  lp_value_construct_none(&neg);
+  lp_value_neg(&neg, &v->v);
+  PyObject* result = PyValue_create(&neg);
+  lp_value_destruct(&neg);
+
+  return result;
 }
 
 static PyObject*
 Value_sub(PyObject* self, PyObject* other) {
-  assert(0);
-  return 0;
+  if (!PyValue_CHECK(self) || !PyValue_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  Value* v1 = (Value*) self;
+  Value* v2 = (Value*) other;
+
+  lp_value_t sub;
+  lp_value_construct_none(&sub);
+  lp_value_sub(&sub, &v1->v, &v2->v);
+  PyObject* result = PyValue_create(&sub);
+  lp_value_destruct(&sub);
+
+  return result;
 }
 
 static PyObject*
 Value_mul(PyObject* self, PyObject* other) {
-  assert(0);
-  return 0;
+  if (!PyValue_CHECK(self) || !PyValue_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  Value* v1 = (Value*) self;
+  Value* v2 = (Value*) other;
+
+  lp_value_t mul;
+  lp_value_construct_none(&mul);
+  lp_value_mul(&mul, &v1->v, &v2->v);
+  PyObject* result = PyValue_create(&mul);
+  lp_value_destruct(&mul);
+
+  return result;
 }
 
 static PyObject*
+Value_div(PyObject* self, PyObject* other) {
+  if (!PyValue_CHECK(self) || !PyValue_CHECK(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  Value* v1 = (Value*) self;
+  Value* v2 = (Value*) other;
+
+  lp_value_t div;
+  lp_value_construct_none(&div);
+  lp_value_div(&div, &v1->v, &v2->v);
+  PyObject* result = PyValue_create(&div);
+  lp_value_destruct(&div);
+
+  return result;
+}
+
+
+static PyObject*
 Value_pow(PyObject* self, PyObject* other) {
-  assert(0);
-  return 0;
+  if (!PyValue_CHECK(self) || !PyInt_Check(other)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  Value* v = (Value*) self;
+  long n = PyInt_AsLong(other);
+
+  lp_value_t mul;
+  lp_value_construct_none(&mul);
+  lp_value_pow(&mul, &v->v, n);
+  PyObject* result = PyValue_create(&mul);
+  lp_value_destruct(&mul);
+
+  return result;
 }
 
 // Returns the o converted to an integer object on success, or NULL on failure.

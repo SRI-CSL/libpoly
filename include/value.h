@@ -39,7 +39,7 @@ typedef enum {
   LP_VALUE_INTEGER,
   /** Dyadic rational */
   LP_VALUE_DYADIC_RATIONAL,
-  /** Ratioanl number */
+  /** Rational number */
   LP_VALUE_RATIONAL,
   /** Reduced algebraic number (univariate representation) */
   LP_VALUE_ALGEBRAIC,
@@ -182,6 +182,28 @@ int lp_value_get_distance_size_approx(const lp_value_t* lower, const lp_value_t*
 
 /** Get the double (approximation) of the value */
 double lp_value_to_double(const lp_value_t* v);
+
+/** Addition. Does not support adding -inf and +inf. */
+void lp_value_add(lp_value_t* sum, const lp_value_t* a, const lp_value_t* b);
+
+/** Subtraction. Does not support subtracting inf and inf of the same sign */
+void lp_value_sub(lp_value_t* sub, const lp_value_t* a, const lp_value_t* b);
+
+/** Negation */
+void lp_value_neg(lp_value_t* neg, const lp_value_t* a);
+
+/** Multiplication. Does not support multiplying 0 and inf. */
+void lp_value_mul(lp_value_t* mul, const lp_value_t* a, const lp_value_t* b);
+
+/** Multiplicative inverse. Does not support ./0, inf/inf. */
+void lp_value_inv(lp_value_t* inv, const lp_value_t* a);
+
+/** Division (b != 0) */
+void lp_value_div(lp_value_t* div, const lp_value_t* a, const lp_value_t* b);
+
+/** Exponentiation */
+void lp_value_pow(lp_value_t* pow, const lp_value_t* a, unsigned n);
+
 
 #ifdef __cplusplus
 } /* close extern "C" { */

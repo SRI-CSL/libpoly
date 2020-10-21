@@ -22,3 +22,14 @@
 #include <value.h>
 
 void lp_value_approx(const lp_value_t* v, lp_rational_interval_t* approx);
+
+/**
+ * Case v1 and v2 to the same type.
+ *
+ * @param v1, v2 the values to case
+ * @param v1_tmp the value to use for allocating a new value
+ * @param v1_to_use, v2_to_use the cast values to use
+ */
+int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
+    lp_value_t* v1_new, lp_value_t* v2_new,
+    const lp_value_t** v1_to_use, const lp_value_t** v2_to_use);

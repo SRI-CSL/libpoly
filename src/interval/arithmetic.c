@@ -134,102 +134,7 @@ void dyadic_interval_add(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1
 }
 
 static
-int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
-    lp_value_t* v1_new, lp_value_t* v2_new,
-    const lp_value_t** v1_to_use, const lp_value_t** v2_to_use) {
-
-  assert(v1->type != v2->type);
-
-  lp_rational_t tmp_rat;
-  lp_dyadic_rational_t tmp_dy;
-
-  switch (v1->type) {
-  case LP_VALUE_INTEGER:
-    switch (v2->type) {
-    case LP_VALUE_DYADIC_RATIONAL:
-      // v1: integer
-      // v2: dyadic rational
-      lp_dyadic_rational_construct_from_integer(&tmp_dy, &v1->value.z);
-      lp_value_construct(v1_new, LP_VALUE_DYADIC_RATIONAL, &tmp_dy);
-      lp_dyadic_rational_destruct(&tmp_dy);
-      *v1_to_use = v1_new;
-      *v2_to_use = v2;
-      break;
-    case LP_VALUE_RATIONAL:
-      // v1: integer
-      // v2: rational
-      lp_rational_construct_from_integer(&tmp_rat, &v1->value.z);
-      lp_value_construct(v1_new, LP_VALUE_RATIONAL, &tmp_rat);
-      lp_rational_destruct(&tmp_rat);
-      *v1_to_use = v1_new;
-      *v2_to_use = v2;
-      break;
-    default:
-      // unsupported
-      return 0;
-    }
-    break;
-  case LP_VALUE_DYADIC_RATIONAL:
-    switch (v2->type) {
-    case LP_VALUE_INTEGER:
-      // v1: dyadic rational
-      // v2: integer
-      lp_dyadic_rational_construct_from_integer(&tmp_dy, &v2->value.z);
-      lp_value_construct(v2_new, LP_VALUE_DYADIC_RATIONAL, &tmp_dy);
-      lp_dyadic_rational_destruct(&tmp_dy);
-      *v1_to_use = v1;
-      *v2_to_use = v2_new;
-      break;
-    case LP_VALUE_RATIONAL:
-      // v1: dyadic rational
-      // v2: rational
-      lp_rational_construct_from_dyadic(&tmp_rat, &v1->value.dy_q);
-      lp_value_construct(v1_new, LP_VALUE_RATIONAL, &tmp_rat);
-      lp_rational_destruct(&tmp_rat);
-      *v1_to_use = v1_new;
-      *v2_to_use = v2;
-      break;
-    default:
-      // unsupported
-      return 0;
-    }
-    break;
-  case LP_VALUE_RATIONAL:
-    switch (v2->type) {
-    case LP_VALUE_INTEGER:
-      // v1: rational
-      // v2: integer
-      lp_rational_construct_from_integer(&tmp_rat, &v2->value.z);
-      lp_value_construct(v2_new, LP_VALUE_RATIONAL, &tmp_rat);
-      lp_rational_destruct(&tmp_rat);
-      *v1_to_use = v1;
-      *v2_to_use = v2_new;
-      break;
-    case LP_VALUE_DYADIC_RATIONAL:
-      // v1: rational
-      // v2: dyadic rational
-      lp_rational_construct_from_dyadic(&tmp_rat, &v2->value.dy_q);
-      lp_value_construct(v2_new, LP_VALUE_RATIONAL, &tmp_rat);
-      lp_rational_destruct(&tmp_rat);
-      *v1_to_use = v1;
-      *v2_to_use = v2_new;
-      break;
-    default:
-      // unsupported
-      return 0;
-    }
-    break;
-  default:
-    // unsupported
-    return 0;
-  }
-
-  return 1;
-}
-
-
-static
-int lp_value_add(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_value_t* ub) {
+int lp_value_add_approx(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_value_t* ub) {
 
   assert(v1 != lb && v1 != ub);
   assert(v2 != lb && v2 != ub);
@@ -333,7 +238,7 @@ int lp_value_add(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_
     int cast = lp_value_to_same_type(v1, v2, &v1_tmp, &v2_tmp, &v1_to_use, &v2_to_use);
     if (cast) {
       // Cast successful, just add as usual
-      lp_value_add(v1_to_use, v2_to_use, lb, ub);
+      lp_value_add_approx(v1_to_use, v2_to_use, lb, ub);
       // If a fesh value was used, delete it
       if (v1_to_use != v1) {
         lp_value_destruct(&v1_tmp);
@@ -415,8 +320,8 @@ int lp_value_add(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_
       const lp_dyadic_rational_t* b = v1->value.a.I.is_point ? a : &v1->value.a.I.b;
       lp_value_construct(&v1_lb, LP_VALUE_DYADIC_RATIONAL, a);
       lp_value_construct(&v1_ub, LP_VALUE_DYADIC_RATIONAL, b);
-      lp_value_add(&v1_lb, v2, lb, 0);
-      lp_value_add(&v1_ub, v2, ub, 0);
+      lp_value_add_approx(&v1_lb, v2, lb, 0);
+      lp_value_add_approx(&v1_ub, v2, ub, 0);
       is_point = 0;
       lp_value_destruct(&v1_lb);
       lp_value_destruct(&v1_ub);
@@ -432,7 +337,7 @@ void lp_interval_add(lp_interval_t* add, const lp_interval_t* I1, const lp_inter
   lp_interval_construct_full(&result);
 
   if (I1->is_point && I2->is_point) {
-    result.is_point = lp_value_add(&I1->a, &I2->a, &result.a, &result.b);
+    result.is_point = lp_value_add_approx(&I1->a, &I2->a, &result.a, &result.b);
     if (result.is_point) {
       lp_value_destruct(&result.b);
     }
@@ -443,8 +348,8 @@ void lp_interval_add(lp_interval_t* add, const lp_interval_t* I1, const lp_inter
     const lp_value_t* I1_b = I1->is_point ? I1_a : &I1->b;
     const lp_value_t* I2_a = &I2->a;
     const lp_value_t* I2_b = I2->is_point ? I2_a : &I2->b;
-    int a_point = lp_value_add(I1_a, I2_a, &result.a, 0);
-    int b_point = lp_value_add(I1_b, I2_b, 0, &result.b);
+    int a_point = lp_value_add_approx(I1_a, I2_a, &result.a, 0);
+    int b_point = lp_value_add_approx(I1_b, I2_b, 0, &result.b);
     result.a_open = I1->a_open || I2->a_open || !a_point;
     result.b_open = I1->b_open || I2->b_open || !b_point;
     result.is_point = 0;
@@ -751,7 +656,7 @@ void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1
 }
 
 static
-int lp_value_mul(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_value_t* ub) {
+int lp_value_mul_approx(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_value_t* ub) {
 
   assert(v1 != lb && v1 != ub);
   assert(v2 != lb && v2 != ub);
@@ -845,7 +750,7 @@ int lp_value_mul(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_
     int cast = lp_value_to_same_type(v1, v2, &v1_tmp, &v2_tmp, &v1_to_use, &v2_to_use);
     if (cast) {
       // Cast successful, just add as usual
-      lp_value_mul(v1_to_use, v2_to_use, lb, ub);
+      lp_value_mul_approx(v1_to_use, v2_to_use, lb, ub);
       // If a fesh value was used, delete it
       if (v1_to_use != v1) {
         lp_value_destruct(&v1_tmp);
@@ -905,8 +810,8 @@ int lp_value_mul(const lp_value_t* v1, const lp_value_t* v2, lp_value_t* lb, lp_
       const lp_dyadic_rational_t* b = v1->value.a.I.is_point ? a : &v1->value.a.I.b;
       lp_value_construct(&v1_lb, LP_VALUE_DYADIC_RATIONAL, a);
       lp_value_construct(&v1_ub, LP_VALUE_DYADIC_RATIONAL, b);
-      lp_value_mul(&v1_lb, v2, lb, 0);
-      lp_value_mul(&v1_ub, v2, ub, 0);
+      lp_value_mul_approx(&v1_lb, v2, lb, 0);
+      lp_value_mul_approx(&v1_ub, v2, ub, 0);
       if (v2_sgn < 0) {
         lp_value_swap(lb, ub);
       }
@@ -927,7 +832,7 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
   if (I1->is_point) {
     if (I2->is_point) {
       // Just multiply the points
-      result.is_point = lp_value_mul(&I1->a, &I2->a, &result.a, &result.b);
+      result.is_point = lp_value_mul_approx(&I1->a, &I2->a, &result.a, &result.b);
       if (result.is_point) {
         lp_value_destruct(&result.b);
       }
@@ -941,14 +846,14 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
         lp_interval_construct_zero(&result);
       } else if (a_sgn > 0) {
         // Regular multiplication
-        int a_is_point = lp_value_mul(&I1->a, &I2->a, &result.a, 0);
-        int b_is_point = lp_value_mul(&I1->a, &I2->b, 0, &result.b);
+        int a_is_point = lp_value_mul_approx(&I1->a, &I2->a, &result.a, 0);
+        int b_is_point = lp_value_mul_approx(&I1->a, &I2->b, 0, &result.b);
         result.is_point = 0;
         result.a_open = I2->a_open || !a_is_point;
         result.b_open = I2->b_open || !b_is_point;
       } else {
-        int a_is_point = lp_value_mul(&I1->a, &I2->b, &result.a, 0);
-        int b_is_point = lp_value_mul(&I1->a, &I2->a, 0, &result.b);
+        int a_is_point = lp_value_mul_approx(&I1->a, &I2->b, &result.a, 0);
+        int b_is_point = lp_value_mul_approx(&I1->a, &I2->a, 0, &result.b);
         result.is_point = 0;
         result.a_open = I2->b_open || !a_is_point;
         result.b_open = I2->a_open || !b_is_point;
@@ -972,11 +877,11 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     int mul_is_point = 0;
 
     // I1.a x I2.a
-    mul_is_point = lp_value_mul(&I1->a, &I2->a, &result.a, &result.b);
+    mul_is_point = lp_value_mul_approx(&I1->a, &I2->a, &result.a, &result.b);
     result.a_open = result.b_open = I1->a_open || I2->a_open || !mul_is_point;
 
     // I1.a x I2.b
-    mul_is_point = lp_value_mul(&I1->a, &I2->b, &tmp_lb, &tmp_ub);
+    mul_is_point = lp_value_mul_approx(&I1->a, &I2->b, &tmp_lb, &tmp_ub);
     int tmp_open = I1->a_open || I2->b_open || !mul_is_point;
     if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
       lp_value_swap(&tmp_lb, &result.a);
@@ -988,7 +893,7 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     }
 
     // I1.b x I2.a
-    mul_is_point = lp_value_mul(&I1->b, &I2->a, &tmp_lb, &tmp_ub);
+    mul_is_point = lp_value_mul_approx(&I1->b, &I2->a, &tmp_lb, &tmp_ub);
     tmp_open = I1->b_open || I2->a_open || !mul_is_point;
     if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
       lp_value_swap(&tmp_lb, &result.a);
@@ -1000,7 +905,7 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
     }
 
     // I1.b x I2.b
-    mul_is_point = lp_value_mul(&I1->b, &I2->b, &tmp_lb, &tmp_ub);
+    mul_is_point = lp_value_mul_approx(&I1->b, &I2->b, &tmp_lb, &tmp_ub);
     tmp_open = I1->b_open || I2->b_open || !mul_is_point;
     if (lp_interval_endpoint_lt(&tmp_lb, tmp_open, &result.a, result.a_open)) {
       lp_value_swap(&tmp_lb, &result.a);
@@ -1045,7 +950,7 @@ void lp_interval_mul(lp_interval_t* mul, const lp_interval_t* I1, const lp_inter
 }
 
 static
-int lp_value_pow(const lp_value_t* v, unsigned n, lp_value_t* lb, lp_value_t* ub) {
+int lp_value_pow_approx(const lp_value_t* v, unsigned n, lp_value_t* lb, lp_value_t* ub) {
 
   assert(n > 0);
   assert(v != lb);
@@ -1187,7 +1092,7 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
     lp_value_destruct(&one);
   } else if (I->is_point) {
     // Plain power
-    result.is_point = lp_value_pow(&I->a, n, &result.a, &result.b);
+    result.is_point = lp_value_pow_approx(&I->a, n, &result.a, &result.b);
     if (result.is_point) {
       lp_value_destruct(&result.b);
     }
@@ -1195,8 +1100,8 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
   } else {
     if (n % 2) {
       // For odd powers we are monotonic, i.e. [a, b]^n = [a^n, b^n]
-      int a_point = lp_value_pow(&I->a, n, &result.a, 0);
-      int b_point = lp_value_pow(&I->b, n, 0, &result.b);
+      int a_point = lp_value_pow_approx(&I->a, n, &result.a, 0);
+      int b_point = lp_value_pow_approx(&I->b, n, 0, &result.b);
       result.a_open = I->a_open || !a_point;
       result.b_open = I->b_open || !b_point;
     } else {
@@ -1204,8 +1109,8 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
       int sgn = lp_interval_sgn(I);
       if (sgn == 0) {
         // P = [0, max(a, b)^n]
-        int a_point = lp_value_pow(&I->a, n, 0, &result.a);
-        int b_point = lp_value_pow(&I->b, n, 0, &result.b);
+        int a_point = lp_value_pow_approx(&I->a, n, 0, &result.a);
+        int b_point = lp_value_pow_approx(&I->b, n, 0, &result.b);
         if (lp_interval_endpoint_lt(&result.b, I->b_open, &result.a, I->a_open)) {
           lp_value_swap(&result.b, &result.a);
           result.b_open = I->a_open || !a_point;
@@ -1216,14 +1121,14 @@ void lp_interval_pow(lp_interval_t* pow, const lp_interval_t* I, unsigned n) {
         result.a_open = 0;
       } else if (sgn > 0) {
         // P = I^n
-        int a_point = lp_value_pow(&I->a, n, &result.a, 0);
-        int b_point = lp_value_pow(&I->b, n, 0, &result.b);
+        int a_point = lp_value_pow_approx(&I->a, n, &result.a, 0);
+        int b_point = lp_value_pow_approx(&I->b, n, 0, &result.b);
         result.a_open = I->a_open || !a_point;
         result.b_open = I->b_open || !b_point;
       } else {
         // P = I^n, but swappeed
-        int a_point = lp_value_pow(&I->a, n, 0, &result.b);
-        int b_point = lp_value_pow(&I->b, n, &result.a, 0);
+        int a_point = lp_value_pow_approx(&I->a, n, 0, &result.b);
+        int b_point = lp_value_pow_approx(&I->b, n, &result.a, 0);
         result.a_open = I->b_open || !b_point;
         result.b_open = I->a_open || !a_point;
       }

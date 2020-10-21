@@ -958,3 +958,425 @@ double lp_value_to_double(const lp_value_t* v) {
     return 0;
   }
 }
+
+/**
+ * Case v1 and v2 to the same type.
+ *
+ * @param v1, v2 the values to case
+ * @param v1_tmp the value to use for allocating a new value
+ * @param v1_to_use, v2_to_use the cast values to use
+ */
+int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
+    lp_value_t* v1_new, lp_value_t* v2_new,
+    const lp_value_t** v1_to_use, const lp_value_t** v2_to_use) {
+
+  // trivial
+  if (v1->type == v2->type) {
+    *v1_to_use = v1;
+    *v2_to_use = v2;
+    return 1;
+  }
+
+  lp_rational_t tmp_rat;
+  lp_dyadic_rational_t tmp_dy;
+  lp_algebraic_number_t tmp_a;
+
+  switch (v1->type) {
+  case LP_VALUE_INTEGER:
+    switch (v2->type) {
+    case LP_VALUE_DYADIC_RATIONAL:
+      // v1: integer
+      // v2: dyadic rational
+      lp_dyadic_rational_construct_from_integer(&tmp_dy, &v1->value.z);
+      lp_value_construct(v1_new, LP_VALUE_DYADIC_RATIONAL, &tmp_dy);
+      lp_dyadic_rational_destruct(&tmp_dy);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    case LP_VALUE_RATIONAL:
+      // v1: integer
+      // v2: rational
+      lp_rational_construct_from_integer(&tmp_rat, &v1->value.z);
+      lp_value_construct(v1_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    case LP_VALUE_ALGEBRAIC:
+      // v1: integer
+      // v2: algebraic
+      lp_algebraic_number_construct_from_integer(&tmp_a, &v1->value.z);
+      lp_value_construct(v1_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_algebraic_number_destruct(&tmp_a);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    default:
+      // unsupported
+      return 0;
+    }
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    switch (v2->type) {
+    case LP_VALUE_INTEGER:
+      // v1: dyadic rational
+      // v2: integer
+      lp_dyadic_rational_construct_from_integer(&tmp_dy, &v2->value.z);
+      lp_value_construct(v2_new, LP_VALUE_DYADIC_RATIONAL, &tmp_dy);
+      lp_dyadic_rational_destruct(&tmp_dy);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_RATIONAL:
+      // v1: dyadic rational
+      // v2: rational
+      lp_rational_construct_from_dyadic(&tmp_rat, &v1->value.dy_q);
+      lp_value_construct(v1_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    case LP_VALUE_ALGEBRAIC:
+      // v1: dyadic rational
+      // v2: algebraic
+      lp_algebraic_number_construct_from_dyadic_rational(&tmp_a, &v1->value.dy_q);
+      lp_value_construct(v1_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_algebraic_number_destruct(&tmp_a);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    default:
+      // unsupported
+      return 0;
+    }
+    break;
+  case LP_VALUE_RATIONAL:
+    switch (v2->type) {
+    case LP_VALUE_INTEGER:
+      // v1: rational
+      // v2: integer
+      lp_rational_construct_from_integer(&tmp_rat, &v2->value.z);
+      lp_value_construct(v2_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_DYADIC_RATIONAL:
+      // v1: rational
+      // v2: dyadic rational
+      lp_rational_construct_from_dyadic(&tmp_rat, &v2->value.dy_q);
+      lp_value_construct(v2_new, LP_VALUE_RATIONAL, &tmp_rat);
+      lp_rational_destruct(&tmp_rat);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_ALGEBRAIC:
+      // v1: rational
+      // v2: algebraic_number
+      lp_algebraic_number_construct_from_rational(&tmp_a, &v1->value.q);
+      lp_value_construct(v2_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_algebraic_number_destruct(&tmp_a);
+      *v1_to_use = v1_new;
+      *v2_to_use = v2;
+      break;
+    default:
+      // unsupported
+      return 0;
+    }
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    switch (v2->type) {
+    case LP_VALUE_INTEGER:
+      // v1: algebraic number
+      // v2: integer
+      lp_algebraic_number_construct_from_integer(&tmp_a, &v2->value.z);
+      lp_value_construct(v2_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_algebraic_number_destruct(&tmp_a);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_DYADIC_RATIONAL:
+      // v1: algebraic number
+      // v2: dyadic rational
+      lp_algebraic_number_construct_from_dyadic_rational(&tmp_a, &v2->value.dy_q);
+      lp_value_construct(v2_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_algebraic_number_destruct(&tmp_a);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    case LP_VALUE_RATIONAL:
+      // v1: algebraic number
+      // v2: ratioal number
+      lp_algebraic_number_construct_from_rational(&tmp_a, &v2->value.q);
+      lp_value_construct(v2_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_algebraic_number_destruct(&tmp_a);
+      *v1_to_use = v1;
+      *v2_to_use = v2_new;
+      break;
+    default:
+      // unsupported
+      return 0;
+    }
+
+  default:
+    // unsupported
+    return 0;
+  }
+
+  return 1;
+}
+
+void lp_value_add(lp_value_t* sum, const lp_value_t* a, const lp_value_t* b) {
+
+  lp_value_t a_new, b_new;
+  const lp_value_t *a_to_use;
+  const lp_value_t *b_to_use;
+
+  // Check for infinities
+  if (a->type == LP_VALUE_PLUS_INFINITY) {
+    if (b->type != LP_VALUE_MINUS_INFINITY) {
+      lp_value_assign_raw(sum, LP_VALUE_PLUS_INFINITY, 0);
+    } else {
+      assert(0);
+    }
+    return;
+  } else if (a->type == LP_VALUE_MINUS_INFINITY) {
+    if (b->type != LP_VALUE_PLUS_INFINITY) {
+      lp_value_assign_raw(sum, LP_VALUE_MINUS_INFINITY, 0);
+    } else {
+      assert(0);
+    }
+    return;
+  } else if (b->type == LP_VALUE_PLUS_INFINITY) {
+    if (a->type != LP_VALUE_MINUS_INFINITY) {
+      lp_value_assign_raw(sum, LP_VALUE_PLUS_INFINITY, 0);
+    } else {
+      assert(0);
+    }
+    return;
+  } else if (b->type == LP_VALUE_MINUS_INFINITY) {
+    if (a->type != LP_VALUE_PLUS_INFINITY) {
+      lp_value_assign_raw(sum, LP_VALUE_MINUS_INFINITY, 0);
+    } else {
+      assert(0);
+    }
+    return;
+  }
+
+  // All other cases, cast and run the operation
+  int ret = lp_value_to_same_type(a, b, &a_new, &b_new, &a_to_use, &b_to_use);
+  (void) ret;
+  assert(ret);
+
+  lp_value_t result;
+
+  result.type = a_to_use->type;
+  switch (result.type) {
+  case LP_VALUE_INTEGER:
+    lp_integer_construct(&result.value.z);
+    lp_integer_add(lp_Z, &result.value.z, &a_to_use->value.z, &b_to_use->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_construct(&result.value.dy_q);
+    lp_dyadic_rational_add(&result.value.dy_q, &a_to_use->value.dy_q, &b_to_use->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_construct(&result.value.q);
+    lp_rational_add(&result.value.q, &a_to_use->value.q, &b_to_use->value.q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_algebraic_number_construct_zero(&result.value.a);
+    lp_algebraic_number_add(&result.value.a, &a_to_use->value.a, &b_to_use->value.a);
+    break;
+  default:
+    assert(0);
+    break;
+  }
+
+  lp_value_swap(sum, &result);
+  lp_value_destruct(&result);
+}
+
+void lp_value_sub(lp_value_t* sub, const lp_value_t* a, const lp_value_t* b) {
+  lp_value_t b_neg;
+  lp_value_construct_none(&b_neg);
+  lp_value_neg(&b_neg, b);
+  lp_value_add(sub, a, &b_neg);
+  lp_value_destruct(&b_neg);
+}
+
+void lp_value_neg(lp_value_t* neg, const lp_value_t* a) {
+
+  lp_value_t result;
+
+  result.type = a->type;
+  switch(a->type) {
+  case LP_VALUE_NONE:
+    break;
+  case LP_VALUE_INTEGER:
+    lp_integer_construct(&result.value.z);
+    lp_integer_neg(lp_Z, &result.value.z, &a->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_construct(&result.value.dy_q);
+    lp_dyadic_rational_neg(&result.value.dy_q, &a->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_construct(&result.value.q);
+    lp_rational_neg(&result.value.q, &a->value.q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_algebraic_number_construct_zero(&result.value.a);
+    lp_algebraic_number_neg(&result.value.a, &a->value.a);
+    break;
+  case LP_VALUE_PLUS_INFINITY:
+    result.type = LP_VALUE_MINUS_INFINITY;
+    break;
+  case LP_VALUE_MINUS_INFINITY:
+    result.type = LP_VALUE_PLUS_INFINITY;
+    break;
+  }
+
+  lp_value_swap(neg, &result);
+  lp_value_destruct(&result);
+}
+
+void lp_value_mul(lp_value_t* mul, const lp_value_t* a, const lp_value_t* b) {
+
+  lp_value_t a_new, b_new;
+  const lp_value_t *a_to_use;
+  const lp_value_t *b_to_use;
+
+  // Check for infinities
+  if (lp_value_is_infinity(a) || lp_value_is_infinity(b)) {
+    int sgn_a = lp_value_sgn(a);
+    int sgn_b = lp_value_sgn(b);
+    int sgn_mul = sgn_a * sgn_b;
+    if (sgn_mul > 0) {
+      lp_value_assign_raw(mul, LP_VALUE_PLUS_INFINITY, 0);
+    } else if (sgn_mul) {
+      lp_value_assign_raw(mul, LP_VALUE_MINUS_INFINITY, 0);
+    } else {
+      assert(0);
+    }
+    return;
+  }
+
+  // All other cases, cast and run the operation
+  int ret = lp_value_to_same_type(a, b, &a_new, &b_new, &a_to_use, &b_to_use);
+  (void) ret;
+  assert(ret);
+
+  lp_value_t result;
+
+  result.type = a_to_use->type;
+  switch (result.type) {
+  case LP_VALUE_INTEGER:
+    lp_integer_construct(&result.value.z);
+    lp_integer_mul(lp_Z, &result.value.z, &a_to_use->value.z, &b_to_use->value.z);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_construct(&result.value.dy_q);
+    lp_dyadic_rational_mul(&result.value.dy_q, &a_to_use->value.dy_q, &b_to_use->value.dy_q);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_construct(&result.value.q);
+    lp_rational_mul(&result.value.q, &a_to_use->value.q, &b_to_use->value.q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_algebraic_number_construct_zero(&result.value.a);
+    lp_algebraic_number_mul(&result.value.a, &a_to_use->value.a, &b_to_use->value.a);
+    break;
+  default:
+    assert(0);
+    break;
+  }
+
+  lp_value_swap(mul, &result);
+  lp_value_destruct(&result);
+}
+
+void lp_value_inv(lp_value_t* inv, const lp_value_t* a) {
+
+  lp_value_t result;
+
+  switch(inv->type) {
+  case LP_VALUE_NONE:
+    break;
+  case LP_VALUE_INTEGER:
+    result.type = LP_VALUE_RATIONAL;
+    lp_rational_construct_from_integer(&result.value.q, &a->value.z);
+    lp_rational_inv(&result.value.q, &result.value.q);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    result.type = LP_VALUE_RATIONAL;
+    lp_rational_construct_from_dyadic(&result.value.q, &a->value.dy_q);
+    lp_rational_inv(&result.value.q, &result.value.q);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_construct(&result.value.q);
+    lp_rational_inv(&result.value.q, &a->value.q);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    result.type = LP_VALUE_RATIONAL;
+    lp_algebraic_number_construct_zero(&result.value.a);
+    lp_algebraic_number_inv(&result.value.a, &a->value.a);
+    break;
+  case LP_VALUE_PLUS_INFINITY:
+  case LP_VALUE_MINUS_INFINITY:
+    lp_value_construct_zero(&result);
+    break;
+  }
+
+  lp_value_swap(inv, &result);
+  lp_value_destruct(&result);
+}
+
+void lp_value_div(lp_value_t* div, const lp_value_t* a, const lp_value_t* b) {
+  lp_value_t b_inv;
+  lp_value_construct_none(&b_inv);
+  lp_value_inv(&b_inv, b);
+  lp_value_mul(div, a, &b_inv);
+  lp_value_destruct(&b_inv);
+}
+
+void lp_value_pow(lp_value_t* pow, const lp_value_t* a, unsigned n) {
+
+  lp_value_t result;
+
+  result.type = a->type;
+  switch(a->type) {
+  case LP_VALUE_NONE:
+    break;
+  case LP_VALUE_INTEGER:
+    lp_integer_construct(&result.value.z);
+    lp_integer_pow(lp_Z, &result.value.z, &a->value.z, n);
+    break;
+  case LP_VALUE_DYADIC_RATIONAL:
+    lp_dyadic_rational_construct(&result.value.dy_q);
+    lp_dyadic_rational_pow(&result.value.dy_q, &a->value.dy_q, n);
+    break;
+  case LP_VALUE_RATIONAL:
+    lp_rational_construct(&result.value.q);
+    lp_rational_pow(&result.value.q, &a->value.q, n);
+    break;
+  case LP_VALUE_ALGEBRAIC:
+    lp_algebraic_number_construct_zero(&result.value.a);
+    lp_algebraic_number_pow(&result.value.a, &a->value.a, n);
+    break;
+  case LP_VALUE_PLUS_INFINITY:
+    result.type = LP_VALUE_MINUS_INFINITY;
+    break;
+  case LP_VALUE_MINUS_INFINITY:
+    if (n % 2) {
+      result.type = LP_VALUE_MINUS_INFINITY;
+    } else {
+      result.type = LP_VALUE_PLUS_INFINITY;
+    }
+    break;
+  }
+
+  lp_value_swap(pow, &result);
+  lp_value_destruct(&result);
+}
+
