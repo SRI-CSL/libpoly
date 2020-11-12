@@ -1193,6 +1193,13 @@ void lp_value_add(lp_value_t* sum, const lp_value_t* a, const lp_value_t* b) {
     break;
   }
 
+  if (a_to_use != a) {
+    lp_value_destruct(a_to_use);
+  }
+  if (b_to_use != b) {
+    lp_value_destruct(b_to_use);
+  }
+
   lp_value_swap(sum, &result);
   lp_value_destruct(&result);
 }
@@ -1290,6 +1297,13 @@ void lp_value_mul(lp_value_t* mul, const lp_value_t* a, const lp_value_t* b) {
   default:
     assert(0);
     break;
+  }
+
+  if (a_to_use != a) {
+    lp_value_destruct(a_to_use);
+  }
+  if (b_to_use != b) {
+    lp_value_destruct(b_to_use);
   }
 
   lp_value_swap(mul, &result);
