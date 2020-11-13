@@ -1194,10 +1194,10 @@ void lp_value_add(lp_value_t* sum, const lp_value_t* a, const lp_value_t* b) {
   }
 
   if (a_to_use != a) {
-    lp_value_destruct(a_to_use);
+    lp_value_destruct(&a_new);
   }
   if (b_to_use != b) {
-    lp_value_destruct(b_to_use);
+    lp_value_destruct(&b_new);
   }
 
   lp_value_swap(sum, &result);
@@ -1300,10 +1300,10 @@ void lp_value_mul(lp_value_t* mul, const lp_value_t* a, const lp_value_t* b) {
   }
 
   if (a_to_use != a) {
-    lp_value_destruct(a_to_use);
+    lp_value_destruct(&a_new);
   }
   if (b_to_use != b) {
-    lp_value_destruct(b_to_use);
+    lp_value_destruct(&b_new);
   }
 
   lp_value_swap(mul, &result);
