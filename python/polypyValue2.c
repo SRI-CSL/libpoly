@@ -209,8 +209,8 @@ Value_init(Value* self, PyObject* args)
       lp_value_construct_zero(&self->v);
     } else if (PyTuple_Size(args) == 1) {
       PyObject* v = PyTuple_GetItem(args, 0);
-      if (PyLong_Check(v)) {
-        long v_int = PyLong_AsLong(v);
+      if (PyInt_Check(v)) {
+        long v_int = PyInt_AsLong(v);
         lp_value_construct_int(&self->v, v_int);
       } else if (PyAlgebraicNumber_CHECK(v)) {
         AlgebraicNumber* v_alg = (AlgebraicNumber*) v;
