@@ -1074,7 +1074,7 @@ int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
       // v1: rational
       // v2: algebraic_number
       lp_algebraic_number_construct_from_rational(&tmp_a, &v1->value.q);
-      lp_value_construct(v2_new, LP_VALUE_ALGEBRAIC, &tmp_a);
+      lp_value_construct(v1_new, LP_VALUE_ALGEBRAIC, &tmp_a);
       lp_algebraic_number_destruct(&tmp_a);
       *v1_to_use = v1_new;
       *v2_to_use = v2;
@@ -1314,7 +1314,7 @@ void lp_value_inv(lp_value_t* inv, const lp_value_t* a) {
 
   lp_value_t result;
 
-  switch(inv->type) {
+  switch(a->type) {
   case LP_VALUE_NONE:
     break;
   case LP_VALUE_INTEGER:
@@ -1328,11 +1328,12 @@ void lp_value_inv(lp_value_t* inv, const lp_value_t* a) {
     lp_rational_inv(&result.value.q, &result.value.q);
     break;
   case LP_VALUE_RATIONAL:
+    result.type = LP_VALUE_RATIONAL;
     lp_rational_construct(&result.value.q);
     lp_rational_inv(&result.value.q, &a->value.q);
     break;
   case LP_VALUE_ALGEBRAIC:
-    result.type = LP_VALUE_RATIONAL;
+    result.type = LP_VALUE_ALGEBRAIC;
     lp_algebraic_number_construct_zero(&result.value.a);
     lp_algebraic_number_inv(&result.value.a, &a->value.a);
     break;

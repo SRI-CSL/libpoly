@@ -19,6 +19,7 @@
 
 #include "polypyValue.h"
 #include "utils.h"
+#include "polypyAlgebraicNumber.h"
 
 #include <structmember.h>
 #include <math.h>
@@ -199,11 +200,31 @@ Value_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
   return PyValue_create(0);
 }
 
-/** Construct a value from given number. */
+/** Construct a value from given number (integer, long or algebraic. */
 static int
 Value_init(Value* self, PyObject* args)
 {
-  assert(0);
+  if (PyTuple_Check(args)) {
+    if (PyTuple_Size(args) == 0) {
+      lp_value_construct_zero(&self->v);
+    } else if (PyTuple_Size(args) == 1) {
+      PyObject* v = PyTuple_GetItem(args, 0);
+      if (PyLong_Check(v)) {
+        long v_int = PyLong_AsLong(v);
+        lp_value_construct_int(&self->v, v_int);
+      } else if (PyAlgebraicNumber_CHECK(v)) {
+        AlgebraicNumber* v_alg = (AlgebraicNumber*) v;
+        lp_value_construct(&self->v, LP_VALUE_ALGEBRAIC, &v_alg->a);
+      } else {
+        return -1;
+      }
+     } else {
+      return -1;
+     }
+  } else {
+    return -1;
+  }
+
   // All fine, initialized
   return 0;
 }

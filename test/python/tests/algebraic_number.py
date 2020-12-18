@@ -33,25 +33,25 @@ result = (a1 == a2)
 check_comparison(a1, a2, "==", result, True)
 
 p = x**2
-zero = polypy.AlgebraicNumber(p, 0);
+zero = polypy.AlgebraicNumber(p, 0)
 result = zero.to_double() == 0.0
 check_comparison(zero, 0, ".to_double ==", result, True)
 
 p = x**2 - 1
-one_neg = polypy.AlgebraicNumber(p, 0);
-one_pos = polypy.AlgebraicNumber(p, 1);
+one_neg = polypy.AlgebraicNumber(p, 0)
+one_pos = polypy.AlgebraicNumber(p, 1)
 result = (one_neg < one_pos)
 check_comparison(one_neg, one_pos, "<", result, True)
 
 p = x**2 - 2
-sqrt2_neg = polypy.AlgebraicNumber(p, 0);
-sqrt2_pos = polypy.AlgebraicNumber(p, 1);
+sqrt2_neg = polypy.AlgebraicNumber(p, 0)
+sqrt2_pos = polypy.AlgebraicNumber(p, 1)
 result = (sqrt2_neg < sqrt2_pos)
 check_comparison(sqrt2_neg, sqrt2_pos, "<", result, True)
 
 p = x**2 - 3
-sqrt3_neg = polypy.AlgebraicNumber(p, 0);
-sqrt3_pos = polypy.AlgebraicNumber(p, 1);
+sqrt3_neg = polypy.AlgebraicNumber(p, 0)
+sqrt3_pos = polypy.AlgebraicNumber(p, 1)
 result = (sqrt3_neg < sqrt3_pos)
 check_comparison(sqrt3_neg, sqrt3_pos, "<", result, True)
 
@@ -142,5 +142,5 @@ for k in range(1, 500):
     random.shuffle(sample)
     p = functools.reduce(lambda x, y: x*y, sample, one)
     random.shuffle(sample)
-    p = functools.reduce(lambda x, y: x/x, sample, p)
+    p = functools.reduce(lambda x, y: x/y, sample, p)
     polypy_test.check(p == 1)

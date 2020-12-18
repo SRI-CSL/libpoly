@@ -33,7 +33,8 @@ def main():
              "tests/polynomial_eval.py",
              "tests/polynomial_roots.py",
              "tests/polynomial_resultants.py",
-             "tests/polynomial_feasibility.py"]
+             "tests/polynomial_feasibility.py", 
+             "tests/value.py"]
 
     if (args.sympy):
         print("Sympy checking enabled")

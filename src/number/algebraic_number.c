@@ -1081,7 +1081,18 @@ void lp_algebraic_number_pow_interval_op(lp_dyadic_interval_t* I, const lp_dyadi
 }
 
 void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n) {
-  lp_algebraic_number_op(pow, a, 0, lp_algebraic_number_pow_construct_op, lp_algebraic_number_pow_interval_op, &n);
+  if (n == 0) {
+    // special case x^0 == 1
+    lp_integer_t one;
+    lp_algebraic_number_t result;
+    lp_integer_construct_from_int(lp_Z, &one, 1);
+    lp_algebraic_number_construct_from_integer(&result, &one);
+    lp_algebraic_number_swap(pow, &result);
+    lp_algebraic_number_destruct(&result);
+    lp_integer_destruct(&one);
+  } else {
+    lp_algebraic_number_op(pow, a, 0, lp_algebraic_number_pow_construct_op, lp_algebraic_number_pow_interval_op, &n);
+  }
 }
 
 void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_dyadic_rational_t* q) {
