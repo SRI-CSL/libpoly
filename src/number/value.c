@@ -1117,7 +1117,7 @@ int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
       // unsupported
       return 0;
     }
-
+    break;
   default:
     // unsupported
     return 0;
@@ -1129,8 +1129,8 @@ int lp_value_to_same_type(const lp_value_t* v1, const lp_value_t* v2,
 void lp_value_add(lp_value_t* sum, const lp_value_t* a, const lp_value_t* b) {
 
   lp_value_t a_new, b_new;
-  const lp_value_t *a_to_use;
-  const lp_value_t *b_to_use;
+  const lp_value_t *a_to_use = 0;
+  const lp_value_t *b_to_use = 0;
 
   // Check for infinities
   if (a->type == LP_VALUE_PLUS_INFINITY) {
