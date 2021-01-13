@@ -78,6 +78,13 @@ void lp_algebraic_number_construct_zero(lp_algebraic_number_t* a) {
   a->sgn_at_b = 0;
 }
 
+void lp_algebraic_number_construct_one(lp_algebraic_number_t* a) {
+  a->f = 0;
+  lp_dyadic_interval_construct_from_int(&a->I, 1, 0, 1, 0);
+  a->sgn_at_a = 0;
+  a->sgn_at_b = 0;
+}
+
 void lp_algebraic_number_construct_copy(lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2) {
   a1->f = a2->f ? lp_upolynomial_construct_copy(a2->f) : 0;
   lp_dyadic_interval_construct_copy(&a1->I, &a2->I);
@@ -921,7 +928,13 @@ void lp_algebraic_number_mul_interval_op(lp_dyadic_interval_t* I, const lp_dyadi
 }
 
 void lp_algebraic_number_mul(lp_algebraic_number_t* mul, const lp_algebraic_number_t* a, const lp_algebraic_number_t* b) {
-  lp_algebraic_number_op(mul, a, b, lp_algebraic_number_mul_construct_op, lp_algebraic_number_mul_interval_op, 0);
+  // Special case, when one is zero
+  if (lp_algebraic_number_sgn(a) == 0 || lp_algebraic_number_sgn(b) == 0) {
+    lp_algebraic_number_destruct(mul);
+    lp_algebraic_number_construct_zero(mul);
+  } else {
+    lp_algebraic_number_op(mul, a, b, lp_algebraic_number_mul_construct_op, lp_algebraic_number_mul_interval_op, 0);
+  }
 }
 
 /**

@@ -18,10 +18,12 @@ def check_comparison(x, expected, precision = 0.0000001):
 
 polypy_test.start("Construction")
 
+zero_int = polypy.Value(0)
 one_int = polypy.Value(1)
 two_int = polypy.Value(2)
 three_int = polypy.Value(3)
 
+check_comparison(zero_int, 0)
 check_comparison(one_int, 1)
 check_comparison(two_int, 2)
 check_comparison(three_int, 3)
@@ -46,7 +48,7 @@ third_rat = one_int / three_int
 check_comparison(half_rat, 0.5)
 check_comparison(third_rat, 0.333333333333)
 
-values = [one_int, two_int, three_int, half_rat, third_rat, sqrt2_pos, sqrt2_neg, sqrt3_pos, sqrt3_neg]
+values = [zero_int, one_int, two_int, three_int, half_rat, third_rat, sqrt2_pos, sqrt2_neg, sqrt3_pos, sqrt3_neg]
 
 polypy_test.start("Addition")
 
@@ -72,6 +74,8 @@ for v1, v2 in combinations_with_replacement(values, 2):
 polypy_test.start("Division")
 
 for v1, v2 in combinations_with_replacement(values, 2):
+    if v2 == zero_int:
+        continue
     result_value = v1 / v2
     result_float = v1.to_double() / v2.to_double()
     check_comparison(result_value, result_float)

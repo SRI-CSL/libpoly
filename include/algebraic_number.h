@@ -48,6 +48,9 @@ void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f
 /** Construct a zero algebraic number */
 void lp_algebraic_number_construct_zero(lp_algebraic_number_t* a);
 
+/** Construct a zero algebraic number */
+void lp_algebraic_number_construct_one(lp_algebraic_number_t* a);
+
 /** Construct a copy of the algebraic number. */
 void lp_algebraic_number_construct_copy(lp_algebraic_number_t* a1, const lp_algebraic_number_t* a2);
 
