@@ -28,9 +28,10 @@ env:
     # iam: the precise versions are need, so we know whether we have to install
     # or just choose. I picked these, because only 2.7.15 and 3.6.7 needs to be built (on osx).
     # the linux image has these versions already.
-    - CMAKE_BUILD_TYPE=Debug PYTHON=2.7.15
+    # iam: i remove the 2.7.15 because its no longer a going concern.
+    # - CMAKE_BUILD_TYPE=Debug PYTHON=2.7.15
     - CMAKE_BUILD_TYPE=Debug PYTHON=3.6.7
-    - CMAKE_BUILD_TYPE=Release PYTHON=2.7.15
+    # - CMAKE_BUILD_TYPE=Release PYTHON=2.7.15
     - CMAKE_BUILD_TYPE=Release PYTHON=3.6.7
 
 install:

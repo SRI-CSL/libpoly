@@ -667,6 +667,8 @@ void lp_algebraic_number_op(
     integer_neg(lp_Z, &p_neg, &a->I.a.a);
     dyadic_rational_get_den(&a->I.a, &q);
     coefficient_construct_linear(ctx, &f_a, &q, &p_neg, var_x);
+    lp_integer_destruct(&p_neg);
+    lp_integer_destruct(&q);
   }
   if (trace_is_enabled("algebraic_number")) {
     tracef("f_a = "); coefficient_print(ctx, &f_a, trace_out); tracef("\n");
@@ -684,6 +686,8 @@ void lp_algebraic_number_op(
       integer_neg(lp_Z, &p_neg, &b->I.a.a);
       dyadic_rational_get_den(&b->I.a, &q);
       coefficient_construct_linear(ctx, &f_b, &q, &p_neg, var_y);
+      lp_integer_destruct(&p_neg);
+      lp_integer_destruct(&q);
     }
     if (trace_is_enabled("algebraic_number")) {
       tracef("f_b = "); coefficient_print(ctx, &f_b, trace_out); tracef("\n");

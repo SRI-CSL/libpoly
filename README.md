@@ -60,6 +60,17 @@ For example, to use Python3 you can configure the project with
 cmake .. -DPython_ADDITIONAL_VERSIONS=3
 ```
 
+### Python Version Skew
+
+On some platforms (i.e. Mac) cmake picks different python installations for the headers and library. If this happens,
+you might try:
+```cmake
+cmake  .. -DCMAKE_BUILD_TYPE=$type  -DPYTHON_LIBRARY=$pythonlibrary  -DPYTHON_INCLUDE_DIR=$pythonheaderfiledir
+```
+For example:
+```
+cmake  .. -DCMAKE_BUILD_TYPE=Release  -DPYTHON_LIBRARY=/opt/homebrew/Cellar/python@3.9/3.9.4/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib  -DPYTHON_INCLUDE_DIR=/opt/homebrew/Cellar/python@3.9/3.9.4/Frameworks/Python.framework/Versions/3.9/include/python3.9/
+```
 ## Installing Prebuilt Binaries
 
 Currently you can install the libpoly library (without python support) either using
