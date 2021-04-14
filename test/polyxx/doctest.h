@@ -345,7 +345,7 @@ DOCTEST_MSVC_SUPPRESS_WARNING(26812) // Prefer 'enum class' over 'enum'
 #define DOCTEST_PLATFORM_MAC
 #elif defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 #define DOCTEST_PLATFORM_IPHONE
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(__CYGWIN__)
 #define DOCTEST_PLATFORM_WINDOWS
 #else // DOCTEST_PLATFORM
 #define DOCTEST_PLATFORM_LINUX
