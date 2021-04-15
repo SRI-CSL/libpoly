@@ -1,0 +1,86 @@
+To cross compile from cygwin to produce mingw/Windows binaries.
+
+
+VERSION 1: GMP is built as a dynamic library
+
+This assumes that a dynamic GMP version for mingw is in /home/bruno/mingw:
+- gmp.h in /home/bruno/mingw/include
+- libgmp.dll.a in /home/bruno/mingw/lib
+- libgmp-10.dll in /home/bruno/mingw/bin
+
+We also want to install libpoly in /home/bruno/mingw
+
+
+1) check the toolchain file in
+
+   script/toolchain-mingw64.cmakd
+
+   update the hardcoded CMAKE_FIND_ROOT_PATH
+
+   to point to /home/bruno/mingw
+
+
+2) from the build directory: run cmake with flags
+
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=../script/toolchain-mingw64.cmake \
+            -DCMAKE_MAKE_PROGRAM=/usr/bin/make.exe \
+	    -DLIBPOLY_BUILD_PYTHON_API=OFF \
+	    -DCMAKE_INSTALL_PREFIX=/home/bruno/mingw
+
+   make
+   make install
+
+
+3) optional: to run the tests (for libpolyxx):
+
+   make sure you have stdlibc++.dll and libgmp-10.dll in your path:
+
+   export PATH=${PATH}:/home/bruno/mingw/bin:/usr/x86_64-w64-mingw32/sys-root/mingw/bin
+
+   make test
+
+
+
+
+VERSION 2: GMP is built as a static library
+
+This assumes that a static GMP version for mingw is in /home/bruno/mingw-static:
+- gmp.h in /home/bruno/mingw-static/include
+- libgmp.a in /home/bruno/mingw-static/lib
+
+We also want to install libpoly in /home/bruno/mingw-statuc
+
+
+1) check the toolchain file in
+
+   script/toolchain-mingw64.cmakd
+
+   update the hardcoded CMAKE_FIND_ROOT_PATH
+
+   to point to /home/bruno/mingw-static
+
+
+2) from the build directory: run cmake with flags
+
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=../script/toolchain-mingw64.cmake \
+            -DCMAKE_MAKE_PROGRAM=/usr/bin/make.exe \
+	    -DLIBPOLY_BUILD_PYTHON_API=OFF \
+	    -DCMAKE_INSTALL_PREFIX=/home/bruno/mingw-static
+
+   make
+   make install
+
+3) optional: to run the tests (for libpolyxx). Nothing special.
+
+   make test
+
+
+
+TROUBLE SHOOTING
+
+Trouble shooting: if cmake does not find GMP, make it explicit.
+For example, add these options to the cmake command
+
+   -DGMP_INCLUDE_DIR=/home/bruno/mingw/include
+   -DGMP_LIBRARY=/home/bruno/mingw/lib/libgmp.dll.a
+

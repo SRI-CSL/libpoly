@@ -1,4 +1,4 @@
-set(poly_SOURCES 
+set(poly_SOURCES
   utils/debug_trace.c
   utils/assignment.c
   utils/statistics.c
@@ -38,7 +38,7 @@ set(poly_SOURCES
 )
 
 if (NOT HAVE_OPEN_MEMSTREAM) 
-  set(poly_SOURCES "utils/open_memstream.c ${poly_SOURCES}")
+  set(poly_SOURCES utils/open_memstream.c ${poly_SOURCES})
 endif()
 
 set(polyxx_SOURCES
@@ -116,13 +116,13 @@ endif()
 
 #
 # If libpoly.a is not position independent, we may need
-# another version that's build to be position-indenpedent code.
+# another version that's built to be position-indepedent code.
 # This allows the library to be embedded into something like libyices.so
 #
 # Linux, FreeBSD, and old versions of Darwin (and probably other systems) don't use fPIC by default.
 # We just check for Linux and FreeBSD here.
 # 
-if(LIBPOLY_BUILD_STATIC_PIC)
+if (LIBPOLY_BUILD_STATIC_PIC)
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
 
