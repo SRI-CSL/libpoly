@@ -245,7 +245,7 @@ DOCTEST_MSVC_SUPPRESS_WARNING(26812) // Prefer 'enum class' over 'enum'
 #endif // DOCTEST_CONFIG_NO_WINDOWS_SEH
 
 #if !defined(_WIN32) && !defined(__QNX__) && !defined(DOCTEST_CONFIG_POSIX_SIGNALS) &&             \
-        !defined(__EMSCRIPTEN__)
+  !defined(__EMSCRIPTEN__)
 #define DOCTEST_CONFIG_POSIX_SIGNALS
 #endif // _WIN32
 #if defined(DOCTEST_CONFIG_NO_POSIX_SIGNALS) && defined(DOCTEST_CONFIG_POSIX_SIGNALS)
@@ -348,6 +348,7 @@ DOCTEST_MSVC_SUPPRESS_WARNING(26812) // Prefer 'enum class' over 'enum'
 #elif defined(_WIN32) && !defined(__CYGWIN__)
 #define DOCTEST_PLATFORM_WINDOWS
 #else // DOCTEST_PLATFORM
+// BD: HACK CYGWIN IS LIKE LINUX BUT WITHOUT POSIX_SIGNALS
 #define DOCTEST_PLATFORM_LINUX
 #endif // DOCTEST_PLATFORM
 
@@ -4172,7 +4173,8 @@ namespace detail {
 namespace {
     using namespace detail;
 
-#if !defined(DOCTEST_CONFIG_POSIX_SIGNALS) && !defined(DOCTEST_CONFIG_WINDOWS_SEH)
+  // BD: cywin does not support POSIX_SIGNALS
+#if defined(__CYGWIN__) || !defined(DOCTEST_CONFIG_POSIX_SIGNALS) && !defined(DOCTEST_CONFIG_WINDOWS_SEH)
     struct FatalConditionHandler
     {
         static void reset() {}

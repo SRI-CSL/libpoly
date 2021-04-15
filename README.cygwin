@@ -1,0 +1,58 @@
+To build on cygwin:
+
+VERSION 1: dynamic GMP in /home/bruno/cygwin
+
+This means that we have:
+
+gmp.h in /home/bruno/cygwin/include
+libgmp.dll.a and libgmpxx.dll.a in /home/bruno/cygwin/lib
+cyggmp-10.dll and cygmpxx-5.dll in /home/bruno/cygwin/bin
+
+We also want to install libpoly in /home/brun/cygwin
+
+1) configure in the build directory:
+
+cmake .. -DCMAKE_INSTALL_PREFIX=/home/bruno/cygwin \
+         -DGMP_INCLUDE_DIR=/home/bruno/cygwin/include \
+	 -DCMP_LIBRARY=/home/bruno/cygwin/lib/libgmp.dll.a
+
+make
+make install
+
+2) Optional: run the polyxx tests:
+
+export PATH=${PATH}:/home/bruno/cygwin/bin
+make test
+
+3) Optional: run the python tests *after make install*
+
+export PATH=${PATH}:/home/bruno/cygwin/bin
+make check
+
+
+
+
+VERSION 2: static GMP in /home/bruno/cygwin-static
+
+This means that we have:
+
+gmp.h in /home/bruno/cygwin-static/include
+libgmp.a and libgmpxx.a in /home/bruno/cygwin-static/lib
+
+We also want to install libpoly in /home/brun/cygwin-static
+
+1) configure in the build directory:
+
+cmake .. -DCMAKE_INSTALL_PREFIX=/home/bruno/cygwin-static \
+         -DGMP_INCLUDE_DIR=/home/bruno/cygwin-static/include \
+	 -DCMP_LIBRARY=/home/bruno/cygwin-static/lib/libgmp.dll.a
+
+make
+make install
+export PATH=${PATH}:/home/bruno/cygwin-static/bin
+make test
+make check
+
+
+
+
