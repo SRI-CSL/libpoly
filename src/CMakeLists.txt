@@ -38,7 +38,7 @@ set(poly_SOURCES
 )
 
 if (NOT HAVE_OPEN_MEMSTREAM) 
-  set(poly_SOURCES "utils/open_memstream.c ${poly_SOURCES}")
+  set(poly_SOURCES utils/open_memstream.c ${poly_SOURCES})
 endif()
 
 set(polyxx_SOURCES
