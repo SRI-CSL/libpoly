@@ -15,6 +15,7 @@ namespace poly {
   }
   IntervalAssignment& IntervalAssignment::operator=(IntervalAssignment&& ia) {
     // Copy internals, reconstruct argument to be empty
+    lp_interval_assignment_destruct(get_internal());
     mAssignment = ia.mAssignment;
     lp_interval_assignment_construct(ia.get_internal(), ia.mAssignment.var_db);
     return *this;

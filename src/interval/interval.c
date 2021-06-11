@@ -823,7 +823,7 @@ void lp_interval_set_a(lp_interval_t* I, const lp_value_t* a, int a_open) {
     assert(cmp <= 0);
     if (cmp < 0) {
       lp_value_construct_copy(&I->b, &I->a);
-      lp_value_construct_copy(&I->a, a);
+      lp_value_assign(&I->a, a);
       I->is_point = 0;
       I->a_open = a_open;
       I->b_open = 0;

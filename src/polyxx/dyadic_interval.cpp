@@ -45,10 +45,12 @@ namespace poly {
   }
 
   DyadicInterval& DyadicInterval::operator=(const DyadicInterval& i) {
+    lp_dyadic_interval_destruct(get_internal());
     lp_dyadic_interval_construct_copy(get_internal(), i.get_internal());
     return *this;
   }
   DyadicInterval& DyadicInterval::operator=(DyadicInterval&& i) {
+    lp_dyadic_interval_destruct(get_internal());
     lp_dyadic_interval_construct_copy(get_internal(), i.get_internal());
     return *this;
   }

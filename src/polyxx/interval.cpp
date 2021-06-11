@@ -32,6 +32,7 @@ namespace poly {
   Interval::~Interval() { lp_interval_destruct(get_internal()); }
 
   Interval& Interval::operator=(const Interval& i) {
+    lp_interval_destruct(get_internal());
     lp_interval_construct_copy(get_internal(), i.get_internal());
     return *this;
   }
