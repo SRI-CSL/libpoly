@@ -132,8 +132,9 @@ if(LIBPOLY_BUILD_STATIC_PIC)
   install(TARGETS static_pic_polyxx ARCHIVE DESTINATION lib)
   target_link_libraries(static_pic_polyxx static_pic_poly)
 
-  if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"))
-    set_target_properties(static_pic_poly PROPERTIES EXCLUDE_FROM_ALL ON)
-    set_target_properties(static_pic_polyxx PROPERTIES EXCLUDE_FROM_ALL ON)
-  endif()
+# iam: safer to just be uniform?
+#  if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"))
+#    set_target_properties(static_pic_poly PROPERTIES EXCLUDE_FROM_ALL ON)
+#    set_target_properties(static_pic_polyxx PROPERTIES EXCLUDE_FROM_ALL ON)
+#  endif()
 endif()
