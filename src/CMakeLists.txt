@@ -125,9 +125,11 @@ endif()
 if(LIBPOLY_BUILD_STATIC_PIC)
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)
+  install(TARGETS static_pic_poly ARCHIVE DESTINATION lib)
 
   add_library(static_pic_polyxx STATIC ${polyxx_SOURCES})
   set_target_properties(static_pic_polyxx PROPERTIES OUTPUT_NAME picpolyxx POSITION_INDEPENDENT_CODE true)
+  install(TARGETS static_pic_polyxx ARCHIVE DESTINATION lib)
   target_link_libraries(static_pic_polyxx static_pic_poly)
 
   if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"))
