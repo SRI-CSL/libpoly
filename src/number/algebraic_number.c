@@ -888,13 +888,27 @@ void lp_algebraic_number_sub(lp_algebraic_number_t* sub, const lp_algebraic_numb
 }
 
 void lp_algebraic_number_neg(lp_algebraic_number_t* neg, const lp_algebraic_number_t* a) {
-  lp_upolynomial_t* f_neg_x = 0;
 
-  if (a->f) {
-    f_neg_x = lp_upolynomial_subst_x_neg(a->f);
-    if (integer_sgn(lp_Z, lp_upolynomial_lead_coeff(f_neg_x)) < 0) {
-      lp_upolynomial_neg_in_place(f_neg_x);
-    }
+  if (a->f == 0)
+  {
+    lp_dyadic_rational_t rat_neg;
+    lp_algebraic_number_t a_neg;
+    lp_dyadic_rational_construct_copy(&rat_neg, &a->I.a);
+    dyadic_rational_neg(&rat_neg, &rat_neg);
+    lp_algebraic_number_construct_from_dyadic_rational(&a_neg, &rat_neg);
+
+    // store result
+    lp_algebraic_number_swap(neg, &a_neg);
+
+    // remove temps
+    lp_algebraic_number_destruct(&a_neg);
+    lp_dyadic_rational_destruct(&rat_neg);
+    return;
+  }
+
+  lp_upolynomial_t* f_neg_x = lp_upolynomial_subst_x_neg(a->f);
+  if (integer_sgn(lp_Z, lp_upolynomial_lead_coeff(f_neg_x)) < 0) {
+    lp_upolynomial_neg_in_place(f_neg_x);
   }
 
   lp_dyadic_interval_t I_neg; // To destroy
