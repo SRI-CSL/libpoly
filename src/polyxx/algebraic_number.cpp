@@ -281,9 +281,21 @@ namespace poly {
                             rhs.get_internal());
     return res;
   }
+  AlgebraicNumber operator/(const AlgebraicNumber& lhs,
+                            const AlgebraicNumber& rhs) {
+    AlgebraicNumber res;
+    lp_algebraic_number_div(res.get_internal(), lhs.get_internal(),
+                            rhs.get_internal());
+    return res;
+  }
   AlgebraicNumber pow(const AlgebraicNumber& lhs, unsigned n) {
     AlgebraicNumber res;
     lp_algebraic_number_pow(res.get_internal(), lhs.get_internal(), n);
+    return res;
+  }
+  AlgebraicNumber inverse(const AlgebraicNumber& an) {
+    AlgebraicNumber res;
+    lp_algebraic_number_inv(res.get_internal(), an.get_internal());
     return res;
   }
 

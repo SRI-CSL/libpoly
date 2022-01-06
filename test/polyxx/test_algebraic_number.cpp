@@ -86,3 +86,9 @@ TEST_CASE("algebraic_number::neg") {
   CHECK(-sqrt2 == msqrt2);
   CHECK(sqrt2 == -msqrt2);
 }
+TEST_CASE("algebraic_number::operator/") {
+  AlgebraicNumber sqrt2(UPolynomial({-2, 0, 1}), DyadicInterval(1, 2));
+  CHECK(is_one(sqrt2 / sqrt2));
+  CHECK(sqrt2 / -sqrt2 == Rational(-1));
+  CHECK(-(sqrt2 / -sqrt2) == Rational(1));
+}

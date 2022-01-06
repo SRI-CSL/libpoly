@@ -203,8 +203,13 @@ namespace poly {
   /** Multiply two algebraic numbers. */
   AlgebraicNumber operator*(const AlgebraicNumber& lhs,
                             const AlgebraicNumber& rhs);
+  /** Divide two algebraic numbers. Assumes rhs != 0. */
+  AlgebraicNumber operator/(const AlgebraicNumber& lhs,
+                            const AlgebraicNumber& rhs);
   /** Compute lhs^n. */
   AlgebraicNumber pow(const AlgebraicNumber& lhs, unsigned n);
+  /** Compute 1/an. Assumes an != 0. */
+  AlgebraicNumber inverse(const AlgebraicNumber& lhs);
 
   /** Check whether an algebraic number is a rational.
    * This check is not complete.
