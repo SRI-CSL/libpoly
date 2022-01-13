@@ -571,6 +571,19 @@ void lp_algebraic_number_to_rational(const lp_algebraic_number_t* a_const, lp_ra
     return;
   }
 
+  if (lp_upolynomial_degree(a_const->f) == 1) {
+    // If degree 1, we're directly rational
+    if(a_const->f->size==2){
+      mpz_neg(&q->_mp_num,&a_const->f->monomials[0].coefficient);
+      mpz_set(&q->_mp_den,&a_const->f->monomials[1].coefficient);
+    } else {
+      /* a_const == 0, is it possible without a_const->f==0? */
+      assert (a_const->f->size<=1);
+      mpq_set_ui(q,0,1);
+    }
+    return;
+  }
+
   // We do the necessary refinement on a copy
   lp_algebraic_number_t a;
   lp_algebraic_number_construct_copy(&a, a_const);
