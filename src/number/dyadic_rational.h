@@ -302,6 +302,36 @@ void dyadic_rational_pow(lp_dyadic_rational_t* pow, const lp_dyadic_rational_t* 
   pow->n = a->n * n;
 }
 
+/* Approximate the positive root of a. The precision of the approximation is at
+   least prec (roughly the overapproximation of the result is at least
+   2^(-prec/n) ). The rounding is done toward plus infinity if ceil is true,
+   otherwise toward minus infinity. If the result is non-null the computation is exact */
+static inline
+int dyadic_rational_root_approx(lp_dyadic_rational_t* pow, const lp_dyadic_rational_t* a, unsigned long n, unsigned long prec, int ceil) {
+  assert(dyadic_rational_is_normalized(a));
+  assert(mpz_sgn(&a->a) >= 0);
+
+  if (mpz_sgn(&a->a) == 0){
+    /* pow = 0 = a */
+    mpz_set(&pow->a,&a->a);
+    pow->n=a->n;
+    return 1;
+  }
+
+  /* ensure denominator is a perfect root and bigger than prec */
+  unsigned long k = (a->n < prec? prec : a->n);
+  k += k%n;
+  pow->n = k/n;
+  mpz_mul_2exp(&pow->a,&a->a, k - a->n);
+
+  int exact = mpz_root(&pow->a,&pow->a,n);
+
+  if(ceil && !exact) mpz_add_ui(&pow->a,&pow->a,1);
+
+  dyadic_rational_normalize(pow);
+  return exact;
+}
+
 static inline
 void dyadic_rational_div_2exp(lp_dyadic_rational_t* div, const lp_dyadic_rational_t* a, unsigned long n) {
   assert(dyadic_rational_is_normalized(a));

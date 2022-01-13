@@ -39,3 +39,9 @@ void dyadic_interval_sub(lp_dyadic_interval_t* S, const lp_dyadic_interval_t* I1
 void dyadic_interval_mul(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I1, const lp_dyadic_interval_t* I2);
 
 void dyadic_interval_pow(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I, unsigned n);
+
+/** Compute an overapproximation of the n th positive root of the reals in
+    I. The precision of the approximation is at least prec (roughly the
+    overapproximation of the result is at least 2^(-prec/n) ) .
+ */
+void dyadic_interval_root_overapprox(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I, unsigned n, unsigned prec);

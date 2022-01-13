@@ -1254,3 +1254,34 @@ void dyadic_interval_pow(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I,
     }
   }
 }
+
+void dyadic_interval_root_overapprox(lp_dyadic_interval_t* P, const lp_dyadic_interval_t* I, unsigned n, unsigned prec) {
+  assert ( n > 0 );
+  if (n == 1) {
+    // I^1 = I
+    lp_dyadic_interval_assign(P,I);
+  } else {
+    if(dyadic_rational_root_approx(&P->a,&I->a,n,prec,0/*floor*/)) {
+       // root of lower bound is exact
+       if (I->is_point) {
+         // Plain root
+         if (!P->is_point) {
+           dyadic_rational_destruct(&P->b);
+           P->is_point = 1;
+           P->a_open = P->b_open = 0;
+         }
+         return;
+       }
+    }
+    if (P->is_point) {
+      P->is_point = 0;
+      dyadic_rational_construct(&P->b);
+    }
+    if (I->is_point) {
+      dyadic_rational_root_approx(&P->b,&I->a,n,prec,1/*ceil*/);
+    } else {
+      dyadic_rational_root_approx(&P->b,&I->b,n,prec,1);
+    }
+    P->a_open = P->b_open = 0;
+  }
+}

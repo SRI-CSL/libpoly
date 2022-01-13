@@ -1186,6 +1186,13 @@ void lp_upolynomial_reverse_in_place(lp_upolynomial_t* p) {
   }
 }
 
+void lp_upolynomial_subst_x_pow_in_place(lp_upolynomial_t* p, size_t n) {
+  size_t i;
+  for (i = 0; i < p->size; ++ i) {
+    p->monomials[i].degree *= n;
+  }
+}
+
 lp_upolynomial_t* lp_upolynomial_subst_x_neg(const lp_upolynomial_t* f) {
 
   lp_upolynomial_t* neg = lp_upolynomial_construct_copy(f);

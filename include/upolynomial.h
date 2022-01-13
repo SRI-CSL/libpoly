@@ -174,6 +174,12 @@ int lp_upolynomial_cmp(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
 lp_upolynomial_t* lp_upolynomial_subst_x_neg(const lp_upolynomial_t* f);
 
 /**
+ * Replace the polynomial with f(x**n).
+ * The function suppose that the maximum degree * n doesn't overflow.
+ */
+void lp_upolynomial_subst_x_pow_in_place(lp_upolynomial_t* f, size_t n);
+
+/**
  * Returns the polynomial -f.
  */
 lp_upolynomial_t* lp_upolynomial_neg(const lp_upolynomial_t* p);

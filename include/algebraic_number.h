@@ -142,6 +142,11 @@ void lp_algebraic_number_div(lp_algebraic_number_t* div, const lp_algebraic_numb
 /** Exponentiation */
 void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_number_t* a, unsigned n);
 
+/** Square, cubic, ... roots positive
+    The function suppose that the algebraic number a is positive.
+ */
+void lp_algebraic_number_positive_root(lp_algebraic_number_t* root, const lp_algebraic_number_t* a, unsigned n);
+
 /** Returns true if a rational number (not complete) */
 int lp_algebraic_number_is_rational(const lp_algebraic_number_t* a);
 
