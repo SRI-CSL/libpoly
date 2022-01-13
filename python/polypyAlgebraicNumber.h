@@ -29,10 +29,10 @@ typedef struct {
   lp_algebraic_number_t a;
 } AlgebraicNumber;
 
-/** Methods on coefficient rings */
+/** Methods on algebraic numbers */
 extern PyMethodDef AlgebraicNumber_methods[];
 
-/** Definition of the CoefficientRing type */
+/** Definition of the AlgebraicNumber type */
 extern PyTypeObject AlgebraicNumberType;
 
 /** Create an algebraic object (makes a copy of a) */

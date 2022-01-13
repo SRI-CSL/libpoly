@@ -48,7 +48,7 @@ void lp_algebraic_number_construct(lp_algebraic_number_t* a, lp_upolynomial_t* f
 /** Construct a zero algebraic number */
 void lp_algebraic_number_construct_zero(lp_algebraic_number_t* a);
 
-/** Construct a zero algebraic number */
+/** Construct a one algebraic number */
 void lp_algebraic_number_construct_one(lp_algebraic_number_t* a);
 
 /** Construct a copy of the algebraic number. */
@@ -159,7 +159,7 @@ void lp_algebraic_number_ceiling(const lp_algebraic_number_t* a, lp_integer_t* a
 /** Returns the floor of the number */
 void lp_algebraic_number_floor(const lp_algebraic_number_t* a, lp_integer_t* a_floor);
 
-/** Returns a hash of the of the dyadic approximation of a */
+/** Returns a hash of the dyadic approximation of a */
 size_t lp_algebraic_number_hash_approx(const lp_algebraic_number_t* a, unsigned precision);
 
 #ifdef __cplusplus
