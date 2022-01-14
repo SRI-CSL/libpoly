@@ -1,5 +1,5 @@
-libpoly0 (1.8-0ubuntu1) bionic; urgency=medium
+libpoly0 (1.11-0ubuntu1) bionic; urgency=medium
 
   * Initial release. (Closes: #864834)
 
- -- Ian A. Mason <iam@csl.sri.com>  Thu, 10 Aug 2017 13:46:30 +0000
+ -- Ian A. Mason <iam@csl.sri.com>  Mon, 20 Dec 2021 13:46:30 +0000
