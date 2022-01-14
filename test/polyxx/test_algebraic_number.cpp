@@ -75,3 +75,20 @@ TEST_CASE("algebraic_number::floor") {
   CHECK(floor(AlgebraicNumber(UPolynomial({-2, 0, 1}), DyadicInterval(1, 2))) ==
         Integer(1));
 }
+TEST_CASE("algebraic_number::neg") {
+  AlgebraicNumber two(UPolynomial({-2, 1}), DyadicInterval(1, 3));
+  CHECK(-two == Rational(-2));
+
+  AlgebraicNumber sqrt2(UPolynomial({-2, 0, 1}), DyadicInterval(1, 2));
+  CHECK(-(sqrt2*sqrt2) == Rational(-2));
+
+  AlgebraicNumber msqrt2(UPolynomial({-2, 0, 1}), DyadicInterval(-2, -1));
+  CHECK(-sqrt2 == msqrt2);
+  CHECK(sqrt2 == -msqrt2);
+}
+TEST_CASE("algebraic_number::operator/") {
+  AlgebraicNumber sqrt2(UPolynomial({-2, 0, 1}), DyadicInterval(1, 2));
+  CHECK(is_one(sqrt2 / sqrt2));
+  CHECK(sqrt2 / -sqrt2 == Rational(-1));
+  CHECK(-(sqrt2 / -sqrt2) == Rational(1));
+}
