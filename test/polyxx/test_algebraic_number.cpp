@@ -63,6 +63,19 @@ TEST_CASE("algebraic_number::is_integer") {
       is_integer(AlgebraicNumber(UPolynomial({3, 1}), DyadicInterval(-4, -2))));
 }
 
+TEST_CASE("algebraic_number::to_rational") {
+  {
+    AlgebraicNumber an(UPolynomial({1, 3}), DyadicInterval(-2, 0));
+    CHECK(is_rational(an));
+    CHECK(to_rational_approximation(an) == Rational(-1, 3));
+  }
+  {
+    AlgebraicNumber an(UPolynomial({3, 1}), DyadicInterval(-4, -2));
+    CHECK(is_rational(an));
+    CHECK(to_rational_approximation(an) == Rational(-3));
+  }
+}
+
 TEST_CASE("algebraic_number::ceil") {
   CHECK(ceil(AlgebraicNumber(UPolynomial({-2, 0, 1}),
                              DyadicInterval(-2, -1))) == Integer(-1));
