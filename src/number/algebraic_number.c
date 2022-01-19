@@ -28,6 +28,7 @@
 #include "polynomial/coefficient.h"
 #include "polynomial/output.h"
 #include "upolynomial/output.h"
+#include "upolynomial/upolynomial.h"
 
 #include "utils/debug_trace.h"
 
@@ -545,9 +546,26 @@ void lp_algebraic_number_to_rational(const lp_algebraic_number_t* a_const, lp_ra
 
   lp_rational_t tmp;
 
-  // If a point, just return it's double
-  if (a_const->f == 0) {
+  // we have a point interval, return the point
+  if (lp_dyadic_interval_is_point(&a_const->I)) {
     rational_construct_from_dyadic(&tmp, &a_const->I.a);
+    rational_swap(q, &tmp);
+    rational_destruct(&tmp);
+    return;
+  }
+  assert(a_const->f != 0);
+  // we have a linear polynomial, just solve it
+  if (lp_upolynomial_degree(a_const->f) == 1) {
+    if (a_const->f->size == 1) {
+      // a*x + 0
+      rational_construct_from_int(&tmp, 0, 1);
+      rational_swap(q, &tmp);
+      rational_destruct(&tmp);
+    }
+    assert(a_const->f->size == 2);
+    // a*x + b
+    rational_construct_from_div(&tmp, &a_const->f->monomials[0].coefficient, &a_const->f->monomials[1].coefficient);
+    rational_neg(&tmp, &tmp);
     rational_swap(q, &tmp);
     rational_destruct(&tmp);
     return;
