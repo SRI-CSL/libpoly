@@ -49,11 +49,27 @@ sqrt2_pos = polypy.AlgebraicNumber(p, 1)
 result = (sqrt2_neg < sqrt2_pos)
 check_comparison(sqrt2_neg, sqrt2_pos, "<", result, True)
 
+two = polypy.AlgebraicNumber(x-2, 0)
+
+sqrt2_pos2 = two.positive_root(2)
+result = (sqrt2_pos == sqrt2_pos)
+check_comparison(sqrt2_pos, sqrt2_pos2, "==", result, True)
+
 p = x**2 - 3
 sqrt3_neg = polypy.AlgebraicNumber(p, 0)
 sqrt3_pos = polypy.AlgebraicNumber(p, 1)
 result = (sqrt3_neg < sqrt3_pos)
 check_comparison(sqrt3_neg, sqrt3_pos, "<", result, True)
+
+three = polypy.AlgebraicNumber(x-3, 0)
+
+sqrt3_pos2 = three.positive_root(2)
+result = (sqrt3_pos == sqrt3_pos)
+check_comparison(sqrt3_pos, sqrt3_pos2, "==", result, True)
+
+three2 = (three ** 3).positive_root(3)
+result = (three == three2)
+check_comparison(three, three2, "==", result, True)
 
 a = [sqrt3_pos, zero, sqrt3_neg, one_neg, sqrt2_pos, one_pos, sqrt2_neg]
 a_sorted = [sqrt3_neg, sqrt2_neg, one_neg, zero, one_pos, sqrt2_pos, sqrt3_pos]
