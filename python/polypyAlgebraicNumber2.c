@@ -65,9 +65,13 @@ AlgebraicNumber_div(PyObject* self, PyObject* args);
 static PyObject*
 AlgebraicNumber_pow(PyObject* self, PyObject* args);
 
+static PyObject*
+AlgebraicNumber_positive_root(PyObject* self, PyObject* args);
+
 PyMethodDef AlgebraicNumber_methods[] = {
     {"refine", (PyCFunction)AlgebraicNumber_refine, METH_NOARGS, "Refines the number to half the interval"},
     {"to_double", (PyCFunction)AlgebraicNumber_to_double, METH_NOARGS, "Returns the approximation of the algebraic number"},
+    {"positive_root", (PyCFunction)AlgebraicNumber_positive_root, METH_VARARGS, "Returns the positive root of the number is positive"},
     {NULL}  /* Sentinel */
 };
 
@@ -445,4 +449,30 @@ AlgebraicNumber_pow(PyObject* self, PyObject* other) {
   lp_algebraic_number_destruct(&pow);
 
   return result;
+}
+
+static PyObject*
+AlgebraicNumber_positive_root(PyObject* self, PyObject* args) {
+  UPolynomialObject* p = (UPolynomialObject*) self;
+  if (p) {
+    // Get the argument
+    if (PyTuple_Size(args) == 1) {
+      // Get n
+      PyObject* other = PyTuple_GetItem(args, 0);
+      AlgebraicNumber* a1 = (AlgebraicNumber*) self;
+      long n = PyLong_AsLong(other);
+
+      lp_algebraic_number_t root;
+      lp_algebraic_number_construct_zero(&root);
+      lp_algebraic_number_positive_root(&root, &a1->a, n);
+      PyObject* result = PyAlgebraicNumber_create(&root);
+      lp_algebraic_number_destruct(&root);
+
+      return result;
+    } else {
+      Py_RETURN_NONE;
+    }
+  } else {
+    Py_RETURN_NONE;
+  }
 }

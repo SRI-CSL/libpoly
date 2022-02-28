@@ -571,6 +571,19 @@ void lp_algebraic_number_to_rational(const lp_algebraic_number_t* a_const, lp_ra
     return;
   }
 
+  if (lp_upolynomial_degree(a_const->f) == 1) {
+    // If degree 1, we're directly rational
+    if(a_const->f->size==2){
+      mpz_neg(&q->_mp_num,&a_const->f->monomials[0].coefficient);
+      mpz_set(&q->_mp_den,&a_const->f->monomials[1].coefficient);
+    } else {
+      /* a_const == 0, is it possible without a_const->f==0? */
+      assert (a_const->f->size<=1);
+      mpq_set_ui(q,0,1);
+    }
+    return;
+  }
+
   // We do the necessary refinement on a copy
   lp_algebraic_number_t a;
   lp_algebraic_number_construct_copy(&a, a_const);
@@ -1143,6 +1156,116 @@ void lp_algebraic_number_pow(lp_algebraic_number_t* pow, const lp_algebraic_numb
     lp_algebraic_number_op(pow, a, 0, lp_algebraic_number_pow_construct_op, lp_algebraic_number_pow_interval_op, &n);
   }
 }
+
+/**
+ * Compute the positive root of an algebraic number.
+ *
+ * f(x) = a_p x^p + ... + a_0
+ *
+ * with f(a) = 0, a only root in (l, u), (l, u) positive
+ *
+ * NOTE: l, u could be 0
+ *
+ * g(x) = f(x^n)
+ *
+ * with g(root(a,n)) = 0, only root in 0 < root(l,n) < root(a,n) < root(u,n)
+ *
+ * but, root(l,n) and root(u,n) are not dyadic rationals. So we overapproximate
+ * the resulting interval and refine the overapproximation until there is a
+ * unique root in g in the resulting interval.
+ */
+void lp_algebraic_number_positive_root(
+    lp_algebraic_number_t* op, const lp_algebraic_number_t* a, unsigned n)
+{
+  assert(0 < n);
+  assert(lp_algebraic_number_sgn(a) >= 0);
+
+  if (trace_is_enabled("algebraic_number")) {
+    tracef("a = "); lp_algebraic_number_print(a, trace_out); tracef("\n");
+    tracef("root = %d",n); tracef("\n");
+  }
+
+  lp_upolynomial_t* f;
+
+  if (a->f) {
+    f = lp_upolynomial_construct_copy(a->f);
+  } else {
+    assert(a->I.is_point);
+    // x = p/q -> q*x - p = 0
+    lp_integer_t coefs[2];
+    integer_construct(&coefs[0]);
+    integer_construct(&coefs[1]);
+    integer_neg(lp_Z, &coefs[0], &a->I.a.a);
+    dyadic_rational_get_den(&a->I.a, &coefs[1]);
+    f = lp_upolynomial_construct(lp_Z,1,coefs);
+    lp_integer_destruct(&coefs[0]);
+    lp_integer_destruct(&coefs[1]);
+  }
+
+  lp_upolynomial_subst_x_pow_in_place(f,n);
+
+  // Get the roots of f
+  size_t f_roots_size = 0;
+  lp_algebraic_number_t* f_roots = malloc(sizeof(lp_algebraic_number_t)*lp_upolynomial_degree(f));
+  lp_upolynomial_roots_isolate(f, f_roots, &f_roots_size);
+  lp_upolynomial_delete(f);
+
+  // Interval for the result
+  lp_dyadic_interval_t I;
+  lp_dyadic_interval_construct_zero(&I);
+
+  unsigned long prec = 0;
+
+  // Approximate the result
+  while (f_roots_size > 1) {
+
+    // Root the interval
+    dyadic_interval_root_overapprox(&I, &a->I, n, prec);
+
+    if (trace_is_enabled("algebraic_number")) {
+      tracef("a = "); lp_algebraic_number_print(a, trace_out); tracef("\n");
+      tracef("I = "); lp_dyadic_interval_print(&I, trace_out); tracef("\n");
+      size_t i;
+      for (i = 0; i < f_roots_size; ++ i) {
+        tracef("f[%zu] = ", i); lp_algebraic_number_print(f_roots + i, trace_out); tracef("\n");
+      }
+    }
+
+    // Filter the roots over I
+    filter_roots(f_roots, &f_roots_size, &I);
+
+    // If more than one root, we need to refine a and b
+    if (f_roots_size > 1) {
+      if (a->f) {
+        lp_algebraic_number_refine_const_internal(a);
+      }
+      size_t i;
+      for (i = 0; i < f_roots_size; ++ i) {
+        if ((f_roots + i)->f) {
+          // not a point, refine it
+          lp_algebraic_number_refine_const_internal(f_roots + i);
+        }
+      }
+    }
+
+    prec += 1;
+  }
+
+  assert(f_roots_size == 1);
+
+  // Our root is the only one left
+  lp_algebraic_number_destruct(op);
+  *op = *f_roots;
+
+  if (trace_is_enabled("algebraic_number")) {
+    tracef("op = "); lp_algebraic_number_print(op, trace_out); tracef("\n");
+  }
+
+  // Remove temps
+  lp_dyadic_interval_destruct(&I);
+  free(f_roots);
+}
+
 
 void lp_algebraic_number_get_dyadic_midpoint(const lp_algebraic_number_t* a, lp_dyadic_rational_t* q) {
   if (a->I.is_point) {
