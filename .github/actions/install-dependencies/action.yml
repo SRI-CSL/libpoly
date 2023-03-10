@@ -14,3 +14,14 @@ runs:
         sudo apt-get install -y python3-pip
         pip3 install sympy
         echo "Install Linux dependencies [DONE]"
+
+    - name: Install Mac Dependencies
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        echo "Install Mac dependencies"
+        brew update
+        brew install gmp
+        brew install python
+        pip3 install sympy
+        echo "Install Mac dependencies [DONE]"
