@@ -9,8 +9,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-	mode: [Debug, Release]
-	env: [CC=gcc CXX=g++, CC=clang CXX=clang++]
+        mode: [Debug, Release]
+        env: [CC=gcc CXX=g++, CC=clang CXX=clang++]
 
     name: ${{ matrix.os }}|${{ matrix.mode }}|${{ matrix.env }}
     runs-on: ${{ matrix.os }}
@@ -26,7 +26,7 @@ jobs:
         mkdir -p build
         cd build
         cmake -DCMAKE_BUILD_TYPE=${{ matrix.mode }} ..
-	make
+        make
 
     - name: Check
       run: make check
