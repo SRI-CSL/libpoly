@@ -29,7 +29,11 @@ jobs:
         make
 
     - name: Check
-      run: make check
+      run: |
+        cd build
+        make check
 
     - name: Test
-      run: make test
+      run: |
+        cd build
+        make test
