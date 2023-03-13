@@ -23,5 +23,5 @@ runs:
         brew update
         brew install gmp
         brew install python
-        pip3 install sympy
+        pip install sympy
         echo "Install Mac dependencies [DONE]"
