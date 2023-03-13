@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        mode: [Debug, Release]
+        env: [CC=gcc CXX=g++, CC=clang CXX=clang++]
+
+    name: ${{ matrix.os }}|${{ matrix.mode }}|${{ matrix.env }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      uses: ./.github/actions/install-dependencies
+
+    - name: Build
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.mode }} ..
+        make
+
+    - name: Check
+      run: |
+        cd build
+        make check
+
+    - name: Test
+      run: |
+        cd build
+        make test
