@@ -26,7 +26,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "utils/open_memstream.h"
+#include "utils/u_memstream.h"
 #include "utils/hash.h"
 
 #define __var_unused(x) ((void)x)
@@ -141,11 +141,13 @@ int integer_print_matrix(const lp_integer_t* c, size_t m, size_t n, FILE* out) {
 
 static inline
 char* integer_to_string(const lp_integer_t* c) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   integer_print(c, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

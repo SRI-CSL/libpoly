@@ -163,3 +163,10 @@ TEST_CASE("rational::floor") {
   CHECK(floor(Rational(1)) == Rational(1));
   CHECK(floor(Rational(Integer(1), Integer(2))) == Rational());
 }
+
+TEST_CASE("rational::operator<<") {
+  Rational r(1);
+  std::stringstream out;
+  out << r;
+  CHECK(out.str() == "1");
+}

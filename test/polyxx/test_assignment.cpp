@@ -59,4 +59,8 @@ TEST_CASE("assignment") {
   CHECK(a.has(z));
   CHECK(a.get(x) == Value(4));
   CHECK(a.get(z) == Value(5));
+
+  std::stringstream out;
+  out << a;
+  CHECK(out.str() == "[x -> 4, z -> 5]");
 }

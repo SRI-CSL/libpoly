@@ -238,3 +238,10 @@ TEST_CASE("integer::gcd") {
 TEST_CASE("integer::lcm") {
     CHECK(lcm(Integer(15), Integer(35)) == Integer(105));
 }
+
+TEST_CASE("integer::operator<<") {
+    Integer i(5);
+    std::stringstream out;
+    out << i;
+    CHECK(out.str() == "5");
+}

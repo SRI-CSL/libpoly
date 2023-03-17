@@ -1,9 +1,10 @@
-set(poly_SOURCES 
+set(poly_SOURCES
   utils/debug_trace.c
   utils/assignment.c
   utils/statistics.c
   utils/output.c
   utils/sign_condition.c
+  utils/u_memstream.c
   number/integer.c
   number/rational.c
   number/dyadic_rational.c
@@ -37,7 +38,7 @@ set(poly_SOURCES
   poly.c
 )
 
-if (NOT HAVE_OPEN_MEMSTREAM) 
+if (NOT HAVE_OPEN_MEMSTREAM)
   set(poly_SOURCES utils/open_memstream.c ${poly_SOURCES})
 endif()
 
@@ -81,9 +82,9 @@ target_link_libraries(poly ${GMP_LIBRARY})
 
 add_library(polyxx SHARED ${polyxx_SOURCES})
 set_target_properties(polyxx PROPERTIES
-  VERSION ${LIBPOLY_VERSION} 
+  VERSION ${LIBPOLY_VERSION}
   SOVERSION ${LIBPOLY_VERSION_MAJOR}
-) 
+)
 
 target_link_libraries(polyxx poly ${GMP_LIBRARY})
 
@@ -121,7 +122,7 @@ endif()
 #
 # Linux, FreeBSD, and old versions of Darwin (and probably other systems) don't use fPIC by default.
 # We just check for Linux and FreeBSD here.
-# 
+#
 if(LIBPOLY_BUILD_STATIC_PIC)
   add_library(static_pic_poly STATIC ${poly_SOURCES})
   set_target_properties(static_pic_poly PROPERTIES OUTPUT_NAME picpoly POSITION_INDEPENDENT_CODE true)

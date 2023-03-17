@@ -102,10 +102,12 @@ int coefficient_print(const lp_polynomial_context_t* ctx, const coefficient_t* C
 }
 
 char* coefficient_to_string(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   coefficient_print(ctx, C, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }

@@ -182,3 +182,10 @@ TEST_CASE("interval::operator*") {
   CHECK(Interval(-1,1) * Interval(1,2) == Interval(-2,2));
   CHECK(Interval(-1,1) * Interval(-1,2) == Interval(-2,2));
 }
+
+TEST_CASE("interval::operator<<") {
+    Interval i(1, 3);
+    std::stringstream out;
+    out << i;
+    CHECK(out.str() == "(1, 3)");
+}

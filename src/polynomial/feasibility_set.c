@@ -157,11 +157,13 @@ int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
 }
 
 char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_feasibility_set_print(set, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

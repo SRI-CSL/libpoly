@@ -93,11 +93,13 @@ int lp_int_ring_print(const lp_int_ring_t* K, FILE* out) {
 }
 
 char* lp_int_ring_to_string(const lp_int_ring_t* K) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_int_ring_print(K, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

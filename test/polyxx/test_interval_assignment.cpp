@@ -59,4 +59,8 @@ TEST_CASE("interval_assignment") {
   CHECK(a.has(z));
   CHECK(a.get(x) == Interval(4, 5));
   CHECK(a.get(z) == Interval(5, 6));
+
+  std::stringstream out;
+  out << a;
+  CHECK(out.str() == "[x -> (4, 5), z -> (5, 6)]");
 }

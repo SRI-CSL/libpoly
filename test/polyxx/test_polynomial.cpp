@@ -72,3 +72,12 @@ TEST_CASE("polynomial::psc") {
   CHECK(tmp[4] == Integer(-45));
   CHECK(tmp[5] == Integer(7));
 }
+
+TEST_CASE("polynomial::operator<<") {
+  Variable y("y");
+  Variable x("x");
+  Polynomial p = 1 * pow(x, 6) + 2 * pow(x, 5) + 3 * y - 1;
+  std::stringstream out;
+  out << p;
+  CHECK(out.str() == "1*x^6 + 2*x^5 + (3*y - 1)");
+}

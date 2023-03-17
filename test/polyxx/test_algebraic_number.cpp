@@ -105,3 +105,10 @@ TEST_CASE("algebraic_number::operator/") {
   CHECK(sqrt2 / -sqrt2 == Rational(-1));
   CHECK(-(sqrt2 / -sqrt2) == Rational(1));
 }
+
+TEST_CASE("algebraic_number::operator<<") {
+  AlgebraicNumber a(UPolynomial({-2, 0, 1}), DyadicInterval(-2, -1));
+  std::stringstream out;
+  out << a;
+  CHECK(out.str() == "<1*x^2 + (-2), (-3/2, -5/4)>");
+}

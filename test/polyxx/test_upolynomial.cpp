@@ -267,3 +267,10 @@ TEST_CASE("upolynomial::isolate_real_roots") {
     CHECK(roots[3] == AlgebraicNumber(UPolynomial({-3, 0, 1}), DyadicInterval(1, 2)));
   }
 }
+
+TEST_CASE("upolynomial::operator<<") {
+  UPolynomial p({1, 2, 3, 4, 5});
+  std::stringstream out;
+  out << p;
+  CHECK(out.str() == "5*x^4 + 4*x^3 + 3*x^2 + 2*x + 1");
+}

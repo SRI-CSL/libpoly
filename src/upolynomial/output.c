@@ -77,11 +77,13 @@ int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out) {
 }
 
 char* lp_upolynomial_to_string(const lp_upolynomial_t* p) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_upolynomial_print(p, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

@@ -47,3 +47,10 @@ TEST_CASE("rational_interval::sgn") {
   CHECK(sgn(RationalInterval(0, 2)) == 1);
   CHECK(sgn(RationalInterval(1, 2)) == 1);
 }
+
+TEST_CASE("rational_interval::operator<<") {
+  RationalInterval ri(-3, 2);
+  std::stringstream out;
+  out << ri;
+  CHECK(out.str() == "( -3 ; 2 )");
+}
