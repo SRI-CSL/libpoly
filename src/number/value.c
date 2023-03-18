@@ -599,11 +599,13 @@ void lp_value_get_den(const lp_value_t* v, lp_integer_t* den) {
 }
 
 char* lp_value_to_string(const lp_value_t* v) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_value_print(v, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

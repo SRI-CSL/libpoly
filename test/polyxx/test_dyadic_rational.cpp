@@ -200,3 +200,10 @@ TEST_CASE("dyadic_rational::floor") {
   CHECK(floor(DyadicRational(1, 3)) == Integer(0));
   CHECK(floor(DyadicRational(7, 2)) == Integer(1));
 }
+
+TEST_CASE("dyadic_rational::operator<<") {
+  DyadicRational dr(1, 3);
+  std::stringstream out;
+  out << dr;
+  CHECK(out.str() == "1/8");
+}

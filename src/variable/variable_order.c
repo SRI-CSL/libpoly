@@ -26,7 +26,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "utils/open_memstream.h"
+#include "utils/u_memstream.h"
 
 /**
  * A simple variable order that orders variable based on a given list, and
@@ -163,11 +163,13 @@ int lp_variable_order_print(const lp_variable_order_t* var_order, const lp_varia
 }
 
 char* lp_variable_order_to_string(const lp_variable_order_t* var_order, const lp_variable_db_t* var_db) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_variable_order_print(var_order, var_db, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

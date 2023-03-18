@@ -503,11 +503,13 @@ int lp_algebraic_number_print(const lp_algebraic_number_t* a, FILE* out) {
 }
 
 char* lp_algebraic_number_to_string(const lp_algebraic_number_t* a) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_algebraic_number_print(a, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 
@@ -865,10 +867,10 @@ lp_upolynomial_t* lp_upolynomial_shift(const lp_upolynomial_t* poly, const lp_in
   lp_upolynomial_unpack(poly, coeffs);
 
   lp_upolynomial_t* out = lp_upolynomial_construct(lp_Z, 0, coeffs);
-  
+
   for (size_t i = 1; i <= lp_upolynomial_degree(poly); ++i) {
     lp_upolynomial_t* cur = lp_upolynomial_mul_c(curmult, &coeffs[i]);
-    
+
     lp_upolynomial_t* tout = lp_upolynomial_add(out, cur);
     lp_upolynomial_t* tcurmult = lp_upolynomial_mul(curmult, basemult);
     lp_upolynomial_delete(cur);

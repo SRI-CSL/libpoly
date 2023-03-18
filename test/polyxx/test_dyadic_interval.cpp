@@ -161,3 +161,10 @@ TEST_CASE("dyadic_interval::sgn") {
     CHECK(sgn(DyadicInterval(4, 5)) == 1);
     CHECK(sgn(DyadicInterval(5)) == 1);
 }
+
+TEST_CASE("dyadic_interval::operator<<") {
+    DyadicInterval di(1, 2);
+    std::stringstream out;
+    out << di;
+    CHECK(out.str() == "( 1 ; 2 )");
+}

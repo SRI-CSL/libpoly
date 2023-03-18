@@ -88,11 +88,13 @@ int lp_assignment_print(const lp_assignment_t* m, FILE* out) {
 }
 
 char* lp_assignment_to_string(const lp_assignment_t* m) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_assignment_print(m, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 
@@ -195,11 +197,13 @@ int lp_interval_assignment_print(const lp_interval_assignment_t* m, FILE* out) {
 }
 
 char* lp_interval_assignment_to_string(const lp_interval_assignment_t* m) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   lp_interval_assignment_print(m, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

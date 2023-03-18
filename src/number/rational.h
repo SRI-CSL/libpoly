@@ -22,7 +22,7 @@
 #include <rational.h>
 #include <assert.h>
 
-#include "utils/open_memstream.h"
+#include "utils/u_memstream.h"
 
 static inline
 void rational_construct(lp_rational_t* q) {
@@ -94,11 +94,13 @@ int rational_print(const lp_rational_t* c, FILE* out) {
 
 static inline
 char* rational_to_string(const lp_rational_t* q) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   rational_print(q, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

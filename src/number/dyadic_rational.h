@@ -113,11 +113,13 @@ int dyadic_rational_print(const lp_dyadic_rational_t* dq, FILE* out) {
 
 static inline
 char* dyadic_rational_to_string(const lp_dyadic_rational_t* q) {
+  struct u_memstream mem;
   char* str = 0;
   size_t size = 0;
-  FILE* f = open_memstream(&str, &size);
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
   dyadic_rational_print(q, f);
-  fclose(f);
+  u_memstream_close(&mem);
   return str;
 }
 

@@ -57,7 +57,7 @@ TEST_CASE("value::operator==") {
 
 TEST_CASE("value::operator!=") {
     CHECK_FALSE(Value() != Value());
-    
+
     CHECK_FALSE(Value::minus_infty() != Value::minus_infty());
     CHECK(Value::minus_infty() != Value(-20));
     CHECK(Value::minus_infty() != Value(Integer(-15)));
@@ -96,7 +96,7 @@ TEST_CASE("value::operator!=") {
 
 TEST_CASE("value::operator<") {
     CHECK_FALSE(Value() < Value());
-    
+
     CHECK_FALSE(Value::minus_infty() < Value::minus_infty());
     CHECK(Value::minus_infty() < Value(-20));
     CHECK(Value::minus_infty() < Value(Integer(-15)));
@@ -135,7 +135,7 @@ TEST_CASE("value::operator<") {
 
 TEST_CASE("value::operator<=") {
     CHECK(Value() <= Value());
-    
+
     CHECK(Value::minus_infty() <= Value::minus_infty());
     CHECK(Value::minus_infty() <= Value(-20));
     CHECK(Value::minus_infty() <= Value(Integer(-15)));
@@ -174,7 +174,7 @@ TEST_CASE("value::operator<=") {
 
 TEST_CASE("value::operator>") {
     CHECK_FALSE(Value() > Value());
-    
+
     CHECK_FALSE(Value::minus_infty() > Value::minus_infty());
     CHECK_FALSE(Value::minus_infty() > Value(-20));
     CHECK_FALSE(Value::minus_infty() > Value(Integer(-15)));
@@ -213,7 +213,7 @@ TEST_CASE("value::operator>") {
 
 TEST_CASE("value::operator>=") {
     CHECK(Value() >= Value());
-    
+
     CHECK(Value::minus_infty() >= Value::minus_infty());
     CHECK_FALSE(Value::minus_infty() >= Value(-20));
     CHECK_FALSE(Value::minus_infty() >= Value(Integer(-15)));
@@ -267,4 +267,11 @@ TEST_CASE("value::value_between") {
     Value s = value_between(a, true, b, true);
     CHECK(a < s);
     CHECK(s < b);
+}
+
+TEST_CASE("value::operator<<") {
+    Value v(-20);
+    std::stringstream out;
+    out << v;
+    CHECK(out.str() == "-20");
 }

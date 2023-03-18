@@ -15,4 +15,8 @@ TEST_CASE("variable") {
   CHECK_FALSE(v1 != v1);
   CHECK(v1 != v2);
   CHECK_FALSE(v2 != v2);
+
+  std::stringstream out;
+  out << v2;
+  CHECK(out.str() == "foo");
 }
