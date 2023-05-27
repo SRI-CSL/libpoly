@@ -1266,12 +1266,10 @@ void factorization_recombination(const lp_upolynomial_t* f, const lp_upolynomial
   const int size = factors_p->size;
 
   // Factors we are still considering (initially all with degree <= max_degree)
-  int enabled_count = 0;
   int enabled[size+1];
   for (k = 0; k < size; ++ k) {
     if (lp_upolynomial_degree(factors_p->factors[k]) <= max_degree) {
       enabled[k] = 1;
-      enabled_count ++;
     } else {
       enabled[k] = 0;
     }
