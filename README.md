@@ -48,7 +48,7 @@ If the tests are enabled, you can do a sanity check of the library by doing a
 ```make check```.
 
 The most up-to-date build instructions can be seen by looking at our Travis
-build script ```.travis.yml```.
+build script ```.github/workflows/ci.yml```.
 
 ## Python bindings
 
