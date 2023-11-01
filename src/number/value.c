@@ -276,7 +276,7 @@ int lp_value_sgn(const lp_value_t* v) {
 int lp_value_cmp(const lp_value_t* v1, const lp_value_t* v2) {
 
   if (trace_is_enabled("value::cmp")) {
-    tracef("lp_value_cmp()\n")
+    tracef("lp_value_cmp()\n");
     tracef("v1 = "); lp_value_print(v1, trace_out); tracef("\n");
     tracef("v2 = "); lp_value_print(v2, trace_out); tracef("\n");
   }
@@ -612,7 +612,7 @@ char* lp_value_to_string(const lp_value_t* v) {
 void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_value_t* b, int b_strict, lp_value_t* v) {
 
   if (trace_is_enabled("value::get_value_between")) {
-    tracef("lp_value_get_value_between()\n")
+    tracef("lp_value_get_value_between()\n");
     tracef("a = "); lp_value_print(a, trace_out); tracef(", a_strict = %d\n", a_strict);
     tracef("b = "); lp_value_print(b, trace_out); tracef(", b_strict = %d\n", b_strict);
   }

@@ -61,7 +61,7 @@ void check_polynomial_assignment(const lp_polynomial_t* A, const lp_assignment_t
     lp_variable_t y = vars.list[i];
     if (x != y && lp_assignment_get_value(M, y)->type == LP_VALUE_NONE) {
       lp_polynomial_print(A, trace_out);
-      tracef("\n")
+      tracef("\n");
       assert(0);
     }
   }
@@ -1146,7 +1146,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   }
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): unsorted roots\n")
+    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): unsorted roots\n");
     for (i = 0; i < roots_tmp_size; ++ i) {
       tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
     }
@@ -1157,7 +1157,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     qsort(roots_tmp, roots_tmp_size, sizeof(lp_value_t), lp_value_cmp_void);
 
     if (trace_is_enabled("polynomial")) {
-      tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n")
+      tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n");
       for (i = 0; i < roots_tmp_size; ++ i) {
         tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
       }

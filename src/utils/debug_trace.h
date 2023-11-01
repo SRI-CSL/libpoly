@@ -28,7 +28,7 @@ FILE* trace_out_real;
 #define trace_out (trace_out_real ? trace_out_real : stderr)
 
 /** Print to the debug trace printf style */
-#define tracef(...) fprintf(trace_out, __VA_ARGS__);
+#define tracef(...) fprintf(trace_out, __VA_ARGS__)
 
 /** Set the output file for tracing */
 void trace_set_output(FILE* file);
@@ -41,17 +41,17 @@ void trace_disable(const char* tag);
 
 int trace_is_enabled(const char* tag);
 
-#define TRACE(tag, ...) { \
+#define TRACE(tag, ...) do { \
   if (trace_is_enabled(tag)) { \
     tracef(__VA_ARGS__); \
   } \
-}
+} while(0)
 
-#define TRACE_CMD(tag, cmd) { \
+#define TRACE_CMD(tag, cmd) do { \
   if (trace_is_enabled(tag)) { \
     cmd; \
   } \
-} \
+} while(0)
 
 #else
 
@@ -61,6 +61,6 @@ int trace_is_enabled(const char* tag) {
   return 0;
 }
 
-#define TRACE(tag, ...)
-#define TRACE_CMD(tag, cmd)
+#define TRACE(tag, ...) ((void)0)
+#define TRACE_CMD(tag, cmd) ((void)0)
 #endif
