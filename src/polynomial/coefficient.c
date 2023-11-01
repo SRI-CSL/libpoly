@@ -2323,7 +2323,7 @@ STAT_DECLARE(int, coefficient, spdivrem)
 
 void coefficient_spdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
     TRACE("coefficient", "coefficient_spdivrem()\n");
-    STAT_INCR(coefficient, pdivrem)
+    STAT_INCR(coefficient, spdivrem)
 
     if (trace_is_enabled("coefficient")) {
         tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
