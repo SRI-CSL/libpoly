@@ -2109,6 +2109,8 @@ void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const
     coefficient_div_constant(ctx, D, &C2->value.num);
     return;
   }
+  // A polynomial does not divide a constant
+  assert(!coefficient_is_constant(C1));
 
   // If different variables
   if (VAR(C1) != VAR(C2)) {
