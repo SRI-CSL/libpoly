@@ -404,7 +404,7 @@ void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, 
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-  // Locate the first non-zero ceofficient past the top one
+  // Locate the first non-zero coefficient past the top one
   int i = SIZE(C) - 2;
   while (i >= 0 && coefficient_is_zero(ctx, COEFF(C, i))) {
     -- i;
@@ -436,7 +436,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-  // Locate the first non-zero ceofficient (normal reductum is the next nonzero)
+  // Locate the first non-zero coefficient (normal reductum is the next nonzero)
   int i = SIZE(C) - 1;
   while (i >= 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
     if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
@@ -1136,7 +1136,7 @@ int coefficient_cmp_general(const lp_polynomial_context_t* ctx, const coefficien
     }
   }
 
-  TRACE("coefficien::internal", "coefficient_cmp() => %d\n", cmp);
+  TRACE("coefficient::internal", "coefficient_cmp() => %d\n", cmp);
   return cmp;
 }
 
@@ -3305,10 +3305,10 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
       if (trace_is_enabled("coefficient")) {
         tracef("coefficient_evaluate(): filtered roots:\n");
-        size_t i = 0;
-        for (i = 0; i < roots_size; ++ i) {
-          tracef("%zu: ", i);
-          lp_value_print(roots + i, trace_out);
+        size_t j = 0;
+        for (j = 0; j < roots_size; ++ j) {
+          tracef("%zu: ", j);
+          lp_value_print(roots + j, trace_out);
           tracef("\n");
         }
       }
