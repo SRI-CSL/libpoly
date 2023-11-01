@@ -2277,6 +2277,88 @@ void coefficient_prem(const lp_polynomial_context_t* ctx, coefficient_t* R, cons
   assert(coefficient_is_normalized(ctx, R));
 }
 
+STAT_DECLARE(int, coefficient, pdivrem)
+
+void coefficient_pdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+    TRACE("coefficient", "coefficient_pdivrem()\n");
+    STAT_INCR(coefficient, pdivrem)
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+        tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
+    }
+
+    assert(!coefficient_is_zero(ctx, C2));
+
+    int cmp_type = coefficient_cmp_type(ctx, C1, C2);
+
+    assert(cmp_type >= 0);
+
+    if (cmp_type == 0 && C1->type == COEFFICIENT_NUMERIC) {
+        assert(C2->type == COEFFICIENT_NUMERIC);
+        if (R->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(R);
+            coefficient_construct(ctx, R);
+        }
+        if (D->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(D);
+            coefficient_construct(ctx, D);
+        }
+        integer_div_rem_Z(&D->value.num, &R->value.num, &C1->value.num, &C2->value.num);
+    } else {
+        coefficient_reduce(ctx, C1, C2, 0, D, R, REMAINDERING_PSEUDO_DENSE);
+    }
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("coefficient_spdivrem() => \n");
+        tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
+        tracef("R = "); coefficient_print(ctx, R, trace_out); tracef("\n");
+    }
+
+    assert(coefficient_is_normalized(ctx, D));
+    assert(coefficient_is_normalized(ctx, R));
+}
+
+STAT_DECLARE(int, coefficient, spdivrem)
+
+void coefficient_spdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+    TRACE("coefficient", "coefficient_spdivrem()\n");
+    STAT_INCR(coefficient, pdivrem)
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+        tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
+    }
+
+    assert(!coefficient_is_zero(ctx, C2));
+
+    int cmp_type = coefficient_cmp_type(ctx, C1, C2);
+
+    assert(cmp_type >= 0);
+
+    if (cmp_type == 0 && C1->type == COEFFICIENT_NUMERIC) {
+        assert(C2->type == COEFFICIENT_NUMERIC);
+        if (R->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(R);
+            coefficient_construct(ctx, R);
+        }
+        if (D->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(D);
+            coefficient_construct(ctx, D);
+        }
+        integer_div_rem_Z(&D->value.num, &R->value.num, &C1->value.num, &C2->value.num);
+    } else {
+        coefficient_reduce(ctx, C1, C2, 0, D, R, REMAINDERING_PSEUDO_SPARSE);
+    }
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("coefficient_spdivrem() => \n");
+        tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
+        tracef("R = "); coefficient_print(ctx, R, trace_out); tracef("\n");
+    }
+
+    assert(coefficient_is_normalized(ctx, R));
+}
 
 STAT_DECLARE(int, coefficient, divrem)
 
@@ -2303,7 +2385,11 @@ void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, co
         coefficient_destruct(R);
         coefficient_construct(ctx, R);
       }
-      integer_rem_Z(&R->value.num, &C1->value.num, &C2->value.num);
+      if (D->type == COEFFICIENT_POLYNOMIAL) {
+        coefficient_destruct(D);
+        coefficient_construct(ctx, D);
+      }
+      integer_div_rem_Z(&D->value.num, &R->value.num, &C1->value.num, &C2->value.num);
       break;
     case COEFFICIENT_POLYNOMIAL:
     {
@@ -2322,7 +2408,7 @@ void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, co
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_divrem() => \n");
     tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
-    tracef("D = "); coefficient_print(ctx, R, trace_out); tracef("\n");
+    tracef("R = "); coefficient_print(ctx, R, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, R));

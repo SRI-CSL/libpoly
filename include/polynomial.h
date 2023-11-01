@@ -220,7 +220,7 @@ void lp_polynomial_sub_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const 
  *
  * and
  *
- *   P in Z[y]
+ *   P in Z[x]
  *   Q, R in Z[y,x]
  *
  * with
@@ -239,8 +239,14 @@ void lp_polynomial_rem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_p
 /** Compute a*A1 = D*A2 + R (pseudo remainder). */
 void lp_polynomial_prem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
+/** Compute a*A1 = D*A2 + R (pseudo remainder). */
+void lp_polynomial_pdivrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
 /** Compute a*A1 = D*A2 + R (sparse pseudo remainder). */
 void lp_polynomial_sprem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
+/** Compute a*A1 = D*A2 + R (sparse pseudo remainder). */
+void lp_polynomial_spdivrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /** Compute A1 = D*A2 + R (assumes that exact division). */
 void lp_polynomial_divrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
