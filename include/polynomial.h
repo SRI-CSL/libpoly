@@ -88,9 +88,6 @@ void lp_polynomial_swap(lp_polynomial_t* A1, lp_polynomial_t* A2);
 /** Assign the polynomial a given polynomial. */
 void lp_polynomial_assign(lp_polynomial_t* A, const lp_polynomial_t* from);
 
-/** Returns the context of the polynomial */
-const lp_polynomial_context_t* lp_polynomial_context(const lp_polynomial_t* A);
-
 /** Returns the degree of the polynomial (in it's top variable) */
 size_t lp_polynomial_degree(const lp_polynomial_t* A);
 
