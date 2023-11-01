@@ -23,6 +23,7 @@
 #include <variable_list.h>
 
 #include "polynomial/polynomial.h"
+#include "polynomial/coefficient.h"
 
 #include "polynomial/gcd.h"
 #include "polynomial/factorization.h"
@@ -754,10 +755,10 @@ void lp_polynomial_reduce(
   lp_polynomial_set_context(Q, ctx);
   lp_polynomial_set_context(R, ctx);
 
-  coefficient_reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, 1);
+  coefficient_reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, REMAINDERING_EXACT_SPARSE);
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_derivative() =>\n");
+    tracef("polynomial_reduce() =>\n");
     tracef("\t P = "); lp_polynomial_print(P, trace_out); tracef("\n");
     tracef("\t Q = "); lp_polynomial_print(Q, trace_out); tracef("\n");
     tracef("\t R = "); lp_polynomial_print(R, trace_out); tracef("\n");
