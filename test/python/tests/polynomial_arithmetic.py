@@ -3,32 +3,46 @@
 import polypy
 import polypy_test
 
+
 def check_binary(op, op_name, p, q, expected):
     result = op(p, q)
     ok = result == expected
-    if (not ok):
+    if not ok:
         print("p = {0}".format(p))
         print("q = {0}".format(q))
         print("{0} = {1}".format(op_name, result))
         print("expected = {0}".format(expected))
     polypy_test.check(ok)
 
+
+def check_binary_tuple(op, op_name, p, q, n, expected):
+    result = (op(p, q))[n]
+    ok = result == expected
+    if not ok:
+        print("p = {0}".format(p))
+        print("q = {0}".format(q))
+        print("{0} = {1}".format(op_name, result))
+        print("expected = {0}".format(expected))
+    polypy_test.check(ok)
+
+
 def check_unary(op, op_name, p, expected):
     result = op(p)
     ok = result == expected
-    if (not ok):
+    if not ok:
         print("p = {0}".format(p))
         print("{0} = {1}".format(op_name, result))
         print("expected = {0}".format(expected))
     polypy_test.check(ok)
 
+
 polypy_test.init()
 
 polypy_test.start("Addition")
 
-x = polypy.Variable("x");
-y = polypy.Variable("y");
-z = polypy.Variable("z");
+x = polypy.Variable("x")
+y = polypy.Variable("y")
+z = polypy.Variable("z")
 
 polypy.variable_order.set([z, y, x])
 
@@ -164,56 +178,91 @@ def poly_div(p, q):
 def poly_rem(p, q):
     return p % q
 
+def poly_prem(p, q):
+    return p.prem(q)
+
+def poly_divmod(p, q):
+    return divmod(p, q)
+
+def poly_pdivrem(p, q):
+    return p.pdivrem(q)
+
+
 p = 2*x + 2
 q = 2
 expected = x + 1
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = x**2 - 1
 q = x - 1
 expected = x + 1
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = x**2 - 1
 q = x - 1
 expected = 0
 check_binary(poly_rem, "rem", p, q, expected)
+check_binary(poly_prem, "rem", p, q, expected)
+check_binary_tuple(poly_divmod, "rem", p, q, 1, expected)
+check_binary_tuple(poly_pdivrem, "rem", p, q, 1, expected)
 
 p = (1*z**11 - 1*z**5)
 q = (z**5)
 expected = z**6 - 1
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = x*y*z
 q = (x*y)
 expected = z
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = 6*y*(x + 1)
 q = (2*y)
 expected = 3*(x + 1)
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = 6*y*(x + 1)
 q = 3*(x+1)
 expected = 2*y
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 q = x + 1
 expected = 6*y
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = 2*x**2 + 4*x + 6
 q = 2
 expected = x**2 + 2*x + 3
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
 
 p = 2*x**2 + 4*x + 6
 q = (x + 2) - x
 expected = x**2 + 2*x + 3
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
+
+expected = 0
+check_binary(poly_rem, "rem", p, q, expected)
+check_binary(poly_prem, "rem", p, q, expected)
+check_binary_tuple(poly_divmod, "rem", p, q, 1, expected)
+check_binary_tuple(poly_pdivrem, "rem", p, q, 1, expected)
 
 p = (x + 6) - x
 q = (x + 3) - x
 expected = 2
 check_binary(poly_div, "div", p, q, expected)
+check_binary_tuple(poly_divmod, "div", p, q, 0, expected)
+
+p = 2*x**2 + 4*x + 6
+q = (x + 2)
+expected = 6
+check_binary(poly_prem, "rem", p, q, expected)
+check_binary_tuple(poly_pdivrem, "rem", p, q, 1, expected)
