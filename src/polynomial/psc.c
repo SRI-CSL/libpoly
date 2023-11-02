@@ -28,12 +28,14 @@
 
 STAT_DECLARE(int, coefficient, psc)
 
+#ifdef UNOPTIMIZED_SUBRESULTANT
+
 /**
  * (non-optimized) Subresultant algorithm, as described in
  *
  * [2000] Ducos - Optimizations of the subresultant algorithm.
  */
-void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
+void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
 
   TRACE("coefficient", "coefficient_psc()\n");
   STAT_INCR(coefficient, psc)
@@ -184,6 +186,8 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
   coefficient_destruct(&pow);
   coefficient_destruct(&s);
 }
+
+#else
 
 static
 void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d, const coefficient_t* S_d_1, coefficient_t* S_e, lp_variable_t X) {
@@ -337,13 +341,12 @@ void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A,
   free(H);
 }
 
-
 /**
  * (optimized) Subresultant algorithm, as described in
  *
  * [2000] Ducos - Optimizations of the subresultant algorithm.
  */
-void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
+void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
 
   if (trace_is_enabled("coefficient::resultant")) {
     tracef("coefficient_psc()\n");
@@ -505,7 +508,4 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
   coefficient_destruct(&s);
 }
 
-void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
-  // coefficient_psc_unoptimized(ctx, S, P, Q);
-  coefficient_psc_optimized(ctx, S, P, Q);
-}
+#endif
