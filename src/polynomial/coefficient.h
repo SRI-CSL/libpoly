@@ -261,14 +261,14 @@ void coefficient_add_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, c
 void coefficient_sub_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
- * Reduce the coefficient A in Z[y,x] using B in Z[y,x] so that
+ * Reduce the coefficient A in Z[x,y] using B in Z[x,y] so that
  *
  *   P*A = Q*B + R
  *
  * and
  *
- *   P in Z[y]
- *   Q, R in Z[y,x]
+ *   P in Z[x]
+ *   Q, R in Z[x,y]
  *
  * with
  *

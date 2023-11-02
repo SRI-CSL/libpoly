@@ -211,14 +211,14 @@ void lp_polynomial_add_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const 
 void lp_polynomial_sub_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
- * Reduce the polynomial A in Z[y,x] using B in Z[y,x] so that
+ * Reduce the polynomial A in Z[x,y] using B in Z[x,y] so that
  *
  *   P*A = Q*B + R
  *
  * and
  *
  *   P in Z[x]
- *   Q, R in Z[y,x]
+ *   Q, R in Z[x,y]
  *
  * with
  *
