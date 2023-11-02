@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
+#define SWAP(type, x, y) ({ type tmp = x; x = y; y = tmp; })
 
 static
 void check_polynomial_assignment(const lp_polynomial_t* A, const lp_assignment_t* M, lp_variable_t x) {
@@ -172,8 +172,6 @@ void lp_polynomial_set_external(lp_polynomial_t* A) {
     lp_polynomial_context_attach((lp_polynomial_context_t*) A->ctx);
   }
 }
-
-#define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 
 void lp_polynomial_swap(lp_polynomial_t* A1, lp_polynomial_t* A2) {
   // Swap everything, but keep the external flags
