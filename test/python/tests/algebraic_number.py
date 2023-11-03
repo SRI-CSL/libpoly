@@ -159,4 +159,4 @@ for k in range(1, 500):
     p = functools.reduce(lambda x, y: x*y, sample, one)
     random.shuffle(sample)
     p = functools.reduce(lambda x, y: x/y, sample, p)
-    polypy_test.check(p == 1)
+    polypy_test.check(p == one)

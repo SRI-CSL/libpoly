@@ -14,7 +14,6 @@ def forkexec(test, env):
 
 
 def main():
-
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--sympy', action="store_true")
     parser.add_argument('--stats', action="store_true")
@@ -36,15 +35,14 @@ def main():
              "tests/polynomial_feasibility.py", 
              "tests/value.py"]
 
-    if (args.sympy):
+    if args.sympy:
         print("Sympy checking enabled")
         polypy_test.sympy_checker.enabled = True
     else:
         print("Sympy checking disabled")
         polypy_test.sympy_checker.enabled = False
 
-
-
+    failed = 0
     for test in tests:
         print("Running {0}:".format(test))
         context = dict()
@@ -52,10 +50,13 @@ def main():
         module = context["polypy_test"]
         print("PASS: {0}".format(module.PASS))
         print("FAIL: {0}".format(module.FAIL))
+        failed += module.FAIL
 
-    if (args.stats):
+    if args.stats:
         print("Statistics:")
         polypy.stats_print()
+
+    return 1 if failed > 0 else 0
 
 
 if __name__ == '__main__':
