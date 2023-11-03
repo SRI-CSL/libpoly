@@ -815,7 +815,7 @@ Polynomial_divmod_general(PyObject* self, PyObject* args, enum rem_type type) {
   lp_polynomial_t* div = lp_polynomial_new(p1_ctx);
   switch (type) {
     case REM_EXACT:
-  lp_polynomial_divrem(div, rem, p1->p, p2->p);
+      lp_polynomial_divrem(div, rem, p1->p, p2->p);
       break;
     case REM_PSEUDO:
       lp_polynomial_pdivrem(div, rem, p1->p, p2->p);
