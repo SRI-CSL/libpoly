@@ -88,9 +88,6 @@ void lp_polynomial_swap(lp_polynomial_t* A1, lp_polynomial_t* A2);
 /** Assign the polynomial a given polynomial. */
 void lp_polynomial_assign(lp_polynomial_t* A, const lp_polynomial_t* from);
 
-/** Returns the context of the polynomial */
-const lp_polynomial_context_t* lp_polynomial_context(const lp_polynomial_t* A);
-
 /** Returns the degree of the polynomial (in it's top variable) */
 size_t lp_polynomial_degree(const lp_polynomial_t* A);
 
@@ -214,14 +211,14 @@ void lp_polynomial_add_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const 
 void lp_polynomial_sub_mul(lp_polynomial_t* S, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
- * Reduce the polynomial A in Z[y,x] using B in Z[y,x] so that
+ * Reduce the polynomial A in Z[x,y] using B in Z[x,y] so that
  *
  *   P*A = Q*B + R
  *
  * and
  *
- *   P in Z[y]
- *   Q, R in Z[y,x]
+ *   P in Z[x]
+ *   Q, R in Z[x,y]
  *
  * with
  *
@@ -239,8 +236,14 @@ void lp_polynomial_rem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_p
 /** Compute a*A1 = D*A2 + R (pseudo remainder). */
 void lp_polynomial_prem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
+/** Compute a*A1 = D*A2 + R (pseudo remainder). */
+void lp_polynomial_pdivrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
 /** Compute a*A1 = D*A2 + R (sparse pseudo remainder). */
 void lp_polynomial_sprem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
+/** Compute a*A1 = D*A2 + R (sparse pseudo remainder). */
+void lp_polynomial_spdivrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /** Compute A1 = D*A2 + R (assumes that exact division). */
 void lp_polynomial_divrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2);

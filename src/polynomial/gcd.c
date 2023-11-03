@@ -183,7 +183,7 @@ void coefficient_gcd_pp_euclid(const lp_polynomial_context_t* ctx, coefficient_t
   STAT_INCR(coefficient, gcd_pp_euclid)
 
   if (trace_is_enabled("coefficient::gcd")) {
-    tracef("gcd\n")
+    tracef("gcd\n");
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
@@ -257,7 +257,7 @@ void coefficient_gcd_pp_subresultant(const lp_polynomial_context_t* ctx, coeffic
   STAT_INCR(coefficient, gcd_pp_subresultant)
 
   if (trace_is_enabled("coefficient::gcd")) {
-    tracef("gcd\n")
+    tracef("gcd\n");
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
@@ -761,7 +761,7 @@ lp_polynomial_vector_t* coefficient_mgcd_pp_subresultant(const lp_polynomial_con
   coefficient_construct(ctx, &cont);
 
   if (trace_is_enabled("coefficient::mgcd")) {
-    tracef("mgcd\n")
+    tracef("mgcd\n");
     tracef("P = "); coefficient_print(ctx, &P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, &Q, trace_out); tracef("\n");
   }

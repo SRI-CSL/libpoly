@@ -23,6 +23,7 @@
 #include <variable_list.h>
 
 #include "polynomial/polynomial.h"
+#include "polynomial/coefficient.h"
 
 #include "polynomial/gcd.h"
 #include "polynomial/factorization.h"
@@ -40,7 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
+#define SWAP(type, x, y) ({ type tmp = x; x = y; y = tmp; })
 
 static
 void check_polynomial_assignment(const lp_polynomial_t* A, const lp_assignment_t* M, lp_variable_t x) {
@@ -60,7 +61,7 @@ void check_polynomial_assignment(const lp_polynomial_t* A, const lp_assignment_t
     lp_variable_t y = vars.list[i];
     if (x != y && lp_assignment_get_value(M, y)->type == LP_VALUE_NONE) {
       lp_polynomial_print(A, trace_out);
-      tracef("\n")
+      tracef("\n");
       assert(0);
     }
   }
@@ -171,8 +172,6 @@ void lp_polynomial_set_external(lp_polynomial_t* A) {
     lp_polynomial_context_attach((lp_polynomial_context_t*) A->ctx);
   }
 }
-
-#define SWAP(type, x, y) { type tmp = x; x = y; y = tmp; }
 
 void lp_polynomial_swap(lp_polynomial_t* A1, lp_polynomial_t* A2) {
   // Swap everything, but keep the external flags
@@ -626,6 +625,31 @@ void lp_polynomial_prem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_
   }
 }
 
+void lp_polynomial_pdivrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
+
+    if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_pdirvrem("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(R, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
+        lp_variable_order_print(
+                A1->ctx->var_order, A1->ctx->var_db,
+                trace_out);
+        tracef("\n");
+    }
+
+    assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
+
+    lp_polynomial_external_clean(A1);
+    lp_polynomial_external_clean(A2);
+
+    lp_polynomial_set_context(D, A1->ctx);
+    lp_polynomial_set_context(R, A1->ctx);
+
+    coefficient_pdivrem(D->ctx, &D->data, &R->data, &A1->data, &A2->data);
+
+    if (trace_is_enabled("polynomial")) {
+        tracef("polynomial_pdirvrem() => ("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(R, trace_out); tracef(")\n");
+    }
+}
+
 void lp_polynomial_sprem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
 
   if (trace_is_enabled("polynomial")) {
@@ -650,6 +674,31 @@ void lp_polynomial_sprem(lp_polynomial_t* R, const lp_polynomial_t* A1, const lp
   }
 }
 
+void lp_polynomial_spdivrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
+
+    if (trace_is_enabled("polynomial")) {
+        tracef("lp_polynomial_spdirvrem("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(R, trace_out); tracef(", "); lp_polynomial_print(A1, trace_out); tracef(", "); lp_polynomial_print(A2, trace_out); tracef(")\n");
+        lp_variable_order_print(
+                A1->ctx->var_order, A1->ctx->var_db,
+                trace_out);
+        tracef("\n");
+    }
+
+    assert(lp_polynomial_context_equal(A1->ctx, A2->ctx));
+
+    lp_polynomial_external_clean(A1);
+    lp_polynomial_external_clean(A2);
+
+    lp_polynomial_set_context(D, A1->ctx);
+    lp_polynomial_set_context(R, A1->ctx);
+
+    coefficient_spdivrem(D->ctx, &D->data, &R->data, &A1->data, &A2->data);
+
+    if (trace_is_enabled("polynomial")) {
+        tracef("lp_polynomial_spdirvrem() => ("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(R, trace_out); tracef(")\n");
+    }
+}
+
 void lp_polynomial_divrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
 
   if (trace_is_enabled("polynomial")) {
@@ -668,7 +717,7 @@ void lp_polynomial_divrem(lp_polynomial_t* D, lp_polynomial_t* R, const lp_polyn
   lp_polynomial_set_context(D, A1->ctx);
   lp_polynomial_set_context(R, A1->ctx);
 
-  coefficient_divrem(D->ctx, &R->data, &R->data, &A1->data, &A2->data);
+  coefficient_divrem(D->ctx, &D->data, &R->data, &A1->data, &A2->data);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_rem() => ("); lp_polynomial_print(D, trace_out); tracef(", "); lp_polynomial_print(R, trace_out); tracef(")\n");
@@ -754,10 +803,10 @@ void lp_polynomial_reduce(
   lp_polynomial_set_context(Q, ctx);
   lp_polynomial_set_context(R, ctx);
 
-  coefficient_reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, 1);
+  coefficient_reduce(ctx, &A->data, &B->data, &P->data, &Q->data, &R->data, REMAINDERING_PSEUDO_DENSE);
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_derivative() =>\n");
+    tracef("polynomial_reduce() =>\n");
     tracef("\t P = "); lp_polynomial_print(P, trace_out); tracef("\n");
     tracef("\t Q = "); lp_polynomial_print(Q, trace_out); tracef("\n");
     tracef("\t R = "); lp_polynomial_print(R, trace_out); tracef("\n");
@@ -1095,7 +1144,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   }
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): unsorted roots\n")
+    tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): unsorted roots\n");
     for (i = 0; i < roots_tmp_size; ++ i) {
       tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
     }
@@ -1106,7 +1155,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     qsort(roots_tmp, roots_tmp_size, sizeof(lp_value_t), lp_value_cmp_void);
 
     if (trace_is_enabled("polynomial")) {
-      tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n")
+      tracef("polynomial_root_isolate("); lp_polynomial_print(A, trace_out); tracef("): sorted roots\n");
       for (i = 0; i < roots_tmp_size; ++ i) {
         tracef("%zu :", i); lp_value_print(roots_tmp + i, trace_out); tracef("\n");
       }

@@ -373,7 +373,7 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
   coefficient_pow(ctx, &s, coefficient_lc(Q), P_deg - Q_deg);
 
   if (trace_is_enabled("coefficient::resultant")) {
-    tracef("s = "); coefficient_print(ctx, &s, trace_out); tracef("\n")
+    tracef("s = "); coefficient_print(ctx, &s, trace_out); tracef("\n");
   }
 
   // Set the final position

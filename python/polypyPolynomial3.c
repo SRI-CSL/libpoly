@@ -82,6 +82,12 @@ static PyObject*
 Polynomial_sprem(PyObject* self, PyObject* args);
 
 static PyObject*
+Polynomial_pdivrem(PyObject* self, PyObject* args);
+
+static PyObject*
+Polynomial_spdivrem(PyObject* self, PyObject* args);
+
+static PyObject*
 Polynomial_gcd(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -180,6 +186,8 @@ PyMethodDef Polynomial_methods[] = {
     {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial"},
     {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial"},
     {"sprem", (PyCFunction)Polynomial_sprem, METH_VARARGS, "Returns the sparse pseudo remainder of current and given polynomial"},
+    {"pdivrem", (PyCFunction)Polynomial_pdivrem, METH_VARARGS, "Returns the pseudo quotient and pseudo remainder of current and given polynomial"},
+    {"spdivprem", (PyCFunction)Polynomial_spdivrem, METH_VARARGS, "Returns the sparse pseudo quotient and sparse pseudo remainder of current and given polynomial"},
     {"gcd", (PyCFunction)Polynomial_gcd, METH_VARARGS, "Returns the gcd of current and given polynomial"},
     {"lcm", (PyCFunction)Polynomial_lcm, METH_VARARGS, "Returns the lcm of current and given polynomial"},
     {"extended_gcd", (PyCFunction)Polynomial_extended_gcd, METH_VARARGS, "Returns the extended gcd, i.e. (gcd, u, v), of current and given polynomial"},
@@ -730,8 +738,14 @@ Polynomial_rem_operator(PyObject* self, PyObject* other) {
   return Polynomial_create(rem);
 }
 
+enum rem_type {
+  REM_EXACT,
+  REM_PSEUDO,
+  REM_SPARSE_PSEUDO
+};
+
 static PyObject*
-Polynomial_divmod(PyObject* self, PyObject* other) {
+Polynomial_divmod_general(PyObject* self, PyObject* args, enum rem_type type) {
 
   int dec_other = 0;
 
@@ -741,10 +755,21 @@ Polynomial_divmod(PyObject* self, PyObject* other) {
   }
 
   // self is always a polynomial
-  Polynomial* p1 = (Polynomial*) self;
-  const lp_polynomial_context_t* p1_ctx = lp_polynomial_get_context(p1->p);
+  Polynomial *p1 = (Polynomial *) self;
+  const lp_polynomial_context_t *p1_ctx = lp_polynomial_get_context(p1->p);
 
-  // Make sure other is a polynomial
+  // check that there is only one other
+  PyObject *other;
+  if (PyTuple_Check(args)) {
+    if (PyTuple_Size(args) != 1) {
+      Py_INCREF(Py_NotImplemented);
+      return Py_NotImplemented;
+    }
+    other = PyTuple_GetItem(args, 0);
+  } else {
+    other = args;
+  }
+  // make sure other is a polynomial
   if (!PyPolynomial_CHECK(other)) {
     if (PyVariable_CHECK(other)) {
       other = PyPolynomial_FromVariable(other, p1_ctx);
@@ -759,31 +784,56 @@ Polynomial_divmod(PyObject* self, PyObject* other) {
   }
 
   // other can be a variable or a number
-  Polynomial* p2 = (Polynomial*) other;
-  const lp_polynomial_context_t* p2_ctx = lp_polynomial_get_context(p2->p);
+  Polynomial *p2 = (Polynomial *) other;
+  const lp_polynomial_context_t *p2_ctx = lp_polynomial_get_context(p2->p);
   if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
 
-  // Multiply the polynomials
-  lp_polynomial_t* rem = lp_polynomial_new(p1_ctx);
-  lp_polynomial_t* div = lp_polynomial_new(p1_ctx);
-  lp_polynomial_divrem(div, rem, p1->p, p2->p);
+  // Divide the polynomials
+  lp_polynomial_t *rem = lp_polynomial_new(p1_ctx);
+  lp_polynomial_t *div = lp_polynomial_new(p1_ctx);
+  switch (type) {
+    case REM_EXACT:
+      lp_polynomial_divrem(div, rem, p1->p, p2->p);
+      break;
+    case REM_PSEUDO:
+      lp_polynomial_pdivrem(div, rem, p1->p, p2->p);
+      break;
+    case REM_SPARSE_PSEUDO:
+      lp_polynomial_spdivrem(div, rem, p1->p, p2->p);
+      break;
+  }
 
   if (dec_other) {
     Py_DECREF(other);
   }
 
   // Return the result
-  PyObject* pair = PyTuple_New(2);
-  PyObject* divObj = Polynomial_create(div);
-  PyObject* remObj = Polynomial_create(rem);
+  PyObject *pair = PyTuple_New(2);
+  PyObject *divObj = Polynomial_create(div);
+  PyObject *remObj = Polynomial_create(rem);
   Py_INCREF(divObj);
   Py_INCREF(remObj);
   PyTuple_SetItem(pair, 0, divObj);
   PyTuple_SetItem(pair, 1, remObj);
   return pair;
+}
+
+static PyObject*
+Polynomial_divmod(PyObject* self, PyObject* other) {
+  return Polynomial_divmod_general(self, other, REM_EXACT);
+}
+
+static PyObject*
+Polynomial_pdivrem(PyObject* self, PyObject* other) {
+  return Polynomial_divmod_general(self, other, REM_PSEUDO);
+}
+
+static PyObject*
+Polynomial_spdivrem(PyObject* self, PyObject* other) {
+  return Polynomial_divmod_general(self, other, REM_SPARSE_PSEUDO);
 }
 
 static int
@@ -794,15 +844,14 @@ Polynomial_nonzero(PyObject* self) {
   return !lp_polynomial_is_zero(p->p);
 }
 
-enum rem_type {
-  REM_EXACT,
-  REM_PSEUDO,
-  REM_SPARSE_PSEUDO
-};
-
 static PyObject*
 Polynomial_rem_general(PyObject* self, PyObject* args, enum rem_type type) {
   int dec_other = 0;
+
+  if (!PyPolynomial_CHECK(self)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;

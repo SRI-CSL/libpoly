@@ -296,6 +296,22 @@ namespace poly {
                         rhs.get_internal());
     return res;
   }
+  std::pair<Polynomial, Polynomial> p_div_rem(const Polynomial& lhs,
+                                              const Polynomial& rhs) {
+    Polynomial d(detail::context(lhs, rhs));
+    Polynomial r(detail::context(lhs, rhs));
+    lp_polynomial_pdivrem(d.get_internal(), r.get_internal(), lhs.get_internal(),
+                         rhs.get_internal());
+    return {d, r};
+  }
+  std::pair<Polynomial, Polynomial> sp_div_rem(const Polynomial& lhs,
+                                               const Polynomial& rhs) {
+    Polynomial d(detail::context(lhs, rhs));
+    Polynomial r(detail::context(lhs, rhs));
+    lp_polynomial_spdivrem(d.get_internal(), r.get_internal(), lhs.get_internal(),
+                          rhs.get_internal());
+    return {d, r};
+  }
   std::pair<Polynomial, Polynomial> div_rem(const Polynomial& lhs,
                                             const Polynomial& rhs) {
     Polynomial d(detail::context(lhs, rhs));

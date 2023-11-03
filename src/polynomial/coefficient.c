@@ -404,7 +404,7 @@ void coefficient_reductum(const lp_polynomial_context_t* ctx, coefficient_t* R, 
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-  // Locate the first non-zero ceofficient past the top one
+  // Locate the first non-zero coefficient past the top one
   int i = SIZE(C) - 2;
   while (i >= 0 && coefficient_is_zero(ctx, COEFF(C, i))) {
     -- i;
@@ -436,7 +436,7 @@ void coefficient_reductum_m(const lp_polynomial_context_t* ctx, coefficient_t* R
 
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
-  // Locate the first non-zero ceofficient (normal reductum is the next nonzero)
+  // Locate the first non-zero coefficient (normal reductum is the next nonzero)
   int i = SIZE(C) - 1;
   while (i >= 0 && coefficient_sgn(ctx, COEFF(C, i), m) == 0) {
     if (assumptions != 0 && !coefficient_is_constant(COEFF(C, i))) {
@@ -1136,7 +1136,7 @@ int coefficient_cmp_general(const lp_polynomial_context_t* ctx, const coefficien
     }
   }
 
-  TRACE("coefficien::internal", "coefficient_cmp() => %d\n", cmp);
+  TRACE("coefficient::internal", "coefficient_cmp() => %d\n", cmp);
   return cmp;
 }
 
@@ -2109,6 +2109,8 @@ void coefficient_div(const lp_polynomial_context_t* ctx, coefficient_t* D, const
     coefficient_div_constant(ctx, D, &C2->value.num);
     return;
   }
+  // A polynomial does not divide a constant
+  assert(!coefficient_is_constant(C1));
 
   // If different variables
   if (VAR(C1) != VAR(C2)) {
@@ -2275,6 +2277,88 @@ void coefficient_prem(const lp_polynomial_context_t* ctx, coefficient_t* R, cons
   assert(coefficient_is_normalized(ctx, R));
 }
 
+STAT_DECLARE(int, coefficient, pdivrem)
+
+void coefficient_pdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+    TRACE("coefficient", "coefficient_pdivrem()\n");
+    STAT_INCR(coefficient, pdivrem)
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+        tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
+    }
+
+    assert(!coefficient_is_zero(ctx, C2));
+
+    int cmp_type = coefficient_cmp_type(ctx, C1, C2);
+
+    assert(cmp_type >= 0);
+
+    if (cmp_type == 0 && C1->type == COEFFICIENT_NUMERIC) {
+        assert(C2->type == COEFFICIENT_NUMERIC);
+        if (R->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(R);
+            coefficient_construct(ctx, R);
+        }
+        if (D->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(D);
+            coefficient_construct(ctx, D);
+        }
+        integer_div_rem_Z(&D->value.num, &R->value.num, &C1->value.num, &C2->value.num);
+    } else {
+        coefficient_reduce(ctx, C1, C2, 0, D, R, REMAINDERING_PSEUDO_DENSE);
+    }
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("coefficient_spdivrem() => \n");
+        tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
+        tracef("R = "); coefficient_print(ctx, R, trace_out); tracef("\n");
+    }
+
+    assert(coefficient_is_normalized(ctx, D));
+    assert(coefficient_is_normalized(ctx, R));
+}
+
+STAT_DECLARE(int, coefficient, spdivrem)
+
+void coefficient_spdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2) {
+    TRACE("coefficient", "coefficient_spdivrem()\n");
+    STAT_INCR(coefficient, spdivrem)
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("C1 = "); coefficient_print(ctx, C1, trace_out); tracef("\n");
+        tracef("C2 = "); coefficient_print(ctx, C2, trace_out); tracef("\n");
+    }
+
+    assert(!coefficient_is_zero(ctx, C2));
+
+    int cmp_type = coefficient_cmp_type(ctx, C1, C2);
+
+    assert(cmp_type >= 0);
+
+    if (cmp_type == 0 && C1->type == COEFFICIENT_NUMERIC) {
+        assert(C2->type == COEFFICIENT_NUMERIC);
+        if (R->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(R);
+            coefficient_construct(ctx, R);
+        }
+        if (D->type == COEFFICIENT_POLYNOMIAL) {
+            coefficient_destruct(D);
+            coefficient_construct(ctx, D);
+        }
+        integer_div_rem_Z(&D->value.num, &R->value.num, &C1->value.num, &C2->value.num);
+    } else {
+        coefficient_reduce(ctx, C1, C2, 0, D, R, REMAINDERING_PSEUDO_SPARSE);
+    }
+
+    if (trace_is_enabled("coefficient")) {
+        tracef("coefficient_spdivrem() => \n");
+        tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
+        tracef("R = "); coefficient_print(ctx, R, trace_out); tracef("\n");
+    }
+
+    assert(coefficient_is_normalized(ctx, R));
+}
 
 STAT_DECLARE(int, coefficient, divrem)
 
@@ -2301,7 +2385,11 @@ void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, co
         coefficient_destruct(R);
         coefficient_construct(ctx, R);
       }
-      integer_rem_Z(&R->value.num, &C1->value.num, &C2->value.num);
+      if (D->type == COEFFICIENT_POLYNOMIAL) {
+        coefficient_destruct(D);
+        coefficient_construct(ctx, D);
+      }
+      integer_div_rem_Z(&D->value.num, &R->value.num, &C1->value.num, &C2->value.num);
       break;
     case COEFFICIENT_POLYNOMIAL:
     {
@@ -2320,7 +2408,7 @@ void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, co
   if (trace_is_enabled("coefficient")) {
     tracef("coefficient_divrem() => \n");
     tracef("D = "); coefficient_print(ctx, D, trace_out); tracef("\n");
-    tracef("D = "); coefficient_print(ctx, R, trace_out); tracef("\n");
+    tracef("R = "); coefficient_print(ctx, R, trace_out); tracef("\n");
   }
 
   assert(coefficient_is_normalized(ctx, R));
@@ -3217,10 +3305,10 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 
       if (trace_is_enabled("coefficient")) {
         tracef("coefficient_evaluate(): filtered roots:\n");
-        size_t i = 0;
-        for (i = 0; i < roots_size; ++ i) {
-          tracef("%zu: ", i);
-          lp_value_print(roots + i, trace_out);
+        size_t j = 0;
+        for (j = 0; j < roots_size; ++ j) {
+          tracef("%zu: ", j);
+          lp_value_print(roots + j, trace_out);
           tracef("\n");
         }
       }

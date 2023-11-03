@@ -261,14 +261,14 @@ void coefficient_add_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, c
 void coefficient_sub_mul(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
- * Reduce the coefficient A in Z[y,x] using B in Z[y,x] so that
+ * Reduce the coefficient A in Z[x,y] using B in Z[x,y] so that
  *
  *   P*A = Q*B + R
  *
  * and
  *
- *   P in Z[y]
- *   Q, R in Z[y,x]
+ *   P in Z[x]
+ *   Q, R in Z[x,y]
  *
  * with
  *
@@ -293,8 +293,14 @@ void coefficient_rem(const lp_polynomial_context_t* ctx, coefficient_t* R, const
 /** Compute the pseudo remainder */
 void coefficient_prem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
+/** Compute a*C1 = D*C2 + R, in the given ring (using pseudo division). */
+void coefficient_pdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
+
 /** Compute the sparse pseudo remainder */
 void coefficient_sprem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
+
+/** Compute a*C1 = D*C2 + R, in the given ring (using sparse pseudo division). */
+void coefficient_spdivrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
 /** Compute C1 = D*C2 + R, in the given ring (assumes division is exact). */
 void coefficient_divrem(const lp_polynomial_context_t* ctx, coefficient_t* D, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
