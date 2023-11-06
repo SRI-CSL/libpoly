@@ -282,7 +282,7 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
 }
 
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
-  if (!coefficient_is_univariate(&A->data)) {
+  if (!(coefficient_is_constant(&A->data) || coefficient_is_univariate(&A->data))) {
     return 0;
   } else {
     return coefficient_to_univariate(A->ctx, &A->data);

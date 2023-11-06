@@ -568,7 +568,6 @@ static const coefficient_t* get_zero() {
 }
 
 const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, size_t d, lp_variable_t x) {
-  __var_unused(ctx);
 
   if (d > coefficient_degree_safe(ctx, C, x)) {
     return get_zero();
@@ -2461,6 +2460,9 @@ const lp_integer_t* coefficient_get_constant(const coefficient_t* C) {
 }
 
 lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
+  if (C->type == COEFFICIENT_NUMERIC) {
+      return lp_upolynomial_construct(ctx->K, 0, &C->value.num);
+  }
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
   lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*SIZE(C));
