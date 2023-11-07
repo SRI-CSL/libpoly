@@ -23,18 +23,18 @@ def main():
     tests = [
         "tests/upolynomial_gcd.py",
         "tests/upolynomial_factor.py",
-         "tests/upolynomial_roots.py",
-         "tests/algebraic_number.py",
-         "tests/variable.py",
-         "tests/polynomial_arithmetic.py",
-         "tests/polynomial_sgn.py",
-         "tests/polynomial_gcd.py",
-         "tests/polynomial_factorization.py",
-         "tests/polynomial_eval.py",
-         "tests/polynomial_roots.py",
-         "tests/polynomial_resultants.py",
-         "tests/polynomial_feasibility.py",
-         "tests/value.py"
+        "tests/upolynomial_roots.py",
+        "tests/algebraic_number.py",
+        "tests/variable.py",
+        "tests/polynomial_arithmetic.py",
+        "tests/polynomial_sgn.py",
+        "tests/polynomial_gcd.py",
+        "tests/polynomial_factorization.py",
+        "tests/polynomial_eval.py",
+        "tests/polynomial_roots.py",
+        "tests/polynomial_resultants.py",
+        "tests/polynomial_feasibility.py",
+        "tests/value.py"
     ]
 
     if args.sympy:
