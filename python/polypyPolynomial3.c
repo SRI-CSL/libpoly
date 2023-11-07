@@ -151,6 +151,9 @@ static PyObject*
 Polynomial_psc(PyObject* self, PyObject* args);
 
 static PyObject*
+Polynomial_srs(PyObject* self, PyObject* args);
+
+static PyObject*
 Polynomial_mgcd(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -199,6 +202,7 @@ PyMethodDef Polynomial_methods[] = {
     {"derivative", (PyCFunction)Polynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
     {"psc", (PyCFunction)Polynomial_psc, METH_VARARGS, "Returns the principal subresultant coefficients of the current and given polynomial"},
+    {"srs", (PyCFunction)Polynomial_srs, METH_VARARGS, "Returns the subresultant regular sub-chain of the current and given polynomial"},
     {"mgcd", (PyCFunction)Polynomial_mgcd, METH_VARARGS, "Returns assumptions that the GCD of two polynomials is of same degree"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
@@ -1023,8 +1027,13 @@ Polynomial_lcm(PyObject* self, PyObject* args) {
   return Polynomial_create(lcm);
 }
 
+enum subres_type {
+  SUBRES_PSC,
+  SUBRES_SRS
+};
+
 static PyObject*
-Polynomial_psc(PyObject* self, PyObject* args) {
+Polynomial_subres(PyObject* self, PyObject* args, enum subres_type type) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
@@ -1053,7 +1062,7 @@ Polynomial_psc(PyObject* self, PyObject* args) {
     }
   }
 
-  // Othe polynomial
+  // Other polynomial
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_get_context(p2->p);
   if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
@@ -1077,21 +1086,30 @@ Polynomial_psc(PyObject* self, PyObject* args) {
   size_t p2_deg = lp_polynomial_degree(p2->p);
   int size = p1_deg > p2_deg ? p2_deg + 1 : p1_deg + 1;
 
-  lp_polynomial_t** psc = malloc(sizeof(lp_polynomial_t*)*size);
+  lp_polynomial_t** S = malloc(sizeof(lp_polynomial_t*)*size);
   int i;
   for (i = 0; i < size; ++ i) {
-    psc[i] = lp_polynomial_new(p1_ctx);
+    S[i] = lp_polynomial_new(p1_ctx);
   }
 
-  // Compute the psc
-  lp_polynomial_psc(psc, p1->p, p2->p);
+  switch (type) {
+    case SUBRES_PSC:
+      // Compute the psc
+      lp_polynomial_psc(S, p1->p, p2->p);
+      break;
+    case SUBRES_SRS:
+      // Compute the srs
+      lp_polynomial_srs(S, p1->p, p2->p);
+      break;
+  }
 
   // Copy the polynomials into a list
   PyObject* list = PyList_New(size);
   for (i = 0; i < size; ++i) {
-    PyObject* p = Polynomial_create(psc[i]);
+    PyObject* p = Polynomial_create(S[i]);
     PyList_SetItem(list, i, p);
   }
+  free(S);
 
   if (dec_other) {
     Py_DECREF(other);
@@ -1099,6 +1117,16 @@ Polynomial_psc(PyObject* self, PyObject* args) {
 
   // Return the result
   return list;
+}
+
+static PyObject*
+Polynomial_psc(PyObject* self, PyObject* args) {
+  return Polynomial_subres(self, args, SUBRES_PSC);
+}
+
+static PyObject*
+Polynomial_srs(PyObject* self, PyObject* args) {
+  return Polynomial_subres(self, args, SUBRES_SRS);
 }
 
 static PyObject*
@@ -1208,7 +1236,7 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
     }
   }
 
-  // Othe polynomial
+  // Other polynomial
   Polynomial* p2 = (Polynomial*) other;
   const lp_polynomial_context_t* p2_ctx = lp_polynomial_get_context(p2->p);
   if (!lp_polynomial_context_equal(p1_ctx, p2_ctx)) {
@@ -1240,7 +1268,6 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
   // Return the result
   return Polynomial_create(resultant);
 }
-
 
 static PyObject*
 Polynomial_extended_gcd(PyObject* self, PyObject* args) {

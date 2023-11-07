@@ -273,11 +273,18 @@ void lp_polynomial_pp_cont(lp_polynomial_t* pp, lp_polynomial_t* cont, const lp_
 void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
- * Compute the principal subresultant coefficients (psc) of A1 and A1. Bot A1
+ * Compute the principal subresultant coefficients (psc) of A1 and A2. Both A1
  * and A2 must be (non-trivial) polynomials over the same variable. If
- *  deg(A1) = m, deg(A2) = n, and output will be of size min(m, n).
+ * deg(A1) = m, deg(A2) = n, and output will be of size min(m, n)+1.
  */
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
+/**
+ * Compute the subresultant regular sub-chain (srs) of A1 and A2. Bot A1
+ * and A2 must be (non-trivial) polynomials over the same variable. If
+ * deg(A1) = m, deg(A2) = n, and output will be of size min(m, n)+1.
+ */
+void lp_polynomial_srs(lp_polynomial_t** srs, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
  * Compute the model-based GCD of the two polynomials. Adds the assumptions to
