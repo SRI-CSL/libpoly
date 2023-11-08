@@ -2076,7 +2076,11 @@ void coefficient_div_constant(const lp_polynomial_context_t* ctx, coefficient_t*
   size_t i ;
 
   if (C->type == COEFFICIENT_NUMERIC) {
-    integer_div_Z(&C->value.num, &C->value.num, A);
+    if (ctx->K == lp_Z) {
+      integer_div_Z(&C->value.num, &C->value.num, A);
+    } else {
+      integer_div_exact(ctx->K, &C->value.num, &C->value.num, A);
+    }
   } else {
     for (i = 0; i < SIZE(C); ++ i) {
       coefficient_div_constant(ctx, COEFF(C, i), A);
