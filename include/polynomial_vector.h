@@ -28,8 +28,11 @@ extern "C" {
 /** Allocate and construct a new vector */
 lp_polynomial_vector_t* lp_polynomial_vector_new(const lp_polynomial_context_t* ctx);
 
-/* Delete the vector */
+/** Delete the vector */
 void lp_polynomial_vector_delete(lp_polynomial_vector_t* v);
+
+/** Swap two vectors */
+void lp_polynomial_vector_swap(lp_polynomial_vector_t *v1, lp_polynomial_vector_t *v2);
 
 /** Add to back (makes a copy, should be in the context of the vector) */
 void lp_polynomial_vector_push_back(lp_polynomial_vector_t* v, const lp_polynomial_t* p);

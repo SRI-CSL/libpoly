@@ -52,6 +52,10 @@ void lp_polynomial_vector_destruct(lp_polynomial_vector_t* v) {
   lp_polynomial_context_detach((lp_polynomial_context_t*)v->ctx);
 }
 
+void lp_polynomial_vector_swap(lp_polynomial_vector_t *v1, lp_polynomial_vector_t *v2) {
+    lp_polynomial_vector_t tmp = *v1; *v1 = *v2; *v2 = tmp;
+}
+
 static inline
 void lp_polynomial_vector_check_size_for_add(lp_polynomial_vector_t* v) {
   if (v->size == v->capacity) {
