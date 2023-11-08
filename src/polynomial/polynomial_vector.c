@@ -19,6 +19,7 @@
 
 #include "polynomial_vector.h"
 #include "polynomial.h"
+#include "output.h"
 
 #include "polynomial/gcd.h"
 
@@ -73,7 +74,7 @@ void lp_polynomial_vector_push_back_coeff(lp_polynomial_vector_t* v, const coeff
 }
 
 void lp_polynomial_vector_reset(lp_polynomial_vector_t* v) {
-  size_t i = 0;
+  size_t i;
   for (i = 0; i < v->size; ++ i) {
     coefficient_destruct(v->data + i);
   }
@@ -86,6 +87,17 @@ size_t lp_polynomial_vector_size(const lp_polynomial_vector_t* v) {
 
 lp_polynomial_t* lp_polynomial_vector_at(const lp_polynomial_vector_t* v, size_t i) {
   return lp_polynomial_new_from_coefficient(v->ctx, v->data + i);
+}
+
+void lp_polynomial_vector_print(const lp_polynomial_vector_t* v, FILE* out) {
+    fputc('[', out);
+    size_t i;
+    for (i = 0; i < v->size; ++ i) {
+        coefficient_print(v->ctx, v->data + i, out);
+        if (i != v->size)
+            fputc(',', out);
+    }
+    fputc(']', out);
 }
 
 void lp_polynomial_vector_push_back_coeff_prime(lp_polynomial_vector_t* v, const coefficient_t* C) {
