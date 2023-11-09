@@ -90,6 +90,28 @@ int lp_polynomial_hash_set_search(lp_polynomial_t** data, size_t mask, const lp_
   return 0;
 }
 
+#define SWAP(A, B) ({lp_polynomial_t *tmp = A; A = B; B = tmp;})
+
+static
+int lp_polynomial_hash_set_search_and_remove(lp_polynomial_t** data, size_t mask, const lp_polynomial_t* p) {
+  size_t i = lp_polynomial_hash(p) & mask;
+  for (;;) {
+    if (data[i] == 0) return 0;
+    if (lp_polynomial_eq(data[i], p)) break;
+    i ++;
+    i &= mask;
+  }
+  lp_polynomial_delete(data[i]);
+  data[i] = 0;
+  for (;;) {
+    size_t j = (i + 1) & mask;
+    if (data[j] == 0 || (lp_polynomial_hash(data[j]) & mask) == j) break;
+    SWAP(data[i], data[j]);
+    i = j;
+  }
+  return 1;
+}
+
 /** Double the size of the set. */
 static
 void lp_polynomial_hash_set_extend(lp_polynomial_hash_set_t* set) {
@@ -132,6 +154,18 @@ int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polyno
     if (set->size > set->resize_threshold) {
       lp_polynomial_hash_set_extend(set);
     }
+  }
+
+  return result;
+}
+
+int lp_polynomial_hash_set_remove(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p) {
+  assert(p);
+  assert(!set->closed);
+
+  int result = lp_polynomial_hash_set_search_and_remove(set->data, set->data_size-1, p);
+  if (result) {
+    set->size --;
   }
 
   return result;
