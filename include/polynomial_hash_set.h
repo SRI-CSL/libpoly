@@ -32,7 +32,7 @@ struct lp_polynomial_hash_set_struct {
   size_t data_size;
   /** Number of set elements */
   size_t size;
-  /** Treshold for resize */
+  /** Threshold for resize */
   size_t resize_threshold;
   /** Has the set been closed */
   int closed;
