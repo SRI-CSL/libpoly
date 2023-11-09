@@ -33,6 +33,19 @@ lp_polynomial_vector_t* lp_polynomial_vector_new(const lp_polynomial_context_t* 
   return result;
 }
 
+lp_polynomial_vector_t* lp_polynomial_vector_copy(const lp_polynomial_vector_t *v) {
+  lp_polynomial_vector_t* result = (lp_polynomial_vector_t*) malloc(sizeof(lp_polynomial_vector_t));
+  // copy all fields
+  *result = *v;
+  // deep copy of data
+  result->data = (coefficient_t*) malloc(v->capacity * sizeof(coefficient_t));
+  for (size_t i = 0; i < v->size; ++i) {
+    coefficient_construct_copy(result->ctx, result->data + i, v->data + i);
+  }
+  lp_polynomial_context_attach((lp_polynomial_context_t*)result->ctx);
+  return result;
+}
+
 void lp_polynomial_vector_delete(lp_polynomial_vector_t* v) {
   lp_polynomial_vector_destruct(v);
   free(v);

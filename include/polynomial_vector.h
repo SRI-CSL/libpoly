@@ -28,6 +28,9 @@ extern "C" {
 /** Allocate and construct a new vector */
 lp_polynomial_vector_t* lp_polynomial_vector_new(const lp_polynomial_context_t* ctx);
 
+/** Allocate and construct a new vector, copies all elements from v */
+lp_polynomial_vector_t* lp_polynomial_vector_copy(const lp_polynomial_vector_t *v);
+
 /** Delete the vector */
 void lp_polynomial_vector_delete(lp_polynomial_vector_t* v);
 
