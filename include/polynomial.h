@@ -145,9 +145,11 @@ int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m);
 /** Returns the interval approximation of the polynomial value */
 void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_assignment_t* m, lp_interval_t* result);
 
-/** returns the sign of the polynomial in the model */
+/** returns the value of the polynomial in the model */
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);
 
+/** returns the integer value of a polynomial. Assignment m must only assign integer values */
+void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t *out);
 
 /**
  * Compare the two polynomials in the ring. Not necessarily +/- 1, could be

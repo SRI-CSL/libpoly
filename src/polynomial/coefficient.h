@@ -351,6 +351,12 @@ void coefficient_order_and_add_monomial(const lp_polynomial_context_t* ctx, lp_m
 void coefficient_add_monomial(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_monomial_t* m);
 
 /**
+ * Substitute and evaluate any integer value. M must assign to integer only.
+ * Can handle ctx->K != lp_Z.
+ */
+void coefficient_evaluate_integer(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, lp_integer_t *out);
+
+/**
  * Substitute and evaluate any rational values. The result C_out = multiplier*M(C) with the multiplier
  * being > 0.
  */

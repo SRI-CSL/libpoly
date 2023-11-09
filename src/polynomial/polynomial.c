@@ -319,6 +319,16 @@ lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment
   return coefficient_evaluate(A->ctx, &A->data, m);
 }
 
+void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t *value) {
+  lp_polynomial_external_clean(A);
+
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, m, lp_variable_null);
+  }
+
+  coefficient_evaluate_integer(A->ctx, &A->data, m, value);
+}
+
 int lp_polynomial_cmp(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
 
   if (trace_is_enabled("polynomial")) {

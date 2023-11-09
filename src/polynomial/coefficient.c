@@ -2652,6 +2652,40 @@ coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C
   }
 }
 
+void coefficient_evaluate_integer(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, lp_integer_t *out) {
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    // Just a number, we're done
+    integer_assign(ctx->K, out, &C->value.num);
+  } else {
+    assert(C->type == COEFFICIENT_POLYNOMIAL);
+
+    // Get the variable and it's value, must be integer
+    const lp_value_t* x_value = lp_assignment_get_value(M, VAR(C));
+    assert(x_value->type == LP_VALUE_INTEGER);
+
+    // The degree of the polynomial
+    size_t size = SIZE(C);
+
+    // keep track of current variable's value
+    lp_integer_t tmp, val;
+    lp_integer_construct(&tmp);
+    lp_integer_construct_from_int(ctx->K, &val, 1);
+    // out is constructed but may have any value
+    lp_integer_assign_int(ctx->K, out, 0);
+    for (size_t i = 0; i < size; ++ i) {
+      // sum up each coefficient's value
+      coefficient_evaluate_integer(ctx, COEFF(C, i), M, &tmp);
+      lp_integer_add_mul(ctx->K, out, &tmp, &val);
+      if (i < size - 1) { // saves unnecessary final multiplication
+        lp_integer_mul(ctx->K, &val, &val, &x_value->value.z);
+      }
+    }
+    lp_integer_destruct(&tmp);
+    lp_integer_destruct(&val);
+  }
+}
+
 void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, coefficient_t* C_out, lp_integer_t* multiplier) {
 
   assert(multiplier);
@@ -2660,7 +2694,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
   size_t i;
   lp_variable_t x;
 
-  // Start wit multiplier 1
+  // Start with multiplier 1
   integer_assign_int(lp_Z, multiplier, 1);
 
   if (C->type == COEFFICIENT_NUMERIC) {
