@@ -46,6 +46,9 @@ size_t lp_polynomial_vector_size(const lp_polynomial_vector_t* v);
 /** Returns the polynomial at i (newly constructed each time) */
 lp_polynomial_t* lp_polynomial_vector_at(const lp_polynomial_vector_t* v, size_t i);
 
+/** Returns the context of the polynomial vector */
+const lp_polynomial_context_t* lp_polynomial_vector_get_context(const lp_polynomial_vector_t *v);
+
 /** Prints the polynomial vector to the given stream. */
 void lp_polynomial_vector_print(const lp_polynomial_vector_t* v, FILE* out);
 

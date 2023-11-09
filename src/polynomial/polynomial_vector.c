@@ -52,6 +52,10 @@ void lp_polynomial_vector_destruct(lp_polynomial_vector_t* v) {
   lp_polynomial_context_detach((lp_polynomial_context_t*)v->ctx);
 }
 
+const lp_polynomial_context_t* lp_polynomial_vector_get_context(const lp_polynomial_vector_t *v) {
+    return v->ctx;
+}
+
 void lp_polynomial_vector_swap(lp_polynomial_vector_t *v1, lp_polynomial_vector_t *v2) {
     lp_polynomial_vector_t tmp = *v1; *v1 = *v2; *v2 = tmp;
 }
