@@ -30,6 +30,17 @@
 /** Resize threshold: the size is doubled when nelems >= size * RESIZE_RATIO */
 #define LP_POLYNOMIAL_HASH_SET_RESIZE_RATIO 0.7
 
+lp_polynomial_hash_set_t* lp_polynomial_hash_set_new(void) {
+  lp_polynomial_hash_set_t *set = malloc(sizeof(lp_polynomial_hash_set_t));
+  lp_polynomial_hash_set_construct(set);
+  return set;
+}
+
+void lp_polynomial_hash_set_delete(lp_polynomial_hash_set_t* set) {
+  lp_polynomial_hash_set_destruct(set);
+  free(set);
+}
+
 void lp_polynomial_hash_set_construct(lp_polynomial_hash_set_t* set) {
   set->data = malloc(LP_POLYNOMIAL_HASH_SET_DEFAULT_SIZE*sizeof(lp_polynomial_t*));
   memset(set->data, 0, LP_POLYNOMIAL_HASH_SET_DEFAULT_SIZE*sizeof(lp_polynomial_t*));

@@ -38,6 +38,12 @@ struct lp_polynomial_hash_set_struct {
   int closed;
 };
 
+/** Allocate and construct a new hash set */
+lp_polynomial_hash_set_t* lp_polynomial_hash_set_new(void);
+
+/** Destructs and deletes the hash set */
+void lp_polynomial_hash_set_delete(lp_polynomial_hash_set_t* set);
+
 /** Construct a new set */
 void lp_polynomial_hash_set_construct(lp_polynomial_hash_set_t* set);
 
