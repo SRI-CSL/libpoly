@@ -19,6 +19,7 @@
 
 #include <polynomial_hash_set.h>
 #include <polynomial.h>
+#include <polynomial_vector.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -68,7 +69,19 @@ int lp_polynomial_hash_set_is_empty(lp_polynomial_hash_set_t* set) {
 }
 
 static
-void lp_polynomial_hash_set_insert_move(lp_polynomial_t** data, size_t mask, lp_polynomial_t* p) {
+int lp_polynomial_hash_set_insert_move(lp_polynomial_t** data, size_t mask, lp_polynomial_t* p) {
+  size_t i = lp_polynomial_hash(p) & mask;
+  while (data[i] != 0) {
+    if (lp_polynomial_eq(data[i], p)) { return 0; }
+    i ++;
+    i &= mask;
+  }
+  data[i] = p;
+  return 1;
+}
+
+static
+void lp_polynomial_hash_set_insert_move_no_check(lp_polynomial_t** data, size_t mask, lp_polynomial_t* p) {
   size_t i = lp_polynomial_hash(p) & mask;
   while (data[i] != 0) {
     i ++;
@@ -138,7 +151,7 @@ void lp_polynomial_hash_set_extend(lp_polynomial_hash_set_t* set) {
   for (i = 0; i < old_data_size; ++ i) {
     lp_polynomial_t* p = set->data[i];
     if (p != 0) {
-      lp_polynomial_hash_set_insert_move(new_data, mask, p);
+      lp_polynomial_hash_set_insert_move_no_check(new_data, mask, p);
     }
   }
 
@@ -168,6 +181,29 @@ int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polyno
   }
 
   return result;
+}
+
+int lp_polynomial_hash_set_insert_vector(lp_polynomial_hash_set_t* set, const lp_polynomial_vector_t* v) {
+  assert(v);
+  assert(set->data_size > set->size);
+  assert(!set->closed);
+
+  int inserted = 0;
+  size_t size = lp_polynomial_vector_size(v);
+  for (size_t i = 0; i < size; ++i) {
+    lp_polynomial_t *p = lp_polynomial_vector_at(v, i);
+    int result = lp_polynomial_hash_set_insert_move(set->data, set->data_size - 1, p);
+    if (result) {
+      inserted ++;
+      set->size ++;
+      if (set->size > set->resize_threshold) {
+        lp_polynomial_hash_set_extend(set);
+      }
+    } else {
+      lp_polynomial_delete(p);
+    }
+  }
+  return inserted;
 }
 
 int lp_polynomial_hash_set_remove(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p) {

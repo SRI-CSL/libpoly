@@ -59,6 +59,9 @@ int lp_polynomial_hash_set_contains(lp_polynomial_hash_set_t* set, const lp_poly
 /** Add polynomial p to set. Returns true if p was added (not already in the set).  */
 int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
+/** Add all polynomials from the vector to the hash map. Returns the number of inserted polynomials */
+int lp_polynomial_hash_set_insert_vector(lp_polynomial_hash_set_t* set, const lp_polynomial_vector_t* v);
+
 /** Add polynomial p to set. Returns true if p was removed (was in the set).  */
 int lp_polynomial_hash_set_remove(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
