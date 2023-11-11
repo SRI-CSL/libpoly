@@ -19,6 +19,7 @@
 
 #include <polynomial_heap.h>
 #include <polynomial.h>
+#include <polynomial_vector.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +27,17 @@
 
 /** Default initial size (must be a power of 2) */
 #define LP_POLYNOMIAL_HEAP_DEFAULT_SIZE 32
+
+lp_polynomial_heap_t* lp_polynomial_heap_new(lp_polynomial_heap_compare_f cmp) {
+  lp_polynomial_heap_t *heap = malloc(sizeof(lp_polynomial_heap_t));
+  lp_polynomial_heap_construct(heap, cmp);
+  return heap;
+}
+
+void lp_polynomial_heap_delete(lp_polynomial_heap_t* heap) {
+  lp_polynomial_heap_destruct(heap);
+  free(heap);
+}
 
 void lp_polynomial_heap_construct(lp_polynomial_heap_t *heap, lp_polynomial_heap_compare_f cmp) {
   heap->data = malloc(LP_POLYNOMIAL_HEAP_DEFAULT_SIZE * sizeof(lp_polynomial_t*));
@@ -71,8 +83,9 @@ void lp_polynomial_heap_heapify_up(lp_polynomial_heap_t *heap) {
 }
 
 static
-void lp_polynomial_heap_heapify_down(lp_polynomial_heap_t *heap) {
-  size_t pos = 1;
+void lp_polynomial_heap_heapify_down(lp_polynomial_heap_t *heap, size_t pos) {
+  // we're using a 1-based index to enable heap index calculation
+  ++ pos;
   // while there is still at least a left child
   while (2 * pos <= heap->size) {
     size_t
@@ -91,22 +104,27 @@ void lp_polynomial_heap_heapify_down(lp_polynomial_heap_t *heap) {
   }
 }
 
-void lp_polynomial_heap_push(lp_polynomial_heap_t* heap, const lp_polynomial_t* p) {
+/** inserts a polynomial, does not copy the polynomial */
+static
+void lp_polynomial_heap_insert(lp_polynomial_heap_t* heap, lp_polynomial_t* p) {
   heap->size++;
   if (heap->size > heap->data_size) {
     lp_polynomial_heap_extend(heap);
   }
-  heap->data[heap->size - 1] = lp_polynomial_new_copy(p);
+  heap->data[heap->size - 1] = p;
   lp_polynomial_heap_heapify_up(heap);
 }
 
-const lp_polynomial_t* lp_polynomial_heap_peek(lp_polynomial_heap_t* heap) {
-  // empty heap does not have a top
-  if (heap->size == 0) {
-    return NULL;
+void lp_polynomial_heap_push(lp_polynomial_heap_t* heap, const lp_polynomial_t* p) {
+  lp_polynomial_heap_insert(heap, lp_polynomial_new_copy(p));
+}
+
+void lp_polynomial_heap_push_vector(lp_polynomial_heap_t* heap, const lp_polynomial_vector_t* v) {
+  size_t size = lp_polynomial_vector_size(v);
+  for (size_t i = 0; i < size; ++i) {
+    // lp_polynomial_vector_at gives a fresh copied polynomial, we reuse it
+    lp_polynomial_heap_insert(heap, lp_polynomial_vector_at(v, i));
   }
-  // return the top element
-  return heap->data[0];
 }
 
 lp_polynomial_t* lp_polynomial_heap_pop(lp_polynomial_heap_t* heap) {
@@ -119,9 +137,30 @@ lp_polynomial_t* lp_polynomial_heap_pop(lp_polynomial_heap_t* heap) {
   // reduce size and moves last element to top
   heap->data[0] = heap->data[--heap->size];
   // restore heap condition
-  lp_polynomial_heap_heapify_down(heap);
+  lp_polynomial_heap_heapify_down(heap, 0);
 
   return ret;
+}
+
+int lp_polynomial_heap_remove(lp_polynomial_heap_t* heap, const lp_polynomial_t *p){
+  int result = 0;
+  for (size_t i = 0; i < heap->size; ++i) {
+    if (lp_polynomial_eq(p, heap->data[i])) {
+      heap->data[i] = heap->data[--heap->size];
+      lp_polynomial_heap_heapify_down(heap, i);
+      result++;
+    }
+  }
+  return result;
+}
+
+const lp_polynomial_t* lp_polynomial_heap_peek(lp_polynomial_heap_t* heap) {
+  // empty heap does not have a top
+  if (heap->size == 0) {
+    return NULL;
+  }
+  // return the top element
+  return heap->data[0];
 }
 
 void lp_polynomial_heap_clear(lp_polynomial_heap_t* heap) {

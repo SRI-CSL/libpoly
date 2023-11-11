@@ -38,6 +38,12 @@ struct lp_polynomial_heap_struct {
     lp_polynomial_heap_compare_f cmp;
 };
 
+/** Allocates a new heap and constructs it */
+lp_polynomial_heap_t* lp_polynomial_heap_new(lp_polynomial_heap_compare_f cmp);
+
+/** Destructs a heap and frees the memory */
+void lp_polynomial_heap_delete(lp_polynomial_heap_t* heap);
+
 /** Construct a new heap */
 void lp_polynomial_heap_construct(lp_polynomial_heap_t* heap, lp_polynomial_heap_compare_f cmp);
 
@@ -50,8 +56,17 @@ int lp_polynomial_heap_is_empty(lp_polynomial_heap_t* heap);
 /** Add polynomial p to heap.  */
 void lp_polynomial_heap_push(lp_polynomial_heap_t* heap, const lp_polynomial_t* p);
 
+/** Add all polynomials from the vector to the heap */
+void lp_polynomial_heap_push_vector(lp_polynomial_heap_t* heap, const lp_polynomial_vector_t* v);
+
 /** Removes and returns the top element of the heap, returns NULL if the heap is empty  */
 lp_polynomial_t* lp_polynomial_heap_pop(lp_polynomial_heap_t* heap);
+
+/** Removes an element from the heap. Returns number of removed polynomials. */
+int lp_polynomial_heap_remove(lp_polynomial_heap_t* heap, const lp_polynomial_t *p);
+
+/** Returns the top element without removing it. */
+const lp_polynomial_t* lp_polynomial_heap_peek(lp_polynomial_heap_t* heap);
 
 /** Clear the heap. */
 void lp_polynomial_heap_clear(lp_polynomial_heap_t* heap);
