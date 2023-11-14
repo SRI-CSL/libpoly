@@ -45,6 +45,18 @@ void lp_variable_order_detach(lp_variable_order_t* var_order);
   */
 int lp_variable_order_cmp(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y);
 
+/** returns the bigger of the two variables wrt. the order */
+static inline
+lp_variable_t lp_variable_order_max(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y) {
+  return lp_variable_order_cmp(var_order, x, y) < 0 ? x : y;
+}
+
+/** returns the smaller of the two variables wrt. the order */
+static inline
+lp_variable_t lp_variable_order_min(const lp_variable_order_t* var_order, lp_variable_t x, lp_variable_t y) {
+  return lp_variable_order_cmp(var_order, x, y) > 0 ? x : y;
+}
+
 /** Get the size of the order */
 size_t lp_variable_order_size(const lp_variable_order_t* var_order);
 
