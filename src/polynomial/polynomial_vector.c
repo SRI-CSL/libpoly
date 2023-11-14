@@ -88,6 +88,15 @@ void lp_polynomial_vector_push_back(lp_polynomial_vector_t* v, const lp_polynomi
   v->size ++;
 }
 
+void lp_polynomial_vector_push_back_move(lp_polynomial_vector_t* v, lp_polynomial_t* p) {
+  assert(lp_polynomial_context_equal(v->ctx, p->ctx));
+  lp_polynomial_vector_check_size_for_add(v);
+  coefficient_t *v_p = v->data + v->size;
+  coefficient_construct_from_int(v->ctx, v_p, 0);
+  coefficient_swap(&p->data, v_p);
+  v->size ++;
+}
+
 void lp_polynomial_vector_push_back_coeff(lp_polynomial_vector_t* v, const coefficient_t* C) {
   lp_polynomial_vector_check_size_for_add(v);
   coefficient_construct_copy(v->ctx, v->data + v->size, C);

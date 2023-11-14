@@ -40,6 +40,10 @@ void lp_polynomial_vector_swap(lp_polynomial_vector_t *v1, lp_polynomial_vector_
 /** Add to back (makes a copy, should be in the context of the vector) */
 void lp_polynomial_vector_push_back(lp_polynomial_vector_t* v, const lp_polynomial_t* p);
 
+/** Add to back by move. More efficient than copying, p becomes a (constructed) zero-polynomial
+ *  and must be in the context of the vector. */
+void lp_polynomial_vector_push_back_move(lp_polynomial_vector_t* v, lp_polynomial_t* p);
+
 /** Reset the vector to 0 elements */
 void lp_polynomial_vector_reset(lp_polynomial_vector_t* v);
 
