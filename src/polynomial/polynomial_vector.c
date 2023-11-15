@@ -124,7 +124,7 @@ void lp_polynomial_vector_print(const lp_polynomial_vector_t* v, FILE* out) {
     size_t i;
     for (i = 0; i < v->size; ++ i) {
         coefficient_print(v->ctx, v->data + i, out);
-        if (i != v->size)
+        if (i != v->size - 1)
             fputc(',', out);
     }
     fputc(']', out);
