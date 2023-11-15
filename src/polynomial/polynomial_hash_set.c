@@ -69,7 +69,7 @@ int lp_polynomial_hash_set_is_empty(lp_polynomial_hash_set_t* set) {
 }
 
 static
-int lp_polynomial_hash_set_insert_move(lp_polynomial_t** data, size_t mask, lp_polynomial_t* p) {
+int lp_polynomial_hash_set_insert_move_check(lp_polynomial_t** data, size_t mask, lp_polynomial_t* p) {
   size_t i = lp_polynomial_hash(p) & mask;
   while (data[i] != 0) {
     if (lp_polynomial_eq(data[i], p)) { return 0; }
@@ -99,6 +99,19 @@ int lp_polynomial_hash_set_insert_copy(lp_polynomial_t** data, size_t mask, cons
     i &= mask;
   }
   data[i] = lp_polynomial_new_copy(p);
+  return 1;
+}
+
+static
+int lp_polynomial_hash_set_insert_swap(lp_polynomial_t** data, size_t mask, lp_polynomial_t* p) {
+  size_t i = lp_polynomial_hash(p) & mask;
+  while (data[i] != 0) {
+    if (lp_polynomial_eq(data[i], p)) { return 0; }
+    i ++;
+    i &= mask;
+  }
+  data[i] = lp_polynomial_new(lp_polynomial_get_context(p));
+  lp_polynomial_swap(data[i], p);
   return 1;
 }
 
@@ -183,6 +196,22 @@ int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polyno
   return result;
 }
 
+int lp_polynomial_hash_set_insert_move(lp_polynomial_hash_set_t* set, lp_polynomial_t* p) {
+  assert(p);
+  assert(set->data_size > set->size);
+  assert(!set->closed);
+
+  int result = lp_polynomial_hash_set_insert_swap(set->data, set->data_size-1, p);
+  if (result) {
+    set->size ++;
+    if (set->size > set->resize_threshold) {
+      lp_polynomial_hash_set_extend(set);
+    }
+  }
+
+  return result;
+}
+
 int lp_polynomial_hash_set_insert_vector(lp_polynomial_hash_set_t* set, const lp_polynomial_vector_t* v) {
   assert(v);
   assert(set->data_size > set->size);
@@ -192,7 +221,7 @@ int lp_polynomial_hash_set_insert_vector(lp_polynomial_hash_set_t* set, const lp
   size_t size = lp_polynomial_vector_size(v);
   for (size_t i = 0; i < size; ++i) {
     lp_polynomial_t *p = lp_polynomial_vector_at(v, i);
-    int result = lp_polynomial_hash_set_insert_move(set->data, set->data_size - 1, p);
+    int result = lp_polynomial_hash_set_insert_move_check(set->data, set->data_size - 1, p);
     if (result) {
       inserted ++;
       set->size ++;

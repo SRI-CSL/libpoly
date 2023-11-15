@@ -56,13 +56,17 @@ int lp_polynomial_hash_set_is_empty(lp_polynomial_hash_set_t* set);
 /** Check whether p is in set. The set must not be closed). */
 int lp_polynomial_hash_set_contains(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
-/** Add polynomial p to set. Returns true if p was added (not already in the set).  */
+/** Add polynomial p to the set. Returns true if p was added (not already in the set). */
 int lp_polynomial_hash_set_insert(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
+
+/** Add polynomial p to the set. Returns true if p was added (not already in the set) and p becomes a 0 polynomial.
+ *  Returns false if p was found in the set and p remained unchanged. */
+int lp_polynomial_hash_set_insert_move(lp_polynomial_hash_set_t* set, lp_polynomial_t* p);
 
 /** Add all polynomials from the vector to the hash map. Returns the number of inserted polynomials */
 int lp_polynomial_hash_set_insert_vector(lp_polynomial_hash_set_t* set, const lp_polynomial_vector_t* v);
 
-/** Add polynomial p to set. Returns true if p was removed (was in the set).  */
+/** Add polynomial p to set. Returns true if p was removed (was in the set). */
 int lp_polynomial_hash_set_remove(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
 /** Close the set: compact the data so that all elements get stored in data[0..size]. No addition after close! */
