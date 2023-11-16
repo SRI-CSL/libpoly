@@ -56,14 +56,18 @@ void lp_polynomial_heap_destruct(lp_polynomial_heap_t* heap) {
   heap->data = NULL;
 }
 
+int lp_polynomial_heap_is_empty(const lp_polynomial_heap_t *heap) {
+    return heap->size == 0;
+}
+
+size_t lp_polynomial_heap_size(const lp_polynomial_heap_t* heap) {
+    return heap->size;
+}
+
 #define SWAP(A,B) ({ lp_polynomial_t *tmp = B; B = A; A = tmp; })
 // macros assume a heap indices 1...size
 #define HEAP_SWAP(heap, i, j) SWAP(heap->data[(i)-1], heap->data[(j)-1])
 #define HEAP_CMP(heap, i, j) (heap->cmp(heap->data[(i)-1], heap->data[(j)-1]))
-
-int lp_polynomial_heap_is_empty(lp_polynomial_heap_t *heap) {
-  return heap->size == 0;
-}
 
 static
 void lp_polynomial_heap_extend(lp_polynomial_heap_t *heap) {
@@ -154,13 +158,20 @@ int lp_polynomial_heap_remove(lp_polynomial_heap_t* heap, const lp_polynomial_t 
   return result;
 }
 
-const lp_polynomial_t* lp_polynomial_heap_peek(lp_polynomial_heap_t* heap) {
+const lp_polynomial_t* lp_polynomial_heap_peek(const lp_polynomial_heap_t* heap) {
   // empty heap does not have a top
   if (heap->size == 0) {
     return NULL;
   }
   // return the top element
   return heap->data[0];
+}
+
+const lp_polynomial_t* lp_polynomial_heap_at(const lp_polynomial_heap_t* heap, size_t n) {
+  if (n >= heap->size) {
+    return NULL;
+  }
+  return heap->data[n];
 }
 
 void lp_polynomial_heap_clear(lp_polynomial_heap_t* heap) {

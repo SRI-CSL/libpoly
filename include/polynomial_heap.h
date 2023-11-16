@@ -51,7 +51,10 @@ void lp_polynomial_heap_construct(lp_polynomial_heap_t* heap, lp_polynomial_heap
 void lp_polynomial_heap_destruct(lp_polynomial_heap_t* heap);
 
 /** Returns true if empty */
-int lp_polynomial_heap_is_empty(lp_polynomial_heap_t* heap);
+int lp_polynomial_heap_is_empty(const lp_polynomial_heap_t* heap);
+
+/** Returns the number of elements */
+size_t lp_polynomial_heap_size(const lp_polynomial_heap_t* heap);
 
 /** Add polynomial p to heap.  */
 void lp_polynomial_heap_push(lp_polynomial_heap_t* heap, const lp_polynomial_t* p);
@@ -66,7 +69,10 @@ lp_polynomial_t* lp_polynomial_heap_pop(lp_polynomial_heap_t* heap);
 int lp_polynomial_heap_remove(lp_polynomial_heap_t* heap, const lp_polynomial_t *p);
 
 /** Returns the top element without removing it. */
-const lp_polynomial_t* lp_polynomial_heap_peek(lp_polynomial_heap_t* heap);
+const lp_polynomial_t* lp_polynomial_heap_peek(const lp_polynomial_heap_t* heap);
+
+/** Returns one element */
+const lp_polynomial_t* lp_polynomial_heap_at(const lp_polynomial_heap_t* heap, size_t n);
 
 /** Clear the heap. */
 void lp_polynomial_heap_clear(lp_polynomial_heap_t* heap);
