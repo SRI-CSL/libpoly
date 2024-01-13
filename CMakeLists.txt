@@ -76,7 +76,9 @@ if(LIBPOLY_BUILD_PYTHON_API)
 
 endif()
 
-# Configure the C++ tests
-enable_testing()
-add_subdirectory(test/polyxx)
+if (BUILD_TESTING)
+  # Configure the C++ tests
+  enable_testing()
+  add_subdirectory(test/polyxx)
+endif()
 
