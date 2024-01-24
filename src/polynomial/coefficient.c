@@ -2486,6 +2486,40 @@ lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, 
   return C_u;
 }
 
+lp_upolynomial_t* coefficient_to_univariate_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {
+  lp_upolynomial_t* C_u;
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    C_u = lp_upolynomial_construct(ctx->K, 0, &C->value.num);
+
+  } else if (lp_assignment_is_set(m, VAR(C))) {
+    lp_integer_t result;
+    lp_integer_construct(&result);
+
+    coefficient_evaluate_integer(ctx, C, m, &result);
+    C_u = lp_upolynomial_construct(ctx->K, 0, &result);
+    lp_integer_destruct(&result);
+
+  } else {
+    lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*SIZE(C));
+
+    size_t i;
+    for (i = 0; i < SIZE(C); ++ i) {
+      lp_integer_construct(coeff + i);
+      coefficient_evaluate_integer(ctx, COEFF(C, i), m, coeff + i);
+    }
+
+    C_u = lp_upolynomial_construct(ctx->K, SIZE(C) - 1, coeff);
+
+    for (i = 0; i < SIZE(C); ++ i) {
+      integer_destruct(coeff + i);
+    }
+    free(coeff);
+  }
+
+  return C_u;
+}
+
 STAT_DECLARE(int, coefficient, resultant)
 
 void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* A, const coefficient_t* B) {
@@ -2668,21 +2702,21 @@ void coefficient_evaluate_integer(const lp_polynomial_context_t* ctx, const coef
     size_t size = SIZE(C);
 
     // keep track of current variable's value
-    lp_integer_t tmp, val;
+    lp_integer_t tmp, exp;
     lp_integer_construct(&tmp);
-    lp_integer_construct_from_int(ctx->K, &val, 1);
+    lp_integer_construct_from_int(ctx->K, &exp, 1);
     // out is constructed but may have any value
     lp_integer_assign_int(ctx->K, out, 0);
     for (size_t i = 0; i < size; ++ i) {
       // sum up each coefficient's value
       coefficient_evaluate_integer(ctx, COEFF(C, i), M, &tmp);
-      lp_integer_add_mul(ctx->K, out, &tmp, &val);
-      if (i < size - 1) { // saves unnecessary final multiplication
-        lp_integer_mul(ctx->K, &val, &val, &x_value->value.z);
+      lp_integer_add_mul(ctx->K, out, &tmp, &exp);
+      if (i < size - 1) { // save unnecessary final multiplication
+        lp_integer_mul(ctx->K, &exp, &exp, &x_value->value.z);
       }
     }
     lp_integer_destruct(&tmp);
-    lp_integer_destruct(&val);
+    lp_integer_destruct(&exp);
   }
 }
 

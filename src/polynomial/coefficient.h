@@ -134,6 +134,9 @@ int coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t*
 /** Returns the univariate version of this coefficient (must be univariate) */
 lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
+/** Returns the univariate version of this coefficient with regard to m. m must evaluate all (sub-)coefficients of C to integer. */
+lp_upolynomial_t* coefficient_to_univariate_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
+
 /** Returns true if the coefficient is a constant */
 int coefficient_is_constant(const coefficient_t* C);
 

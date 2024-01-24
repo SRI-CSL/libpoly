@@ -136,6 +136,12 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
 /** Returns the univariate polynomial (if univariate, or 0 otherwise) */
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A);
 
+/**
+ * Returns the univariate polynomial of A partially evaluated with m.
+ * m must assign all variables in A (but the top variable) to an integer value.
+ */
+lp_upolynomial_t* lp_polynomial_to_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m);
+
 /** Returns true if all of polynomial's variables are assigned */
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m);
 
