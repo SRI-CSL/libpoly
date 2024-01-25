@@ -56,7 +56,7 @@ Variable_str(PyObject* self);
 static PyObject*
 Variable_repr(PyObject* self);
 
-static long
+static Py_hash_t
 Variable_hash(PyObject* self);
 
 static PyObject *
@@ -227,7 +227,7 @@ static PyObject* Variable_repr(PyObject* self) {
   return str;
 }
 
-static long Variable_hash(PyObject* self) {
+static Py_hash_t Variable_hash(PyObject* self) {
   Variable* x = (Variable*) self;
   return x->x;
 }

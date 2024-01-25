@@ -42,7 +42,7 @@ Value_richcompare(PyObject* self, PyObject* other, int op);
 static PyObject*
 Value_str(PyObject* self);
 
-static long
+static Py_hash_t
 Value_hash(PyObject* self);
 
 static PyObject*
@@ -304,10 +304,10 @@ static PyObject* Value_str(PyObject* self) {
   return pystr;
 }
 
-static long
+static Py_hash_t
 Value_hash(PyObject* self) {
   Value* v = (Value*) self;
-  long hash = lp_value_hash(&v->v);
+  Py_hash_t hash = lp_value_hash(&v->v);
   if (hash == -1) {
     // value -1 should not be returned as a normal return value
     hash = 0;
