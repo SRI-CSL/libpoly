@@ -182,7 +182,7 @@ PyMethodDef Polynomial_methods[] = {
     {"coefficients", (PyCFunction)Polynomial_coefficients, METH_NOARGS, "Returns a dictionary from degrees to coefficients"},
     {"reductum", (PyCFunction)Polynomial_reductum, METH_VARARGS, "Returns the reductum of the polynomial"},
     {"sgn", (PyCFunction)Polynomial_sgn, METH_VARARGS, "Returns the sign of the polynomials in the given model"},
-    {"sgn_check", (PyCFunction)Polynomial_sgn_check, METH_VARARGS, "Returns true if the sign of the polynomail respects the sign condition."},
+    {"sgn_check", (PyCFunction)Polynomial_sgn_check, METH_VARARGS, "Returns true if the sign of the polynomial respects the sign condition."},
     {"rem", (PyCFunction)Polynomial_rem, METH_VARARGS, "Returns the remainder of current and given polynomial"},
     {"prem", (PyCFunction)Polynomial_prem, METH_VARARGS, "Returns the pseudo remainder of current and given polynomial"},
     {"sprem", (PyCFunction)Polynomial_sprem, METH_VARARGS, "Returns the sparse pseudo remainder of current and given polynomial"},
