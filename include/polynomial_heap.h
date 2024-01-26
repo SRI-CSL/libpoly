@@ -56,8 +56,11 @@ int lp_polynomial_heap_is_empty(const lp_polynomial_heap_t* heap);
 /** Returns the number of elements */
 size_t lp_polynomial_heap_size(const lp_polynomial_heap_t* heap);
 
-/** Add polynomial p to heap.  */
+/** Add polynomial p to the heap.  */
 void lp_polynomial_heap_push(lp_polynomial_heap_t* heap, const lp_polynomial_t* p);
+
+/** Add polynomial p to the heap. Moves the content of p and p becomes a 0 polynomial. */
+void lp_polynomial_heap_push_move(lp_polynomial_heap_t* heap, lp_polynomial_t* p);
 
 /** Add all polynomials from the vector to the heap */
 void lp_polynomial_heap_push_vector(lp_polynomial_heap_t* heap, const lp_polynomial_vector_t* v);

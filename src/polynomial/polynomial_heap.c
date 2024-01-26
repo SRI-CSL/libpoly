@@ -123,6 +123,12 @@ void lp_polynomial_heap_push(lp_polynomial_heap_t* heap, const lp_polynomial_t* 
   lp_polynomial_heap_insert(heap, lp_polynomial_new_copy(p));
 }
 
+void lp_polynomial_heap_push_move(lp_polynomial_heap_t* heap, lp_polynomial_t* p) {
+  lp_polynomial_t *tmp = lp_polynomial_new(lp_polynomial_get_context(p));
+  lp_polynomial_swap(tmp, p);
+  lp_polynomial_heap_insert(heap, tmp);
+}
+
 void lp_polynomial_heap_push_vector(lp_polynomial_heap_t* heap, const lp_polynomial_vector_t* v) {
   size_t size = lp_polynomial_vector_size(v);
   for (size_t i = 0; i < size; ++i) {
