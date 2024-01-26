@@ -140,6 +140,9 @@ namespace poly {
   bool is_assigned_over_assignment(const Polynomial& p, const Assignment& a) {
     return lp_polynomial_is_assigned(p.get_internal(), a.get_internal());
   }
+  UPolynomial to_univariate(const Polynomial& p, const Assignment& a) {
+    return UPolynomial(lp_polynomial_to_univariate_m(p.get_internal(), a.get_internal()));
+  }
   int sgn(const Polynomial& p, const Assignment& a) {
     return lp_polynomial_sgn(p.get_internal(), a.get_internal());
   }

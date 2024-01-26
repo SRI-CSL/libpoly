@@ -115,6 +115,10 @@ namespace poly {
   /** Check if the given polynomial is completely assigned over a given
    * assignment. */
   bool is_assigned_over_assignment(const Polynomial& p, const Assignment& a);
+  /** Evaluates p over a given assignment and returns an univariate polynomial.
+   * Assumes that a assigns all variable in p but the top variable.
+   * Assumes that a assigns to integer only. */
+  UPolynomial to_univariate(const Polynomial& p, const Assignment& a);
   /** Compute the sign of a polynomial over an assignment. */
   int sgn(const Polynomial& p, const Assignment& a);
   /** Evaluate a polynomial over an assignment. */
