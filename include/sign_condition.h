@@ -53,7 +53,7 @@ typedef enum lp_sign_condition_enum lp_sign_condition_t;
 int lp_sign_condition_consistent(lp_sign_condition_t sgn_condition, int sign);
 
 /**
- * CHeck if the sign condition is consistent with the given interval.
+ * Check if the sign condition is consistent with the given interval.
  */
 int lp_sign_condition_consistent_interval(lp_sign_condition_t sgn_condition, const lp_interval_t* I);
 
@@ -61,6 +61,11 @@ int lp_sign_condition_consistent_interval(lp_sign_condition_t sgn_condition, con
  * Negate the sign condition.
  */
 lp_sign_condition_t lp_sign_condition_negate(lp_sign_condition_t sgn_condition);
+
+/**
+ * Check if the sign condition is valid for a integer ring with a non-zero characteristic.
+ */
+int lp_sign_condition_Zp_valid(lp_sign_condition_t sgn_condition);
 
 /**
  * Print the sign condition.

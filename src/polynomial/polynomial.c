@@ -2067,9 +2067,30 @@ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_conditio
   if (trace_is_enabled("polynomial::check_input")) {
     check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
   }
+  assert(A->ctx->K == lp_Z);
 
   // Evaluate the sign and check
   int p_sign = lp_polynomial_sgn(A, M);
+  return lp_sign_condition_consistent(sgn_condition, p_sign);
+}
+
+int lp_polynomial_constraint_evaluate_Zp(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* m) {
+
+  lp_polynomial_external_clean(A);
+
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, m, lp_polynomial_top_variable(A));
+  }
+  assert(A->ctx->K != lp_Z);
+  assert(lp_sign_condition_Zp_valid(sgn_condition));
+  assert(lp_assignment_is_integer(m));
+
+  // Evaluate the sign and check
+  lp_integer_t value;
+  lp_integer_construct(&value);
+  lp_polynomial_evaluate_integer(A, m, &value);
+  int p_sign = !lp_integer_is_zero(A->ctx->K, &value);
+  lp_integer_destruct(&value);
   return lp_sign_condition_consistent(sgn_condition, p_sign);
 }
 

@@ -128,9 +128,30 @@ void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, l
 }
 
 int lp_assignment_is_set(const lp_assignment_t* m, lp_variable_t x) {
-    if (x >= m->size)
-        return 0;
-    return (m->values + x)->type != LP_VALUE_NONE;
+  if (x >= m->size) {
+    return 0;
+  }
+  return (m->values + x)->type != LP_VALUE_NONE;
+}
+
+int lp_assignment_is_integer(const lp_assignment_t *m) {
+  for (size_t v = 0; v < m->size; v++) {
+    const lp_value_t *val = &m->values[v];
+    if (val->type != LP_VALUE_NONE && val->type != LP_VALUE_INTEGER) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+int lp_assignment_is_empty(const lp_assignment_t *m) {
+  for (size_t v = 0; v < m->size; v++) {
+    const lp_value_t *val = &m->values[v];
+    if (val->type != LP_VALUE_NONE) {
+      return 0;
+    }
+  }
+  return 1;
 }
 
 int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A) {

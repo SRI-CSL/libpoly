@@ -356,6 +356,12 @@ lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomi
 int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
 
 /**
+ * Given a polynomial constraint over an integer ring Zp, evaluate its truth value.
+ * sgn_condition must either be (== 0) or (!= 0) and M must assign to Zp.
+ */
+int lp_polynomial_constraint_evaluate_Zp(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
+
+/**
  * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a root index,
  * a sign condition, and an assignment M that assigns x1, ..., xn, the function
  * returns a subset or R where
