@@ -1902,7 +1902,7 @@ void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C)
         if (coefficient_is_zero(ctx, COEFF(C, j))) {
           coefficient_swap(COEFF(C, i), COEFF(C, j));
         } else {
-          coefficient_mul(ctx, COEFF(C, j), COEFF(C, j), COEFF(C, i));
+          coefficient_add(ctx, COEFF(C, j), COEFF(C, j), COEFF(C, i));
           coefficient_t empty;
           coefficient_construct(ctx, &empty);
           coefficient_swap(COEFF(C, i), &empty);
@@ -1912,7 +1912,7 @@ void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C)
     }
     coefficient_normalize(ctx, C);
   }
-  assert(integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) > 0);
+  assert(integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) >= 0);
   for (size_t i = 0; i < SIZE(C); ++i) {
     coefficient_reduce_Zp(ctx, COEFF(C, i));
   }
