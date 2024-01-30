@@ -143,6 +143,12 @@ int coefficient_is_constant(const coefficient_t* C);
 /** Returns the constant of the polynomial (the actual deep constant) */
 const lp_integer_t* coefficient_get_constant(const coefficient_t* C);
 
+/** Returns true if the coefficient is a monomial */
+int coefficient_is_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C);
+
+/** In case C is a monomial, returns it. */
+void coefficient_to_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_monomial_t *out);
+
 /** The degree of the coefficient */
 size_t coefficient_degree(const coefficient_t* C);
 
@@ -207,7 +213,10 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 /** Returns the sign of the leading coefficient */
 int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
-/** Returns treu if the coefficient is properly ordered according to ctx */
+/** Returns the integer value of the leading coefficient */
+void coefficient_lc_constant(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_integer_t* out);
+
+/** Returns true if the coefficient is properly ordered according to ctx */
 int coefficient_in_order(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /**
@@ -289,6 +298,9 @@ void coefficient_div_constant(const lp_polynomial_context_t* ctx, coefficient_t*
 
 /** Divide the degrees of the main variable of coefficient with the given number */
 void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* C, size_t p);
+
+/** Divides the degree of exponents wrt to the prime field order */
+void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C);
 
 /** Compute R = D*C2 - C1, in the given ring (assumes division is exact). */
 void coefficient_rem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);

@@ -206,6 +206,10 @@ int lp_polynomial_lc_sgn(const lp_polynomial_t* A) {
   return coefficient_lc_sgn(A->ctx, &A->data);
 }
 
+void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out) {
+  lp_polynomial_external_clean(A);
+  coefficient_lc_constant(A->ctx, &A->data, out);
+}
 
 size_t lp_polynomial_degree(const lp_polynomial_t* A) {
   lp_polynomial_external_clean(A);
@@ -291,6 +295,14 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
 
 lp_upolynomial_t* lp_polynomial_to_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m) {
   return coefficient_to_univariate_m(A->ctx, &A->data, m);
+}
+
+int lp_polynomial_is_monomial(const lp_polynomial_t* A) {
+  return coefficient_is_monomial(A->ctx, &A->data);
+}
+
+void lp_polynomial_to_monomial(const lp_polynomial_t* A, lp_monomial_t* out) {
+  coefficient_to_monomial(A->ctx, &A->data, out);
 }
 
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m) {
@@ -2334,3 +2346,18 @@ int lp_polynomial_constraint_resolve_fm(
   return ok;
 }
 
+void lp_polynomial_reduce_degree_Zp(lp_polynomial_t *R, const lp_polynomial_t *A) {
+  lp_polynomial_external_clean(A);
+
+  const lp_polynomial_context_t *ctx = A->ctx;
+
+  if (R == A) {
+    coefficient_reduce_Zp(ctx, &R->data);
+  } else {
+    lp_polynomial_t tmp;
+    lp_polynomial_construct_copy(&tmp, A);
+    coefficient_reduce_Zp(ctx, &tmp.data);
+    lp_polynomial_swap(&tmp, R);
+    lp_polynomial_destruct(&tmp);
+  }
+}

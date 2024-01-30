@@ -103,6 +103,9 @@ int lp_polynomial_lc_is_constant(const lp_polynomial_t* A);
 /** In case lc is constant, this returns the sign */
 int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
 
+/** Returns the constant part of the leading coefficient */
+void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out);
+
 /** Get the context of the given polynomial */
 const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
 
@@ -142,6 +145,12 @@ lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A);
  */
 lp_upolynomial_t* lp_polynomial_to_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m);
 
+/** Returns true if the polynomial is a monomial */
+int lp_polynomial_is_monomial(const lp_polynomial_t* A);
+
+/** Returns A as a monomial. Assumes that A is a monomial */
+void lp_polynomial_to_monomial(const lp_polynomial_t* A, lp_monomial_t* out);
+
 /** Returns true if all of polynomial's variables are assigned */
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m);
 
@@ -155,7 +164,7 @@ void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_as
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);
 
 /** returns the integer value of a polynomial. Assignment m must only assign integer values */
-void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t *out);
+void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t* out);
 
 /**
  * Compare the two polynomials in the ring. Not necessarily +/- 1, could be
@@ -404,7 +413,11 @@ int lp_polynomial_constraint_resolve_fm(
     lp_polynomial_t* R, lp_sign_condition_t* R_sgn,
     lp_polynomial_vector_t* assumptions);
 
-
+/**
+ * Reduces the degree of the polynomials wrt. to the polynomial's int_ring_t K.
+ * E.g. for K = x mod 5, x = x^5 for every value in K
+ */
+void lp_polynomial_reduce_degree_Zp(lp_polynomial_t *R, const lp_polynomial_t *A);
 
 #ifdef __cplusplus
 } /* close extern "C" { */

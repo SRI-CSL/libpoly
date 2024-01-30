@@ -473,6 +473,19 @@ int coefficient_is_constant(const coefficient_t* C) {
   return C->type == COEFFICIENT_NUMERIC;
 }
 
+int coefficient_is_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
+  if (C->type == COEFFICIENT_NUMERIC) {
+    return 1;
+  } else {
+    for (size_t i = 0; i < SIZE(C) - 1; ++i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        return 0;
+      }
+    }
+    return coefficient_is_monomial(ctx, COEFF(C, SIZE(C) - 1));
+  }
+}
+
 size_t coefficient_degree(const coefficient_t* C) {
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -1054,6 +1067,17 @@ int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* 
   return integer_sgn(ctx->K, &C->value.num);
 }
 
+STAT_DECLARE(int, coefficient, lc_constant)
+
+void coefficient_lc_constant(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_integer_t* out) {
+  STAT_INCR(coefficient, lc_constant)
+
+  while (C->type != COEFFICIENT_NUMERIC) {
+    C = coefficient_lc(C);
+  }
+
+  lp_integer_assign(ctx->K, out, &C->value.num);
+}
 
 STAT_DECLARE(int, coefficient, in_order)
 
@@ -1184,6 +1208,22 @@ void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_
         lp_monomial_pop(m);
       }
     }
+    break;
+  }
+}
+
+void coefficient_to_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_monomial_t *out) {
+  size_t d;
+
+  switch (C->type) {
+  case COEFFICIENT_NUMERIC:
+    integer_assign(ctx->K, &out->a, &C->value.num);
+    break;
+  case COEFFICIENT_POLYNOMIAL:
+    d = SIZE(C) - 1;
+    assert(d >= 1);
+    lp_monomial_push(out, VAR(C), d);
+    coefficient_to_monomial(ctx, COEFF(C, d), out);
     break;
   }
 }
@@ -1843,6 +1883,40 @@ void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* 
     }
     coefficient_normalize(ctx, C);
   }
+}
+
+void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C) {
+  assert(ctx->K != lp_Z);
+  assert(ctx->K->is_prime);
+  if (C->type == COEFFICIENT_NUMERIC) {
+    return;
+  }
+  assert(C->type == COEFFICIENT_POLYNOMIAL);
+  if (integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) <= 0) {
+    // SIZE(C) is greater than M, thus M fits in unsigned long
+    size_t m = integer_to_int(&ctx->K->M);
+    for (size_t i = m; i < SIZE(C); ++i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        size_t j = i % (m - 1);
+        if (j == 0) { j = (m - 1); }
+        if (coefficient_is_zero(ctx, COEFF(C, j))) {
+          coefficient_swap(COEFF(C, i), COEFF(C, j));
+        } else {
+          coefficient_mul(ctx, COEFF(C, j), COEFF(C, j), COEFF(C, i));
+          coefficient_t empty;
+          coefficient_construct(ctx, &empty);
+          coefficient_swap(COEFF(C, i), &empty);
+          coefficient_destruct(&empty);
+        }
+      }
+    }
+    coefficient_normalize(ctx, C);
+  }
+  assert(integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) > 0);
+  for (size_t i = 0; i < SIZE(C); ++i) {
+    coefficient_reduce_Zp(ctx, COEFF(C, i));
+  }
+  coefficient_normalize(ctx, C);
 }
 
 //
