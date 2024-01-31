@@ -1888,17 +1888,16 @@ void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* 
 void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C) {
   assert(ctx->K != lp_Z);
   assert(ctx->K->is_prime);
-  if (C->type == COEFFICIENT_NUMERIC) {
-    return;
-  }
-  assert(C->type == COEFFICIENT_POLYNOMIAL);
-  if (integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) <= 0) {
-    // SIZE(C) is greater than M, thus M fits in unsigned long
+  while (C->type == COEFFICIENT_POLYNOMIAL && integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) < 0) {
+    // SIZE(C) is greater than M, thus M fits in size_t
     size_t m = integer_to_int(&ctx->K->M);
+    assert(m < SIZE(C));
     for (size_t i = m; i < SIZE(C); ++i) {
       if (!coefficient_is_zero(ctx, COEFF(C, i))) {
         size_t j = i % (m - 1);
-        if (j == 0) { j = (m - 1); }
+        if (j == 0) {
+          j = (m - 1);
+        }
         if (coefficient_is_zero(ctx, COEFF(C, j))) {
           coefficient_swap(COEFF(C, i), COEFF(C, j));
         } else {
@@ -1912,11 +1911,14 @@ void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C)
     }
     coefficient_normalize(ctx, C);
   }
-  assert(integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) >= 0);
-  for (size_t i = 0; i < SIZE(C); ++i) {
-    coefficient_reduce_Zp(ctx, COEFF(C, i));
+  // could have changed in coefficient_normalize
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    assert(integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) >= 0);
+    for (size_t i = 0; i < SIZE(C); ++i) {
+      coefficient_reduce_Zp(ctx, COEFF(C, i));
+    }
+    coefficient_normalize(ctx, C);
   }
-  coefficient_normalize(ctx, C);
 }
 
 //
