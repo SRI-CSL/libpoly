@@ -251,6 +251,29 @@ int lp_polynomial_hash_set_remove(lp_polynomial_hash_set_t* set, const lp_polyno
   return result;
 }
 
+void lp_polynomial_hash_set_intersect(lp_polynomial_hash_set_t* set, const lp_polynomial_hash_set_t* other) {
+  assert(!set->closed);
+
+  size_t mask = set->data_size - 1;
+  for (size_t i = 0; i < set->data_size;) {
+    if (set->data[i] == NULL) {
+      ++i;
+      continue;
+    }
+    if (!lp_polynomial_hash_set_contains(other, set->data[i])) {
+      lp_polynomial_delete(set->data[i]);
+      set->data[i] = NULL;
+      size_t k = i;
+      for (;;) {
+        size_t j = (k + 1) & mask;
+        if (set->data[j] == 0 || (lp_polynomial_hash(set->data[j]) & mask) == j) break;
+        SWAP(set->data[k], set->data[j]);
+        k = j;
+      }
+    }
+  }
+}
+
 void lp_polynomial_hash_set_close(lp_polynomial_hash_set_t* set) {
 
   if (set->closed) {

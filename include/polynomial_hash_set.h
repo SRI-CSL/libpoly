@@ -72,6 +72,9 @@ int lp_polynomial_hash_set_insert_vector(lp_polynomial_hash_set_t* set, const lp
 /** Add polynomial p to set. Returns true if p was removed (was in the set). */
 int lp_polynomial_hash_set_remove(lp_polynomial_hash_set_t* set, const lp_polynomial_t* p);
 
+/** Removes all elements from set that are not in other */
+void lp_polynomial_hash_set_intersect(lp_polynomial_hash_set_t* set, const lp_polynomial_hash_set_t* other);
+
 /** Close the set: compact the data so that all elements get stored in data[0..size]. No addition after close! */
 void lp_polynomial_hash_set_close(lp_polynomial_hash_set_t* set);
 

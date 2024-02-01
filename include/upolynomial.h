@@ -110,6 +110,12 @@ int lp_upolynomial_print(const lp_upolynomial_t* p, FILE* out);
 char* lp_upolynomial_to_string(const lp_upolynomial_t* p);
 
 /**
+ * Converts the upolynomial to a polynomial in variable var.
+ * ctx must have the same ring than upolynomial.
+ */
+lp_polynomial_t* lp_upolynomial_to_polynomial(const lp_upolynomial_t* p, const lp_polynomial_context_t* ctx, lp_variable_t var);
+
+/**
  * Returns true if this is a zero polynomial
  */
 int lp_upolynomial_is_zero(const lp_upolynomial_t* p);
