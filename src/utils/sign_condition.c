@@ -123,10 +123,7 @@ int lp_sign_condition_Zp_valid(lp_sign_condition_t sgn_condition) {
   case LP_SGN_EQ_0:
   case LP_SGN_NE_0:
     return 1;
-  case LP_SGN_LT_0:
-  case LP_SGN_LE_0:
-  case LP_SGN_GT_0:
-  case LP_SGN_GE_0:
+  default:
     return 0;
   }
 }
