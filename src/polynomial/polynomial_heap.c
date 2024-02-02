@@ -73,7 +73,7 @@ static
 void lp_polynomial_heap_extend(lp_polynomial_heap_t *heap) {
   // double the size
   heap->data_size <<= 1;
-  heap->data = realloc(heap->data, heap->data_size);
+  heap->data = realloc(heap->data, heap->data_size * sizeof(lp_polynomial_t*));
 }
 
 static
@@ -111,6 +111,7 @@ void lp_polynomial_heap_heapify_down(lp_polynomial_heap_t *heap, size_t pos) {
 /** inserts a polynomial, does not copy the polynomial */
 static
 void lp_polynomial_heap_insert(lp_polynomial_heap_t* heap, lp_polynomial_t* p) {
+  assert(p);
   heap->size++;
   if (heap->size > heap->data_size) {
     lp_polynomial_heap_extend(heap);
