@@ -603,7 +603,7 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
   } else {
 
     // The prime (should be small)
-    assert(integer_cmp_int(lp_Z, &K->M, 100) < 0);
+    assert(integer_cmp_int(lp_Z, &K->M, 250) < 0);
     int p = integer_to_int(&K->M);
 
     // Construct the Q matrix
