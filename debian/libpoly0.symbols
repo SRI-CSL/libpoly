@@ -104,13 +104,9 @@ libpoly.so.0 libpoly0 #MINVER#
  dyadic_interval_neg@Base 1.3
  dyadic_interval_pow@Base 1.3
  dyadic_interval_sub@Base 1.3
- factorization_recombination@Base 1.3
  filter_roots@Base 1.3
  get_power_symbol@Base 1.3
  get_upolynomial_var_symbol@Base 1.3
- hensel_lift_compute_products@Base 1.3
- hensel_lift_initialize@Base 1.3
- hensel_lift_quadratic@Base 1.3
  lp_Z@Base 1.3
  lp_algebraic_number_add@Base 1.3
  lp_algebraic_number_ceiling@Base 1.3
@@ -509,7 +505,6 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_extended_gcd@Base 1.3
  lp_upolynomial_factor@Base 1.3
  lp_upolynomial_factor_square_free@Base 1.3
- lp_upolynomial_factor_square_free_primitive@Base 1.3
  lp_upolynomial_factors_add@Base 1.3
  lp_upolynomial_factors_clear@Base 1.3
  lp_upolynomial_factors_construct@Base 1.3
@@ -630,11 +625,6 @@ libpoly.so.0 libpoly0 #MINVER#
  stats_print@Base 1.3
  set_output_language@Base 1.3
  set_upolynomial_var_symbol@Base 1.3
- sturm_seqence_count_roots@Base 1.3
- sturm_seqence_count_roots_dyadic@Base 1.3
- sturm_seqence_count_sign_changes@Base 1.3
- sturm_seqence_count_sign_changes_dyadic@Base 1.3
- sturm_seqence_isolate_roots@Base 1.3
  tags_to_trace@Base 1.3
  tags_to_trace_size@Base 1.3
  trace_disable@Base 1.3
@@ -679,11 +669,10 @@ libpoly.so.0 libpoly0 #MINVER#
  upolynomial_dense_to_upolynomial@Base 1.3
  upolynomial_dense_touch@Base 1.3
  upolynomial_factor_Z@Base 1.3
- upolynomial_factor_Z_square_free@Base 1.3
  upolynomial_factor_Zp@Base 1.3
- upolynomial_factor_berlekamp_square_free@Base 1.3
  upolynomial_factor_bound_landau_mignotte@Base 1.3
  upolynomial_factor_distinct_degree@Base 1.3
+ upolynomial_factor_square_free_primitive@Base 1.3
  upolynomial_gcd_euclid@Base 1.3
  upolynomial_gcd_heuristic@Base 1.3
  upolynomial_gcd_subresultant@Base 1.3

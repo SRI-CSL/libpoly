@@ -29,7 +29,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <stdlib.h>
 
 #include "utils/debug_trace.h"
 
@@ -102,6 +101,7 @@ void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_d
  * Compute the number sgn_changes(a) given Sturm sequence and a. If a is 0 or
  * 1 as a pointer, we evaluate at -inf, +inf respectively.
  */
+static
 int sturm_seqence_count_sign_changes(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_rational_t* a, int max_changes)
@@ -128,6 +128,7 @@ int sturm_seqence_count_sign_changes(
  * Compute the number sgn_changes(a) given Sturm sequence and a. If a is 0 or
  * 1 as a pointer, we evaluate at -inf, +inf respectively.
  */
+static
 int sturm_seqence_count_sign_changes_dyadic(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_dyadic_rational_t* a, int max_changes)
@@ -150,6 +151,7 @@ int sturm_seqence_count_sign_changes_dyadic(
 }
 
 /** Count roots in the given interval */
+static
 int sturm_seqence_count_roots(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_rational_interval_t* interval)
@@ -178,6 +180,7 @@ int sturm_seqence_count_roots(
 }
 
 /** Count roots in the given interval */
+static
 int sturm_seqence_count_roots_dyadic(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_dyadic_interval_t* interval)
@@ -263,6 +266,7 @@ int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_rational_i
 /**
  * Recursive root isolation on an interval (a, b].
  */
+static
 void sturm_seqence_isolate_roots(
     const upolynomial_dense_t* S, size_t S_size,
     lp_algebraic_number_t* roots, size_t* roots_size,

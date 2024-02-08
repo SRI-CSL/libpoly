@@ -1091,6 +1091,7 @@ void lp_upolynomial_solve_bezout(const lp_upolynomial_t* p, const lp_upolynomial
 }
 
 lp_upolynomial_factors_t* lp_upolynomial_factor(const lp_upolynomial_t* p) {
+  assert(p);
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor("); lp_upolynomial_print(p, trace_out); tracef(")\n");
