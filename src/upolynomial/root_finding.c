@@ -497,6 +497,10 @@ lp_upolynomial_t* upolynomial_reduce_to_linear(const lp_upolynomial_t *f ) {
   return linear;
 }
 
+/**
+ * Implements Rabin root-finding.
+ * Rabin, Michael O. "Probabilistic algorithms in finite fields." SIAM Journal on computing 9.2 (1980): 273-280.
+ */
 static
 void upolynomial_roots_find_rabin(const lp_upolynomial_t* f, lp_integer_t* roots, size_t* roots_size) {
   const lp_int_ring_t* K = f->K;
