@@ -251,7 +251,7 @@ const lp_integer_t* lp_upolynomial_const_term(const lp_upolynomial_t* p) {
   if (p->monomials[0].degree == 0) {
     return &p->monomials[0].coefficient;
   } else {
-    return 0;
+    return NULL;
   }
 }
 
@@ -774,7 +774,7 @@ void lp_upolynomial_div_rem_exact(const lp_upolynomial_t* p, const lp_upolynomia
     upolynomial_dense_t rem_buffer;
     upolynomial_dense_t div_buffer;
     lp_upolynomial_div_general(p, q, &div_buffer, &rem_buffer, /** exact */ 1);
-    *div= upolynomial_dense_to_upolynomial(&div_buffer, K);
+    *div = upolynomial_dense_to_upolynomial(&div_buffer, K);
     *rem = upolynomial_dense_to_upolynomial(&rem_buffer, K);
     upolynomial_dense_destruct(&div_buffer);
     upolynomial_dense_destruct(&rem_buffer);
@@ -1157,6 +1157,16 @@ void lp_upolynomial_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t**
   free(S_dense);
 }
 
+// TODO add to python, C++ and write python tests
+void lp_upolynomial_roots_find_Zp(const lp_upolynomial_t* f, lp_integer_t** roots, size_t* roots_size) {
+  if (trace_is_enabled("roots")) {
+    tracef("upolynomial_roots_find_Zp("); lp_upolynomial_print(f, trace_out); tracef(")\n");
+  }
+  assert(f->K != lp_Z);
+
+  upolynomial_roots_find_Zp(f, roots, roots_size);
+}
+
 lp_upolynomial_t* lp_upolynomial_neg(const lp_upolynomial_t* p) {
   lp_upolynomial_t* neg = lp_upolynomial_construct_copy(p);
   lp_upolynomial_neg_in_place(neg);
@@ -1168,6 +1178,27 @@ void lp_upolynomial_neg_in_place(lp_upolynomial_t* p) {
   for (i = 0; i < p->size; ++ i) {
     integer_neg(p->K, &p->monomials[i].coefficient, &p->monomials[i].coefficient);
   }
+}
+
+lp_upolynomial_t* lp_upolynomial_make_monic(const lp_upolynomial_t* p) {
+  lp_upolynomial_t* monic = lp_upolynomial_construct_copy(p);
+  lp_upolynomial_make_monic_in_place(monic);
+  return monic;
+}
+
+void lp_upolynomial_make_monic_in_place(lp_upolynomial_t* p) {
+  if (lp_upolynomial_is_zero(p)) {
+    return;
+  }
+  const lp_int_ring_t* K = p->K;
+
+  const lp_integer_t *c = lp_upolynomial_lead_coeff(p);
+  assert(integer_cmp_int(K, c, 0));
+  for (size_t i = 0; i < p->size; ++i) {
+    assert(integer_divides(K, c, &p->monomials[i].coefficient));
+    integer_div_exact(K, &p->monomials[i].coefficient, &p->monomials[i].coefficient, c);
+  }
+  assert(lp_upolynomial_is_monic(p));
 }
 
 void lp_upolynomial_reverse_in_place(lp_upolynomial_t* p) {

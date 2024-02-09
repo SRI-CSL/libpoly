@@ -24,6 +24,7 @@ set(poly_SOURCES
   upolynomial/factors.c
   upolynomial/factorization.c
   upolynomial/root_finding.c
+  upolynomial/upolynomial_vector.c
   polynomial/monomial.c
   polynomial/coefficient.c
   polynomial/output.c

@@ -196,6 +196,16 @@ lp_upolynomial_t* lp_upolynomial_neg(const lp_upolynomial_t* p);
 void lp_upolynomial_neg_in_place(lp_upolynomial_t* p);
 
 /**
+ * Makes the polynomial monic in place.
+ */
+lp_upolynomial_t* lp_upolynomial_make_monic(const lp_upolynomial_t* p);
+
+/**
+ * Makes the polynomial monic in place.
+ */
+void lp_upolynomial_make_monic_in_place(lp_upolynomial_t* p);
+
+/**
  * Add two polynomials (all operations in the same ring).
  */
 lp_upolynomial_t* lp_upolynomial_add(const lp_upolynomial_t* p, const lp_upolynomial_t* q);
@@ -363,6 +373,13 @@ int lp_upolynomial_roots_count(const lp_upolynomial_t* p, const lp_rational_inte
  * an estimate of the number of roots.
  */
 void lp_upolynomial_roots_isolate(const lp_upolynomial_t* p, lp_algebraic_number_t* roots, size_t* roots_size);
+
+/**
+ * Finds the root for an univariate polynomial in Zp. The array roots will be allocated,
+ * and the user should de-allocate it. The size parameter will be updated with the size
+ * of the array.
+ */
+void lp_upolynomial_roots_find_Zp(const lp_upolynomial_t* f, lp_integer_t** roots, size_t* roots_size);
 
 /**
  * Reverses the coefficient of p in place. The result polynomial is

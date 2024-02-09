@@ -758,7 +758,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
 
     // Extract linear factors
     assert(mpz_fits_slong_p(&K->M));
-    int x_int, p = integer_to_int(&K->M);
+    long x_int, p = integer_to_int(&K->M);
     assert(p < FIELD_ORDER_LIMIT);
     lp_upolynomial_t* linear_factors_product = 0;
     for (x_int = 0; x_int < p; ++ x_int) {
