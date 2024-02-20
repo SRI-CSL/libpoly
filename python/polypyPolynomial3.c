@@ -54,7 +54,7 @@ Polynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static PyObject*
 Polynomial_richcompare(PyObject* self, PyObject* args, int op);
 
-static long
+static Py_hash_t
 Polynomial_hash(PyObject* self);
 
 static PyObject*
@@ -407,10 +407,10 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
   return result;
 }
 
-static long
+static Py_hash_t
 Polynomial_hash(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
-  long hash = lp_polynomial_hash(p->p);
+  Py_hash_t hash = lp_polynomial_hash(p->p);
   if (hash == -1) {
     // value -1 should not be returned as a normal return value
     hash = 0;
