@@ -235,4 +235,9 @@ namespace poly {
    */
   std::vector<AlgebraicNumber> isolate_real_roots(const UPolynomial& p);
 
+  /**
+   * Finds the roots for a polynomial mod p using rabin root finding.
+   */
+  std::vector<Integer> find_roots_Zp(const UPolynomial& p);
+
 }  // namespace poly

@@ -342,5 +342,19 @@ namespace poly {
     return res;
   }
 
+  std::vector<Integer> find_roots_Zp(const UPolynomial& p) {
+    lp_integer_t *roots;
+    std::size_t roots_size;
+    lp_upolynomial_roots_find_Zp(p.get_internal(), &roots, &roots_size);
+    std::vector<Integer> res;
+    for (std::size_t i = 0; i < roots_size; ++i) {
+      res.emplace_back(&roots[i]);
+    }
+    for (std::size_t i = 0; i < roots_size; ++i) {
+      lp_integer_destruct(&roots[i]);
+    }
+    free(roots);
+    return res;
+  }
 
 }  // namespace poly

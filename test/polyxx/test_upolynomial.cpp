@@ -274,3 +274,45 @@ TEST_CASE("upolynomial::operator<<") {
   out << p;
   CHECK(out.str() == "5*x^4 + 4*x^3 + 3*x^2 + 2*x + 1");
 }
+
+TEST_CASE("upolynomial::find_roots_Zp") {
+  // test brute force
+  {
+    Integer mod(13);
+    IntegerRing ring(mod, true);
+    UPolynomial p(ring, {1, 2, 3, 4, 5});
+    std::vector<Integer> roots = find_roots_Zp(p);
+    CHECK(roots.size() == 1);
+    CHECK(compare(ring, roots[0], -5) == 0);
+    CHECK(compare(ring, roots[0], 8) == 0);
+  }
+  {
+    Integer mod(211);
+    IntegerRing ring(mod, true);
+    UPolynomial p(ring, {1, 2, 3, 4, 5});
+    std::vector<Integer> roots = find_roots_Zp(p);
+    CHECK(roots.size() == 2);
+    CHECK(compare(ring, roots[0], -31) == 0);
+    CHECK(compare(ring, roots[0], 180) == 0);
+    CHECK(compare(ring, roots[1], 51) == 0);
+  }
+  // test rabin root finding
+  {
+    Integer mod(1000003);
+    IntegerRing ring(mod, true);
+    UPolynomial p(ring, {1, 2, 3, 4, 5});
+    std::vector<Integer> roots = find_roots_Zp(p);
+    CHECK(roots.size() == 2);
+    CHECK(compare(ring, roots[0], 682693) == 0);
+    CHECK(compare(ring, roots[1], 939713) == 0);
+  }
+  {
+    Integer mod("2425967623052370772757633156976982469681", 10);
+    IntegerRing ring(mod, true);
+    UPolynomial p(ring, {1, 2, 3, 4, 5});
+    std::vector<Integer> roots = find_roots_Zp(p);
+    CHECK(roots.size() == 2);
+    CHECK(compare(ring, roots[0], Integer("-1812258784923425884426588992727582130833", 10)) == 0);
+    CHECK(compare(ring, roots[1], Integer("-2083615688050021089599246736669243933656", 10)) == 0);
+  }
+}
