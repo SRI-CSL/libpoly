@@ -329,13 +329,13 @@ void coefficient_derivative(const lp_polynomial_context_t* ctx, coefficient_t* C
 void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
- * Compute the subresultant regular sub-chain.
- * SRS should be a constructed array of size deg(B) + 1 filled with 0.
+ * Compute the subresultant sequence.
+ * sr should be a constructed array of size deg(B) + 1 filled with 0.
  */
-void coefficient_srs(const lp_polynomial_context_t* ctx, coefficient_t* srs, const coefficient_t* C1, const coefficient_t* C2);
+void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* sr, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
- * Compute the principal subresultant coefficients. These are the leading coefficients of the SRS.
+ * Compute the principal subresultant coefficients. These are the leading coefficients of the subresultant.
  * PSC should be a constructed array of size deg(B) + 1 filled with 0.
  */
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2);

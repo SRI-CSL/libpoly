@@ -23,13 +23,13 @@ def check_psc(p, q, expected):
         print("expected = {0}".format(expected))
     polypy_test.check(ok)
 
-def check_srs(p, q, expected):
-    srs = p.srs(q)
-    ok = cmp3(srs, expected) == 0
+def check_subres(p, q, expected):
+    subres = p.subres(q)
+    ok = cmp3(subres, expected) == 0
     if not ok:
         print("p = {0}".format(p))
         print("q = {0}".format(q))
-        print("srs      = {0}".format(srs))
+        print("subres   = {0}".format(subres))
         print("expected = {0}".format(expected))
     polypy_test.check(ok)
 
@@ -107,9 +107,9 @@ polypy_test.start("Principal Sub-resultant Coefficients")
 p = (y-1)*z*x**2 + y*(z-1)*x + y*z
 q =                z*(y-1)*x + y*z
 expected_psc = [-y ** 2 * z ** 2 + y ** 3 * z ** 2 + y * z ** 3 - 2 * y ** 2 * z ** 3 + y ** 3 * z ** 3, -z + y * z]
-expected_srs = [-y ** 2 * z ** 2 + y ** 3 * z ** 2 + y * z ** 3 - 2 * y ** 2 * z ** 3 + y ** 3 * z ** 3, (-z + y * z) * x + z * y]
+expected_sr = [-y ** 2 * z ** 2 + y ** 3 * z ** 2 + y * z ** 3 - 2 * y ** 2 * z ** 3 + y ** 3 * z ** 3, (-z + y * z) * x + z * y]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = (y-1)*z*x**2 + y*(z-1)*x + y*z
 q = (z-1)*y*x**2 + z*(y-1)*x + y*z
@@ -118,13 +118,13 @@ expected_psc = [
     -y**2 + 2 * y ** 2 * z + z ** 2 - 2 * y * z ** 2,
     1
 ]
-expected_srs = [
+expected_sr = [
     3 * y ** 4 * z ** 2 - 6 * y ** 3 * z ** 3 + 3 * y ** 2 * z ** 4 - y ** 4 * z + y ** 3 * z ** 2 + y ** 2 * z ** 3 - y * z ** 4,
     2 * x * y ** 2 * z - 2 * x * y * z ** 2 - x * y ** 2 + y ** 2 * z + x * z ** 2 - y * z ** 2,
     x ** 2 * y * z - x ** 2 * y + x * y * z - x * z + y * z
 ]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = (y-3)*x**3 + (y-2)*x**2 + (y-1)*x + y
 q = (z-3)*x**3 + (z-2)*x**2 + (z-1)*x + z
@@ -134,65 +134,65 @@ expected_psc = [
     y - z,
     1
 ]
-expected_srs = [
+expected_sr = [
     16 * y ** 3 - 48 * y ** 2 * z + 48 * y * z ** 2 - 16 * z ** 3,
     4 * y ** 2 - 8 * y * z + 4 * z ** 2,
     x ** 2 * y - x ** 2 * z + 2 * x * y - 2 * x * z + 3 * y - 3 * z,
     x ** 3 * z - 3 * x ** 3 + x ** 2 * z - 2 * x ** 2 + x * z - x + z
 ]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 expected_psc = [
     -16 * y ** 3 + 48 * y ** 2 * z - 48 * y * z ** 2 + 16 * z ** 3,
     0,
     z - y,
     1
 ]
-expected_srs = [
+expected_sr = [
     -16*y**3 + 48*y**2*z - 48*y*z**2 + 16*z**3,
     4*y**2 - 8*y*z + 4*z**2,
     -x**2*y + x**2*z - 2*x*y + 2*x*z - 3*y + 3*z,
     x**3*y - 3*x**3 + x**2*y - 2*x**2 + x*y - x + y
 ]
 check_psc(q, p, expected_psc)
-check_srs(q, p, expected_srs)
+check_subres(q, p, expected_sr)
 
 p = x**2 + y**2 - 1
 q = p.derivative()
 expected_psc = [-4 + 4 * y ** 2, 2]
-expected_srs = [4 * y ** 2 - 4, 2 * x]
+expected_sr = [4 * y ** 2 - 4, 2 * x]
 check_psc(p, q, expected_psc)
 check_psc(q, p, expected_psc)
-check_srs(p, q, expected_srs)
-check_srs(q, p, expected_srs)
+check_subres(p, q, expected_sr)
+check_subres(q, p, expected_sr)
 
 p = (y-1)*x**2
 q = (y-2)*x**2
 expected_psc = [0, 0, 1]
-expected_srs = [0, 0, x ** 2 * y - 2 * x ** 2]
+expected_sr = [0, 0, x ** 2 * y - 2 * x ** 2]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = x**2
 q = x**2
 expected_psc = [0, 0, 1]
-expected_srs = [0, 0, x ** 2]
+expected_sr = [0, 0, x ** 2]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = x**2
 q = x
 expected_psc = [0, 1]
-expected_srs = [0, x]
+expected_sr = [0, x]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = x**2 + y**2 + z**2 - 1
 q = p.derivative()
 expected_psc = [-4 + 4 * y ** 2 + 4 * z ** 2, 2]
-expected_srs = [4 * y ** 2 + 4 * z ** 2 - 4, 2 * x]
+expected_sr = [4 * y ** 2 + 4 * z ** 2 - 4, 2 * x]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = (y-3)*x**3 + (y-2)*x**2 + (y-1)*x + y
 q =              (z-2)*x**2 + (z-1)*x + z
@@ -201,13 +201,13 @@ expected_psc = [
     -3 + 3 * y - 2 * z - y * z + z ** 2,
     -2 + z
 ]
-expected_srs = [
+expected_sr = [
     -3 * y - 5 * y ** 2 + 3 * z - y * z + 7 * y ** 2 * z + 6 * z ** 2 - y * z ** 2 - 3 * y ** 2 * z ** 2 + 3 * z ** 3 - 3 * y * z ** 3 + y ** 2 * z ** 3,
     (-3 + 3 * y - 2 * z - y * z + z ** 2) * x + (y * z ** 2 - 3 * y * z - z ** 2 + 4 * y - z),
     (-2 + z) * x ** 2 + (z - 1) * x + z
 ]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = z*x**3 + (y - 1)*x**2 + z*y
 q = y*x**3 + (z - 1)*x**2 + z*y
@@ -217,14 +217,14 @@ expected_psc = [
     y - y ** 2 - z + z ** 2,
     1
 ]
-expected_srs = [
+expected_sr = [
     -y ** 6 * z ** 3 + 3 * y ** 5 * z ** 4 - 3 * y ** 4 * z ** 5 + y ** 3 * z ** 6 - y ** 6 * z ** 2 + 2 * y ** 5 * z ** 3 - 2 * y ** 3 * z ** 5 + y ** 2 * z ** 6 + y ** 5 * z ** 2 - 3 * y ** 4 * z ** 3 + 3 * y ** 3 * z ** 4 - y ** 2 * z ** 5,
     -x * y ** 4 * z + x * y ** 3 * z ** 2 + x * y ** 2 * z ** 3 - x * y * z ** 4 + x * y ** 3 * z + y ** 4 * z - 2 * x * y ** 2 * z ** 2 - y ** 3 * z ** 2 + x * y * z ** 3 - y ** 2 * z ** 3 + y * z ** 4 - y ** 3 * z + 2 * y ** 2 * z ** 2 - y * z ** 3,
     -x ** 2 * y ** 2 + x ** 2 * z ** 2 + x ** 2 * y - x ** 2 * z - y ** 2 * z + y * z ** 2,
     x ** 3 * y + x ** 2 * z - x ** 2 + y * z
 ]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)
 
 p = z*x**4 + (y - 1)*x**3 + z*y
 q = y*x**4 + (z - 1)*x**3 + z*y
@@ -235,7 +235,7 @@ expected_psc = [
     y - y ** 2 - z + z ** 2,
     1
 ]
-expected_srs = [
+expected_sr = [
     y ** 8 * z ** 4 - 4 * y ** 7 * z ** 5 + 6 * y ** 6 * z ** 6 - 4 * y ** 5 * z ** 7 + y ** 4 * z ** 8 + y ** 8 * z ** 3 - 3 * y ** 7 * z ** 4 + 2 * y ** 6 * z ** 5 + 2 * y ** 5 * z ** 6 - 3 * y ** 4 * z ** 7 + y ** 3 * z ** 8 - y ** 7 * z ** 3 + 4 * y ** 6 * z ** 4 - 6 * y ** 5 * z ** 5 + 4 * y ** 4 * z ** 6 - y ** 3 * z ** 7,
     -x * y ** 6 * z ** 2 + 2 * x * y ** 5 * z ** 3 - 2 * x * y ** 3 * z ** 5 + x * y ** 2 * z ** 6 + x * y ** 5 * z ** 2 + y ** 6 * z ** 2 - 3 * x * y ** 4 * z ** 3 - 2 * y ** 5 * z ** 3 + 3 * x * y ** 3 * z ** 4 - x * y ** 2 * z ** 5 + 2 * y ** 3 * z ** 5 - y ** 2 * z ** 6 - y ** 5 * z ** 2 + 3 * y ** 4 * z ** 3 - 3 * y ** 3 * z ** 4 + y ** 2 * z ** 5,
     -x * y ** 4 * z + x * y ** 3 * z ** 2 + x * y ** 2 * z ** 3 - x * y * z ** 4 + x * y ** 3 * z + y ** 4 * z - 2 * x * y ** 2 * z ** 2 - y ** 3 * z ** 2 + x * y * z ** 3 - y ** 2 * z ** 3 + y * z ** 4 - y ** 3 * z + 2 * y ** 2 * z ** 2 - y * z ** 3,
@@ -243,4 +243,4 @@ expected_srs = [
     x ** 4 * y + x ** 3 * z - x ** 3 + y * z
 ]
 check_psc(p, q, expected_psc)
-check_srs(p, q, expected_srs)
+check_subres(p, q, expected_sr)

@@ -928,10 +928,10 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
   }
 }
 
-void lp_polynomial_srs(lp_polynomial_t** srs, const lp_polynomial_t* A, const lp_polynomial_t* B) {
+void lp_polynomial_subres(lp_polynomial_t** subres, const lp_polynomial_t* A, const lp_polynomial_t* B) {
 
   if (trace_is_enabled("polynomial")) {
-    tracef("polynomial_srs("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
+    tracef("polynomial_subres("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
   }
 
   if (trace_is_enabled("polynomial::expensive")) {
@@ -949,7 +949,7 @@ void lp_polynomial_srs(lp_polynomial_t** srs, const lp_polynomial_t* A, const lp
   size_t B_deg = lp_polynomial_degree(B);
 
   if (A_deg < B_deg) {
-    lp_polynomial_srs(srs, B, A);
+    lp_polynomial_subres(subres, B, A);
     return;
   }
 
@@ -966,30 +966,30 @@ void lp_polynomial_srs(lp_polynomial_t** srs, const lp_polynomial_t* A, const lp
 
   // Allocate the space for the result
   size_t size = B_deg + 1;
-  coefficient_t*srs_coeff = malloc(sizeof(coefficient_t)*size);
+  coefficient_t *subres_coeff = malloc(sizeof(coefficient_t) * size);
   size_t i;
   for (i = 0; i < size; ++ i) {
-    coefficient_construct(ctx, srs_coeff + i);
+    coefficient_construct(ctx, subres_coeff + i);
   }
 
   // Compute
-  coefficient_srs(ctx, srs_coeff, &A->data, &B->data);
+  coefficient_subres(ctx, subres_coeff, &A->data, &B->data);
 
   // Construct the output (one less, we ignore the final 1)
   // the last one is not ignored right now
   for (i = 0; i < size; ++ i) {
     lp_polynomial_t tmp;
-    lp_polynomial_construct_from_coefficient(&tmp, ctx, srs_coeff + i);
-    lp_polynomial_swap(&tmp, srs[i]);
+    lp_polynomial_construct_from_coefficient(&tmp, ctx, subres_coeff + i);
+    lp_polynomial_swap(&tmp, subres[i]);
     lp_polynomial_destruct(&tmp);
-    coefficient_destruct(&srs_coeff[i]);
+    coefficient_destruct(&subres_coeff[i]);
   }
 
-  free(srs_coeff);
+  free(subres_coeff);
 
   if (trace_is_enabled("polynomial")) {
     for (i = 0; i < size; ++ i) {
-      tracef("SRS[%zu] = ", i); lp_polynomial_print(srs[i], trace_out); tracef("\n");
+      tracef("SR[%zu] = ", i); lp_polynomial_print(subres[i], trace_out); tracef("\n");
     }
   }
 }

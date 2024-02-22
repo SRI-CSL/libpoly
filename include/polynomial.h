@@ -297,11 +297,11 @@ void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A1, co
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
- * Compute the subresultant regular sub-chain (srs) of A1 and A2. Bot A1
+ * Compute the subresultant regular sub-chain (subres) of A1 and A2. Bot A1
  * and A2 must be (non-trivial) polynomials over the same variable. If
  * deg(A1) = m, deg(A2) = n, and output will be of size min(m, n)+1.
  */
-void lp_polynomial_srs(lp_polynomial_t** srs, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+void lp_polynomial_subres(lp_polynomial_t** subres, const lp_polynomial_t* A, const lp_polynomial_t* B);
 
 /**
  * Compute the model-based GCD of the two polynomials. Adds the assumptions to

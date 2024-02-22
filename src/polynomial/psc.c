@@ -26,8 +26,6 @@
 
 #include <assert.h>
 
-STAT_DECLARE(int, coefficient, psc)
-
 #ifdef UNOPTIMIZED_SUBRESULTANT
 
 /**
@@ -36,7 +34,7 @@ STAT_DECLARE(int, coefficient, psc)
  * [2000] Ducos - Optimizations of the subresultant algorithm.
  */
 static
-void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q, int psc_only) {
+void subres(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q, int psc_only) {
 
   TRACE("coefficient", "coefficient_psc()\n");
   STAT_INCR(coefficient, psc)
@@ -361,14 +359,13 @@ void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A,
  * [2000] Ducos - Optimizations of the subresultant algorithm.
  */
 static
-void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q, int psc_only) {
+void subres(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q, int psc_only) {
 
   if (trace_is_enabled("coefficient::resultant")) {
     tracef("coefficient_psc()\n");
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
-  STAT_INCR(coefficient, psc)
 
   assert(P->type == COEFFICIENT_POLYNOMIAL);
   assert(Q->type == COEFFICIENT_POLYNOMIAL);
@@ -538,10 +535,15 @@ void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* S, co
 
 #endif
 
-void coefficient_srs(const lp_polynomial_context_t* ctx, coefficient_t* srs, const coefficient_t* C1, const coefficient_t* C2) {
-  coefficient_subres(ctx, srs, C1, C2, 0);
+STAT_DECLARE(int, coefficient, subres)
+STAT_DECLARE(int, coefficient, psc)
+
+void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* sr, const coefficient_t* C1, const coefficient_t* C2) {
+  STAT_INCR(coefficient, subres)
+  subres(ctx, sr, C1, C2, 0);
 }
 
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2) {
-  coefficient_subres(ctx, psc, C1, C2, 1);
+  STAT_INCR(coefficient, psc)
+  subres(ctx, psc, C1, C2, 1);
 }

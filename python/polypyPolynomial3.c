@@ -151,7 +151,7 @@ static PyObject*
 Polynomial_psc(PyObject* self, PyObject* args);
 
 static PyObject*
-Polynomial_srs(PyObject* self, PyObject* args);
+Polynomial_subres(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_mgcd(PyObject* self, PyObject* args);
@@ -202,7 +202,7 @@ PyMethodDef Polynomial_methods[] = {
     {"derivative", (PyCFunction)Polynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"resultant", (PyCFunction)Polynomial_resultant, METH_VARARGS, "Returns the resultant of the current and given polynomial"},
     {"psc", (PyCFunction)Polynomial_psc, METH_VARARGS, "Returns the principal subresultant coefficients of the current and given polynomial"},
-    {"srs", (PyCFunction)Polynomial_srs, METH_VARARGS, "Returns the subresultant regular sub-chain of the current and given polynomial"},
+    {"subres", (PyCFunction) Polynomial_subres, METH_VARARGS, "Returns the subresultant chain of the current and given polynomial"},
     {"mgcd", (PyCFunction)Polynomial_mgcd, METH_VARARGS, "Returns assumptions that the GCD of two polynomials is of same degree"},
     {"factor_square_free", (PyCFunction)Polynomial_factor_square_free, METH_NOARGS, "Returns the square-free factorization of the polynomial"},
     {"evaluate", (PyCFunction)Polynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial in the given assignment (or null if it doesn't fully evaluate"},
@@ -1028,12 +1028,12 @@ Polynomial_lcm(PyObject* self, PyObject* args) {
 }
 
 enum subres_type {
-  SUBRES_PSC,
-  SUBRES_SRS
+  SUBRES,
+  SUBRES_PSC
 };
 
 static PyObject*
-Polynomial_subres(PyObject* self, PyObject* args, enum subres_type type) {
+Polynomial_subres_impl(PyObject* self, PyObject* args, enum subres_type type) {
 
   // self is always a polynomial
   Polynomial* p1 = (Polynomial*) self;
@@ -1093,13 +1093,13 @@ Polynomial_subres(PyObject* self, PyObject* args, enum subres_type type) {
   }
 
   switch (type) {
+    case SUBRES:
+      // Compute the full subres
+      lp_polynomial_subres(S, p1->p, p2->p);
+      break;
     case SUBRES_PSC:
       // Compute the psc
       lp_polynomial_psc(S, p1->p, p2->p);
-      break;
-    case SUBRES_SRS:
-      // Compute the srs
-      lp_polynomial_srs(S, p1->p, p2->p);
       break;
   }
 
@@ -1121,12 +1121,12 @@ Polynomial_subres(PyObject* self, PyObject* args, enum subres_type type) {
 
 static PyObject*
 Polynomial_psc(PyObject* self, PyObject* args) {
-  return Polynomial_subres(self, args, SUBRES_PSC);
+  return Polynomial_subres_impl(self, args, SUBRES_PSC);
 }
 
 static PyObject*
-Polynomial_srs(PyObject* self, PyObject* args) {
-  return Polynomial_subres(self, args, SUBRES_SRS);
+Polynomial_subres(PyObject* self, PyObject* args) {
+  return Polynomial_subres_impl(self, args, SUBRES);
 }
 
 static PyObject*
