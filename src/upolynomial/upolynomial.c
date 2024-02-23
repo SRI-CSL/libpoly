@@ -1157,7 +1157,6 @@ void lp_upolynomial_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t**
   free(S_dense);
 }
 
-// TODO add to python, C++ and write python tests
 void lp_upolynomial_roots_find_Zp(const lp_upolynomial_t* f, lp_integer_t** roots, size_t* roots_size) {
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_roots_find_Zp("); lp_upolynomial_print(f, trace_out); tracef(")\n");
