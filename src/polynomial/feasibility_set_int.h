@@ -1,5 +1,5 @@
 /**
- * Copyright 2015, SRI International.
+ * Copyright 2024, SRI International.
  *
  * This file is part of LibPoly.
  *
@@ -19,4 +19,3 @@
 
 #pragma once
 
-lp_feasibility_set_t* lp_feasibility_set_new_internal(size_t size);
