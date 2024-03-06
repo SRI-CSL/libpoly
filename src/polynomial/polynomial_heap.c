@@ -92,9 +92,8 @@ void lp_polynomial_heap_heapify_down(lp_polynomial_heap_t *heap, size_t pos) {
   ++ pos;
   // while there is still at least a left child
   while (2 * pos <= heap->size) {
-    size_t
-        l = 2 * pos,
-        r = 2 * pos + 1;
+    size_t l = 2 * pos;
+    size_t r = 2 * pos + 1;
 
     // find larger child
     size_t o = (r <= heap->size && HEAP_CMP(heap, l, r) < 0) ? r : l;
