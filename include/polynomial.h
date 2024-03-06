@@ -163,7 +163,7 @@ void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_as
 /** returns the value of the polynomial in the model */
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);
 
-/** returns the integer value of a polynomial. Assignment m must only assign integer values */
+/** copies the integer value of a polynomial to out; assignment m must only assign integer values */
 void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t* out);
 
 /**
