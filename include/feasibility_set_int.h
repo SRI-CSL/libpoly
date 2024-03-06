@@ -41,6 +41,7 @@ struct lp_feasibility_set_int_struct {
   /** Number of elements */
   size_t size;
 
+  // TODO remove capacity?
   /** Capacity of the elements table */
   size_t capacity;
 
@@ -99,6 +100,11 @@ int lp_feasibility_set_int_is_full(const lp_feasibility_set_int_t* set);
 int lp_feasibility_set_int_is_point(const lp_feasibility_set_int_t* set);
 
 /**
+ * assigns the size of the set to out
+ */
+void lp_feasibility_set_int_size(const lp_feasibility_set_int_t *set, lp_integer_t *out);
+
+/**
  * Check if the given value belongs to the set.
  */
 int lp_feasibility_set_int_contains(const lp_feasibility_set_int_t* set, const lp_integer_t* value);
@@ -119,18 +125,25 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect(const lp_feasibility_
 lp_feasibility_set_int_t* lp_feasibility_set_int_union(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2);
 
 typedef enum {
-  LP_FEASIBILITY_SET_INT_INTERSECT_S1,
-  LP_FEASIBILITY_SET_INT_INTERSECT_S2,
+  LP_FEASIBILITY_SET_INT_S1,
+  LP_FEASIBILITY_SET_INT_S2,
   LP_FEASIBILITY_SET_INT_NEW,
   LP_FEASIBILITY_SET_INT_EMPTY
-} lp_feasibility_set_int_intersect_status_t;
+} lp_feasibility_set_int_status_t;
 
 /**
  * Get intersection of the two sets, returns the status in the given variable.
- * The set s1 is given precedence so LP_FEASIBILITY_SET_INTERSECT_S2 is the
+ * The set s1 is given precedence so LP_FEASIBILITY_SET_S2 is the
  * status only if the intersect is not s1.
  */
-lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_intersect_status_t* status);
+lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t * status);
+
+/**
+ * Get union of the two sets, returns the status in the given variable.
+ * The set s1 is given precedence so LP_FEASIBILITY_SET_S2 is the
+ * status only if the union is not s1.
+ */
+lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t* status);
 
 /**
  * Add one set to another, i.e. s = s \cup from.

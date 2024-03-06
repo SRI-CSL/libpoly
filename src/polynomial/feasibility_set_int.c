@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "utils/u_memstream.h"
+
 static
 int int_cmp(const void *i1, const void *i2) {
   return lp_integer_cmp(lp_Z, i1, i2);
@@ -128,6 +130,27 @@ int lp_feasibility_set_int_is_full(const lp_feasibility_set_int_t* set) {
   return 0;
 }
 
+void lp_feasibility_set_int_size(const lp_feasibility_set_int_t *set, lp_integer_t *out) {
+  lp_integer_assign_int(lp_Z, out, set->size);
+  if (set->inverted) {
+    lp_integer_sub(lp_Z, out, &set->K->M, out);
+  }
+}
+
+static
+size_t lp_feasibility_set_int_size_approx(const lp_feasibility_set_int_t *set) {
+  if (!set->inverted) {
+    return set->size;
+  } else {
+    if (mpz_fits_ulong_p(&set->K->M)) {
+      return lp_integer_to_int(&set->K->M) - set->size;
+    } else {
+      // size can't be big enough for an actual size of 0 or 1
+      return ULONG_MAX;
+    }
+  }
+}
+
 int lp_feasibility_set_int_is_point(const lp_feasibility_set_int_t* set) {
   assert(lp_integer_cmp_int(lp_Z, &set->K->M, 2) > 0);
   if (set->inverted && set->size == 1) return 1;
@@ -183,125 +206,284 @@ void lp_feasibility_set_int_pick_value(const lp_feasibility_set_int_t* set, lp_i
 
 /** Calculates i1 \cup i2 */
 static
-size_t ordered_integer_set_union(lp_integer_t **result, const lp_integer_t *i1, size_t i1_size, const lp_integer_t *i2, size_t i2_size) {
-  size_t max_size = i1_size + i2_size;
-  *result = malloc(max_size * sizeof(lp_integer_t));
-  size_t result_size = 0;
+lp_feasibility_set_int_status_t ordered_integer_set_union(
+        lp_integer_t **result, size_t *result_size,
+        const lp_integer_t *i1, size_t i1_size,
+        const lp_integer_t *i2, size_t i2_size) {
 
+  size_t max_size = i1_size + i2_size;
+  *result_size = 0;
+  if (i1_size == 0 && i2_size == 0) {
+    return LP_FEASIBILITY_SET_INT_EMPTY;
+  }
+
+  *result = malloc(max_size * sizeof(lp_integer_t));
+
+  bool just_i1 = true, just_i2 = true;
   size_t p1 = 0, p2 = 0;
   while (p1 < i1_size && p2 < i2_size) {
     int cmp = lp_integer_cmp(lp_Z, i1 + p1, i2 + p2);
     if (cmp < 0) {
-      lp_integer_construct_copy(lp_Z, *result + result_size, i1 + p1);
+      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
+      just_i2 = false;
       p1 ++;
     } else if (cmp > 0) {
-      lp_integer_construct_copy(lp_Z, *result + result_size, i2 + p2);
+      lp_integer_construct_copy(lp_Z, *result + *result_size, i2 + p2);
+      just_i1 = false;
       p2 ++;
     } else {
-      lp_integer_construct_copy(lp_Z, *result + result_size, i1 + p1);
+      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
       p1 ++; p2 ++;
     }
-    result_size ++;
+    (*result_size) ++;
   }
   while (p1 < i1_size) {
-    lp_integer_construct_copy(lp_Z, *result + result_size++, i1 + p1++);
+    lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1++);
+    (*result_size) ++;
+    just_i2 = false;
   }
   while (p2 < i2_size) {
-    lp_integer_construct_copy(lp_Z, *result + result_size++, i2 + p2++);
+    lp_integer_construct_copy(lp_Z, *result + *result_size, i2 + p2++);
+    (*result_size) ++;
+    just_i1 = false;
   }
-  *result = realloc(*result, result_size * sizeof(lp_integer_t));
-  return result_size;
+  *result = realloc(*result, *result_size * sizeof(lp_integer_t));
+
+  if (just_i1) {
+    return LP_FEASIBILITY_SET_INT_S1;
+  } else if (just_i2) {
+    return LP_FEASIBILITY_SET_INT_S2;
+  } else {
+    return LP_FEASIBILITY_SET_INT_NEW;
+  }
 }
 
 /** Calculates i1 \cap i2 */
 static
-size_t ordered_integer_set_intersect(lp_integer_t **result, const lp_integer_t *i1, size_t i1_size, const lp_integer_t *i2, size_t i2_size) {
+lp_feasibility_set_int_status_t ordered_integer_set_intersect(
+        lp_integer_t **result, size_t *result_size,
+        const lp_integer_t *i1, size_t i1_size,
+        const lp_integer_t *i2, size_t i2_size) {
+
   size_t max_size = i1_size < i2_size ? i1_size : i2_size;
+  *result_size = 0;
+  if (i1_size == 0 || i2_size == 0) {
+    return LP_FEASIBILITY_SET_INT_EMPTY;
+  }
+
   *result = malloc(max_size * sizeof(lp_integer_t));
-  size_t result_size = 0;
 
   size_t p1 = 0, p2 = 0;
+  bool all_i1 = true, all_i2 = true;
   while (p1 < i1_size && p2 < i2_size) {
     int cmp = lp_integer_cmp(lp_Z, i1 + p1, i2 + p2);
     if (cmp < 0) {
       p2 ++;
+      all_i2 = false;
     } else if (cmp > 0) {
       p1 ++;
+      all_i1 = false;
     } else {
-      lp_integer_construct_copy(lp_Z, *result + result_size, i1 + p1);
+      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
       p1 ++; p2 ++;
-      result_size ++;
+      (*result_size) ++;
     }
   }
-  *result = realloc(*result, result_size * sizeof(lp_integer_t));
-  return result_size;
+
+  *result = realloc(*result, *result_size * sizeof(lp_integer_t));
+
+  if (*result_size == 0) {
+    return LP_FEASIBILITY_SET_INT_EMPTY;
+  } else if (all_i1) {
+    return LP_FEASIBILITY_SET_INT_S1;
+  } else if (all_i2) {
+    return LP_FEASIBILITY_SET_INT_S2;
+  } else {
+    return LP_FEASIBILITY_SET_INT_NEW;
+  }
 }
 
 /** Calculates i1 \setminus i2 */
 static
-size_t ordered_integer_set_minus(lp_integer_t **result, const lp_integer_t *i1, size_t i1_size, const lp_integer_t *i2, size_t i2_size) {
+lp_feasibility_set_int_status_t ordered_integer_set_minus(
+        lp_integer_t **result, size_t *result_size,
+        const lp_integer_t *i1, size_t i1_size,
+        const lp_integer_t *i2, size_t i2_size) {
+
   size_t max_size = i1_size;
+  *result_size = 0;
   *result = malloc(max_size * sizeof(lp_integer_t));
-  size_t result_size = 0;
 
   size_t p1 = 0, p2 = 0;
   while (p1 < i1_size) {
-    bool i2_found = false;
+    bool found = false;
     while(p2 < i2_size) {
       // as long i2's value is smaller than current i1, we continue
       int cmp = lp_integer_cmp(lp_Z, i1 + p1, i2 + p2);
       if (cmp == 0) {
-        i2_found = true;
+        found = true;
       }
       if (cmp <= 0) {
         break;
       }
       p2 ++;
     }
-    if (!i2_found) {
-      lp_integer_construct_copy(lp_Z, *result + result_size, i1 + p1);
-      result_size ++;
+    if (!found) {
+      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
+      (*result_size) ++;
     }
     p1 ++;
   }
-  *result = realloc(*result, result_size * sizeof(lp_integer_t));
-  return result_size;
+  *result = realloc(*result, *result_size * sizeof(lp_integer_t));
+
+  if (*result_size == 0) {
+    return LP_FEASIBILITY_SET_INT_EMPTY;
+  } else if (*result_size == i1_size) {
+    return LP_FEASIBILITY_SET_INT_S1;
+  } else {
+    return LP_FEASIBILITY_SET_INT_NEW;
+  }
+}
+
+static
+void lp_feasibility_set_int_invert(lp_feasibility_set_int_t *set) {
+  assert(set->K != lp_Z);
+  // don't invert big fields
+  assert(lp_integer_cmp_int(lp_Z, &set->K->M, 10000) < 0);
+
+  size_t cnt = lp_integer_to_int(&set->K->M);
+  assert(set->size <= cnt);
+  cnt -= set->size;
+
+  lp_integer_t *new = malloc(cnt * sizeof(lp_integer_t));
+  lp_integer_t *old = set->elements;
+  size_t pos_new = 0;
+  size_t pos_old = 0;
+
+  long lb = lp_integer_to_int(&set->K->lb);
+  long ub = lp_integer_to_int(&set->K->ub);
+  for (long val = lb; val <= ub; ++val) {
+    assert(pos_new < cnt);
+    assert(pos_old >= set->size || lp_integer_cmp_int(lp_Z, old + pos_old, val) >= 0);
+    if (pos_old < set->size && lp_integer_cmp_int(lp_Z, old + pos_old, val) == 0) {
+      ++ pos_old;
+    } else {
+      lp_integer_construct_from_int(lp_Z, new + pos_new, val);
+      ++ pos_new;
+    }
+  }
+
+  free(old);
+  set->elements = new;
+  set->size = cnt;
+  set->capacity = cnt;
+  set->inverted = !set->inverted;
+}
+
+static inline
+lp_feasibility_set_int_status_t invert_i1_i2(lp_feasibility_set_int_status_t status) {
+  if (status == LP_FEASIBILITY_SET_INT_S1) { return LP_FEASIBILITY_SET_INT_S2; }
+  if (status == LP_FEASIBILITY_SET_INT_S2) { return LP_FEASIBILITY_SET_INT_S1; }
+  return status;
 }
 
 lp_feasibility_set_int_t* lp_feasibility_set_int_intersect(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
+  lp_feasibility_set_int_status_t status;
+  return lp_feasibility_set_int_intersect_with_status(s1, s2, &status);
+}
+
+lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t * status) {
   assert(lp_int_ring_equal(s1->K, s2->K));
 
-  lp_feasibility_set_int_t *result = lp_feasibility_set_int_new_empty(s1->K);
-  size_t s;
+  lp_feasibility_set_int_t *result;
 
   if (s1->inverted && s2->inverted) {
+    result = lp_feasibility_set_int_new_empty(s1->K);
+    *status = ordered_integer_set_union(&result->elements, &result->size,
+                                  s1->elements, s1->size, s2->elements,
+                                  s2->size);
     result->inverted = true;
-    s = ordered_integer_set_union(&result->elements,
-                                  s1->elements,s1->size,
-                                  s2->elements, s2->size);
+    result->capacity = result->size;
+  } else if (!s1->inverted && !s2->inverted) {
+    result = lp_feasibility_set_int_new_empty(s1->K);
+    *status = ordered_integer_set_intersect(&result->elements, &result->size,
+                                      s1->elements, s1->size, s2->elements,
+                                      s2->size);
+    result->inverted = false;
+    result->capacity = result->size;
   } else if (s1->inverted && !s2->inverted) {
-    result->inverted = false;
-    s = ordered_integer_set_minus(&result->elements,
-                                  s2->elements, s2->size,
-                                  s1->elements, s1->size);
-  } else if (!s1->inverted && s2->inverted) {
-    result->inverted = false;
-    s = ordered_integer_set_minus(&result->elements,
-                                  s1->elements, s1->size,
-                                  s2->elements, s2->size);
+    result = lp_feasibility_set_int_intersect_with_status(s2, s1, status);
+    // TODO this gives I2 precedence in case I1 == I2. Maybe introduce a BOTH option.
+    *status = invert_i1_i2(*status);
   } else {
-    assert(!s1->inverted && !s2->inverted);
-    result->inverted = false;
-    s = ordered_integer_set_intersect(&result->elements,
-                                      s1->elements, s1->size,
-                                      s2->elements, s2->size);
+    assert(!s1->inverted && s2->inverted);
+    if (s1->size > lp_feasibility_set_int_size_approx(s2)) {
+      // s2 could be the smaller set, LP_FEASIBILITY_SET_INT_S2 is possible
+      // TODO this effort could be saved in case we don't care about the status
+      lp_feasibility_set_int_t *tmp = lp_feasibility_set_int_new_copy(s2);
+      lp_feasibility_set_int_invert(tmp);
+      result = lp_feasibility_set_int_intersect_with_status(s1, tmp, status);
+      lp_feasibility_set_int_delete(tmp);
+    } else {
+      // s1 is the smaller set, LP_FEASIBILITY_SET_INT_S2 is not possible
+      result = lp_feasibility_set_int_new_empty(s1->K);
+      *status = ordered_integer_set_minus(&result->elements, &result->size,
+                                          s1->elements, s1->size,
+                                          s2->elements, s2->size);
+      result->inverted = false;
+      result->capacity = result->size;
+    }
   }
-  result->capacity = result->size = s;
+
   return result;
 }
 
-lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_intersect_status_t* status) {
+lp_feasibility_set_int_t* lp_feasibility_set_int_union(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
+  lp_feasibility_set_int_status_t status;
+  return lp_feasibility_set_int_union_with_status(s1, s2, &status);
+}
 
+lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t* status) {
+  assert(lp_int_ring_equal(s1->K, s2->K));
+
+  lp_feasibility_set_int_t *result = lp_feasibility_set_int_new_empty(s1->K);
+
+  if (s1->inverted && s2->inverted) {
+    *status = ordered_integer_set_intersect(&result->elements, &result->size,
+                                            s1->elements, s1->size,
+                                            s2->elements, s2->size);
+    result->inverted = true;
+    result->capacity = result->size;
+  } else if (!s1->inverted && !s2->inverted) {
+    *status = ordered_integer_set_union(&result->elements, &result->size,
+                                        s1->elements, s1->size,
+                                        s2->elements, s2->size);
+    result->inverted = false;
+    result->capacity = result->size;
+  } else if (!s1->inverted && s2->inverted) {
+    result = lp_feasibility_set_int_union_with_status(s2, s1, status);
+    // TODO this gives I2 precedence in case I1 == I2. Maybe introduce a BOTH option.
+    *status = invert_i1_i2(*status);
+  } else {
+    assert (s1->inverted && !s2->inverted);
+    if (s2->size > lp_feasibility_set_int_size_approx(s1)) {
+      // s2 is be the bigger set, LP_FEASIBILITY_SET_INT_S2 is possible
+      // TODO this effort could be saved in case we don't care about the status
+      lp_feasibility_set_int_t *tmp = lp_feasibility_set_int_new_copy(s1);
+      lp_feasibility_set_int_invert(tmp);
+      result = lp_feasibility_set_int_intersect_with_status(tmp, s2, status);
+      lp_feasibility_set_int_delete(tmp);
+    } else {
+      // s1 is the bigger set, LP_FEASIBILITY_SET_INT_S2 is not possible
+      *status = ordered_integer_set_minus(&result->elements, &result->size,
+                                          s1->elements, s1->size,
+                                          s2->elements, s2->size);
+      result->inverted = true;
+      result->capacity = result->size;
+    }
+  }
+
+  return result;
 }
 
 void lp_feasibility_set_int_add(lp_feasibility_set_int_t* s, const lp_feasibility_set_int_t* from) {
@@ -310,34 +492,30 @@ void lp_feasibility_set_int_add(lp_feasibility_set_int_t* s, const lp_feasibilit
   lp_feasibility_set_int_delete(tmp);
 }
 
-lp_feasibility_set_int_t* lp_feasibility_set_int_union(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
-  assert(lp_int_ring_equal(s1->K, s2->K));
-
-  lp_feasibility_set_int_t *result = lp_feasibility_set_int_new_empty(s1->K);
-  size_t s;
-
-  if (s1->inverted && s2->inverted) {
-    result->inverted = true;
-    s = ordered_integer_set_intersect(&result->elements,
-                                      s1->elements,s1->size,
-                                      s2->elements, s2->size);
-  } else if (s1->inverted && !s2->inverted) {
-    result->inverted = true;
-    s = ordered_integer_set_minus(&result->elements,
-                                  s1->elements, s1->size,
-                                  s2->elements, s2->size);
-  } else if (!s1->inverted && s2->inverted) {
-    result->inverted = true;
-    s = ordered_integer_set_minus(&result->elements,
-                                  s2->elements, s2->size,
-                                  s1->elements, s1->size);
-  } else {
-    assert(!s1->inverted && !s2->inverted);
-    result->inverted = false;
-    s = ordered_integer_set_union(&result->elements,
-                                  s1->elements, s1->size,
-                                  s2->elements, s2->size);
+int lp_feasibility_set_int_print(const lp_feasibility_set_int_t* set, FILE* out) {
+  int ret = 0;
+  if (set->inverted) {
+    ret += fprintf(out, "F \\");
   }
-  result->capacity = result->size = s;
-  return result;
+  ret += fprintf(out, "{ ");
+  for(size_t i = 0; i < set->size; ++ i) {
+    if (i) {
+      ret += fprintf(out, ", ");
+    }
+    ret += lp_integer_print(&set->elements[i], out);
+  }
+  ret += fprintf(out, " } in ");
+  ret += lp_int_ring_print(set->K, out);
+  return ret;
+}
+
+char* lp_feasibility_set_int_to_string(const lp_feasibility_set_int_t* set) {
+  struct u_memstream mem;
+  char* str = 0;
+  size_t size = 0;
+  u_memstream_open(&mem, &str, &size);
+  FILE* f = u_memstream_get(&mem);
+  lp_feasibility_set_int_print(set, f);
+  u_memstream_close(&mem);
+  return str;
 }
