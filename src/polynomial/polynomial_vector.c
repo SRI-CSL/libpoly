@@ -19,6 +19,7 @@
 
 #include "polynomial_vector.h"
 #include "polynomial.h"
+#include "output.h"
 
 #include "polynomial/gcd.h"
 
@@ -29,6 +30,19 @@
 lp_polynomial_vector_t* lp_polynomial_vector_new(const lp_polynomial_context_t* ctx) {
   lp_polynomial_vector_t* result = (lp_polynomial_vector_t*) malloc(sizeof(lp_polynomial_vector_t));
   lp_polynomial_vector_construct(result, ctx);
+  return result;
+}
+
+lp_polynomial_vector_t* lp_polynomial_vector_copy(const lp_polynomial_vector_t *v) {
+  lp_polynomial_vector_t* result = (lp_polynomial_vector_t*) malloc(sizeof(lp_polynomial_vector_t));
+  // copy all fields
+  *result = *v;
+  // deep copy of data
+  result->data = (coefficient_t*) malloc(v->capacity * sizeof(coefficient_t));
+  for (size_t i = 0; i < v->size; ++i) {
+    coefficient_construct_copy(result->ctx, result->data + i, v->data + i);
+  }
+  lp_polynomial_context_attach((lp_polynomial_context_t*)result->ctx);
   return result;
 }
 
@@ -51,6 +65,14 @@ void lp_polynomial_vector_destruct(lp_polynomial_vector_t* v) {
   lp_polynomial_context_detach((lp_polynomial_context_t*)v->ctx);
 }
 
+const lp_polynomial_context_t* lp_polynomial_vector_get_context(const lp_polynomial_vector_t *v) {
+    return v->ctx;
+}
+
+void lp_polynomial_vector_swap(lp_polynomial_vector_t *v1, lp_polynomial_vector_t *v2) {
+    lp_polynomial_vector_t tmp = *v1; *v1 = *v2; *v2 = tmp;
+}
+
 static inline
 void lp_polynomial_vector_check_size_for_add(lp_polynomial_vector_t* v) {
   if (v->size == v->capacity) {
@@ -66,6 +88,15 @@ void lp_polynomial_vector_push_back(lp_polynomial_vector_t* v, const lp_polynomi
   v->size ++;
 }
 
+void lp_polynomial_vector_push_back_move(lp_polynomial_vector_t* v, lp_polynomial_t* p) {
+  assert(lp_polynomial_context_equal(v->ctx, p->ctx));
+  lp_polynomial_vector_check_size_for_add(v);
+  coefficient_t *v_p = v->data + v->size;
+  coefficient_construct_from_int(v->ctx, v_p, 0);
+  coefficient_swap(&p->data, v_p);
+  v->size ++;
+}
+
 void lp_polynomial_vector_push_back_coeff(lp_polynomial_vector_t* v, const coefficient_t* C) {
   lp_polynomial_vector_check_size_for_add(v);
   coefficient_construct_copy(v->ctx, v->data + v->size, C);
@@ -73,7 +104,7 @@ void lp_polynomial_vector_push_back_coeff(lp_polynomial_vector_t* v, const coeff
 }
 
 void lp_polynomial_vector_reset(lp_polynomial_vector_t* v) {
-  size_t i = 0;
+  size_t i;
   for (i = 0; i < v->size; ++ i) {
     coefficient_destruct(v->data + i);
   }
@@ -86,6 +117,17 @@ size_t lp_polynomial_vector_size(const lp_polynomial_vector_t* v) {
 
 lp_polynomial_t* lp_polynomial_vector_at(const lp_polynomial_vector_t* v, size_t i) {
   return lp_polynomial_new_from_coefficient(v->ctx, v->data + i);
+}
+
+void lp_polynomial_vector_print(const lp_polynomial_vector_t* v, FILE* out) {
+    fputc('[', out);
+    size_t i;
+    for (i = 0; i < v->size; ++ i) {
+        coefficient_print(v->ctx, v->data + i, out);
+        if (i != v->size - 1)
+            fputc(',', out);
+    }
+    fputc(']', out);
 }
 
 void lp_polynomial_vector_push_back_coeff_prime(lp_polynomial_vector_t* v, const coefficient_t* C) {

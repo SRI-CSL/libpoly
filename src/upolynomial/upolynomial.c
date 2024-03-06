@@ -31,10 +31,10 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
 
-#include <upolynomial.h>
 #include "upolynomial/upolynomial.h"
+
+#include <polynomial.h>
 
 size_t lp_upolynomial_degree(const lp_upolynomial_t* p) {
   assert(p);
@@ -43,6 +43,7 @@ size_t lp_upolynomial_degree(const lp_upolynomial_t* p) {
 }
 
 // Construct the polynomial, but don't construct monomials
+static
 lp_upolynomial_t* lp_upolynomial_construct_empty(const lp_int_ring_t* K, size_t size) {
   size_t malloc_size = sizeof(lp_upolynomial_t) + size*sizeof(ulp_monomial_t);
   lp_upolynomial_t* new_p = (lp_upolynomial_t*) malloc(malloc_size);
@@ -1205,4 +1206,23 @@ lp_upolynomial_t* lp_upolynomial_subst_x_neg(const lp_upolynomial_t* f) {
   }
 
   return neg;
+}
+
+lp_polynomial_t* lp_upolynomial_to_polynomial(const lp_upolynomial_t* p, const lp_polynomial_context_t* ctx, lp_variable_t var) {
+  assert(p);
+  assert(lp_int_ring_equal(p->K, ctx->K));
+
+  lp_polynomial_t *poly = lp_polynomial_new(ctx);
+
+  lp_monomial_t mono;
+  lp_monomial_construct(ctx, &mono);
+  for (size_t i = 0; i < p->size; ++i) {
+    lp_monomial_set_coefficient(ctx, &mono, &p->monomials[i].coefficient);
+    lp_monomial_push(&mono, var, p->monomials[i].degree);
+    lp_polynomial_add_monomial(poly, &mono);
+    lp_monomial_clear(ctx, &mono);
+  }
+  lp_monomial_destruct(&mono);
+
+  return poly;
 }
