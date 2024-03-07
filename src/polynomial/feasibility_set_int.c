@@ -52,13 +52,37 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_new_full(lp_int_ring_t *K) {
 }
 
 static
+size_t unique_lp_integer(lp_integer_t *b, size_t size) {
+  if (size <= 1) return size;
+
+  size_t new_size = 1;
+  lp_integer_t *first = b, *last = b + size;
+  lp_integer_t *result = first;
+  while (++first != last) {
+    if (lp_integer_cmp(lp_Z, result, first) != 0) {
+      lp_integer_swap(++result, first);
+      ++new_size;
+    }
+  }
+  while (++result != last) {
+    lp_integer_destruct(result);
+  }
+  assert(new_size <= size);
+  return new_size;
+}
+
+static
 void lp_feasibility_set_int_construct_from_integer(lp_feasibility_set_int_t *set, lp_int_ring_t *K, const lp_integer_t *elements, size_t size, bool inverted) {
   lp_feasibility_set_int_construct(K, set, size, inverted);
   for (size_t i = 0; i < size; ++ i) {
     lp_integer_construct_copy(K, set->elements + i, elements + i);
   }
-  set->size = size;
   qsort(set->elements, size, sizeof(lp_integer_t), int_cmp);
+  size_t new_size = unique_lp_integer(set->elements, size);
+  if (new_size < size) {
+    set->elements = realloc(set->elements, new_size * sizeof(lp_integer_t));
+  }
+  set->size = new_size;
 }
 
 lp_feasibility_set_int_t* lp_feasibility_set_int_new_from_integer(lp_int_ring_t *K, const lp_integer_t* elements, size_t elements_size, bool inverted) {
@@ -127,7 +151,6 @@ void lp_feasibility_set_int_size(const lp_feasibility_set_int_t *set, lp_integer
   }
 }
 
-static
 size_t lp_feasibility_set_int_size_approx(const lp_feasibility_set_int_t *set) {
   if (!set->inverted) {
     return set->size;
@@ -148,7 +171,7 @@ int lp_feasibility_set_int_is_point(const lp_feasibility_set_int_t* set) {
   return 0;
 }
 
-/** returns true if value is in elements. Assumes that the elements are sorted. */
+/** returns true if value is in elements. Assumes that the elements are sorted and that value is normalized wrt set->K */
 static
 bool lp_feasibility_set_int_find(const lp_feasibility_set_int_t* set, const lp_integer_t* value, size_t *pos) {
   if (set->size == 0){
@@ -156,20 +179,19 @@ bool lp_feasibility_set_int_find(const lp_feasibility_set_int_t* set, const lp_i
   }
   assert(set->elements);
   // including l and r
-  size_t l = 0, r = set->size - 1;
+  long l = 0, r = set->size - 1;
   while (l <= r) {
-    size_t p = (r + l) >> 1;
+    long p = (r + l) / 2;
     int cmp = lp_integer_cmp(lp_Z, set->elements + p, value);
-    if (cmp < 0) {
+    if (cmp > 0) {
       // continue left
       r = p - 1;
-    } else if (cmp > 0) {
+    } else if (cmp < 0) {
       // continue right
       l = p + 1;
     } else {
       // found
-      if (pos)
-        *pos = p;
+      if (pos) { *pos = p; }
       return true;
     }
   }
@@ -177,7 +199,11 @@ bool lp_feasibility_set_int_find(const lp_feasibility_set_int_t* set, const lp_i
 }
 
 int lp_feasibility_set_int_contains(const lp_feasibility_set_int_t* set, const lp_integer_t* value) {
-  bool found = lp_feasibility_set_int_find(set, value, NULL);
+  lp_integer_t value_normalized;
+  // normalize value before check
+  lp_integer_construct_copy(set->K, &value_normalized, value);
+  bool found = lp_feasibility_set_int_find(set, &value_normalized, NULL);
+  lp_integer_destruct(&value_normalized);
   return found != set->inverted;
 }
 
@@ -194,117 +220,116 @@ void lp_feasibility_set_int_pick_value(const lp_feasibility_set_int_t* set, lp_i
   }
 }
 
+typedef enum {
+  NONE = 0,
+  S1 = 1,
+  S2 = 2,
+  BOTH = 3,
+} set_status_internal_t;
+
 /** Calculates i1 \cup i2 */
 static
-lp_feasibility_set_int_status_t ordered_integer_set_union(
+set_status_internal_t ordered_integer_set_union(
         lp_integer_t **result, size_t *result_size,
         const lp_integer_t *i1, size_t i1_size,
         const lp_integer_t *i2, size_t i2_size) {
 
   size_t max_size = i1_size + i2_size;
-  *result_size = 0;
   if (i1_size == 0 && i2_size == 0) {
-    return LP_FEASIBILITY_SET_INT_EMPTY;
+    if (result_size) { *result_size = 0; }
+    return BOTH;
   }
 
-  *result = malloc(max_size * sizeof(lp_integer_t));
+  if (result) { *result = malloc(max_size * sizeof(lp_integer_t)); }
 
   bool just_i1 = true, just_i2 = true;
-  size_t p1 = 0, p2 = 0;
+  size_t p1 = 0, p2 = 0, pr = 0;
   while (p1 < i1_size && p2 < i2_size) {
     int cmp = lp_integer_cmp(lp_Z, i1 + p1, i2 + p2);
     if (cmp < 0) {
-      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
+      if (result) { lp_integer_construct_copy(lp_Z, *result + pr, i1 + p1); }
       just_i2 = false;
       p1 ++;
     } else if (cmp > 0) {
-      lp_integer_construct_copy(lp_Z, *result + *result_size, i2 + p2);
+      if (result) { lp_integer_construct_copy(lp_Z, *result + pr, i2 + p2); }
       just_i1 = false;
       p2 ++;
     } else {
-      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
+      if (result) { lp_integer_construct_copy(lp_Z, *result + pr, i1 + p1); }
       p1 ++; p2 ++;
     }
-    (*result_size) ++;
+    pr ++;
   }
-  while (p1 < i1_size) {
-    lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1++);
-    (*result_size) ++;
-    just_i2 = false;
-  }
-  while (p2 < i2_size) {
-    lp_integer_construct_copy(lp_Z, *result + *result_size, i2 + p2++);
-    (*result_size) ++;
-    just_i1 = false;
-  }
-  *result = realloc(*result, *result_size * sizeof(lp_integer_t));
-
-  if (just_i1) {
-    return LP_FEASIBILITY_SET_INT_S1;
-  } else if (just_i2) {
-    return LP_FEASIBILITY_SET_INT_S2;
+  if (result) {
+    while (p1 < i1_size) {
+      lp_integer_construct_copy(lp_Z, *result + pr, i1 + p1);
+      p1++; pr++;
+      just_i2 = false;
+    }
+    while (p2 < i2_size) {
+      lp_integer_construct_copy(lp_Z, *result + pr, i2 + p2);
+      p2++; pr++;
+      just_i1 = false;
+    }
+    *result = realloc(*result, pr * sizeof(lp_integer_t));
   } else {
-    return LP_FEASIBILITY_SET_INT_NEW;
+    if (p1 < i1_size) { just_i2 = false; pr += (i1_size - p1); }
+    if (p2 < i2_size) { just_i1 = false; pr += (i2_size - p2); }
   }
+
+  if (result_size) { *result_size = pr; }
+  return (just_i1 ? S1 : NONE) | (just_i2 ? S2 : NONE);
 }
 
 /** Calculates i1 \cap i2 */
 static
-lp_feasibility_set_int_status_t ordered_integer_set_intersect(
+set_status_internal_t ordered_integer_set_intersect(
         lp_integer_t **result, size_t *result_size,
         const lp_integer_t *i1, size_t i1_size,
         const lp_integer_t *i2, size_t i2_size) {
 
   size_t max_size = i1_size < i2_size ? i1_size : i2_size;
-  *result_size = 0;
   if (i1_size == 0 || i2_size == 0) {
-    return LP_FEASIBILITY_SET_INT_EMPTY;
+    if (result_size) { *result_size = 0; }
+    return (i1_size == 0 ? S1 : NONE) | (i2_size == 0 ? S2 : NONE);
   }
 
-  *result = malloc(max_size * sizeof(lp_integer_t));
+  if (result) { *result = malloc(max_size * sizeof(lp_integer_t)); }
 
-  size_t p1 = 0, p2 = 0;
+  size_t p1 = 0, p2 = 0, pr = 0;
   bool all_i1 = true, all_i2 = true;
   while (p1 < i1_size && p2 < i2_size) {
     int cmp = lp_integer_cmp(lp_Z, i1 + p1, i2 + p2);
-    if (cmp < 0) {
+    if (cmp > 0) {
       p2 ++;
       all_i2 = false;
-    } else if (cmp > 0) {
+    } else if (cmp < 0) {
       p1 ++;
       all_i1 = false;
     } else {
-      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
-      p1 ++; p2 ++;
-      (*result_size) ++;
+      if (result) { lp_integer_construct_copy(lp_Z, *result + pr, i1 + p1); }
+      p1 ++; p2 ++; pr ++;
     }
   }
+  if (p1 < i1_size) { all_i1 = false; }
+  if (p2 < i2_size) { all_i2 = false; }
 
-  *result = realloc(*result, *result_size * sizeof(lp_integer_t));
-
-  if (*result_size == 0) {
-    return LP_FEASIBILITY_SET_INT_EMPTY;
-  } else if (all_i1) {
-    return LP_FEASIBILITY_SET_INT_S1;
-  } else if (all_i2) {
-    return LP_FEASIBILITY_SET_INT_S2;
-  } else {
-    return LP_FEASIBILITY_SET_INT_NEW;
-  }
+  if (result) { *result = realloc(*result, pr * sizeof(lp_integer_t)); }
+  if (result_size) { *result_size = pr; }
+  return (all_i1 ? S1 : NONE) | (all_i2 ? S2 : NONE);
 }
 
 /** Calculates i1 \setminus i2 */
 static
-lp_feasibility_set_int_status_t ordered_integer_set_minus(
+set_status_internal_t ordered_integer_set_minus(
         lp_integer_t **result, size_t *result_size,
         const lp_integer_t *i1, size_t i1_size,
         const lp_integer_t *i2, size_t i2_size) {
 
   size_t max_size = i1_size;
-  *result_size = 0;
-  *result = malloc(max_size * sizeof(lp_integer_t));
+  if (result) { *result = malloc(max_size * sizeof(lp_integer_t)); }
 
-  size_t p1 = 0, p2 = 0;
+  size_t p1 = 0, p2 = 0, pr = 0;
   while (p1 < i1_size) {
     bool found = false;
     while(p2 < i2_size) {
@@ -319,20 +344,15 @@ lp_feasibility_set_int_status_t ordered_integer_set_minus(
       p2 ++;
     }
     if (!found) {
-      lp_integer_construct_copy(lp_Z, *result + *result_size, i1 + p1);
-      (*result_size) ++;
+      if (result) { lp_integer_construct_copy(lp_Z, *result + pr, i1 + p1); }
+      pr ++;
     }
     p1 ++;
   }
-  *result = realloc(*result, *result_size * sizeof(lp_integer_t));
 
-  if (*result_size == 0) {
-    return LP_FEASIBILITY_SET_INT_EMPTY;
-  } else if (*result_size == i1_size) {
-    return LP_FEASIBILITY_SET_INT_S1;
-  } else {
-    return LP_FEASIBILITY_SET_INT_NEW;
-  }
+  if (result) { *result = realloc(*result, pr * sizeof(lp_integer_t)); }
+  if (result_size) { *result_size = pr; }
+  return (pr == i1_size ? S1 : NONE);
 }
 
 static
@@ -370,18 +390,26 @@ void lp_feasibility_set_int_invert(lp_feasibility_set_int_t *set) {
 }
 
 static inline
-lp_feasibility_set_int_status_t invert_i1_i2(lp_feasibility_set_int_status_t status) {
-  if (status == LP_FEASIBILITY_SET_INT_S1) { return LP_FEASIBILITY_SET_INT_S2; }
-  if (status == LP_FEASIBILITY_SET_INT_S2) { return LP_FEASIBILITY_SET_INT_S1; }
-  return status;
+set_status_internal_t invert_i1_i2(set_status_internal_t status) {
+  return (status & S1 ? S2 : NONE) | (status & S2 ? S1: NONE);
 }
 
-lp_feasibility_set_int_t* lp_feasibility_set_int_intersect(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
-  lp_feasibility_set_int_status_t status;
-  return lp_feasibility_set_int_intersect_with_status(s1, s2, &status);
+static inline
+lp_feasibility_set_int_status_t status_internal_to_external(set_status_internal_t is) {
+  switch (is) {
+  case BOTH:
+  case S1:
+    return LP_FEASIBILITY_SET_INT_S1;
+  case S2:
+    return LP_FEASIBILITY_SET_INT_S2;
+  default:
+  case NONE:
+    return LP_FEASIBILITY_SET_INT_NEW;
+  }
 }
 
-lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t * status) {
+static
+lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_internal(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, set_status_internal_t *status) {
   assert(lp_int_ring_equal(s1->K, s2->K));
 
   lp_feasibility_set_int_t *result;
@@ -399,8 +427,7 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_
                                       s2->size);
     result->inverted = false;
   } else if (s1->inverted && !s2->inverted) {
-    result = lp_feasibility_set_int_intersect_with_status(s2, s1, status);
-    // TODO this gives I2 precedence in case I1 == I2. Maybe introduce a BOTH option.
+    result = lp_feasibility_set_int_intersect_internal(s2, s1, status);
     *status = invert_i1_i2(*status);
   } else {
     assert(!s1->inverted && s2->inverted);
@@ -409,7 +436,7 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_
       // TODO this effort could be saved in case we don't care about the status
       lp_feasibility_set_int_t *tmp = lp_feasibility_set_int_new_copy(s2);
       lp_feasibility_set_int_invert(tmp);
-      result = lp_feasibility_set_int_intersect_with_status(s1, tmp, status);
+      result = lp_feasibility_set_int_intersect_internal(s1, tmp, status);
       lp_feasibility_set_int_delete(tmp);
     } else {
       // s1 is the smaller set, LP_FEASIBILITY_SET_INT_S2 is not possible
@@ -424,29 +451,38 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_
   return result;
 }
 
-lp_feasibility_set_int_t* lp_feasibility_set_int_union(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
-  lp_feasibility_set_int_status_t status;
-  return lp_feasibility_set_int_union_with_status(s1, s2, &status);
+lp_feasibility_set_int_t* lp_feasibility_set_int_intersect(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
+  set_status_internal_t is;
+  return lp_feasibility_set_int_intersect_internal(s1, s2, &is);
 }
 
-lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t* status) {
+lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t *status) {
+  set_status_internal_t is;
+  lp_feasibility_set_int_t *result = lp_feasibility_set_int_intersect_internal(s1, s2, &is);
+  *status = lp_feasibility_set_int_is_empty(result) ? LP_FEASIBILITY_SET_INT_EMPTY : status_internal_to_external(is);
+  return result;
+}
+
+static
+lp_feasibility_set_int_t* lp_feasibility_set_int_union_internal(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, set_status_internal_t * status) {
   assert(lp_int_ring_equal(s1->K, s2->K));
 
-  lp_feasibility_set_int_t *result = lp_feasibility_set_int_new_empty(s1->K);
+  lp_feasibility_set_int_t *result;
 
   if (s1->inverted && s2->inverted) {
+    result = lp_feasibility_set_int_new_empty(s1->K);
     *status = ordered_integer_set_intersect(&result->elements, &result->size,
                                             s1->elements, s1->size,
                                             s2->elements, s2->size);
     result->inverted = true;
   } else if (!s1->inverted && !s2->inverted) {
+    result = lp_feasibility_set_int_new_empty(s1->K);
     *status = ordered_integer_set_union(&result->elements, &result->size,
                                         s1->elements, s1->size,
                                         s2->elements, s2->size);
     result->inverted = false;
   } else if (!s1->inverted && s2->inverted) {
-    result = lp_feasibility_set_int_union_with_status(s2, s1, status);
-    // TODO this gives I2 precedence in case I1 == I2. Maybe introduce a BOTH option.
+    result = lp_feasibility_set_int_union_internal(s2, s1, status);
     *status = invert_i1_i2(*status);
   } else {
     assert (s1->inverted && !s2->inverted);
@@ -455,9 +491,10 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feas
       // TODO this effort could be saved in case we don't care about the status
       lp_feasibility_set_int_t *tmp = lp_feasibility_set_int_new_copy(s1);
       lp_feasibility_set_int_invert(tmp);
-      result = lp_feasibility_set_int_intersect_with_status(tmp, s2, status);
+      result = lp_feasibility_set_int_union_internal(tmp, s2, status);
       lp_feasibility_set_int_delete(tmp);
     } else {
+      result = lp_feasibility_set_int_new_empty(s1->K);
       // s1 is the bigger set, LP_FEASIBILITY_SET_INT_S2 is not possible
       *status = ordered_integer_set_minus(&result->elements, &result->size,
                                           s1->elements, s1->size,
@@ -469,10 +506,43 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feas
   return result;
 }
 
+lp_feasibility_set_int_t* lp_feasibility_set_int_union(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
+  set_status_internal_t status;
+  return lp_feasibility_set_int_union_internal(s1, s2, &status);
+}
+
+lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t* status) {
+  set_status_internal_t is;
+  lp_feasibility_set_int_t *result = lp_feasibility_set_int_union_internal(s1, s2, &is);
+  *status = lp_feasibility_set_int_is_empty(result) ? LP_FEASIBILITY_SET_INT_EMPTY : status_internal_to_external(is);
+  return result;
+}
+
 void lp_feasibility_set_int_add(lp_feasibility_set_int_t* s, const lp_feasibility_set_int_t* from) {
   lp_feasibility_set_int_t *tmp = lp_feasibility_set_int_union(s, from);
   lp_feasibility_set_int_swap(tmp, s);
   lp_feasibility_set_int_delete(tmp);
+}
+
+bool lp_feasibility_set_int_eq(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2) {
+  if (s1->inverted == s2->inverted) {
+    if (s1->size != s2->size) {
+      return false;
+    }
+    for (size_t i = 0; i < s1->size; ++i) {
+      if (lp_integer_cmp(lp_Z, s1->elements + i, s2->elements + i) != 0) {
+        return false;
+      }
+    }
+    return true;
+  } else {
+    if (lp_feasibility_set_int_size_approx(s1) != lp_feasibility_set_int_size_approx(s2)) {
+      return false;
+    }
+    size_t count;
+    ordered_integer_set_intersect(NULL, &count, s1->elements, s1->size, s2->elements, s2->size);
+    return count == 0;
+  }
 }
 
 int lp_feasibility_set_int_print(const lp_feasibility_set_int_t* set, FILE* out) {

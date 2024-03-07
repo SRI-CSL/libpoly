@@ -41,7 +41,10 @@ struct lp_feasibility_set_int_struct {
   /** Number of elements */
   size_t size;
 
-  /** Vector feasibility elements */
+  /**
+   * Vector feasibility elements
+   * Values are normalized wrt to K, kept sorted and unique
+   */
   lp_integer_t* elements;
 };
 
@@ -101,6 +104,11 @@ int lp_feasibility_set_int_is_point(const lp_feasibility_set_int_t* set);
 void lp_feasibility_set_int_size(const lp_feasibility_set_int_t *set, lp_integer_t *out);
 
 /**
+ * returns the size; guaranteed to be correct if it fits in long
+ */
+size_t lp_feasibility_set_int_size_approx(const lp_feasibility_set_int_t *set);
+
+/**
  * Check if the given value belongs to the set.
  */
 int lp_feasibility_set_int_contains(const lp_feasibility_set_int_t* set, const lp_integer_t* value);
@@ -149,6 +157,11 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feas
  * Add one set to another, i.e. s = s \cup from.
  */
 void lp_feasibility_set_int_add(lp_feasibility_set_int_t* s, const lp_feasibility_set_int_t* from);
+
+/**
+ * Returns true if both sets are equal
+ */
+bool lp_feasibility_set_int_eq(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2);
 
 /**
  * Print the set.
