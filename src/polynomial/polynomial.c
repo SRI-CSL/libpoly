@@ -19,6 +19,7 @@
 
 #include <upolynomial.h>
 #include <feasibility_set.h>
+#include <feasibility_set_int.h>
 #include <variable_db.h>
 #include <variable_list.h>
 
@@ -33,6 +34,7 @@
 #include "number/integer.h"
 
 #include "polynomial/feasibility_set.h"
+#include "polynomial/feasibility_set_int.h"
 #include "polynomial/polynomial_vector.h"
 
 #include "utils/debug_trace.h"
@@ -2034,6 +2036,50 @@ lp_feasibility_set_t* lp_polynomial_root_constraint_get_feasible_set(const lp_po
 
   return result;
 
+}
+
+lp_feasibility_set_int_t* lp_polynomial_constraint_get_feasible_set_Zp(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
+  const lp_polynomial_context_t *ctx = lp_polynomial_get_context(A);
+  assert(ctx->K != lp_Z);
+  assert(lp_sign_condition_Zp_valid(sgn_condition));
+
+  // The ring
+  lp_int_ring_t *K = ctx->K;
+
+  // Negate the constraint if negated
+  if (negated) {
+    sgn_condition = lp_sign_condition_negate(sgn_condition);
+  }
+
+  assert(lp_polynomial_is_univariate_m(A, M));
+
+  lp_upolynomial_t *upoly = lp_polynomial_to_univariate_m(A, M);
+  if (lp_upolynomial_degree(upoly) == 0) {
+    if (lp_upolynomial_is_zero(upoly)) {
+      return sgn_condition == LP_SGN_EQ_0 ? lp_feasibility_set_int_new_full(K) : lp_feasibility_set_int_new_empty(K);
+    } else {
+      return sgn_condition == LP_SGN_EQ_0 ? lp_feasibility_set_int_new_empty(K) : lp_feasibility_set_int_new_full(K);
+    }
+  }
+
+  lp_feasibility_set_int_t *result = sgn_condition == LP_SGN_EQ_0 ? lp_feasibility_set_int_new_empty(K) : lp_feasibility_set_int_new_full(K);
+
+  lp_upolynomial_roots_find_Zp(upoly, &result->elements, &result->size);
+
+#ifndef NDEBUG
+  {
+    lp_integer_t tmp;
+    lp_integer_construct(&tmp);
+    for (size_t i = 0; i < result->size; ++i) {
+      lp_upolynomial_evaluate_at_integer(upoly, &result->elements[i], &tmp);
+      assert(lp_integer_is_zero(lp_upolynomial_ring(upoly) , &tmp));
+    }
+    lp_integer_destruct(&tmp);
+  }
+#endif
+
+  lp_upolynomial_delete(upoly);
+  return result;
 }
 
 void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars) {
