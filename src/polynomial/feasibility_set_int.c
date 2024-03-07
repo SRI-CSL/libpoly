@@ -31,22 +31,12 @@ int int_cmp(const void *i1, const void *i2) {
 }
 
 static
-void lp_feasibility_set_int_ensure_capacity(lp_feasibility_set_int_t* s, size_t capacity) {
-  if (capacity && capacity > s->capacity) {
-    s->capacity = capacity;
-    s->elements = realloc(s->elements, s->capacity * sizeof(lp_integer_t));
-  }
-}
-
-static
 void lp_feasibility_set_int_construct(lp_int_ring_t *K, lp_feasibility_set_int_t* s, size_t size, bool inverted) {
   s->K = K;
   lp_int_ring_attach(s->K);
-  s->capacity = 0;
   s->size = size;
   s->inverted = inverted;
-  s->elements = NULL;
-  lp_feasibility_set_int_ensure_capacity(s, size);
+  s->elements = size ? malloc(s->size * sizeof(lp_integer_t)) : NULL;
 }
 
 lp_feasibility_set_int_t* lp_feasibility_set_int_new_empty(lp_int_ring_t *K) {
@@ -376,7 +366,6 @@ void lp_feasibility_set_int_invert(lp_feasibility_set_int_t *set) {
   free(old);
   set->elements = new;
   set->size = cnt;
-  set->capacity = cnt;
   set->inverted = !set->inverted;
 }
 
@@ -403,14 +392,12 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_
                                   s1->elements, s1->size, s2->elements,
                                   s2->size);
     result->inverted = true;
-    result->capacity = result->size;
   } else if (!s1->inverted && !s2->inverted) {
     result = lp_feasibility_set_int_new_empty(s1->K);
     *status = ordered_integer_set_intersect(&result->elements, &result->size,
                                       s1->elements, s1->size, s2->elements,
                                       s2->size);
     result->inverted = false;
-    result->capacity = result->size;
   } else if (s1->inverted && !s2->inverted) {
     result = lp_feasibility_set_int_intersect_with_status(s2, s1, status);
     // TODO this gives I2 precedence in case I1 == I2. Maybe introduce a BOTH option.
@@ -431,7 +418,6 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_
                                           s1->elements, s1->size,
                                           s2->elements, s2->size);
       result->inverted = false;
-      result->capacity = result->size;
     }
   }
 
@@ -453,13 +439,11 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feas
                                             s1->elements, s1->size,
                                             s2->elements, s2->size);
     result->inverted = true;
-    result->capacity = result->size;
   } else if (!s1->inverted && !s2->inverted) {
     *status = ordered_integer_set_union(&result->elements, &result->size,
                                         s1->elements, s1->size,
                                         s2->elements, s2->size);
     result->inverted = false;
-    result->capacity = result->size;
   } else if (!s1->inverted && s2->inverted) {
     result = lp_feasibility_set_int_union_with_status(s2, s1, status);
     // TODO this gives I2 precedence in case I1 == I2. Maybe introduce a BOTH option.
@@ -479,7 +463,6 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feas
                                           s1->elements, s1->size,
                                           s2->elements, s2->size);
       result->inverted = true;
-      result->capacity = result->size;
     }
   }
 

@@ -41,10 +41,6 @@ struct lp_feasibility_set_int_struct {
   /** Number of elements */
   size_t size;
 
-  // TODO remove capacity?
-  /** Capacity of the elements table */
-  size_t capacity;
-
   /** Vector feasibility elements */
   lp_integer_t* elements;
 };
