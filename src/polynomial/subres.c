@@ -26,14 +26,15 @@
 
 #include <assert.h>
 
-STAT_DECLARE(int, coefficient, psc)
+#ifdef UNOPTIMIZED_SUBRESULTANT
 
 /**
  * (non-optimized) Subresultant algorithm, as described in
  *
  * [2000] Ducos - Optimizations of the subresultant algorithm.
  */
-void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
+static
+void subres(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q, int psc_only) {
 
   TRACE("coefficient", "coefficient_psc()\n");
   STAT_INCR(coefficient, psc)
@@ -64,7 +65,20 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
   }
 
   // Set the final position
-  coefficient_assign(ctx, S + Q_deg, &s);
+  if (psc_only) {
+    coefficient_assign(ctx, S + Q_deg, &s);
+  } else {
+    if (P_deg > Q_deg) {
+      coefficient_t tmp;
+      coefficient_construct(ctx, &tmp);
+      coefficient_pow(ctx, &tmp, coefficient_lc(Q), P_deg - Q_deg - 1);
+      coefficient_mul(ctx, &tmp, &tmp, Q);
+      coefficient_assign(ctx, S + Q_deg, &tmp);
+      coefficient_destruct(&tmp);
+    } else {
+      coefficient_assign(ctx, S + Q_deg, Q);
+    }
+  }
 
   // A = Q, B = prem(P, -Q)
   coefficient_t A, B;
@@ -107,7 +121,7 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
     // S = [B; S]
     // we only collect the principal coefficients
     assert(d > 0);
-    coefficient_assign(ctx, S + (d-1), coefficient_get_coefficient_safe(ctx, &B, d-1, x));
+    coefficient_assign(ctx, S + (d-1), psc_only ? coefficient_get_coefficient_safe(ctx, &B, d-1, x) : &B);
     if (trace_is_enabled("coefficient::resultant")) {
       tracef("S[%d] = ", d-1); coefficient_print(ctx, S + (d-1), trace_out); tracef("\n");
     }
@@ -123,7 +137,7 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
       coefficient_pow(ctx, &pow, &s, delta-1);
       coefficient_div(ctx, &C, &C, &pow);
       // S = [C; S]
-      coefficient_assign(ctx, S + e, coefficient_get_coefficient_safe(ctx, &C, e, x));
+      coefficient_assign(ctx, S + e, psc_only ? coefficient_get_coefficient_safe(ctx, &C, e, x) : &C);
       if (trace_is_enabled("coefficient::resultant")) {
         tracef("C = "); coefficient_print(ctx, &C, trace_out); tracef("\n");
         tracef("S[%d] = ", e); coefficient_print(ctx, S + e, trace_out); tracef("\n");
@@ -184,6 +198,8 @@ void coefficient_psc_unoptimized(const lp_polynomial_context_t* ctx, coefficient
   coefficient_destruct(&pow);
   coefficient_destruct(&s);
 }
+
+#else
 
 static
 void S_e_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* S_d, const coefficient_t* S_d_1, coefficient_t* S_e, lp_variable_t X) {
@@ -337,20 +353,19 @@ void S_e_1_optimized(const lp_polynomial_context_t* ctx, const coefficient_t* A,
   free(H);
 }
 
-
 /**
  * (optimized) Subresultant algorithm, as described in
  *
  * [2000] Ducos - Optimizations of the subresultant algorithm.
  */
-void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
+static
+void subres(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q, int psc_only) {
 
   if (trace_is_enabled("coefficient::resultant")) {
     tracef("coefficient_psc()\n");
     tracef("P = "); coefficient_print(ctx, P, trace_out); tracef("\n");
     tracef("Q = "); coefficient_print(ctx, Q, trace_out); tracef("\n");
   }
-  STAT_INCR(coefficient, psc)
 
   assert(P->type == COEFFICIENT_POLYNOMIAL);
   assert(Q->type == COEFFICIENT_POLYNOMIAL);
@@ -377,7 +392,20 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
   }
 
   // Set the final position
-  coefficient_assign(ctx, S + Q_deg, &s);
+  if (psc_only) {
+    coefficient_assign(ctx, S + Q_deg, &s);
+  } else {
+    if (P_deg > Q_deg) {
+      coefficient_t tmp;
+      coefficient_construct(ctx, &tmp);
+      coefficient_pow(ctx, &tmp, coefficient_lc(Q), P_deg - Q_deg - 1);
+      coefficient_mul(ctx, &tmp, &tmp, Q);
+      coefficient_assign(ctx, S + Q_deg, &tmp);
+      coefficient_destruct(&tmp);
+    } else {
+      coefficient_assign(ctx, S + Q_deg, Q);
+    }
+  }
 
   // A = Q, B = prem(P, -Q)
   coefficient_t A, B;
@@ -424,7 +452,7 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
 
     // S = [B; S]
     assert(d > 0);
-    coefficient_assign(ctx, S + (d-1), coefficient_get_coefficient_safe(ctx, &B, d-1, x));
+    coefficient_assign(ctx, S + (d-1), psc_only ? coefficient_get_coefficient_safe(ctx, &B, d-1, x) : &B);
     if (trace_is_enabled("coefficient::resultant")) {
       tracef("S[%d] = ", d-1); coefficient_print(ctx, S + (d-1), trace_out); tracef("\n");
     }
@@ -447,7 +475,7 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
         coefficient_div(ctx, &C, &C, &pow);
       }
       // S = [C; S]
-      coefficient_assign(ctx, S + e, coefficient_get_coefficient_safe(ctx, &C, e, x));
+      coefficient_assign(ctx, S + e, psc_only ? coefficient_get_coefficient_safe(ctx, &C, e, x) : &C);
       if (trace_is_enabled("coefficient::resultant")) {
         tracef("S[%d] = ", e); coefficient_print(ctx, S + e, trace_out); tracef("\n");
       }
@@ -505,7 +533,17 @@ void coefficient_psc_optimized(const lp_polynomial_context_t* ctx, coefficient_t
   coefficient_destruct(&s);
 }
 
-void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* S, const coefficient_t* P, const coefficient_t* Q) {
-  // coefficient_psc_unoptimized(ctx, S, P, Q);
-  coefficient_psc_optimized(ctx, S, P, Q);
+#endif
+
+STAT_DECLARE(int, coefficient, subres)
+STAT_DECLARE(int, coefficient, psc)
+
+void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* sr, const coefficient_t* C1, const coefficient_t* C2) {
+  STAT_INCR(coefficient, subres)
+  subres(ctx, sr, C1, C2, 0);
+}
+
+void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2) {
+  STAT_INCR(coefficient, psc)
+  subres(ctx, psc, C1, C2, 1);
 }

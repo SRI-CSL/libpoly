@@ -103,6 +103,9 @@ int lp_polynomial_lc_is_constant(const lp_polynomial_t* A);
 /** In case lc is constant, this returns the sign */
 int lp_polynomial_lc_sgn(const lp_polynomial_t* A);
 
+/** Returns the constant part of the leading coefficient */
+void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out);
+
 /** Get the context of the given polynomial */
 const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
 
@@ -136,6 +139,18 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
 /** Returns the univariate polynomial (if univariate, or 0 otherwise) */
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A);
 
+/**
+ * Returns the univariate polynomial of A partially evaluated with m.
+ * m must assign all variables in A (but the top variable) to an integer value.
+ */
+lp_upolynomial_t* lp_polynomial_to_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m);
+
+/** Returns true if the polynomial is a monomial */
+int lp_polynomial_is_monomial(const lp_polynomial_t* A);
+
+/** Returns A as a monomial. Assumes that A is a monomial */
+void lp_polynomial_to_monomial(const lp_polynomial_t* A, lp_monomial_t* out);
+
 /** Returns true if all of polynomial's variables are assigned */
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m);
 
@@ -145,9 +160,11 @@ int lp_polynomial_sgn(const lp_polynomial_t* A, const lp_assignment_t* m);
 /** Returns the interval approximation of the polynomial value */
 void lp_polynomial_interval_value(const lp_polynomial_t* A, const lp_interval_assignment_t* m, lp_interval_t* result);
 
-/** returns the sign of the polynomial in the model */
+/** returns the value of the polynomial in the model */
 lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment_t* m);
 
+/** copies the integer value of a polynomial to out; assignment m must only assign integer values */
+void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t* out);
 
 /**
  * Compare the two polynomials in the ring. Not necessarily +/- 1, could be
@@ -273,11 +290,18 @@ void lp_polynomial_pp_cont(lp_polynomial_t* pp, lp_polynomial_t* cont, const lp_
 void lp_polynomial_resultant(lp_polynomial_t* res, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
 
 /**
- * Compute the principal subresultant coefficients (psc) of A1 and A1. Bot A1
+ * Compute the principal subresultant coefficients (psc) of A1 and A2. Both A1
  * and A2 must be (non-trivial) polynomials over the same variable. If
- *  deg(A1) = m, deg(A2) = n, and output will be of size min(m, n).
+ * deg(A1) = m, deg(A2) = n, and output will be of size min(m, n)+1.
  */
 void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A1, const lp_polynomial_t* A2);
+
+/**
+ * Compute the subresultant regular sub-chain (subres) of A1 and A2. Bot A1
+ * and A2 must be (non-trivial) polynomials over the same variable. If
+ * deg(A1) = m, deg(A2) = n, and output will be of size min(m, n)+1.
+ */
+void lp_polynomial_subres(lp_polynomial_t** subres, const lp_polynomial_t* A, const lp_polynomial_t* B);
 
 /**
  * Compute the model-based GCD of the two polynomials. Adds the assumptions to
@@ -341,6 +365,12 @@ lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomi
 int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
 
 /**
+ * Given a polynomial constraint over an integer ring Zp, evaluate its truth value.
+ * sgn_condition must either be (== 0) or (!= 0) and M must assign to Zp.
+ */
+int lp_polynomial_constraint_evaluate_Zp(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
+
+/**
  * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a root index,
  * a sign condition, and an assignment M that assigns x1, ..., xn, the function
  * returns a subset or R where
@@ -383,7 +413,11 @@ int lp_polynomial_constraint_resolve_fm(
     lp_polynomial_t* R, lp_sign_condition_t* R_sgn,
     lp_polynomial_vector_t* assumptions);
 
-
+/**
+ * Reduces the degree of the polynomials wrt. to the polynomial's int_ring_t K.
+ * E.g. for K = x mod 5, x = x^5 for every value in K
+ */
+void lp_polynomial_reduce_degree_Zp(lp_polynomial_t *R, const lp_polynomial_t *A);
 
 #ifdef __cplusplus
 } /* close extern "C" { */

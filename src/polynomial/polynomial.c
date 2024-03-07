@@ -206,6 +206,10 @@ int lp_polynomial_lc_sgn(const lp_polynomial_t* A) {
   return coefficient_lc_sgn(A->ctx, &A->data);
 }
 
+void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out) {
+  lp_polynomial_external_clean(A);
+  coefficient_lc_constant(A->ctx, &A->data, out);
+}
 
 size_t lp_polynomial_degree(const lp_polynomial_t* A) {
   lp_polynomial_external_clean(A);
@@ -282,11 +286,24 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
 }
 
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
-  if (!coefficient_is_univariate(&A->data)) {
-    return 0;
+  if (!(coefficient_is_constant(&A->data) || coefficient_is_univariate(&A->data))) {
+    return NULL;
   } else {
     return coefficient_to_univariate(A->ctx, &A->data);
   }
+}
+
+lp_upolynomial_t* lp_polynomial_to_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m) {
+  lp_polynomial_external_clean(A);
+  return coefficient_to_univariate_m(A->ctx, &A->data, m);
+}
+
+int lp_polynomial_is_monomial(const lp_polynomial_t* A) {
+  return coefficient_is_monomial(A->ctx, &A->data);
+}
+
+void lp_polynomial_to_monomial(const lp_polynomial_t* A, lp_monomial_t* out) {
+  coefficient_to_monomial(A->ctx, &A->data, out);
 }
 
 int lp_polynomial_is_assigned(const lp_polynomial_t* A, const lp_assignment_t* m) {
@@ -317,6 +334,16 @@ lp_value_t* lp_polynomial_evaluate(const lp_polynomial_t* A, const lp_assignment
   }
 
   return coefficient_evaluate(A->ctx, &A->data, m);
+}
+
+void lp_polynomial_evaluate_integer(const lp_polynomial_t* A, const lp_assignment_t* m, lp_integer_t *value) {
+  lp_polynomial_external_clean(A);
+
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, m, lp_variable_null);
+  }
+
+  coefficient_evaluate_integer(A->ctx, &A->data, m, value);
 }
 
 int lp_polynomial_cmp(const lp_polynomial_t* A1, const lp_polynomial_t* A2) {
@@ -883,6 +910,7 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
   coefficient_psc(ctx, psc_coeff, &A->data, &B->data);
 
   // Construct the output (one less, we ignore the final 1)
+  // the last one is not ignored right now
   for (i = 0; i < size; ++ i) {
     lp_polynomial_t tmp;
     lp_polynomial_construct_from_coefficient(&tmp, ctx, psc_coeff + i);
@@ -896,6 +924,72 @@ void lp_polynomial_psc(lp_polynomial_t** psc, const lp_polynomial_t* A, const lp
   if (trace_is_enabled("polynomial")) {
     for (i = 0; i < size; ++ i) {
       tracef("PSC[%zu] = ", i); lp_polynomial_print(psc[i], trace_out); tracef("\n");
+    }
+  }
+}
+
+void lp_polynomial_subres(lp_polynomial_t** subres, const lp_polynomial_t* A, const lp_polynomial_t* B) {
+
+  if (trace_is_enabled("polynomial")) {
+    tracef("polynomial_subres("); lp_polynomial_print(A, trace_out); tracef(", "); lp_polynomial_print(B, trace_out); tracef(")\n");
+  }
+
+  if (trace_is_enabled("polynomial::expensive")) {
+    tracef("A = "); lp_polynomial_print(A, trace_out); tracef("\n");
+    tracef("B = "); lp_polynomial_print(B, trace_out); tracef("\n");
+    tracef("var = %s\n", lp_variable_db_get_name(A->ctx->var_db, lp_polynomial_top_variable(A)));
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out); tracef("\n");
+  }
+
+  assert(A->data.type == COEFFICIENT_POLYNOMIAL);
+  assert(B->data.type == COEFFICIENT_POLYNOMIAL);
+  assert(VAR(&A->data) == VAR(&B->data));
+
+  size_t A_deg = lp_polynomial_degree(A);
+  size_t B_deg = lp_polynomial_degree(B);
+
+  if (A_deg < B_deg) {
+    lp_polynomial_subres(subres, B, A);
+    return;
+  }
+
+  const lp_polynomial_context_t* ctx = A->ctx;
+  assert(lp_polynomial_context_equal(B->ctx, ctx));
+
+  if (trace_is_enabled("polynomial")) {
+    lp_variable_order_print(A->ctx->var_order, A->ctx->var_db, trace_out);
+    tracef("\n");
+  }
+
+  lp_polynomial_external_clean(A);
+  lp_polynomial_external_clean(B);
+
+  // Allocate the space for the result
+  size_t size = B_deg + 1;
+  coefficient_t *subres_coeff = malloc(sizeof(coefficient_t) * size);
+  size_t i;
+  for (i = 0; i < size; ++ i) {
+    coefficient_construct(ctx, subres_coeff + i);
+  }
+
+  // Compute
+  coefficient_subres(ctx, subres_coeff, &A->data, &B->data);
+
+  // Construct the output (one less, we ignore the final 1)
+  // the last one is not ignored right now
+  for (i = 0; i < size; ++ i) {
+    lp_polynomial_t tmp;
+    lp_polynomial_construct_from_coefficient(&tmp, ctx, subres_coeff + i);
+    lp_polynomial_swap(&tmp, subres[i]);
+    lp_polynomial_destruct(&tmp);
+    coefficient_destruct(&subres_coeff[i]);
+  }
+
+  free(subres_coeff);
+
+  if (trace_is_enabled("polynomial")) {
+    for (i = 0; i < size; ++ i) {
+      tracef("SR[%zu] = ", i); lp_polynomial_print(subres[i], trace_out); tracef("\n");
     }
   }
 }
@@ -1986,9 +2080,30 @@ int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_conditio
   if (trace_is_enabled("polynomial::check_input")) {
     check_polynomial_assignment(A, M, lp_polynomial_top_variable(A));
   }
+  assert(A->ctx->K == lp_Z);
 
   // Evaluate the sign and check
   int p_sign = lp_polynomial_sgn(A, M);
+  return lp_sign_condition_consistent(sgn_condition, p_sign);
+}
+
+int lp_polynomial_constraint_evaluate_Zp(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* m) {
+
+  lp_polynomial_external_clean(A);
+
+  if (trace_is_enabled("polynomial::check_input")) {
+    check_polynomial_assignment(A, m, lp_polynomial_top_variable(A));
+  }
+  assert(A->ctx->K != lp_Z);
+  assert(lp_sign_condition_Zp_valid(sgn_condition));
+  assert(lp_assignment_is_integer(m));
+
+  // Evaluate the sign and check
+  lp_integer_t value;
+  lp_integer_construct(&value);
+  lp_polynomial_evaluate_integer(A, m, &value);
+  int p_sign = !lp_integer_is_zero(A->ctx->K, &value);
+  lp_integer_destruct(&value);
   return lp_sign_condition_consistent(sgn_condition, p_sign);
 }
 
@@ -2232,3 +2347,18 @@ int lp_polynomial_constraint_resolve_fm(
   return ok;
 }
 
+void lp_polynomial_reduce_degree_Zp(lp_polynomial_t *R, const lp_polynomial_t *A) {
+  lp_polynomial_external_clean(A);
+
+  const lp_polynomial_context_t *ctx = A->ctx;
+
+  if (R == A) {
+    coefficient_reduce_Zp(ctx, &R->data);
+  } else {
+    lp_polynomial_t tmp;
+    lp_polynomial_construct_copy(&tmp, A);
+    coefficient_reduce_Zp(ctx, &tmp.data);
+    lp_polynomial_swap(&tmp, R);
+    lp_polynomial_destruct(&tmp);
+  }
+}

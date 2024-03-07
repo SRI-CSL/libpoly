@@ -118,3 +118,12 @@ int lp_sign_condition_consistent_interval(lp_sign_condition_t sgn_condition, con
   return 0;
 }
 
+int lp_sign_condition_Zp_valid(lp_sign_condition_t sgn_condition) {
+  switch (sgn_condition) {
+  case LP_SGN_EQ_0:
+  case LP_SGN_NE_0:
+    return 1;
+  default:
+    return 0;
+  }
+}

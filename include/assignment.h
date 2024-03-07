@@ -65,8 +65,18 @@ const lp_value_t* lp_assignment_get_value(const lp_assignment_t* m, lp_variable_
 /** Get an approximate value of the variable */
 void lp_assignment_get_value_approx(const lp_assignment_t* m, lp_variable_t x, lp_rational_interval_t* approx);
 
+/** Returns 1 if the variable is set, 0 otherwise. */
+int lp_assignment_is_set(const lp_assignment_t* m, lp_variable_t x);
+
+/** Returns 1 if the assignment assigns integer values only */
+int lp_assignment_is_integer(const lp_assignment_t *m);
+
+/** Returns 1 if the assignment is empty */
+int lp_assignment_is_empty(const lp_assignment_t *m);
+
 /** Get the sign of the polynomial in the model */
 int lp_assignment_sgn(const lp_assignment_t* m, const lp_polynomial_t* A);
+
 
 struct lp_interval_assignment_struct {
   /** Size of the map */

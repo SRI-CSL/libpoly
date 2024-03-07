@@ -140,6 +140,9 @@ namespace poly {
   bool is_assigned_over_assignment(const Polynomial& p, const Assignment& a) {
     return lp_polynomial_is_assigned(p.get_internal(), a.get_internal());
   }
+  UPolynomial to_univariate(const Polynomial& p, const Assignment& a) {
+    return UPolynomial(lp_polynomial_to_univariate_m(p.get_internal(), a.get_internal()));
+  }
   int sgn(const Polynomial& p, const Assignment& a) {
     return lp_polynomial_sgn(p.get_internal(), a.get_internal());
   }
@@ -379,6 +382,20 @@ namespace poly {
       tmp[i] = lp_polynomial_new(detail::context(p, q));
     }
     lp_polynomial_psc(tmp, p.get_internal(), q.get_internal());
+    std::vector<Polynomial> res;
+    for (std::size_t i = 0; i < size; ++i) {
+      res.emplace_back(tmp[i]);
+    }
+    return res;
+  }
+
+  std::vector<Polynomial> subres(const Polynomial& p, const Polynomial& q) {
+    std::size_t size = std::min(degree(p), degree(q)) + 1;
+    lp_polynomial_t* tmp[size];
+    for (std::size_t i = 0; i < size; ++i) {
+      tmp[i] = lp_polynomial_new(detail::context(p, q));
+    }
+    lp_polynomial_subres(tmp, p.get_internal(), q.get_internal());
     std::vector<Polynomial> res;
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);

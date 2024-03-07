@@ -20,8 +20,7 @@ namespace poly {
     lp_assignment_set_value(get_internal(), var.get_internal(), nullptr);
   }
   bool Assignment::has(const Variable& var) const {
-    return lp_assignment_get_value(get_internal(), var.get_internal())->type !=
-           LP_VALUE_NONE;
+    return lp_assignment_is_set(get_internal(), var.get_internal());
   }
   const Value& Assignment::get(const Variable& var) const {
     return *detail::cast_from(

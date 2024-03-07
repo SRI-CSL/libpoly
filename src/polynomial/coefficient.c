@@ -473,6 +473,19 @@ int coefficient_is_constant(const coefficient_t* C) {
   return C->type == COEFFICIENT_NUMERIC;
 }
 
+int coefficient_is_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
+  if (C->type == COEFFICIENT_NUMERIC) {
+    return 1;
+  } else {
+    for (size_t i = 0; i < SIZE(C) - 1; ++i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        return 0;
+      }
+    }
+    return coefficient_is_monomial(ctx, COEFF(C, SIZE(C) - 1));
+  }
+}
+
 size_t coefficient_degree(const coefficient_t* C) {
   switch (C->type) {
   case COEFFICIENT_NUMERIC:
@@ -568,7 +581,6 @@ static const coefficient_t* get_zero() {
 }
 
 const coefficient_t* coefficient_get_coefficient_safe(const lp_polynomial_context_t* ctx, const coefficient_t* C, size_t d, lp_variable_t x) {
-  __var_unused(ctx);
 
   if (d > coefficient_degree_safe(ctx, C, x)) {
     return get_zero();
@@ -1055,6 +1067,17 @@ int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* 
   return integer_sgn(ctx->K, &C->value.num);
 }
 
+STAT_DECLARE(int, coefficient, lc_constant)
+
+void coefficient_lc_constant(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_integer_t* out) {
+  STAT_INCR(coefficient, lc_constant)
+
+  while (C->type != COEFFICIENT_NUMERIC) {
+    C = coefficient_lc(C);
+  }
+
+  lp_integer_assign(ctx->K, out, &C->value.num);
+}
 
 STAT_DECLARE(int, coefficient, in_order)
 
@@ -1185,6 +1208,22 @@ void coefficient_traverse(const lp_polynomial_context_t* ctx, const coefficient_
         lp_monomial_pop(m);
       }
     }
+    break;
+  }
+}
+
+void coefficient_to_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_monomial_t *out) {
+  size_t d;
+
+  switch (C->type) {
+  case COEFFICIENT_NUMERIC:
+    integer_assign(ctx->K, &out->a, &C->value.num);
+    break;
+  case COEFFICIENT_POLYNOMIAL:
+    d = SIZE(C) - 1;
+    assert(d >= 1);
+    lp_monomial_push(out, VAR(C), d);
+    coefficient_to_monomial(ctx, COEFF(C, d), out);
     break;
   }
 }
@@ -1846,6 +1885,42 @@ void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* 
   }
 }
 
+void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C) {
+  assert(ctx->K != lp_Z);
+  assert(ctx->K->is_prime);
+  while (C->type == COEFFICIENT_POLYNOMIAL && integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) < 0) {
+    // SIZE(C) is greater than M, thus M fits in size_t
+    size_t m = integer_to_int(&ctx->K->M);
+    assert(m < SIZE(C));
+    for (size_t i = m; i < SIZE(C); ++i) {
+      if (!coefficient_is_zero(ctx, COEFF(C, i))) {
+        size_t j = i % (m - 1);
+        if (j == 0) {
+          j = (m - 1);
+        }
+        if (coefficient_is_zero(ctx, COEFF(C, j))) {
+          coefficient_swap(COEFF(C, i), COEFF(C, j));
+        } else {
+          coefficient_add(ctx, COEFF(C, j), COEFF(C, j), COEFF(C, i));
+          coefficient_t empty;
+          coefficient_construct(ctx, &empty);
+          coefficient_swap(COEFF(C, i), &empty);
+          coefficient_destruct(&empty);
+        }
+      }
+    }
+    coefficient_normalize(ctx, C);
+  }
+  // could have changed in coefficient_normalize
+  if (C->type == COEFFICIENT_POLYNOMIAL) {
+    assert(integer_cmp_int(lp_Z, &ctx->K->M, SIZE(C)) >= 0);
+    for (size_t i = 0; i < SIZE(C); ++i) {
+      coefficient_reduce_Zp(ctx, COEFF(C, i));
+    }
+    coefficient_normalize(ctx, C);
+  }
+}
+
 //
 // Implementation of the division/reduction/gcd stuff
 //
@@ -2077,7 +2152,11 @@ void coefficient_div_constant(const lp_polynomial_context_t* ctx, coefficient_t*
   size_t i ;
 
   if (C->type == COEFFICIENT_NUMERIC) {
-    integer_div_Z(&C->value.num, &C->value.num, A);
+    if (ctx->K == lp_Z) {
+      integer_div_Z(&C->value.num, &C->value.num, A);
+    } else {
+      integer_div_exact(ctx->K, &C->value.num, &C->value.num, A);
+    }
   } else {
     for (i = 0; i < SIZE(C); ++ i) {
       coefficient_div_constant(ctx, COEFF(C, i), A);
@@ -2461,6 +2540,9 @@ const lp_integer_t* coefficient_get_constant(const coefficient_t* C) {
 }
 
 lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* C) {
+  if (C->type == COEFFICIENT_NUMERIC) {
+      return lp_upolynomial_construct(ctx->K, 0, &C->value.num);
+  }
   assert(C->type == COEFFICIENT_POLYNOMIAL);
 
   lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*SIZE(C));
@@ -2476,6 +2558,40 @@ lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, 
     integer_destruct(coeff + i);
   }
   free(coeff);
+
+  return C_u;
+}
+
+lp_upolynomial_t* coefficient_to_univariate_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m) {
+  lp_upolynomial_t* C_u;
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    C_u = lp_upolynomial_construct(ctx->K, 0, &C->value.num);
+
+  } else if (lp_assignment_is_set(m, VAR(C))) {
+    lp_integer_t result;
+    lp_integer_construct(&result);
+
+    coefficient_evaluate_integer(ctx, C, m, &result);
+    C_u = lp_upolynomial_construct(ctx->K, 0, &result);
+    lp_integer_destruct(&result);
+
+  } else {
+    lp_integer_t* coeff = malloc(sizeof(lp_integer_t)*SIZE(C));
+
+    size_t i;
+    for (i = 0; i < SIZE(C); ++ i) {
+      lp_integer_construct(coeff + i);
+      coefficient_evaluate_integer(ctx, COEFF(C, i), m, coeff + i);
+    }
+
+    C_u = lp_upolynomial_construct(ctx->K, SIZE(C) - 1, coeff);
+
+    for (i = 0; i < SIZE(C); ++ i) {
+      integer_destruct(coeff + i);
+    }
+    free(coeff);
+  }
 
   return C_u;
 }
@@ -2646,6 +2762,40 @@ coefficient_ensure_capacity(const lp_polynomial_context_t* ctx, coefficient_t* C
   }
 }
 
+void coefficient_evaluate_integer(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, lp_integer_t *out) {
+
+  if (C->type == COEFFICIENT_NUMERIC) {
+    // Just a number, we're done
+    integer_assign(ctx->K, out, &C->value.num);
+  } else {
+    assert(C->type == COEFFICIENT_POLYNOMIAL);
+
+    // Get the variable and it's value, must be integer
+    const lp_value_t* x_value = lp_assignment_get_value(M, VAR(C));
+    assert(x_value->type == LP_VALUE_INTEGER);
+
+    // The degree of the polynomial
+    size_t size = SIZE(C);
+
+    // keep track of current variable's value
+    lp_integer_t tmp, exp;
+    lp_integer_construct(&tmp);
+    lp_integer_construct_from_int(ctx->K, &exp, 1);
+    // out is constructed but may have any value
+    lp_integer_assign_int(ctx->K, out, 0);
+    for (size_t i = 0; i < size; ++ i) {
+      // sum up each coefficient's value
+      coefficient_evaluate_integer(ctx, COEFF(C, i), M, &tmp);
+      lp_integer_add_mul(ctx->K, out, &tmp, &exp);
+      if (i < size - 1) { // save unnecessary final multiplication
+        lp_integer_mul(ctx->K, &exp, &exp, &x_value->value.z);
+      }
+    }
+    lp_integer_destruct(&tmp);
+    lp_integer_destruct(&exp);
+  }
+}
+
 void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, coefficient_t* C_out, lp_integer_t* multiplier) {
 
   assert(multiplier);
@@ -2654,7 +2804,7 @@ void coefficient_evaluate_rationals(const lp_polynomial_context_t* ctx, const co
   size_t i;
   lp_variable_t x;
 
-  // Start wit multiplier 1
+  // Start with multiplier 1
   integer_assign_int(lp_Z, multiplier, 1);
 
   if (C->type == COEFFICIENT_NUMERIC) {

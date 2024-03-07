@@ -134,11 +134,20 @@ int coefficient_is_normalized(const lp_polynomial_context_t* ctx, coefficient_t*
 /** Returns the univariate version of this coefficient (must be univariate) */
 lp_upolynomial_t* coefficient_to_univariate(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
+/** Returns the univariate version of this coefficient with regard to m. m must evaluate all (sub-)coefficients of C to integer. */
+lp_upolynomial_t* coefficient_to_univariate_m(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* m);
+
 /** Returns true if the coefficient is a constant */
 int coefficient_is_constant(const coefficient_t* C);
 
 /** Returns the constant of the polynomial (the actual deep constant) */
 const lp_integer_t* coefficient_get_constant(const coefficient_t* C);
+
+/** Returns true if the coefficient is a monomial */
+int coefficient_is_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C);
+
+/** In case C is a monomial, returns it. */
+void coefficient_to_monomial(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_monomial_t *out);
 
 /** The degree of the coefficient */
 size_t coefficient_degree(const coefficient_t* C);
@@ -204,7 +213,10 @@ lp_value_t* coefficient_evaluate(const lp_polynomial_context_t* ctx, const coeff
 /** Returns the sign of the leading coefficient */
 int coefficient_lc_sgn(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
-/** Returns treu if the coefficient is properly ordered according to ctx */
+/** Returns the integer value of the leading coefficient */
+void coefficient_lc_constant(const lp_polynomial_context_t* ctx, const coefficient_t* C, lp_integer_t* out);
+
+/** Returns true if the coefficient is properly ordered according to ctx */
 int coefficient_in_order(const lp_polynomial_context_t* ctx, const coefficient_t* C);
 
 /**
@@ -287,6 +299,9 @@ void coefficient_div_constant(const lp_polynomial_context_t* ctx, coefficient_t*
 /** Divide the degrees of the main variable of coefficient with the given number */
 void coefficient_div_degrees(const lp_polynomial_context_t* ctx, coefficient_t* C, size_t p);
 
+/** Divides the degree of exponents wrt to the prime field order */
+void coefficient_reduce_Zp(const lp_polynomial_context_t* ctx, coefficient_t* C);
+
 /** Compute R = D*C2 - C1, in the given ring (assumes division is exact). */
 void coefficient_rem(const lp_polynomial_context_t* ctx, coefficient_t* R, const coefficient_t* C1, const coefficient_t* C2);
 
@@ -314,8 +329,14 @@ void coefficient_derivative(const lp_polynomial_context_t* ctx, coefficient_t* C
 void coefficient_resultant(const lp_polynomial_context_t* ctx, coefficient_t* res, const coefficient_t* C1, const coefficient_t* C2);
 
 /**
- * Compute the principal subresultant coefficients. PSC should be a constructed
- * array of size deg(B) + 1 filled with 0.
+ * Compute the subresultant sequence.
+ * sr should be a constructed array of size deg(B) + 1 filled with 0.
+ */
+void coefficient_subres(const lp_polynomial_context_t* ctx, coefficient_t* sr, const coefficient_t* C1, const coefficient_t* C2);
+
+/**
+ * Compute the principal subresultant coefficients. These are the leading coefficients of the subresultant.
+ * PSC should be a constructed array of size deg(B) + 1 filled with 0.
  */
 void coefficient_psc(const lp_polynomial_context_t* ctx, coefficient_t* psc, const coefficient_t* C1, const coefficient_t* C2);
 
@@ -343,6 +364,12 @@ void coefficient_order_and_add_monomial(const lp_polynomial_context_t* ctx, lp_m
  * Add the monomial to the coefficient.
  */
 void coefficient_add_monomial(const lp_polynomial_context_t* ctx, coefficient_t* C, const lp_monomial_t* m);
+
+/**
+ * Substitute and evaluate any integer value. M must assign to integer only.
+ * Can handle ctx->K != lp_Z.
+ */
+void coefficient_evaluate_integer(const lp_polynomial_context_t* ctx, const coefficient_t* C, const lp_assignment_t* M, lp_integer_t *out);
 
 /**
  * Substitute and evaluate any rational values. The result C_out = multiplier*M(C) with the multiplier
