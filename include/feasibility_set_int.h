@@ -112,11 +112,13 @@ void lp_feasibility_set_int_pick_value(const lp_feasibility_set_int_t* set, lp_i
 
 /**
  * Get intersection of the two sets.
+ * s1 and s2 must be over the same ring K.
  */
 lp_feasibility_set_int_t* lp_feasibility_set_int_intersect(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2);
 
 /**
  * Get union of the two sets.
+ * s1 and s2 must be over the same ring K.
  */
 lp_feasibility_set_int_t* lp_feasibility_set_int_union(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2);
 
@@ -131,6 +133,7 @@ typedef enum {
  * Get intersection of the two sets, returns the status in the given variable.
  * The set s1 is given precedence so LP_FEASIBILITY_SET_S2 is the
  * status only if the intersect is not s1.
+ * s1 and s2 must be over the same ring K.
  */
 lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t * status);
 
@@ -138,6 +141,7 @@ lp_feasibility_set_int_t* lp_feasibility_set_int_intersect_with_status(const lp_
  * Get union of the two sets, returns the status in the given variable.
  * The set s1 is given precedence so LP_FEASIBILITY_SET_S2 is the
  * status only if the union is not s1.
+ * s1 and s2 must be over the same ring K.
  */
 lp_feasibility_set_int_t* lp_feasibility_set_int_union_with_status(const lp_feasibility_set_int_t* s1, const lp_feasibility_set_int_t* s2, lp_feasibility_set_int_status_t* status);
 
