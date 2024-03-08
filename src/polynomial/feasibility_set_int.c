@@ -166,15 +166,15 @@ size_t lp_feasibility_set_int_size_approx(const lp_feasibility_set_int_t *set) {
 
 int lp_feasibility_set_int_is_point(const lp_feasibility_set_int_t* set) {
   assert(lp_integer_cmp_int(lp_Z, &set->K->M, 2) > 0);
-  if (set->inverted && set->size == 1) return 1;
-  if (!set->inverted && lp_integer_cmp_int(lp_Z, &set->K->M, set->size + 1) == 0) return 1;
+  if (!set->inverted && set->size == 1) return 1;
+  if (set->inverted && lp_integer_cmp_int(lp_Z, &set->K->M, set->size + 1) == 0) return 1;
   return 0;
 }
 
 /** returns true if value is in elements. Assumes that the elements are sorted and that value is normalized wrt set->K */
 static
-bool lp_feasibility_set_int_find(const lp_feasibility_set_int_t* set, const lp_integer_t* value, size_t *pos) {
-  if (set->size == 0){
+bool lp_feasibility_set_int_find(const lp_feasibility_set_int_t *set, const lp_integer_t *value) {
+  if (set->size == 0) {
     return false;
   }
   assert(set->elements);
@@ -191,7 +191,6 @@ bool lp_feasibility_set_int_find(const lp_feasibility_set_int_t* set, const lp_i
       l = p + 1;
     } else {
       // found
-      if (pos) { *pos = p; }
       return true;
     }
   }
@@ -202,7 +201,7 @@ int lp_feasibility_set_int_contains(const lp_feasibility_set_int_t* set, const l
   lp_integer_t value_normalized;
   // normalize value before check
   lp_integer_construct_copy(set->K, &value_normalized, value);
-  bool found = lp_feasibility_set_int_find(set, &value_normalized, NULL);
+  bool found = lp_feasibility_set_int_find(set, &value_normalized);
   lp_integer_destruct(&value_normalized);
   return found != set->inverted;
 }
@@ -213,10 +212,27 @@ void lp_feasibility_set_int_pick_value(const lp_feasibility_set_int_t* set, lp_i
     size_t pos = random() % set->size;
     lp_integer_assign(lp_Z, value, set->elements + pos);
   } else {
-    assert(false);
-    // TODO implement
+    lp_integer_construct_from_int(lp_Z, value, 0);
+    // check 0
+    if (!lp_feasibility_set_int_find(set, value)) {
+      return;
+    }
+    while (true) {
+      lp_integer_inc(lp_Z, value);
+      assert(lp_integer_in_ring(set->K, value));
+      if (!lp_feasibility_set_int_find(set, value)) {
+        return;
+      }
+      lp_integer_neg(lp_Z, value, value);
+      if (!lp_feasibility_set_int_find(set, value)) {
+        return;
+      }
+      lp_integer_neg(lp_Z, value, value);
+    }
+    // TODO proper implementation
     // get random element between (incl.) 0 and (|K| - size)
     // find and add number of <= element
+    assert(false);
   }
 }
 
