@@ -459,6 +459,10 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
   lp_upolynomial_factors_destruct(square_free_factors, 1);
 }
 
+/**
+ * helper function for rabin root finding
+ * returns x^p mod f
+ */
 static
 lp_upolynomial_t* upolynomial_power_mod(const lp_upolynomial_t *b, const lp_integer_t *e, const lp_upolynomial_t *m) {
   lp_integer_t ee;
@@ -483,6 +487,10 @@ lp_upolynomial_t* upolynomial_power_mod(const lp_upolynomial_t *b, const lp_inte
   return acc;
 }
 
+/**
+ * helper function for rabin root finding
+ * returns gcd(f, x^p - x)
+ */
 static
 lp_upolynomial_t* upolynomial_reduce_to_linear(const lp_upolynomial_t *f ) {
   lp_upolynomial_t *x = lp_upolynomial_construct_power(f->K, 1, 1);
@@ -575,6 +583,9 @@ void upolynomial_roots_find_rabin(const lp_upolynomial_t* f, lp_integer_t* roots
   gmp_randclear(state);
 }
 
+/**
+ * iterates over all p possible values of Zp and check each
+ */
 static
 void upolynomial_roots_find_brute_force(const lp_upolynomial_t* f, lp_integer_t* roots, size_t* roots_size) {
   const lp_int_ring_t* K = f->K;
