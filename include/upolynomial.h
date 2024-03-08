@@ -196,7 +196,7 @@ lp_upolynomial_t* lp_upolynomial_neg(const lp_upolynomial_t* p);
 void lp_upolynomial_neg_in_place(lp_upolynomial_t* p);
 
 /**
- * Makes the polynomial monic in-place.
+ * Makes the polynomial monic.
  */
 lp_upolynomial_t* lp_upolynomial_make_monic(const lp_upolynomial_t* p);
 
