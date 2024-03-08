@@ -73,6 +73,9 @@ static PyObject*
 UPolynomial_sturm_sequence(PyObject* self);
 
 static PyObject*
+UPolynomial_roots_find_Zp(PyObject* self);
+
+static PyObject*
 UPolynomial_evaluate(PyObject* self, PyObject* args);
 
 static PyObject*
@@ -120,6 +123,7 @@ PyMethodDef UPolynomial_methods[] = {
     {"roots_count", (PyCFunction)UPolynomial_roots_count, METH_VARARGS, "Returns the number of real roots in the given interval"},
     {"roots_isolate", (PyCFunction)UPolynomial_roots_isolate, METH_NOARGS, "Returns the list of real roots"},
     {"sturm_sequence", (PyCFunction)UPolynomial_sturm_sequence, METH_NOARGS, "Returns the Sturm sequence"},
+    {"roots_find_Zp", (PyCFunction)UPolynomial_roots_find_Zp, METH_NOARGS, "Returns the roots of the polynomial in Zp"},
     {"derivative", (PyCFunction)UPolynomial_derivative, METH_NOARGS, "Returns the derivative of the polynomial"},
     {"evaluate", (PyCFunction)UPolynomial_evaluate, METH_VARARGS, "Returns the value of the polynomial at the given point"},
     {NULL}  /* Sentinel */
@@ -860,6 +864,36 @@ UPolynomial_sturm_sequence(PyObject* self) {
   lp_upolynomial_sturm_sequence(p, &S, &S_size);
   PyObject* result = upolynomials_to_PyList(S, S_size);
   free(S);
+  return result;
+}
+
+static PyObject* integer_list_to_PyList(lp_integer_t *list, size_t size) {
+  // Construct the result
+  PyObject* pylist = PyList_New(size);
+
+  // Copy over the integers
+  size_t i;
+  for (i = 0; i < size; ++ i) {
+    PyObject* pylist_i = integer_to_PyLong(&list[i]);
+    Py_INCREF(pylist_i);
+    PyList_SetItem(pylist, i, pylist_i);
+  }
+
+  // Return the list
+  return pylist;
+}
+
+static PyObject*
+UPolynomial_roots_find_Zp(PyObject* self) {
+  lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
+  lp_integer_t* roots;
+  size_t roots_size;
+  lp_upolynomial_roots_find_Zp(p, &roots, &roots_size);
+  PyObject* result = integer_list_to_PyList(roots, roots_size);
+  for (size_t i = 0; i < roots_size; ++i) {
+    lp_integer_destruct(&roots[i]);
+  }
+  free(roots);
   return result;
 }
 

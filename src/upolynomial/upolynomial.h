@@ -20,6 +20,7 @@
 #pragma once
 
 #include <integer.h>
+#include <upolynomial.h>
 #include "upolynomial/umonomial.h"
 
 /**
@@ -33,3 +34,12 @@ struct lp_upolynomial_struct {
   /** The monomials */
   ulp_monomial_t monomials[];
 };
+
+typedef lp_upolynomial_t* (*upolynomial_op)(const lp_upolynomial_t*, const lp_upolynomial_t*);
+
+static inline
+void upolynomial_op_inplace(upolynomial_op op, lp_upolynomial_t **a, const lp_upolynomial_t *b) {
+  lp_upolynomial_t *r = op(*a, b);
+  lp_upolynomial_delete(*a);
+  *a = r;
+}

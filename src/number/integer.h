@@ -185,6 +185,16 @@ int integer_is_zero(const lp_int_ring_t* K, const lp_integer_t* c) {
 }
 
 static inline
+int integer_is_odd(const lp_integer_t* c) {
+  return mpz_odd_p(c);
+}
+
+static inline
+int integer_is_even(const lp_integer_t* c) {
+  return mpz_even_p(c);
+}
+
+static inline
 int integer_sgn(const lp_int_ring_t* K, const lp_integer_t* c) {
   if (K) {
     lp_integer_t c_normalized;

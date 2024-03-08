@@ -31,6 +31,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+/* Limits on the prime field order p when performing operations with O(p) time and
+ * space complexity, respectively. Assertions will fail when the limits are exceeded. */
+#define FIELD_ORDER_LIMIT 1000
+#define FIELD_ORDER_LIMIT_BERLEKAMP 250
 
 STAT_DECLARE(int, upolynomial, factor_square_free)
 STAT_DECLARE(int, upolynomial, factor_distinct_degree)
@@ -77,7 +81,7 @@ STAT_DECLARE(int, upolynomial, factor_berlekamp_square_free)
  * The loop ends when L = 1 and then we know that P = \prod_{p \div k} f_k^k
  * which we know how to special case (if P != 1).
  */
-lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_upolynomial_t* f) {
+lp_upolynomial_factors_t* upolynomial_factor_square_free_primitive(const lp_upolynomial_t* f) {
 
   if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_square_free("); lp_upolynomial_print(f, trace_out); tracef(")\n");
@@ -107,11 +111,11 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_u
     // f' is zero for a non-zero polynomial => f has to be of the form
     // f = \sum a_k x^(p*d_k) = f_p(x^p) where f_p = \sum a_k x^d_k
     // we factor f_p and then return f_p(x^p)=(f_p)^p
-    int p = integer_to_int(&f->K->M);
+    assert(mpz_fits_slong_p(&f->K->M));
+    long p = integer_to_int(&f->K->M);
     lp_upolynomial_t* f_p = lp_upolynomial_div_degrees(f, p);
-    factors = lp_upolynomial_factor_square_free_primitive(f_p);
-    size_t i;
-    for (i = 0; i < factors->size; ++ i) {
+    factors = upolynomial_factor_square_free_primitive(f_p);
+    for (size_t i = 0; i < factors->size; ++ i) {
       factors->multiplicities[i] *= p;
     }
     lp_upolynomial_delete(f_p);
@@ -167,9 +171,10 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free_primitive(const lp_u
 
     // If P has content, it is a power of p
     if (lp_upolynomial_degree(P) > 0) {
-      int p = integer_to_int(&f->K->M);
+      assert(mpz_fits_slong_p(&f->K->M));
+      long p = integer_to_int(&f->K->M);
       lp_upolynomial_t* P_p = lp_upolynomial_div_degrees(P, p);
-      lp_upolynomial_factors_t* sub_factors = lp_upolynomial_factor_square_free_primitive(P_p);
+      lp_upolynomial_factors_t* sub_factors = upolynomial_factor_square_free_primitive(P_p);
       size_t i;
       for (i = 0; i < sub_factors->size; ++ i) {
         lp_upolynomial_factors_add(factors, sub_factors->factors[i], sub_factors->multiplicities[i] * p);
@@ -220,7 +225,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
   // Take out the power of x^k
   if (lp_upolynomial_const_term(f_pp)) {
     // Get a square-free decomposition of f
-    sq_free_factors = lp_upolynomial_factor_square_free_primitive(f_pp);
+    sq_free_factors = upolynomial_factor_square_free_primitive(f_pp);
   } else {
     // Get a copy without the power of x
     lp_upolynomial_t* f_pp_nonzero = lp_upolynomial_construct_copy(f_pp);
@@ -230,7 +235,7 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
       f_pp_nonzero->monomials[i].degree -= x_degree;
     }
     // Get a square-free decomposition of f
-    sq_free_factors = lp_upolynomial_factor_square_free_primitive(f_pp_nonzero);
+    sq_free_factors = upolynomial_factor_square_free_primitive(f_pp_nonzero);
     // Add x^k to the factorization
     lp_upolynomial_t* x_upoly = lp_upolynomial_construct_power(f->K, 1, 1);
     lp_upolynomial_factors_add(sq_free_factors, x_upoly, x_degree);
@@ -283,8 +288,9 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
   assert(lp_upolynomial_is_monic(f));
 
   // The prime
-  int p = integer_to_int(&K->M);
-  assert(p < 100);
+  assert(mpz_fits_slong_p(&K->M));
+  long p = integer_to_int(&K->M);
+  assert(p < FIELD_ORDER_LIMIT);
 
   lp_upolynomial_factors_t* factors = lp_upolynomial_factors_construct();
 
@@ -360,11 +366,13 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
   return factors;
 }
 
-
-static void Q_construct(lp_integer_t* Q, size_t size, const lp_upolynomial_t* u) {
+static
+void Q_construct(lp_integer_t* Q, size_t size, const lp_upolynomial_t* u) {
 
   const lp_int_ring_t* K = lp_upolynomial_ring(u);
+  assert(mpz_fits_slong_p(&K->M));
   size_t p = (size_t) integer_to_int(&K->M);
+  assert(p < FIELD_ORDER_LIMIT);
 
   size_t k;
 
@@ -393,7 +401,8 @@ static void Q_construct(lp_integer_t* Q, size_t size, const lp_upolynomial_t* u)
   integer_destruct(&tmp); integer_destruct(&one);
 }
 
-static void Q_column_multiply(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, int j, const lp_integer_t* m) {
+static
+void Q_column_multiply(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, int j, const lp_integer_t* m) {
 
   if (trace_is_enabled("nullspace")) {
     tracef("Multiplying column %d of Q with ", j); integer_print(m, trace_out); tracef("\n");
@@ -417,7 +426,8 @@ static void Q_column_multiply(const lp_int_ring_t* K, lp_integer_t* Q, size_t si
 }
 
 // add column j into i multiplied by m
-static void Q_column_add(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, int i, const lp_integer_t* m, int j) {
+static
+void Q_column_add(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, int i, const lp_integer_t* m, int j) {
 
   assert(i != j);
 
@@ -453,7 +463,8 @@ static void Q_column_add(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, i
   }
 }
 
-static void Q_null_space(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, lp_integer_t** v, size_t* v_size) {
+static
+void Q_null_space(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, lp_integer_t** v, size_t* v_size) {
 
   *v_size = 0;
 
@@ -520,9 +531,9 @@ static void Q_null_space(const lp_int_ring_t* K, lp_integer_t* Q, size_t size, l
 
 }
 
-static void Q_destruct(lp_integer_t* Q, size_t size) {
-  size_t i;
-  for (i = 0; i < size*size; ++ i) {
+static
+void Q_destruct(lp_integer_t* Q, size_t size) {
+  for (size_t i = 0; i < size*size; ++ i) {
     integer_destruct(Q + i);
   }
 }
@@ -584,6 +595,7 @@ static void Q_destruct(lp_integer_t* Q, size_t size) {
  * does not filter the factorization, so we start at 2. If the size of the
  * basis is 1, then the polynomial is already irreducible.
  */
+static
 lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upolynomial_t* f) {
 
   if (trace_is_enabled("berlekamp")) {
@@ -603,7 +615,7 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
   } else {
 
     // The prime (should be small)
-    assert(integer_cmp_int(lp_Z, &K->M, 100) < 0);
+    assert(integer_cmp_int(lp_Z, &K->M, FIELD_ORDER_LIMIT_BERLEKAMP) < 0);
     int p = integer_to_int(&K->M);
 
     // Construct the Q matrix
@@ -630,16 +642,14 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
     lp_upolynomial_factors_add(factors, lp_upolynomial_construct_copy(f), 1);
 
     // Filter through the null-basis
-    size_t i;
     int done = 0;
-    for (i = 1; !done && i < v_size; ++i) {
+    for (size_t i = 1; !done && i < v_size; ++i) {
 
       // v-s polynomial
       lp_upolynomial_t* v_poly[p];
 
       // Construct the v[i](x) - s polynomials
-      int s;
-      for (s = 0; s < p; ++ s) {
+      for (int s = 0; s < p; ++ s) {
         v_poly[s] = lp_upolynomial_construct(K, deg_f - 1, v[i]);
         integer_dec(K, &v[i][0]);
       }
@@ -656,8 +666,7 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
         }
 
         // Filter the current factorization with v_i
-        int s;
-        for (s = 0; !done && s < p; ++ s) {
+        for (int s = 0; !done && s < p; ++ s) {
           // Compute the gcd
           lp_upolynomial_t* gcd = lp_upolynomial_gcd(factor, v_poly[s]);
           // We only split if gcd splits factor
@@ -677,15 +686,14 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
       }
 
       // Free  the v[i](x) -s polynomials
-      for (s = 0; s < p; ++ s) {
+      for (int s = 0; s < p; ++ s) {
         lp_upolynomial_delete(v_poly[s]);
       }
     }
 
     // Deallocate the null vectors
-    size_t j;
-    for (i = 0; i < v_size; ++i) {
-      for (j = 0; j < deg_f; ++j) {
+    for (size_t i = 0; i < v_size; ++i) {
+      for (size_t j = 0; j < deg_f; ++j) {
         integer_destruct(v[i] + j);
       }
       free(v[i]);
@@ -717,7 +725,7 @@ lp_upolynomial_factors_t* upolynomial_factor_berlekamp_square_free(const lp_upol
  */
 lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
 
-  if (trace_is_enabled("berlekamp")) {
+  if (trace_is_enabled("factorization")) {
     tracef("upolynomial_factor_Zp("); lp_upolynomial_print(f, trace_out); tracef(")\n");
   }
 
@@ -749,7 +757,9 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
     size_t f_i_multiplicity = sq_free_factors->multiplicities[i];
 
     // Extract linear factors
-    int x_int, p = integer_to_int(&K->M);
+    assert(mpz_fits_slong_p(&K->M));
+    long x_int, p = integer_to_int(&K->M);
+    assert(p < FIELD_ORDER_LIMIT);
     lp_upolynomial_t* linear_factors_product = 0;
     for (x_int = 0; x_int < p; ++ x_int) {
       // Values
@@ -813,7 +823,6 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
   return result;
 }
 
-
 /**
  * All polynomials here are in Zp for some prime p.
  *
@@ -844,6 +853,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
  *
  * [6] (P2/A1)*U2 + ... + (Pr/A1)*Ur = V1
  */
+static
 void hensel_lift_initialize(const lp_upolynomial_factors_t* A, lp_upolynomial_factors_t* U) {
 
   int i;
@@ -931,6 +941,7 @@ void hensel_lift_initialize(const lp_upolynomial_factors_t* A, lp_upolynomial_fa
  *
  * All products are in Z[x]
  */
+static
 void hensel_lift_compute_products(const lp_upolynomial_factors_t* A, lp_upolynomial_t** P_z) {
 
   int k;
@@ -1008,6 +1019,7 @@ void hensel_lift_compute_products(const lp_upolynomial_factors_t* A, lp_upolynom
  *  Same as input for (q^2, F, Bk, Vk)
  *
  */
+static
 void hensel_lift_quadratic(const lp_upolynomial_t* F,
     const lp_upolynomial_factors_t* A, const lp_upolynomial_factors_t* U,
     lp_upolynomial_factors_t* B, lp_upolynomial_factors_t* V)
@@ -1252,6 +1264,7 @@ void hensel_lift_quadratic(const lp_upolynomial_t* F,
  * the result in factors. Basically try combinations of factors and see if they
  * divide f.
  */
+static
 void factorization_recombination(const lp_upolynomial_t* f, const lp_upolynomial_factors_t* factors_p, lp_upolynomial_factors_t* factors) {
 
   // Our copy of f to work with
@@ -1428,6 +1441,7 @@ static size_t primes_count = sizeof(primes)/sizeof(long);
 /**
  * Factors a square-free f in Z.
  */
+static
 lp_upolynomial_factors_t* upolynomial_factor_Z_square_free(const lp_upolynomial_t* f) {
 
   if (trace_is_enabled("factorization")) {
@@ -1577,7 +1591,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Z(const lp_upolynomial_t* f) {
   lp_upolynomial_t* f_pp = lp_upolynomial_primitive_part_Z(f);
 
   // Get a square-free decomposition of f
-  lp_upolynomial_factors_t* sq_free_factors = lp_upolynomial_factor_square_free_primitive(f_pp);
+  lp_upolynomial_factors_t* sq_free_factors = upolynomial_factor_square_free_primitive(f_pp);
   assert(integer_cmp_int(lp_Z, &sq_free_factors->constant, 1) == 0);
 
   // Factor individuals

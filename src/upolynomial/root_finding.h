@@ -52,3 +52,9 @@ int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_rational_i
  * will be updated to the number of roots.
  */
 void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_number_t* roots, size_t* roots_size);
+
+/**
+* Finds the roots for a polynomial over Zp. Uses brute force or rabin root
+* finding, depending on p. Degree of p must be positive.
+*/
+void upolynomial_roots_find_Zp(const lp_upolynomial_t* f, lp_integer_t** roots, size_t* roots_size);

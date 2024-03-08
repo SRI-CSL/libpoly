@@ -24,14 +24,17 @@
 #include "upolynomial/factors.h"
 #include "upolynomial/root_finding.h"
 #include "upolynomial/factorization.h"
+#include "upolynomial/upolynomial_vector.h"
 #include "upolynomial/upolynomial_dense.h"
 #include "upolynomial/output.h"
 
 #include <assert.h>
 #include <stdlib.h>
-#include <stdlib.h>
 
 #include "utils/debug_trace.h"
+
+/** Field order up to we're doing brute force. */
+#define FIELD_ORDER_LIMIT 1000
 
 /** Negative infinity */
 #define INF_N (void*) 0
@@ -102,6 +105,7 @@ void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_d
  * Compute the number sgn_changes(a) given Sturm sequence and a. If a is 0 or
  * 1 as a pointer, we evaluate at -inf, +inf respectively.
  */
+static
 int sturm_seqence_count_sign_changes(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_rational_t* a, int max_changes)
@@ -128,6 +132,7 @@ int sturm_seqence_count_sign_changes(
  * Compute the number sgn_changes(a) given Sturm sequence and a. If a is 0 or
  * 1 as a pointer, we evaluate at -inf, +inf respectively.
  */
+static
 int sturm_seqence_count_sign_changes_dyadic(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_dyadic_rational_t* a, int max_changes)
@@ -150,6 +155,7 @@ int sturm_seqence_count_sign_changes_dyadic(
 }
 
 /** Count roots in the given interval */
+static
 int sturm_seqence_count_roots(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_rational_interval_t* interval)
@@ -178,6 +184,7 @@ int sturm_seqence_count_roots(
 }
 
 /** Count roots in the given interval */
+static
 int sturm_seqence_count_roots_dyadic(
     const upolynomial_dense_t* sturm_sequence, int sturm_sequence_size,
     const lp_dyadic_interval_t* interval)
@@ -263,6 +270,7 @@ int upolynomial_roots_count_sturm(const lp_upolynomial_t* f, const lp_rational_i
 /**
  * Recursive root isolation on an interval (a, b].
  */
+static
 void sturm_seqence_isolate_roots(
     const upolynomial_dense_t* S, size_t S_size,
     lp_algebraic_number_t* roots, size_t* roots_size,
@@ -432,8 +440,7 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
 
     // Destroy the temporaries
     lp_dyadic_interval_destruct(&interval_all);
-    size_t i;
-    for (i = 0; i < sturm_sequence_size; ++i) {
+    for (size_t i = 0; i < sturm_sequence_size; ++i) {
       upolynomial_dense_destruct(sturm_sequence + i);
     }
     free(sturm_sequence);
@@ -450,4 +457,207 @@ void upolynomial_roots_isolate_sturm(const lp_upolynomial_t* f, lp_algebraic_num
 
   // Destroy the factors
   lp_upolynomial_factors_destruct(square_free_factors, 1);
+}
+
+/**
+ * helper function for rabin root finding
+ * returns x^p mod f
+ */
+static
+lp_upolynomial_t* upolynomial_power_mod(const lp_upolynomial_t *b, const lp_integer_t *e, const lp_upolynomial_t *m) {
+  lp_integer_t ee;
+  lp_integer_construct_copy(lp_Z, &ee, e);
+  lp_upolynomial_t *acc = lp_upolynomial_construct_power(m->K, 0, 1);
+  lp_upolynomial_t *power = lp_upolynomial_construct_copy(b);
+
+  while (!lp_integer_is_zero(lp_Z, &ee)) {
+    if (integer_is_odd(&ee)) {
+      upolynomial_op_inplace(lp_upolynomial_mul, &acc, power);
+      upolynomial_op_inplace(lp_upolynomial_rem_exact, &acc, m);
+    }
+    upolynomial_op_inplace(lp_upolynomial_mul, &power, power);
+    upolynomial_op_inplace(lp_upolynomial_rem_exact, &power, m);
+
+    integer_div_floor_pow2(&ee, &ee, 1);
+  }
+
+  lp_integer_destruct(&ee);
+  lp_upolynomial_delete(power);
+
+  return acc;
+}
+
+/**
+ * helper function for rabin root finding
+ * returns gcd(f, x^p - x)
+ */
+static
+lp_upolynomial_t* upolynomial_reduce_to_linear(const lp_upolynomial_t *f ) {
+  lp_upolynomial_t *x = lp_upolynomial_construct_power(f->K, 1, 1);
+  lp_upolynomial_t *pm = upolynomial_power_mod(x, &f->K->M, f);
+  lp_upolynomial_t *fp = lp_upolynomial_sub(pm, x);
+  lp_upolynomial_t *linear = lp_upolynomial_gcd(f, fp);
+
+  lp_upolynomial_delete(x);
+  lp_upolynomial_delete(pm);
+  lp_upolynomial_delete(fp);
+
+  return linear;
+}
+
+/**
+ * Implements Rabin root-finding.
+ * Rabin, Michael O. "Probabilistic algorithms in finite fields." SIAM Journal on computing 9.2 (1980): 273-280.
+ */
+static
+void upolynomial_roots_find_rabin(const lp_upolynomial_t* f, lp_integer_t* roots, size_t* roots_size) {
+  const lp_int_ring_t* K = f->K;
+
+  *roots_size = 0;
+
+  gmp_randstate_t state;
+  gmp_randinit_default(state);
+
+  lp_integer_t s;
+  lp_integer_construct_copy(lp_Z, &s, &K->M);
+  // right shift by p1
+  integer_div_floor_pow2(&s, &s, 1);
+
+  // construct helper polynomials (1 and x)
+  lp_upolynomial_t *p1 = lp_upolynomial_construct_power(K, 0, 1);
+  lp_upolynomial_t *px = lp_upolynomial_construct_power(K, 1, 1);
+
+  lp_upolynomial_vector_t *to_factor = lp_upolynomial_vector_construct();
+  lp_upolynomial_vector_move_back(to_factor, upolynomial_reduce_to_linear(f));
+
+  while (lp_upolynomial_vector_size(to_factor)) {
+    lp_upolynomial_t *p = lp_upolynomial_vector_pop(to_factor);
+    size_t d = lp_upolynomial_degree(p);
+    bool const_is_zero = !lp_upolynomial_const_term(p) || lp_integer_is_zero(lp_Z, lp_upolynomial_const_term(p));
+    if (d == 0) {
+      // it's dead
+    } else if (const_is_zero) {
+      // it has a zero root
+      assert(lp_upolynomial_degree(f) > *roots_size);
+      lp_integer_construct_from_int(lp_Z, &roots[(*roots_size)++], 0);
+      lp_upolynomial_vector_move_back(to_factor, lp_upolynomial_div_exact(p, px));
+    } else if (d == 1) {
+      // push the zero
+      lp_upolynomial_make_monic_in_place(p);
+      lp_upolynomial_neg_in_place(p);
+      assert(lp_upolynomial_const_term(p));
+      assert(lp_upolynomial_degree(f) > *roots_size);
+      lp_integer_construct_copy(lp_Z, &roots[(*roots_size)++], lp_upolynomial_const_term(p));
+    } else {
+      // gen (px - delta)
+      lp_upolynomial_t *xd = lp_upolynomial_construct_from_int(K, 1, (int[2]){1, 1});
+      lp_integer_t *delta = (lp_integer_t*) lp_upolynomial_const_term(xd);
+      assert(delta);
+
+      bool done = false;
+      while (!done) {
+        // set constant term delta in xd to random value
+        mpz_urandomm(delta, state, &K->M);
+        integer_ring_normalize(K, delta);
+        integer_neg(K, delta, delta);
+        // calculate gcd
+        lp_upolynomial_t *h = upolynomial_power_mod(xd, &s, p);
+        upolynomial_op_inplace(lp_upolynomial_sub, &h, p1);
+        upolynomial_op_inplace(lp_upolynomial_gcd, &h, p);
+        if (0 < lp_upolynomial_degree(h) && lp_upolynomial_degree(h) < d) {
+          lp_upolynomial_vector_push_back(to_factor, h);
+          lp_upolynomial_vector_move_back(to_factor, lp_upolynomial_div_exact(p, h));
+          done = true;
+        }
+        lp_upolynomial_delete(h);
+      }
+      lp_upolynomial_delete(xd);
+    }
+    lp_upolynomial_delete(p);
+  }
+
+  lp_integer_destruct(&s);
+  lp_upolynomial_delete(p1);
+  lp_upolynomial_delete(px);
+  lp_upolynomial_vector_delete(to_factor);
+  gmp_randclear(state);
+}
+
+/**
+ * iterates over all p possible values of Zp and check each
+ */
+static
+void upolynomial_roots_find_brute_force(const lp_upolynomial_t* f, lp_integer_t* roots, size_t* roots_size) {
+  const lp_int_ring_t* K = f->K;
+
+  size_t d = lp_upolynomial_degree(f);
+  assert(d > 0);
+
+  assert(mpz_fits_slong_p(&K->M));
+  long p = integer_to_int(&K->M);
+  assert(p < FIELD_ORDER_LIMIT);
+
+  *roots_size = 0;
+
+  // Values
+  lp_integer_t x, value;
+  integer_construct_copy(lp_Z, &x, &K->lb);
+  integer_construct(&value);
+
+  for (long x_int = 0; x_int < p; ++x_int) {
+    assert(integer_in_ring(K, &x));
+
+    // Evaluate the polynomial
+    lp_upolynomial_evaluate_at_integer(f, &x, &value);
+
+    // If zero we found one
+    if (integer_sgn(K, &value) == 0) {
+      lp_integer_construct_copy(K, roots + *roots_size, &x);
+      (*roots_size) ++;
+
+      // check if we found all
+      if (*roots_size == d) {
+        break;
+      }
+    }
+
+    // next element
+    integer_inc(lp_Z, &x);
+  }
+  assert(*roots_size == d || lp_integer_cmp(lp_Z, &x, &K->ub));
+
+  integer_destruct(&value);
+  integer_destruct(&x);
+}
+
+void upolynomial_roots_find_Zp(const lp_upolynomial_t* f, lp_integer_t** roots, size_t* roots_size) {
+  if (trace_is_enabled("roots")) {
+    tracef("upolynomial_roots_find_Zp("); lp_upolynomial_print(f, trace_out); tracef(")\n");
+  }
+
+  const lp_int_ring_t* K = f->K;
+  assert(K && K->is_prime);
+
+  size_t d = lp_upolynomial_degree(f);
+
+  *roots = malloc(sizeof(lp_integer_t) * d);
+
+  // depending on the finite field size, choose appropriate function
+  if (integer_cmp_int(lp_Z, &K->M, FIELD_ORDER_LIMIT) < 0) {
+    upolynomial_roots_find_brute_force(f, *roots, roots_size);
+  } else {
+    upolynomial_roots_find_rabin(f, *roots, roots_size);
+  }
+
+  // realloc has undefined behavior in case size is zero
+  if (*roots_size == 0) {
+    free(*roots);
+    *roots = NULL;
+  } else if (*roots_size < d) {
+    *roots = realloc(*roots, sizeof(lp_integer_t) * (*roots_size));
+  }
+
+  if (trace_is_enabled("roots")) {
+    tracef("upolynomial_roots_find_Zp() found %zu roots\n", *roots_size);
+  }
 }

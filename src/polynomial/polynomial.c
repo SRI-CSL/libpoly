@@ -261,6 +261,7 @@ int lp_polynomial_is_univariate(const lp_polynomial_t* A) {
   return coefficient_is_univariate(&A->data);
 }
 
+// TODO is a constant polynomial univariate?
 int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_t* m) {
   if (lp_polynomial_is_constant(A)) {
     return 0;
@@ -286,6 +287,7 @@ int lp_polynomial_is_univariate_m(const lp_polynomial_t* A, const lp_assignment_
 }
 
 lp_upolynomial_t* lp_polynomial_to_univariate(const lp_polynomial_t* A) {
+  lp_polynomial_external_clean(A);
   if (!(coefficient_is_constant(&A->data) || coefficient_is_univariate(&A->data))) {
     return NULL;
   } else {

@@ -168,7 +168,7 @@ int lp_integer_sgn(const lp_int_ring_t* K, const lp_integer_t* c);
 int lp_integer_cmp(const lp_int_ring_t* K, const lp_integer_t* c, const lp_integer_t* to);
 
 /**
- * Compare the two integers in the ring. Same as for sgn.
+ * Compare the two integers in the ring. Same as for cmp.
  */
 int lp_integer_cmp_int(const lp_int_ring_t* K, const lp_integer_t* c, long to);
 

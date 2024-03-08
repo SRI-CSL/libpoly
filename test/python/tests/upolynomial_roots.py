@@ -113,3 +113,41 @@ check_roots_count(p, 2, -1.5, 1.5)
 check_roots_count(p, 2, -2, 2)
 check_roots_count(p, 4, -2.5, 2.5)
 check_roots_count(p, 4, -3, 3)
+
+
+# checking root finding mod p
+polypy_test.start("Root finding in Zp")
+
+
+def check_roots_Zp(p, expected):
+    zeros = p.roots_find_Zp()
+    if set(zeros) != set(expected):
+        polypy_test.check(False)
+        print("p = {0}".format(p))
+        print("got = {0}".format(','.join(map(str, zeros))))
+        print("expected = {0}".format(','.join(map(str, expected))))
+    else:
+        polypy_test.check(True)
+
+
+primes = [13, 10007, 1230127]
+P = lambda x: [
+    (x - 1),
+    (x - 1) * (x + 1),
+    (x - 1) * (x + 1) * (x - 2),
+    (x - 1) * (x + 1) * (x - 2) * (x + 2),
+    (x - 1) ** 3 * (x + 1) ** 2 * (x - 2) ** 2 * (x + 2)
+]
+expected = [
+    [1],
+    [1, -1],
+    [1, -1, 2],
+    [1, -1, 2, -2],
+    [1, -1, 2, -2]
+]
+
+for prime in primes:
+    K = polypy.CoefficientRing(prime)
+    x = polypy.x.to_ring(K)
+    for i, p in enumerate(P(x)):
+        check_roots_Zp(p, expected[i])
