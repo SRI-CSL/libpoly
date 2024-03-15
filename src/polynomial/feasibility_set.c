@@ -32,17 +32,18 @@
 #include "polynomial/feasibility_set.h"
 
 static
-void lp_feasibility_set_ensure_capacity(lp_feasibility_set_t* s, size_t size) {
-  if (size && size > s->capacity) {
-    s->capacity = size;
+void lp_feasibility_set_ensure_capacity(lp_feasibility_set_t* s, size_t capacity) {
+  if (capacity && capacity > s->capacity) {
+    s->capacity = capacity;
     s->intervals = realloc(s->intervals, s->capacity * sizeof(lp_interval_t));
   }
 }
 
+static
 void lp_feasibility_set_construct(lp_feasibility_set_t* s, size_t size) {
   s->size = 0;
   s->capacity = 0;
-  s->intervals = 0;
+  s->intervals = NULL;
   lp_feasibility_set_ensure_capacity(s, size);
 }
 
@@ -86,6 +87,7 @@ void lp_feasibility_set_delete(lp_feasibility_set_t* set) {
   free(set);
 }
 
+static
 void lp_feasibility_set_construct_copy(lp_feasibility_set_t* set, const lp_feasibility_set_t* from) {
   lp_feasibility_set_construct(set, from->size);
   size_t i;

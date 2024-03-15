@@ -66,6 +66,7 @@ typedef struct lp_dyadic_interval_struct lp_dyadic_interval_t;
 typedef struct lp_interval_struct lp_interval_t;
 
 typedef struct lp_feasibility_set_struct lp_feasibility_set_t;
+typedef struct lp_feasibility_set_int_struct lp_feasibility_set_int_t;
 typedef struct lp_polynomial_hash_set_struct lp_polynomial_hash_set_t;
 typedef struct lp_polynomial_vector_struct lp_polynomial_vector_t;
 typedef struct lp_polynomial_heap_struct lp_polynomial_heap_t;

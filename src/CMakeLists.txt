@@ -34,6 +34,7 @@ set(poly_SOURCES
   polynomial/polynomial.c
   polynomial/polynomial_context.c
   polynomial/feasibility_set.c
+  polynomial/feasibility_set_int.c
   polynomial/polynomial_hash_set.c
   polynomial/polynomial_heap.c
   polynomial/polynomial_vector.c
