@@ -18,7 +18,6 @@
  */
 
 #include <feasibility_set_int.h>
-#include "polynomial/feasibility_set_int.h"
 
 #include <stdlib.h>
 #include <assert.h>
