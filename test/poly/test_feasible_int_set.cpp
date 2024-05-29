@@ -409,6 +409,55 @@ TEST_CASE("feasibility_set_int::intersect") {
   CHECK_EQ(K.get_internal()->ref_count, 1);
 }
 
+TEST_CASE("feasibility_set_int::intersect_wrap_around") {
+  Integer prime(3);
+  IntegerRing K(prime, true);
+
+  lp_feasibility_set_int_t *set1 = integer_list({1,-1}).gen_set(K, false);
+  lp_feasibility_set_int_t *set2 = integer_list({-1}).gen_set(K, false);
+  lp_feasibility_set_int_t *set1_inv = integer_list({0}).gen_set(K, true);
+  lp_feasibility_set_int_t *set2_inv = integer_list({0,1}).gen_set(K, true);
+
+  SUBCASE("feasibility_set_int::intersect_wrap_around1") {
+    lp_feasibility_set_int_status_t status;
+    lp_feasibility_set_int_t *s = lp_feasibility_set_int_intersect_with_status(set1, set2, &status);
+    CHECK(lp_feasibility_set_int_size_approx(s) == 1);
+    CHECK(status == LP_FEASIBILITY_SET_INT_S2);
+    CHECK(lp_feasibility_set_int_contains(s, Integer(K, -1).get_internal()));
+    lp_feasibility_set_int_delete(s);
+  }
+  SUBCASE("feasibility_set_int::intersect_wrap_around2") {
+    lp_feasibility_set_int_status_t status;
+    lp_feasibility_set_int_t *s = lp_feasibility_set_int_intersect_with_status(set1, set2_inv, &status);
+    CHECK(lp_feasibility_set_int_size_approx(s) == 1);
+    CHECK(status == LP_FEASIBILITY_SET_INT_S2);
+    CHECK(lp_feasibility_set_int_contains(s, Integer(K, -1).get_internal()));
+    lp_feasibility_set_int_delete(s);
+  }
+  SUBCASE("feasibility_set_int::intersect_wrap_around3") {
+    lp_feasibility_set_int_status_t status;
+    lp_feasibility_set_int_t *s = lp_feasibility_set_int_intersect_with_status(set1_inv, set2, &status);
+    CHECK(lp_feasibility_set_int_size_approx(s) == 1);
+    CHECK(status == LP_FEASIBILITY_SET_INT_S2);
+    CHECK(lp_feasibility_set_int_contains(s, Integer(K, -1).get_internal()));
+    lp_feasibility_set_int_delete(s);
+  }
+  SUBCASE("feasibility_set_int::intersect_wrap_around2") {
+    lp_feasibility_set_int_status_t status;
+    lp_feasibility_set_int_t *s = lp_feasibility_set_int_intersect_with_status(set1_inv, set2_inv, &status);
+    CHECK(lp_feasibility_set_int_size_approx(s) == 1);
+    CHECK(status == LP_FEASIBILITY_SET_INT_S2);
+    CHECK(lp_feasibility_set_int_contains(s, Integer(K, -1).get_internal()));
+    lp_feasibility_set_int_delete(s);
+  }
+
+  lp_feasibility_set_int_delete(set1);
+  lp_feasibility_set_int_delete(set1_inv);
+  lp_feasibility_set_int_delete(set2);
+  lp_feasibility_set_int_delete(set2_inv);
+  CHECK_EQ(K.get_internal()->ref_count, 1);
+}
+
 TEST_CASE("feasibility_set_int::intersect_empty") {
   Integer prime(7);
   IntegerRing K(prime, true);

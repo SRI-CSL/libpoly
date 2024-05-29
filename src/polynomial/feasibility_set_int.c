@@ -388,11 +388,11 @@ void lp_feasibility_set_int_invert(lp_feasibility_set_int_t *set) {
   long lb = lp_integer_to_int(&set->K->lb);
   long ub = lp_integer_to_int(&set->K->ub);
   for (long val = lb; val <= ub; ++val) {
-    assert(pos_new < cnt);
     assert(pos_old >= set->size || lp_integer_cmp_int(lp_Z, old + pos_old, val) >= 0);
     if (pos_old < set->size && lp_integer_cmp_int(lp_Z, old + pos_old, val) == 0) {
       ++ pos_old;
     } else {
+      assert(pos_new < cnt);
       lp_integer_construct_from_int(lp_Z, new + pos_new, val);
       ++ pos_new;
     }
