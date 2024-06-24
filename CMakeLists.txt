@@ -82,6 +82,7 @@ endif()
 if (BUILD_TESTING)
   # Configure the C++ tests
   enable_testing()
+  add_subdirectory(test/poly)
   add_subdirectory(test/polyxx)
 endif()
 
