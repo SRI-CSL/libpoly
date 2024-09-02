@@ -2320,6 +2320,8 @@ int lp_polynomial_constraint_resolve_fm(
     case LP_SGN_GE_0:
       assert(0);
     }
+    // TODO why is this not symmetric?
+    //  < & = : <, while = & < : false
 
     if (ok) {
       const coefficient_t* p1_lc = coefficient_lc(&p1_c);
