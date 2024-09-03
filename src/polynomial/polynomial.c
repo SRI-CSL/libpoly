@@ -2226,6 +2226,11 @@ int lp_polynomial_constraint_resolve_fm(
     return 0;
   }
 
+  // TODO check what to do when both are equal
+  if (p1_sgn == LP_SGN_EQ_0 && p2_sgn == LP_SGN_EQ_0) {
+    return 0;
+  }
+
   const lp_polynomial_context_t* ctx = p1->ctx;
   assert(p2->ctx == ctx);
 
@@ -2295,10 +2300,9 @@ int lp_polynomial_constraint_resolve_fm(
     switch (p2_sgn) {
     case LP_SGN_LT_0:
     case LP_SGN_LE_0:
-    case LP_SGN_EQ_0:
-      // TODO check what to do when both are equal
       *R_sgn = p2_sgn;
       break;
+    case LP_SGN_EQ_0:
     case LP_SGN_NE_0:
     case LP_SGN_GT_0:
     case LP_SGN_GE_0:
