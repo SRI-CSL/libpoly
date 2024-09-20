@@ -457,7 +457,11 @@ int interval_sort_for_union(const void *I1_void, const void* I2_void) {
 
 void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t* from) {
 
-  if (from->size == 0) {
+  if (lp_feasibility_set_is_empty(from)) {
+    return;
+  }
+
+  if (lp_feasibility_set_is_full(s)) {
     return;
   }
 
