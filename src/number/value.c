@@ -418,7 +418,6 @@ int lp_value_is_integer(const lp_value_t* v) {
     return lp_dyadic_rational_is_integer(&v->value.dy_q);
   case LP_VALUE_RATIONAL:
     return lp_rational_is_integer(&v->value.q);
-    break;
   case LP_VALUE_ALGEBRAIC:
     return lp_algebraic_number_is_integer(&v->value.a);
   default:
@@ -670,7 +669,7 @@ void lp_value_get_value_between(const lp_value_t* a, int a_strict, const lp_valu
     } else {
       // Get the upper bound of the interval as a_ub
       rational_construct_from_dyadic(&a_ub, &a->value.a.I.b);
-      // Algebaic bound is strict so a_ub can be picked
+      // Algebraic bound is strict so a_ub can be picked
       a_ub_strict = 0;
     }
     break;

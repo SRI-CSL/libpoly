@@ -86,8 +86,7 @@ void lp_interval_construct(lp_interval_t* I,
   }
 }
 
-void lp_rational_interval_construct_point(lp_rational_interval_t* I, const lp_rational_t* a)
-{
+void lp_rational_interval_construct_point(lp_rational_interval_t* I, const lp_rational_t* a) {
   rational_construct_copy(&I->a, a);
   I->a_open = 0;
   I->b_open = 0;
@@ -110,7 +109,8 @@ void lp_interval_construct_point(lp_interval_t* I, const lp_value_t* q) {
 
 void lp_rational_interval_construct_zero(lp_rational_interval_t* I) {
   rational_construct(&I->a);
-  I->a_open = I->b_open = 0;
+  I->a_open = 0;
+  I->b_open = 0;
   I->is_point = 1;
 }
 

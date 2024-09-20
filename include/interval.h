@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * An interval (a, b) with both point being values. This side is open is _open
+ * An interval (a, b) with both point being values. A side is open if _open
  * is true. If interval is a point [a,a], then the value b is not used (it is
  * not constructed).
  */
@@ -113,7 +113,7 @@ void lp_interval_pick_value(const lp_interval_t* I, lp_value_t* v);
 /** Compares the lower bounds of the intervals */
 int lp_interval_cmp_lower_bounds(const lp_interval_t* I1, const lp_interval_t* I2);
 
-/** Compares the uppoer bounds of the intervals */
+/** Compares the upper bounds of the intervals */
 int lp_interval_cmp_upper_bounds(const lp_interval_t* I1, const lp_interval_t* I2);
 
 /**
