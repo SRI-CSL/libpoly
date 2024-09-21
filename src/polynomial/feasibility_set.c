@@ -179,6 +179,15 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
   return 0;
 }
 
+int lp_feasibility_set_contains_int(const lp_feasibility_set_t* set) {
+  for (size_t i = 0; i < set->size; ++ i) {
+    if (lp_interval_contains_int(set->intervals + i)) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 // We get smallest integer < rational < algebraic
 // If same we get one with largest interval size
 static inline

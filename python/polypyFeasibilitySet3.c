@@ -40,9 +40,17 @@ FeasibilitySet_pick_value(PyObject* self);
 static PyObject*
 FeasibilitySet_intersect(PyObject* self, PyObject* args);
 
+static PyObject*
+FeasibilitySet_contains_value(PyObject* self, PyObject* args);
+
+static PyObject*
+FeasibilitySet_contains_int(PyObject* self);
+
 PyMethodDef FeasibilitySet_methods[] = {
     {"pick_value", (PyCFunction)FeasibilitySet_pick_value, METH_NOARGS, "Returns a value from the interval."},
-    {"intersect", (PyCFunction)FeasibilitySet_intersect, METH_VARARGS, "Returns the intersection of the interval with another one."},
+    {"intersect", (PyCFunction)FeasibilitySet_intersect, METH_VARARGS, "Returns the intersection of the set with another one."},
+    {"contains", (PyCFunction)FeasibilitySet_contains_value, METH_VARARGS, "Returns true if the value is in the feasibility set."},
+    {"contains_int", (PyCFunction)FeasibilitySet_contains_int, METH_NOARGS, "Returns true if the set contains an integer value."},
     {NULL}  /* Sentinel */
 };
 
@@ -98,8 +106,7 @@ PyTypeObject FeasibilitySetType = {
 };
 
 static void
-FeasibilitySet_dealloc(FeasibilitySet* self)
-{
+FeasibilitySet_dealloc(FeasibilitySet* self) {
   lp_feasibility_set_delete(self->S);
   ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
@@ -120,8 +127,7 @@ FeasibilitySet_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static int
-FeasibilitySet_init(FeasibilitySet* self, PyObject* args)
-{
+FeasibilitySet_init(FeasibilitySet* self, PyObject* args) {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 0) {
     // Defaults to (-inf, +inf)
     self->S = lp_feasibility_set_new_full();
@@ -168,9 +174,42 @@ FeasibilitySet_intersect(PyObject* self, PyObject* args) {
   lp_feasibility_set_t* S1 = ((FeasibilitySet*) self)->S;
   lp_feasibility_set_t* S2 = ((FeasibilitySet*) feasibility_set_obj)->S;
 
-  // The intersect
+  // The intersection
   lp_feasibility_set_t* P = lp_feasibility_set_intersect(S1, S2);
   PyObject* P_obj = PyFeasibilitySet_create(P);
 
   return P_obj;
+}
+
+static PyObject*
+FeasibilitySet_contains_value(PyObject* self, PyObject* args) {
+
+  if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  PyObject* value_obj = PyTuple_GetItem(args, 0);
+
+  if (!PyValue_CHECK(value_obj)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+
+  lp_feasibility_set_t* S = ((FeasibilitySet*) self)->S;
+  lp_value_t* v = &((Value*) value_obj)->v;
+
+  int result = lp_feasibility_set_contains(S, v);
+
+  PyObject* result_object = result ? Py_True : Py_False;
+  Py_INCREF(result_object);
+  return result_object;
+}
+
+static PyObject*
+FeasibilitySet_contains_int(PyObject* self) {
+  lp_feasibility_set_t* S = ((FeasibilitySet*) self)->S;
+  PyObject* result_object = lp_feasibility_set_contains_int(S) ? Py_True : Py_False;
+  Py_INCREF(result_object);
+  return result_object;
 }

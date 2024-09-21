@@ -83,6 +83,9 @@ void lp_interval_swap(lp_interval_t* I1, lp_interval_t* I2);
 /** Check if the value is contained in the interval */
 int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v);
 
+/** Check if the interval contains an integer value */
+int lp_interval_contains_int(const lp_interval_t* I);
+
 /** Returns an approximation of the log interval size */
 int lp_interval_size_approx(const lp_interval_t* I);
 

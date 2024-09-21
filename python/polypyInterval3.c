@@ -40,9 +40,13 @@ Interval_pick_value(PyObject* self);
 static PyObject*
 Interval_contains_value(PyObject* self, PyObject* args);
 
+static PyObject*
+Interval_contains_int(PyObject* self);
+
 PyMethodDef Interval_methods[] = {
     {"pick_value", (PyCFunction)Interval_pick_value, METH_NOARGS, "Returns a value from the interval."},
     {"contains", (PyCFunction)Interval_contains_value, METH_VARARGS, "Returns true if the value is in the interval."},
+    {"contains_int", (PyCFunction)Interval_contains_int, METH_NOARGS, "Returns true if the interval contains an integer value."},
     {NULL}  /* Sentinel */
 };
 
@@ -98,8 +102,7 @@ PyTypeObject IntervalType = {
 };
 
 static void
-Interval_dealloc(Interval* self)
-{
+Interval_dealloc(Interval* self) {
   lp_interval_destruct(&self->I);
   ((PyObject*)self)->ob_type->tp_free((PyObject*)self);
 }
@@ -120,8 +123,7 @@ Interval_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static int
-Interval_init(Interval* self, PyObject* args)
-{
+Interval_init(Interval* self, PyObject* args) {
   if (PyTuple_Check(args) && PyTuple_Size(args) == 0) {
     // Defaults to (-inf, +inf)
     lp_interval_construct_full(&self->I);
@@ -172,6 +174,13 @@ Interval_contains_value(PyObject* self, PyObject* args) {
 
   PyObject* result_object = result ? Py_True : Py_False;
   Py_INCREF(result_object);
+  return result_object;
+}
 
+static PyObject*
+Interval_contains_int(PyObject* self) {
+  Interval* I = (Interval*) self;
+  PyObject* result_object = lp_interval_contains_int(&I->I) ? Py_True : Py_False;
+  Py_INCREF(result_object);
   return result_object;
 }
