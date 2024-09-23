@@ -157,6 +157,11 @@ size_t integer_bits(const lp_integer_t* c) {
 }
 
 static inline
+int integer_fits_int(const lp_integer_t* c) {
+  return mpz_fits_slong_p(c);
+}
+
+static inline
 long integer_to_int(const lp_integer_t* c) {
   return mpz_get_si(c);
 }

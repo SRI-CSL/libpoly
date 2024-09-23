@@ -111,7 +111,7 @@ lp_upolynomial_factors_t* upolynomial_factor_square_free_primitive(const lp_upol
     // f' is zero for a non-zero polynomial => f has to be of the form
     // f = \sum a_k x^(p*d_k) = f_p(x^p) where f_p = \sum a_k x^d_k
     // we factor f_p and then return f_p(x^p)=(f_p)^p
-    assert(mpz_fits_slong_p(&f->K->M));
+    assert(lp_integer_fits_int(&f->K->M));
     long p = integer_to_int(&f->K->M);
     lp_upolynomial_t* f_p = lp_upolynomial_div_degrees(f, p);
     factors = upolynomial_factor_square_free_primitive(f_p);
@@ -171,7 +171,7 @@ lp_upolynomial_factors_t* upolynomial_factor_square_free_primitive(const lp_upol
 
     // If P has content, it is a power of p
     if (lp_upolynomial_degree(P) > 0) {
-      assert(mpz_fits_slong_p(&f->K->M));
+      assert(lp_integer_fits_int(&f->K->M));
       long p = integer_to_int(&f->K->M);
       lp_upolynomial_t* P_p = lp_upolynomial_div_degrees(P, p);
       lp_upolynomial_factors_t* sub_factors = upolynomial_factor_square_free_primitive(P_p);
@@ -288,7 +288,7 @@ lp_upolynomial_factors_t* upolynomial_factor_distinct_degree(const lp_upolynomia
   assert(lp_upolynomial_is_monic(f));
 
   // The prime
-  assert(mpz_fits_slong_p(&K->M));
+  assert(lp_integer_fits_int(&K->M));
   long p = integer_to_int(&K->M);
   assert(p < FIELD_ORDER_LIMIT);
 
@@ -370,7 +370,7 @@ static
 void Q_construct(lp_integer_t* Q, size_t size, const lp_upolynomial_t* u) {
 
   const lp_int_ring_t* K = lp_upolynomial_ring(u);
-  assert(mpz_fits_slong_p(&K->M));
+  assert(lp_integer_fits_int(&K->M));
   size_t p = (size_t) integer_to_int(&K->M);
   assert(p < FIELD_ORDER_LIMIT);
 
@@ -757,7 +757,7 @@ lp_upolynomial_factors_t* upolynomial_factor_Zp(const lp_upolynomial_t* f) {
     size_t f_i_multiplicity = sq_free_factors->multiplicities[i];
 
     // Extract linear factors
-    assert(mpz_fits_slong_p(&K->M));
+    assert(lp_integer_fits_int(&K->M));
     long x_int, p = integer_to_int(&K->M);
     assert(p < FIELD_ORDER_LIMIT);
     lp_upolynomial_t* linear_factors_product = 0;

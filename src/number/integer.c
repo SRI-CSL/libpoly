@@ -153,6 +153,10 @@ char* lp_integer_to_string(const lp_integer_t* c) {
   return integer_to_string(c);
 }
 
+int lp_integer_fits_int(const lp_integer_t* c) {
+  return integer_fits_int(c);
+}
+
 long lp_integer_to_int(const lp_integer_t* c) {
   return integer_to_int(c);
 }

@@ -593,7 +593,7 @@ void upolynomial_roots_find_brute_force(const lp_upolynomial_t* f, lp_integer_t*
   size_t d = lp_upolynomial_degree(f);
   assert(d > 0);
 
-  assert(mpz_fits_slong_p(&K->M));
+  assert(lp_integer_fits_int(&K->M));
   long p = integer_to_int(&K->M);
   assert(p < FIELD_ORDER_LIMIT);
 
