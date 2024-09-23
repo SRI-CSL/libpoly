@@ -715,6 +715,46 @@ int lp_interval_contains_int(const lp_interval_t* I) {
   return result;
 }
 
+long lp_interval_count_int(const lp_interval_t* I) {
+  if (lp_value_is_infinity(&I->a)) return LONG_MAX;
+  int a_int = lp_value_is_integer(&I->a);
+  if (I->is_point) {
+    return a_int ? 1 : 0;
+  }
+  if (lp_value_is_infinity(&I->b)) return LONG_MAX;
+
+  long result = 0;
+  int b_int = lp_value_is_integer(&I->b);
+  if (!I->a_open && a_int) result++;
+  if (!I->b_open && b_int) result++;
+
+  lp_integer_t m, n;
+  lp_integer_construct(&m);
+  lp_integer_construct(&n);
+
+  lp_value_ceiling(&I->a, &m);
+  lp_value_floor(&I->b, &n);
+
+  if (a_int) lp_integer_inc(lp_Z, &m);
+  if (b_int) lp_integer_dec(lp_Z, &n);
+
+  lp_integer_sub(lp_Z, &n, &n, &m);
+  if (lp_integer_sgn(lp_Z, &n) >= 0) {
+    if (lp_integer_fits_int(&n)) {
+      result += lp_integer_to_int(&n) + 1;
+      // check for overflow
+      if (result < 0) result = LONG_MAX;
+    } else {
+      result = LONG_MAX;
+    }
+  }
+
+  lp_integer_destruct(&m);
+  lp_integer_destruct(&n);
+
+  return result;
+}
+
 int lp_dyadic_interval_contains_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
   int cmp_a_q = dyadic_rational_cmp(&I->a, q);
   if (I->is_point) {

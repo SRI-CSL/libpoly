@@ -144,11 +144,37 @@ int lp_feasibility_set_is_point(const lp_feasibility_set_t* set) {
   return set->size == 1 && set->intervals->is_point;
 }
 
+int lp_feasibility_set_is_point_int(const lp_feasibility_set_t* set) {
+  long cnt = 0;
+  for (size_t i = 0; i < set->size; ++i) {
+    long tmp = lp_interval_count_int(set->intervals + i);
+    assert(tmp >= 0);
+    if (tmp > 1 || tmp + cnt > 1) {
+      return 0;
+    }
+    cnt += tmp;
+  }
+  return cnt == 1;
+}
+
+long lp_feasibility_set_count_int(const lp_feasibility_set_t* set) {
+  long cnt = 0;
+  for (size_t i = 0; i < set->size; ++i) {
+    long tmp = lp_interval_count_int(set->intervals + i);
+    assert(tmp >= 0);
+    // check for overflow
+    if (tmp >= LONG_MAX - cnt) {
+      return LONG_MAX;
+    }
+    cnt += tmp;
+  }
+  return cnt;
+}
+
 int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   int ret = 0;
-  size_t i;
   ret += fprintf(out, "{ ");
-  for(i = 0; i < set->size; ++ i) {
+  for(size_t i = 0; i < set->size; ++ i) {
     if (i) {
       ret += fprintf(out, ", ");
     }

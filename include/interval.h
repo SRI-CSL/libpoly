@@ -86,6 +86,9 @@ int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v);
 /** Check if the interval contains an integer value */
 int lp_interval_contains_int(const lp_interval_t* I);
 
+/** Counts the number of integers in the interval (up to LONG_MAX) */
+long lp_interval_count_int(const lp_interval_t* I);
+
 /** Returns an approximation of the log interval size */
 int lp_interval_size_approx(const lp_interval_t* I);
 
