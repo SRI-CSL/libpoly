@@ -673,17 +673,21 @@ int lp_rational_interval_contains_rational(const lp_rational_interval_t* I, cons
   return 1;
 }
 
-int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v) {
+int lp_interval_cmp_value(const lp_interval_t* I, const lp_value_t* v) {
   int cmp_a_v = lp_value_cmp(&I->a, v);
   if (I->is_point) {
-    return cmp_a_v == 0;
+    return cmp_a_v;
   }
-  if (I->a_open && cmp_a_v >= 0) return 0;
-  if (!I->a_open && cmp_a_v > 0) return 0;
+  if (I->a_open && cmp_a_v >= 0) return 1;
+  if (!I->a_open && cmp_a_v > 0) return 1;
   int cmp_v_b = lp_value_cmp(v, &I->b);
-  if (I->b_open && cmp_v_b >= 0) return 0;
-  if (!I->b_open && cmp_v_b > 0) return 0;
-  return 1;
+  if (I->b_open && cmp_v_b >= 0) return -1;
+  if (!I->b_open && cmp_v_b > 0) return -1;
+  return 0;
+}
+
+int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v) {
+  return lp_interval_cmp_value(I, v) == 0;
 }
 
 int lp_interval_contains_int(const lp_interval_t* I) {

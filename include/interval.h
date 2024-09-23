@@ -122,6 +122,9 @@ int lp_interval_cmp_lower_bounds(const lp_interval_t* I1, const lp_interval_t* I
 /** Compares the upper bounds of the intervals */
 int lp_interval_cmp_upper_bounds(const lp_interval_t* I1, const lp_interval_t* I2);
 
+/** Compares an interval I with a value v. Returns 0 if v in I, 1 if v is below I, -1 if v is above I. */
+int lp_interval_cmp_value(const lp_interval_t* I, const lp_value_t* v);
+
 /**
  * Comparison of intervals based on upper bounds, with additional intersect info.
  */

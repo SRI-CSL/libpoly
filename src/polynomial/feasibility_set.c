@@ -196,9 +196,18 @@ char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
 }
 
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value) {
-  // TODO: binary search
-  for (size_t i = 0; i < set->size; ++ i) {
-    if (lp_interval_contains(set->intervals + i, value)) {
+  size_t l = 0, r = set->size;
+  while(r > l) {
+    size_t m = l + (r - l) / 2;
+    int cmp = lp_interval_cmp_value(set->intervals + m, value);
+    if (cmp > 0) {
+      // v below I
+      r = m;
+    } else if (cmp < 0) {
+      // v above I
+      l = m + 1;
+    } else {
+      // v in I
       return 1;
     }
   }
