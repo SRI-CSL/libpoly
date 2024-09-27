@@ -1524,7 +1524,7 @@ int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_cond
     if (r) {
       return r;
     }
-    return lp_polynomial_constraint_infer_bounds(A, LP_SGN_LE_0, 0, M);
+    return lp_polynomial_constraint_infer_bounds(A, LP_SGN_GE_0, 0, M);
   }
   case LP_SGN_NE_0: // |x| - d != 0 => ?
     return 0;
