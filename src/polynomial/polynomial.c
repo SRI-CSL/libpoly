@@ -1743,7 +1743,7 @@ lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomi
     if (p) {
       return p;
     }
-    return lp_polynomial_constraint_explain_infer_bounds(A, LP_SGN_LE_0, 0, x);
+    return lp_polynomial_constraint_explain_infer_bounds(A, LP_SGN_GE_0, 0, x);
   }
   case LP_SGN_NE_0: // |x| - d != 0 => ?
     return 0;
