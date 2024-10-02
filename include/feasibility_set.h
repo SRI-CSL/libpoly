@@ -105,6 +105,13 @@ int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_
 void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* v);
 
 /**
+ * Pick a value from the feasible set (must be non-empty). If an integer value
+ * is available it will be picked. Preference integer < rational < algebraic.
+ * If equal, pick the closer to the near value.
+ */
+void lp_feasibility_set_pick_near_value(const lp_feasibility_set_t* set, lp_value_t* v, const lp_value_t* near_value);
+
+/**
  * Pick a value from the first interval towards -inf.
  */
 void lp_feasibility_set_pick_first_value(const lp_feasibility_set_t* set, lp_value_t* v);

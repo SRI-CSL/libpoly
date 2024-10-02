@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <string.h>
 #include <limits.h>
+#include <math.h>
 
 #include "poly.h"
 #include "value.h"
@@ -224,6 +225,59 @@ void lp_feasibility_set_pick_value(const lp_feasibility_set_t* set, lp_value_t* 
     if (!same_or_better_complexity(value, value_interval_size, &current, current_interval_size)) {
       lp_value_swap(value, &current);
       value_interval_size = current_interval_size;
+    }
+  }
+  lp_value_destruct(&current);
+}
+
+// We get smallest integer < rational < algebraic
+// If same we get one with the smallest distance from the near value
+static inline
+int near_or_better_complexity(const lp_value_t* v1, double v1_dbl, const lp_value_t* v2, double v2_dbl, double near_dbl) {
+
+  // See if any is integer
+  int v1_is_int = lp_value_is_integer(v1);
+  int v2_is_int = lp_value_is_integer(v2);
+  if (v1_is_int && !v2_is_int) {
+    return 1;
+  }
+  if (v2_is_int && !v1_is_int) {
+    return 0;
+  }
+
+  // See if any is rational
+  int v1_is_rational = lp_value_is_rational(v1);
+  int v2_is_rational = lp_value_is_rational(v2);
+  if (v1_is_rational && !v2_is_rational) {
+    return 1;
+  }
+  if (v2_is_rational && !v1_is_rational) {
+    return 0;
+  }
+
+  // Same type, compare the distance
+  return fabs(v1_dbl - near_dbl) < fabs(v2_dbl - near_dbl);
+}
+
+void lp_feasibility_set_pick_near_value(const lp_feasibility_set_t* set, lp_value_t* value, const lp_value_t* near_value) {
+  size_t i;
+
+  assert(!lp_feasibility_set_is_empty(set));
+
+  lp_interval_pick_value(set->intervals, value);
+  double value_dbl = lp_value_to_double(value);
+  double near_dbl = lp_value_to_double(near_value);
+
+  lp_value_t current;
+  double current_dbl;
+  lp_value_construct_none(&current);
+  for (i = 1; i < set->size; ++ i) {
+    lp_interval_pick_value(set->intervals + i, &current);
+    current_dbl = lp_value_to_double(&current);
+
+    if (!near_or_better_complexity(value, value_dbl, &current, current_dbl, near_dbl)) {
+      lp_value_swap(value, &current);
+      value_dbl = current_dbl;
     }
   }
   lp_value_destruct(&current);
