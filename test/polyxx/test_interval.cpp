@@ -70,13 +70,13 @@ TEST_CASE("interval::count_int") {
   CHECK(count_int(Interval()) == 1);
   CHECK(count_int(Interval(Rational(1,2))) == 0);
   CHECK(count_int(Interval(Rational(3,4), Rational(5,4))) == 1);
-  CHECK(count_int(Interval(0, false, 2, false)) == 3);
-  CHECK(count_int(Interval(0,LONG_MAX)) == LONG_MAX - 1);
-  CHECK(count_int(Interval(0,false, LONG_MAX, true)) == LONG_MAX);
-  CHECK(count_int(Interval(0,false, LONG_MAX, false)) == LONG_MAX);
+  CHECK(count_int(Interval(0,false,2, false)) == 3);
+  CHECK(count_int(Interval(0,LONG_MAX)) == LONG_MAX-1);
+  CHECK(count_int(Interval(0,false,LONG_MAX,true)) == LONG_MAX);
+  CHECK(count_int(Interval(0,false,LONG_MAX,false)) == LONG_MAX);
   CHECK(count_int(Interval(-1,LONG_MAX)) == LONG_MAX);
   CHECK(count_int(Interval(-2,LONG_MAX)) == LONG_MAX);
-  CHECK(count_int(Interval(LONG_MIN, LONG_MAX)) == LONG_MAX);
+  CHECK(count_int(Interval(LONG_MIN,LONG_MAX)) == LONG_MAX);
 }
 
 TEST_CASE("interval::pick_value") {
