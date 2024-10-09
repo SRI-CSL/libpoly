@@ -149,6 +149,7 @@ int lp_feasibility_set_is_point_int(const lp_feasibility_set_t* set) {
   for (size_t i = 0; i < set->size; ++i) {
     long tmp = lp_interval_count_int(set->intervals + i);
     assert(tmp >= 0);
+    // checking tmp and the sum independently to avoid overflows
     if (tmp > 1 || tmp + cnt > 1) {
       return 0;
     }
