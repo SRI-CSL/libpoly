@@ -81,6 +81,10 @@ namespace poly {
 
   /** Check whether an interval contains some value. */
   bool contains(const Interval& i, const Value& v);
+  /** Check whether an interval contains an integer value. */
+  bool contains_int(const Interval& i);
+  /** Counts the number of integers in the interval up to LONG_MAX. */
+  long count_int(const Interval& i);
   /** Get an approximation of the log interval size. */
   int log_size(const Interval& i);
 

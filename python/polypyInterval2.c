@@ -40,9 +40,13 @@ Interval_pick_value(PyObject* self);
 static PyObject*
 Interval_contains_value(PyObject* self, PyObject* args);
 
+static PyObject*
+Interval_contains_int(PyObject* self);
+
 PyMethodDef Interval_methods[] = {
     {"pick_value", (PyCFunction)Interval_pick_value, METH_NOARGS, "Returns a value from the interval."},
     {"contains", (PyCFunction)Interval_contains_value, METH_VARARGS, "Returns true if the value is in the interval."},
+    {"contains_int", (PyCFunction)Interval_contains_int, METH_NOARGS, "Returns true if the interval contains an integer value."},
     {NULL}  /* Sentinel */
 };
 
@@ -89,8 +93,7 @@ PyTypeObject IntervalType = {
 };
 
 static void
-Interval_dealloc(Interval* self)
-{
+Interval_dealloc(Interval* self) {
   lp_interval_destruct(&self->I);
   self->ob_type->tp_free((PyObject*)self);
 }
@@ -163,6 +166,13 @@ Interval_contains_value(PyObject* self, PyObject* args) {
 
   PyObject* result_object = result ? Py_True : Py_False;
   Py_INCREF(result_object);
+  return result_object;
+}
 
+static PyObject*
+Interval_contains_int(PyObject* self) {
+  Interval* I = (Interval*) self;
+  PyObject* result_object = lp_interval_contains_int(&I->I) ? Py_True : Py_False;
+  Py_INCREF(result_object);
   return result_object;
 }

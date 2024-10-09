@@ -94,9 +94,24 @@ int lp_feasibility_set_is_full(const lp_feasibility_set_t* set);
 int lp_feasibility_set_is_point(const lp_feasibility_set_t* set);
 
 /**
+ * Check if the set contains only one integer value.
+ */
+int lp_feasibility_set_is_point_int(const lp_feasibility_set_t* set);
+
+/**
+ * Returns the number of integers in set (up to LONG_MAX).
+ */
+long lp_feasibility_set_count_int(const lp_feasibility_set_t* set);
+
+/**
  * Check if the given value belongs to the set.
  */
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value);
+
+/**
+ * Checks if the set contains an integer value.
+ */
+int lp_feasibility_set_contains_int(const lp_feasibility_set_t* set);
 
 /**
  * Pick a value from the feasible set (must be non-empty). If an integer value

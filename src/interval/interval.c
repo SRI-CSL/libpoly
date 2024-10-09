@@ -86,8 +86,7 @@ void lp_interval_construct(lp_interval_t* I,
   }
 }
 
-void lp_rational_interval_construct_point(lp_rational_interval_t* I, const lp_rational_t* a)
-{
+void lp_rational_interval_construct_point(lp_rational_interval_t* I, const lp_rational_t* a) {
   rational_construct_copy(&I->a, a);
   I->a_open = 0;
   I->b_open = 0;
@@ -110,7 +109,8 @@ void lp_interval_construct_point(lp_interval_t* I, const lp_value_t* q) {
 
 void lp_rational_interval_construct_zero(lp_rational_interval_t* I) {
   rational_construct(&I->a);
-  I->a_open = I->b_open = 0;
+  I->a_open = 0;
+  I->b_open = 0;
   I->is_point = 1;
 }
 
@@ -673,19 +673,91 @@ int lp_rational_interval_contains_rational(const lp_rational_interval_t* I, cons
   return 1;
 }
 
-int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v) {
+int lp_interval_cmp_value(const lp_interval_t* I, const lp_value_t* v) {
   int cmp_a_v = lp_value_cmp(&I->a, v);
   if (I->is_point) {
-    return cmp_a_v == 0;
+    return cmp_a_v;
   }
-  if (I->a_open && cmp_a_v >= 0) return 0;
-  if (!I->a_open && cmp_a_v > 0) return 0;
+  if (I->a_open && cmp_a_v >= 0) return 1;
+  if (!I->a_open && cmp_a_v > 0) return 1;
   int cmp_v_b = lp_value_cmp(v, &I->b);
-  if (I->b_open && cmp_v_b >= 0) return 0;
-  if (!I->b_open && cmp_v_b > 0) return 0;
-  return 1;
+  if (I->b_open && cmp_v_b >= 0) return -1;
+  if (!I->b_open && cmp_v_b > 0) return -1;
+  return 0;
 }
 
+int lp_interval_contains(const lp_interval_t* I, const lp_value_t* v) {
+  return lp_interval_cmp_value(I, v) == 0;
+}
+
+int lp_interval_contains_int(const lp_interval_t* I) {
+  if (lp_value_is_infinity(&I->a)) return 1;
+  int a_int = lp_value_is_integer(&I->a);
+  if (I->is_point) {
+    return a_int;
+  }
+  if (!I->a_open && a_int) return 1;
+  if (lp_value_is_infinity(&I->b)) return 1;
+  int b_int = lp_value_is_integer(&I->b);
+  if (!I->b_open && b_int) return 1;
+
+  lp_integer_t m, n;
+  lp_integer_construct(&m);
+  lp_integer_construct(&n);
+
+  lp_value_ceiling(&I->a, &m);
+  lp_value_floor(&I->b, &n);
+
+  if (a_int) lp_integer_inc(lp_Z, &m);
+  if (b_int) lp_integer_dec(lp_Z, &n);
+
+  int result = lp_integer_cmp(lp_Z, &n, &m) >= 0;
+
+  lp_integer_destruct(&m);
+  lp_integer_destruct(&n);
+
+  return result;
+}
+
+long lp_interval_count_int(const lp_interval_t* I) {
+  if (lp_value_is_infinity(&I->a)) return LONG_MAX;
+  int a_int = lp_value_is_integer(&I->a);
+  if (I->is_point) {
+    return a_int ? 1 : 0;
+  }
+  if (lp_value_is_infinity(&I->b)) return LONG_MAX;
+
+  long result = 0;
+  int b_int = lp_value_is_integer(&I->b);
+  if (!I->a_open && a_int) result++;
+  if (!I->b_open && b_int) result++;
+
+  lp_integer_t m, n;
+  lp_integer_construct(&m);
+  lp_integer_construct(&n);
+
+  lp_value_ceiling(&I->a, &m);
+  lp_value_floor(&I->b, &n);
+
+  if (a_int) lp_integer_inc(lp_Z, &m);
+  if (b_int) lp_integer_dec(lp_Z, &n);
+
+  lp_integer_sub(lp_Z, &n, &n, &m);
+  if (lp_integer_sgn(lp_Z, &n) >= 0) {
+    if (lp_integer_fits_int(&n)) {
+      result += lp_integer_to_int(&n) + 1;
+      // check for overflow
+      if (result < 0) result = LONG_MAX;
+    } else {
+      result = LONG_MAX;
+    }
+  }
+
+  lp_integer_destruct(&m);
+  lp_integer_destruct(&n);
+
+  return result;
+}
 
 int lp_dyadic_interval_contains_dyadic_rational(const lp_dyadic_interval_t* I, const lp_dyadic_rational_t* q) {
   int cmp_a_q = dyadic_rational_cmp(&I->a, q);

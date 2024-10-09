@@ -53,6 +53,32 @@ TEST_CASE("interval::contains") {
   CHECK(contains(i, Value(Rational(5,2))));
 }
 
+TEST_CASE("interval::contains_int") {
+  CHECK_FALSE(contains_int(Interval(1,2)));
+  CHECK(contains_int(Interval(1,3)));
+  CHECK(contains_int(Interval()));
+  CHECK(contains_int(Interval(1)));
+  CHECK_FALSE(contains_int(Interval(Value(Rational(3,2)))));
+  CHECK(contains_int(Interval(1, false, 2, true)));
+  CHECK(contains_int(Interval(1, true, 2, false)));
+  CHECK_FALSE(contains_int(Interval(Rational(1,4), Rational(3,4))));
+}
+
+TEST_CASE("interval::count_int") {
+  CHECK(count_int(Interval(0,1)) == 0);
+  CHECK(count_int(Interval(0,2)) == 1);
+  CHECK(count_int(Interval()) == 1);
+  CHECK(count_int(Interval(Rational(1,2))) == 0);
+  CHECK(count_int(Interval(Rational(3,4), Rational(5,4))) == 1);
+  CHECK(count_int(Interval(0,false,2, false)) == 3);
+  CHECK(count_int(Interval(0,LONG_MAX)) == LONG_MAX-1);
+  CHECK(count_int(Interval(0,false,LONG_MAX,true)) == LONG_MAX);
+  CHECK(count_int(Interval(0,false,LONG_MAX,false)) == LONG_MAX);
+  CHECK(count_int(Interval(-1,LONG_MAX)) == LONG_MAX);
+  CHECK(count_int(Interval(-2,LONG_MAX)) == LONG_MAX);
+  CHECK(count_int(Interval(LONG_MIN,LONG_MAX)) == LONG_MAX);
+}
+
 TEST_CASE("interval::pick_value") {
   Interval i(1,3);
   CHECK(contains(i, pick_value(i)));

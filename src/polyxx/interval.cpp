@@ -68,6 +68,15 @@ namespace poly {
   bool contains(const Interval& i, const Value& v) {
     return lp_interval_contains(i.get_internal(), v.get_internal());
   }
+
+  bool contains_int(const Interval& i) {
+    return lp_interval_contains_int(i.get_internal());
+  }
+
+  long count_int(const Interval& i) {
+    return lp_interval_count_int(i.get_internal());
+  }
+
   int log_size(const Interval& i) {
     return lp_interval_size_approx(i.get_internal());
   }

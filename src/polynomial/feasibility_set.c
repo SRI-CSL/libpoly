@@ -144,11 +144,38 @@ int lp_feasibility_set_is_point(const lp_feasibility_set_t* set) {
   return set->size == 1 && set->intervals->is_point;
 }
 
+int lp_feasibility_set_is_point_int(const lp_feasibility_set_t* set) {
+  long cnt = 0;
+  for (size_t i = 0; i < set->size; ++i) {
+    long tmp = lp_interval_count_int(set->intervals + i);
+    assert(tmp >= 0);
+    // checking tmp and the sum independently to avoid overflows
+    if (tmp > 1 || tmp + cnt > 1) {
+      return 0;
+    }
+    cnt += tmp;
+  }
+  return cnt == 1;
+}
+
+long lp_feasibility_set_count_int(const lp_feasibility_set_t* set) {
+  long cnt = 0;
+  for (size_t i = 0; i < set->size; ++i) {
+    long tmp = lp_interval_count_int(set->intervals + i);
+    assert(tmp >= 0);
+    // check for overflow
+    if (tmp >= LONG_MAX - cnt) {
+      return LONG_MAX;
+    }
+    cnt += tmp;
+  }
+  return cnt;
+}
+
 int lp_feasibility_set_print(const lp_feasibility_set_t* set, FILE* out) {
   int ret = 0;
-  size_t i;
   ret += fprintf(out, "{ ");
-  for(i = 0; i < set->size; ++ i) {
+  for(size_t i = 0; i < set->size; ++ i) {
     if (i) {
       ret += fprintf(out, ", ");
     }
@@ -170,9 +197,27 @@ char* lp_feasibility_set_to_string(const lp_feasibility_set_t* set) {
 }
 
 int lp_feasibility_set_contains(const lp_feasibility_set_t* set, const lp_value_t* value) {
-  // TODO: binary search
+  size_t l = 0, r = set->size;
+  while(r > l) {
+    size_t m = l + (r - l) / 2;
+    int cmp = lp_interval_cmp_value(set->intervals + m, value);
+    if (cmp > 0) {
+      // v below I
+      r = m;
+    } else if (cmp < 0) {
+      // v above I
+      l = m + 1;
+    } else {
+      // v in I
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int lp_feasibility_set_contains_int(const lp_feasibility_set_t* set) {
   for (size_t i = 0; i < set->size; ++ i) {
-    if (lp_interval_contains(set->intervals + i, value)) {
+    if (lp_interval_contains_int(set->intervals + i)) {
       return 1;
     }
   }
@@ -457,7 +502,11 @@ int interval_sort_for_union(const void *I1_void, const void* I2_void) {
 
 void lp_feasibility_set_add(lp_feasibility_set_t* s, const lp_feasibility_set_t* from) {
 
-  if (from->size == 0) {
+  if (lp_feasibility_set_is_empty(from)) {
+    return;
+  }
+
+  if (lp_feasibility_set_is_full(s)) {
     return;
   }
 
