@@ -377,29 +377,31 @@ namespace poly {
 
   std::vector<Polynomial> psc(const Polynomial& p, const Polynomial& q) {
     std::size_t size = std::min(degree(p), degree(q)) + 1;
-    lp_polynomial_t* tmp[size];
+    std::vector<lp_polynomial_t*> tmp;
     for (std::size_t i = 0; i < size; ++i) {
-      tmp[i] = lp_polynomial_new(detail::context(p, q));
+      tmp.push_back(lp_polynomial_new(detail::context(p, q)));
     }
-    lp_polynomial_psc(tmp, p.get_internal(), q.get_internal());
+    lp_polynomial_psc(tmp.data(), p.get_internal(), q.get_internal());
     std::vector<Polynomial> res;
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);
     }
+    tmp.clear();
     return res;
   }
 
   std::vector<Polynomial> subres(const Polynomial& p, const Polynomial& q) {
     std::size_t size = std::min(degree(p), degree(q)) + 1;
-    lp_polynomial_t* tmp[size];
+    std::vector<lp_polynomial_t*> tmp;
     for (std::size_t i = 0; i < size; ++i) {
-      tmp[i] = lp_polynomial_new(detail::context(p, q));
+      tmp.push_back(lp_polynomial_new(detail::context(p, q)));
     }
-    lp_polynomial_subres(tmp, p.get_internal(), q.get_internal());
+    lp_polynomial_subres(tmp.data(), p.get_internal(), q.get_internal());
     std::vector<Polynomial> res;
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);
     }
+    tmp.clear();
     return res;
   }
 
