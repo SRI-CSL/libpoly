@@ -386,6 +386,7 @@ namespace poly {
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);
     }
+    tmp.clear();
     return res;
   }
 
@@ -400,6 +401,7 @@ namespace poly {
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);
     }
+    tmp.clear();
     return res;
   }
 
