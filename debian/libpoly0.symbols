@@ -6,6 +6,7 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_add_ordered_monomial@Base 1.3
  coefficient_assign@Base 1.3
  coefficient_assign_int@Base 1.3
+ coefficient_assign_integer@Base 1.13
  coefficient_cmp@Base 1.3
  coefficient_cmp_general@Base 1.3
  coefficient_cmp_type@Base 1.3
@@ -14,6 +15,7 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_construct_from_int@Base 1.3
  coefficient_construct_from_integer@Base 1.3
  coefficient_construct_from_univariate@Base 1.3
+ coefficient_construct_linear@Base 1.13
  coefficient_construct_rec@Base 1.3
  coefficient_construct_simple@Base 1.3
  coefficient_construct_simple_int@Base 1.3
@@ -49,6 +51,7 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_hash@Base 1.3
  coefficient_hash_traverse@Base 1.3
  coefficient_in_order@Base 1.3
+ coefficient_interval_value@Base 1.13
  coefficient_is_assigned@Base 1.3
  coefficient_is_constant@Base 1.3
  coefficient_is_linear@Base 1.3
@@ -86,6 +89,7 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_resultant@Base 1.3
  coefficient_root_lower_bound@Base 1.3
  coefficient_roots_isolate@Base 1.3
+ coefficient_roots_isolate_univariate@Base 1.13
  coefficient_sgn@Base 1.3
  coefficient_shl@Base 1.3
  coefficient_shr@Base 1.3
@@ -103,9 +107,12 @@ libpoly.so.0 libpoly0 #MINVER#
  dyadic_interval_mul@Base 1.3
  dyadic_interval_neg@Base 1.3
  dyadic_interval_pow@Base 1.3
+ dyadic_interval_root_overapprox@Base 1.13
  dyadic_interval_sub@Base 1.3
+ dyadic_rational_get_value_between@Base 1.13
  factorization_recombination@Base 1.3
  filter_roots@Base 1.3
+ full_interval@Base 1.13
  get_power_symbol@Base 1.3
  get_upolynomial_var_symbol@Base 1.3
  hensel_lift_compute_products@Base 1.3
@@ -122,17 +129,24 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_algebraic_number_construct@Base 1.3
  lp_algebraic_number_construct_copy@Base 1.3
  lp_algebraic_number_construct_from_dyadic_rational@Base 1.3
+ lp_algebraic_number_construct_from_integer@Base 1.13
+ lp_algebraic_number_construct_from_rational@Base 1.13
+ lp_algebraic_number_construct_one@Base 1.13
  lp_algebraic_number_construct_zero@Base 1.3
  lp_algebraic_number_destruct@Base 1.3
+ lp_algebraic_number_div@Base 1.13
  lp_algebraic_number_floor@Base 1.3
  lp_algebraic_number_get_dyadic_midpoint@Base 1.3
  lp_algebraic_number_get_rational_midpoint@Base 1.3
+ lp_algebraic_number_hash_approx@Base 1.13
+ lp_algebraic_number_inv@Base 1.13
  lp_algebraic_number_is_integer@Base 1.3
  lp_algebraic_number_is_rational@Base 1.3
  lp_algebraic_number_mul@Base 1.3
  lp_algebraic_number_mul_construct_op@Base 1.3
  lp_algebraic_number_mul_interval_op@Base 1.3
  lp_algebraic_number_neg@Base 1.3
+ lp_algebraic_number_positive_root@Base 1.13
  lp_algebraic_number_pow@Base 1.3
  lp_algebraic_number_pow_construct_op@Base 1.3
  lp_algebraic_number_pow_interval_op@Base 1.3
@@ -141,6 +155,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_algebraic_number_refine_const@Base 1.3
  lp_algebraic_number_restore_interval@Base 1.3
  lp_algebraic_number_restore_interval_const@Base 1.3
+ lp_algebraic_number_sgn@Base 1.13
  lp_algebraic_number_sub@Base 1.3
  lp_algebraic_number_sub_construct_op@Base 1.3
  lp_algebraic_number_sub_interval_op@Base 1.3
@@ -193,6 +208,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_dyadic_rational_ceiling@Base 1.3
  lp_dyadic_rational_cmp@Base 1.3
  lp_dyadic_rational_cmp_integer@Base 1.3
+ lp_dyadic_rational_cmp_rational@Base 1.13
  lp_dyadic_rational_construct@Base 1.3
  lp_dyadic_rational_construct_copy@Base 1.3
  lp_dyadic_rational_construct_from_double@Base 1.3
@@ -203,6 +219,8 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_dyadic_rational_floor@Base 1.3
  lp_dyadic_rational_get_den@Base 1.3
  lp_dyadic_rational_get_num@Base 1.3
+ lp_dyadic_rational_hash@Base 1.13
+ lp_dyadic_rational_hash_approx@Base 1.13
  lp_dyadic_rational_is_integer@Base 1.3
  lp_dyadic_rational_mul@Base 1.3
  lp_dyadic_rational_mul_2exp@Base 1.3
@@ -217,6 +235,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_feasibility_set_add@Base 1.3
  lp_feasibility_set_construct@Base 1.3
  lp_feasibility_set_construct_copy@Base 1.3
+ lp_feasibility_set_construct_from_interval@Base 1.13
  lp_feasibility_set_contains@Base 1.3
  lp_feasibility_set_delete@Base 1.3
  lp_feasibility_set_destruct@Base 1.3
@@ -227,6 +246,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_feasibility_set_is_point@Base 1.3
  lp_feasibility_set_new_copy@Base 1.3
  lp_feasibility_set_new_empty@Base 1.3
+ lp_feasibility_set_new_from_interval@Base 1.13
  lp_feasibility_set_new_from_intervals@Base 1.3
  lp_feasibility_set_new_full@Base 1.3
  lp_feasibility_set_new_internal@Base 1.3
@@ -234,6 +254,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_feasibility_set_pick_value@Base 1.3
  lp_feasibility_set_print@Base 1.3
  lp_feasibility_set_swap@Base 1.3
+ lp_feasibility_set_to_interval@Base 1.13
  lp_feasibility_set_to_string@Base 1.3
  lp_feasibiliy_set_assign@Base 1.3
  lp_int_ring_attach@Base 1.3
@@ -288,7 +309,17 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_integer_to_double@Base 1.3
  lp_integer_to_int@Base 1.3
  lp_integer_to_string@Base 1.3
+ lp_interval_add@Base 1.13
  lp_interval_assign@Base 1.3
+ lp_interval_assignment_construct@Base 1.13
+ lp_interval_assignment_delete@Base 1.13
+ lp_interval_assignment_destruct@Base 1.13
+ lp_interval_assignment_get_interval@Base 1.13
+ lp_interval_assignment_new@Base 1.13
+ lp_interval_assignment_print@Base 1.13
+ lp_interval_assignment_reset@Base 1.13
+ lp_interval_assignment_set_interval@Base 1.13
+ lp_interval_assignment_to_string@Base 1.13
  lp_interval_cmp@Base 1.3
  lp_interval_cmp_lower_bounds@Base 1.3
  lp_interval_cmp_upper_bounds@Base 1.3
@@ -301,14 +332,20 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_interval_construct_zero@Base 1.3
  lp_interval_contains@Base 1.3
  lp_interval_destruct@Base 1.3
+ lp_interval_endpoint_lt@Base 1.13
+ lp_interval_full@Base 1.13
  lp_interval_get_lower_bound@Base 1.3
  lp_interval_get_point@Base 1.3
  lp_interval_get_upper_bound@Base 1.3
+ lp_interval_is_full@Base 1.13
  lp_interval_is_point@Base 1.3
+ lp_interval_mul@Base 1.13
  lp_interval_pick_value@Base 1.3
+ lp_interval_pow@Base 1.13
  lp_interval_print@Base 1.3
  lp_interval_set_a@Base 1.3
  lp_interval_set_b@Base 1.3
+ lp_interval_sgn@Base 1.13
  lp_interval_size_approx@Base 1.3
  lp_interval_swap@Base 1.3
  lp_interval_to_string@Base 1.3
@@ -328,10 +365,14 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_alloc@Base 1.3
  lp_polynomial_assign@Base 1.3
  lp_polynomial_check_integrity@Base 1.3
+ lp_polynomial_check_order@Base 1.13
  lp_polynomial_cmp@Base 1.3
  lp_polynomial_cmp_type@Base 1.3
  lp_polynomial_constraint_evaluate@Base 1.3
+ lp_polynomial_constraint_explain_infer_bounds@Base 1.13
  lp_polynomial_constraint_get_feasible_set@Base 1.3
+ lp_polynomial_constraint_infer_bounds@Base 1.13
+ lp_polynomial_constraint_resolve_fm@Base 1.13
  lp_polynomial_construct@Base 1.3
  lp_polynomial_construct_copy@Base 1.3
  lp_polynomial_construct_from_coefficient@Base 1.3
@@ -350,6 +391,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_div@Base 1.3
  lp_polynomial_divides@Base 1.3
  lp_polynomial_divrem@Base 1.3
+ lp_polynomial_ensure_order@Base 1.13
  lp_polynomial_eq@Base 1.3
  lp_polynomial_evaluate@Base 1.3
  lp_polynomial_external_clean@Base 1.3
@@ -368,8 +410,10 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_hash_set_insert@Base 1.3
  lp_polynomial_hash_set_is_empty@Base 1.3
  lp_polynomial_hash_set_print@Base 1.3
+ lp_polynomial_interval_value@Base 1.13
  lp_polynomial_is_assigned@Base 1.3
  lp_polynomial_is_constant@Base 1.3
+ lp_polynomial_is_linear@Base 1.13
  lp_polynomial_is_univariate@Base 1.3
  lp_polynomial_is_univariate_m@Base 1.3
  lp_polynomial_is_zero@Base 1.3
@@ -440,6 +484,8 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_rational_floor@Base 1.3
  lp_rational_get_den@Base 1.3
  lp_rational_get_num@Base 1.3
+ lp_rational_hash@Base 1.13
+ lp_rational_hash_approx@Base 1.13
  lp_rational_interval_assign@Base 1.3
  lp_rational_interval_construct@Base 1.3
  lp_rational_interval_construct_copy@Base 1.3
@@ -476,6 +522,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_set_output_language@Base 1.3
  lp_set_upolynomial_var_symbol@Base 1.3
  lp_sign_condition_consistent@Base 1.3
+ lp_sign_condition_consistent_interval@Base 1.13
  lp_sign_condition_negate@Base 1.3
  lp_sign_condition_print@Base 1.3
  lp_stats_print@Base 1.3
@@ -537,6 +584,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_primitive_part_Z@Base 1.3
  lp_upolynomial_print@Base 1.3
  lp_upolynomial_rem_exact@Base 1.3
+ lp_upolynomial_reverse_in_place@Base 1.13
  lp_upolynomial_ring@Base 1.3
  lp_upolynomial_roots_count@Base 1.3
  lp_upolynomial_roots_isolate@Base 1.3
@@ -544,12 +592,15 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_sgn_at_dyadic_rational@Base 1.3
  lp_upolynomial_sgn_at_integer@Base 1.3
  lp_upolynomial_sgn_at_rational@Base 1.3
+ lp_upolynomial_shift@Base 1.13
  lp_upolynomial_solve_bezout@Base 1.3
  lp_upolynomial_sturm_sequence@Base 1.3
  lp_upolynomial_sub@Base 1.3
  lp_upolynomial_subst_x_neg@Base 1.3
+ lp_upolynomial_subst_x_pow_in_place@Base 1.13
  lp_upolynomial_to_string@Base 1.3
  lp_upolynomial_unpack@Base 1.3
+ lp_value_add@Base 1.13
  lp_value_approx@Base 1.3
  lp_value_assign@Base 1.3
  lp_value_assign_raw@Base 1.3
@@ -560,10 +611,12 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_value_cmp_void@Base 1.3
  lp_value_construct@Base 1.3
  lp_value_construct_copy@Base 1.3
+ lp_value_construct_int@Base 1.13
  lp_value_construct_none@Base 1.3
  lp_value_construct_zero@Base 1.3
  lp_value_delete@Base 1.3
  lp_value_destruct@Base 1.3
+ lp_value_div@Base 1.13
  lp_value_floor@Base 1.3
  lp_value_get_den@Base 1.3
  lp_value_get_distance_size_approx@Base 1.3
@@ -571,13 +624,25 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_value_get_rational@Base 1.3
  lp_value_get_value_between@Base 1.3
  lp_value_hash@Base 1.3
+ lp_value_hash_approx@Base 1.13
+ lp_value_inv@Base 1.13
+ lp_value_is_infinity@Base 1.13
  lp_value_is_integer@Base 1.3
  lp_value_is_rational@Base 1.3
+ lp_value_minus_infinity@Base 1.13
+ lp_value_mul@Base 1.13
+ lp_value_neg@Base 1.13
  lp_value_new@Base 1.3
  lp_value_new_copy@Base 1.3
+ lp_value_none@Base 1.13
+ lp_value_plus_infinity@Base 1.13
+ lp_value_pow@Base 1.13
  lp_value_print@Base 1.3
+ lp_value_sgn@Base 1.13
+ lp_value_sub@Base 1.13
  lp_value_swap@Base 1.3
  lp_value_to_double@Base 1.3
+ lp_value_to_same_type@Base 1.13
  lp_value_to_string@Base 1.3
  lp_variable_db_add_variable@Base 1.3
  lp_variable_db_attach@Base 1.3
@@ -627,9 +692,9 @@ libpoly.so.0 libpoly0 #MINVER#
  rational_interval_neg@Base 1.3
  rational_interval_pow@Base 1.3
  rational_interval_sub@Base 1.3
- stats_print@Base 1.3
  set_output_language@Base 1.3
  set_upolynomial_var_symbol@Base 1.3
+ stats_print@Base 1.3
  sturm_seqence_count_roots@Base 1.3
  sturm_seqence_count_roots_dyadic@Base 1.3
  sturm_seqence_count_sign_changes@Base 1.3
@@ -642,6 +707,8 @@ libpoly.so.0 libpoly0 #MINVER#
  trace_is_enabled@Base 1.3
  trace_out_real@Base 1.3
  trace_set_output@Base 1.3
+ u_memstream_close@Base 1.13
+ u_memstream_open@Base 1.13
  umonomial_construct@Base 1.3
  umonomial_construct_copy@Base 1.3
  umonomial_construct_from_int@Base 1.3
@@ -691,3 +758,6 @@ libpoly.so.0 libpoly0 #MINVER#
  upolynomial_roots_count_sturm@Base 1.3
  upolynomial_roots_isolate_sturm@Base 1.3
  upolynomial_var_symbol@Base 1.3
+ value_minus_inf@Base 1.13
+ value_none@Base 1.13
+ value_plus_inf@Base 1.13
