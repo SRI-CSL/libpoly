@@ -377,7 +377,7 @@ namespace poly {
 
   std::vector<Polynomial> psc(const Polynomial& p, const Polynomial& q) {
     std::size_t size = std::min(degree(p), degree(q)) + 1;
-    lp_polynomial_t* tmp[size];
+    lp_polynomial_t **tmp = (lp_polynomial_t**)malloc(size * sizeof(lp_polynomial_t*));
     for (std::size_t i = 0; i < size; ++i) {
       tmp[i] = lp_polynomial_new(detail::context(p, q));
     }
@@ -386,12 +386,13 @@ namespace poly {
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);
     }
+    free(tmp);
     return res;
   }
 
   std::vector<Polynomial> subres(const Polynomial& p, const Polynomial& q) {
     std::size_t size = std::min(degree(p), degree(q)) + 1;
-    lp_polynomial_t* tmp[size];
+    lp_polynomial_t **tmp = (lp_polynomial_t**)malloc(size * sizeof(lp_polynomial_t*));
     for (std::size_t i = 0; i < size; ++i) {
       tmp[i] = lp_polynomial_new(detail::context(p, q));
     }
@@ -400,6 +401,7 @@ namespace poly {
     for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(tmp[i]);
     }
+    free(tmp);
     return res;
   }
 

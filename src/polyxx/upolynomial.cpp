@@ -100,16 +100,18 @@ namespace poly {
   }
 
   std::vector<Integer> coefficients(const UPolynomial& p) {
-    lp_integer_t coeffs[degree(p) + 1];
-    for (std::size_t i = 0; i < degree(p) + 1; ++i) {
+    std::size_t size = degree(p) + 1;
+    lp_integer_t *coeffs = (lp_integer_t*)malloc(size * sizeof(lp_integer_t));
+    for (std::size_t i = 0; i < size; ++i) {
       lp_integer_construct_from_int(lp_Z, &coeffs[i], 0);
     }
     lp_upolynomial_unpack(p.get_internal(), coeffs);
     std::vector<Integer> res;
-    for (std::size_t i = 0; i < degree(p) + 1; ++i) {
+    for (std::size_t i = 0; i < size; ++i) {
       res.emplace_back(&coeffs[i]);
       lp_integer_destruct(&coeffs[i]);
     }
+    free(coeffs);
     return res;
   }
 
