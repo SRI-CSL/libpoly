@@ -208,7 +208,7 @@ int lp_feasibility_set_int_contains(const lp_feasibility_set_int_t* set, const l
 void lp_feasibility_set_int_pick_value(const lp_feasibility_set_int_t* set, lp_integer_t* value) {
   assert(!lp_feasibility_set_int_is_empty(set));
   if (!set->inverted) {
-    size_t pos = random() % set->size;
+    size_t pos = rand() % set->size;
     lp_integer_assign(lp_Z, value, set->elements + pos);
   } else {
     lp_integer_construct_from_int(lp_Z, value, 0);
