@@ -1,5 +1,5 @@
-libpoly0 (1.13-0ubuntu1) bionic; urgency=medium
+libpoly0 (0.2.0-0ubuntu1) focal; urgency=medium
 
-  * Libpoly 1.13 Release
+  * Libpoly 0.2.0 Release
 
- -- Ahmed Irfan <ahmed.irfan@sri.com>  Thu, 19 Dec 2024 13:46:30 +0000
+ -- Ahmed Irfan <ahmed.irfan@sri.com>  Fri, 2 May 2025 18:46:30 +0000
