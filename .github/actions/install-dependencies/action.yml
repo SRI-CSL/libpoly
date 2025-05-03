@@ -20,9 +20,9 @@ runs:
       shell: bash
       run: |
         echo "Install Mac dependencies"
-        # brew update
-        ## python3 installation fails after updating brew. It is an open issue, so until it is fixed we disable updating brew 
-        brew install gmp
-        brew install python
+        brew update
+        ## gmp and python are already installed in the latest macOS
+        # brew install gmp
+        # brew install python
         pip install sympy
         echo "Install Mac dependencies [DONE]"
