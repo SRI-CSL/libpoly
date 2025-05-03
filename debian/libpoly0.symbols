@@ -31,6 +31,7 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_divides@Base 1.3
  coefficient_divrem@Base 1.3
  coefficient_evaluate@Base 1.3
+ coefficient_evaluate_integer@Base 2.0-0ubuntu1
  coefficient_evaluate_rationals@Base 1.3
  coefficient_factor_content_free@Base 1.3
  coefficient_factor_square_free@Base 1.3
@@ -56,11 +57,13 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_is_constant@Base 1.3
  coefficient_is_linear@Base 1.3
  coefficient_is_minus_one@Base 1.3
+ coefficient_is_monomial@Base 2.0-0ubuntu1
  coefficient_is_normalized@Base 1.3
  coefficient_is_one@Base 1.3
  coefficient_is_univariate@Base 1.3
  coefficient_is_zero@Base 1.3
  coefficient_lc@Base 1.3
+ coefficient_lc_constant@Base 2.0-0ubuntu1
  coefficient_lc_m@Base 1.3
  coefficient_lc_safe@Base 1.3
  coefficient_lc_sgn@Base 1.3
@@ -74,15 +77,15 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_neg@Base 1.3
  coefficient_order@Base 1.3
  coefficient_order_and_add_monomial@Base 1.3
+ coefficient_pdivrem@Base 2.0-0ubuntu1
  coefficient_pow@Base 1.3
  coefficient_pp@Base 1.3
  coefficient_pp_cont@Base 1.3
  coefficient_prem@Base 1.3
  coefficient_print@Base 1.3
  coefficient_psc@Base 1.3
- coefficient_psc_optimized@Base 1.3
- coefficient_psc_unoptimized@Base 1.3
  coefficient_reduce@Base 1.3
+ coefficient_reduce_Zp@Base 2.0-0ubuntu1
  coefficient_reductum@Base 1.3
  coefficient_reductum_m@Base 1.3
  coefficient_rem@Base 1.3
@@ -93,12 +96,16 @@ libpoly.so.0 libpoly0 #MINVER#
  coefficient_sgn@Base 1.3
  coefficient_shl@Base 1.3
  coefficient_shr@Base 1.3
+ coefficient_spdivrem@Base 2.0-0ubuntu1
  coefficient_sprem@Base 1.3
  coefficient_sub@Base 1.3
  coefficient_sub_mul@Base 1.3
+ coefficient_subres@Base 2.0-0ubuntu1
  coefficient_swap@Base 1.3
+ coefficient_to_monomial@Base 2.0-0ubuntu1
  coefficient_to_string@Base 1.3
  coefficient_to_univariate@Base 1.3
+ coefficient_to_univariate_m@Base 2.0-0ubuntu1
  coefficient_top_variable@Base 1.3
  coefficient_traverse@Base 1.3
  coefficient_value_approx@Base 1.3
@@ -110,14 +117,10 @@ libpoly.so.0 libpoly0 #MINVER#
  dyadic_interval_root_overapprox@Base 1.13
  dyadic_interval_sub@Base 1.3
  dyadic_rational_get_value_between@Base 1.13
- factorization_recombination@Base 1.3
  filter_roots@Base 1.3
  full_interval@Base 1.13
  get_power_symbol@Base 1.3
  get_upolynomial_var_symbol@Base 1.3
- hensel_lift_compute_products@Base 1.3
- hensel_lift_initialize@Base 1.3
- hensel_lift_quadratic@Base 1.3
  lp_Z@Base 1.3
  lp_algebraic_number_add@Base 1.3
  lp_algebraic_number_ceiling@Base 1.3
@@ -168,6 +171,9 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_assignment_destruct@Base 1.3
  lp_assignment_get_value@Base 1.3
  lp_assignment_get_value_approx@Base 1.3
+ lp_assignment_is_empty@Base 2.0-0ubuntu1
+ lp_assignment_is_integer@Base 2.0-0ubuntu1
+ lp_assignment_is_set@Base 2.0-0ubuntu1
  lp_assignment_new@Base 1.3
  lp_assignment_print@Base 1.3
  lp_assignment_set_value@Base 1.3
@@ -233,17 +239,40 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_dyadic_rational_to_double@Base 1.3
  lp_dyadic_rational_to_string@Base 1.3
  lp_feasibility_set_add@Base 1.3
- lp_feasibility_set_construct@Base 1.3
- lp_feasibility_set_construct_copy@Base 1.3
  lp_feasibility_set_construct_from_interval@Base 1.13
  lp_feasibility_set_contains@Base 1.3
+ lp_feasibility_set_contains_int@Base 2.0-0ubuntu1
+ lp_feasibility_set_count_int@Base 2.0-0ubuntu1
  lp_feasibility_set_delete@Base 1.3
  lp_feasibility_set_destruct@Base 1.3
+ lp_feasibility_set_int_add@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_assign@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_contains@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_delete@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_eq@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_intersect@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_intersect_with_status@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_is_empty@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_is_full@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_is_point@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_new_copy@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_new_empty@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_new_from_integer@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_new_full@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_pick_value@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_print@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_size@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_size_approx@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_swap@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_to_string@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_union@Base 2.0-0ubuntu1
+ lp_feasibility_set_int_union_with_status@Base 2.0-0ubuntu1
  lp_feasibility_set_intersect@Base 1.3
  lp_feasibility_set_intersect_with_status@Base 1.3
  lp_feasibility_set_is_empty@Base 1.3
  lp_feasibility_set_is_full@Base 1.3
  lp_feasibility_set_is_point@Base 1.3
+ lp_feasibility_set_is_point_int@Base 2.0-0ubuntu1
  lp_feasibility_set_new_copy@Base 1.3
  lp_feasibility_set_new_empty@Base 1.3
  lp_feasibility_set_new_from_interval@Base 1.13
@@ -285,6 +314,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_integer_div_rem_Z@Base 1.3
  lp_integer_div_rem_pow2_Z@Base 1.3
  lp_integer_divides@Base 1.3
+ lp_integer_fits_int@Base 2.0-0ubuntu1
  lp_integer_gcd_Z@Base 1.3
  lp_integer_hash@Base 1.3
  lp_integer_in_ring@Base 1.3
@@ -323,6 +353,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_interval_cmp@Base 1.3
  lp_interval_cmp_lower_bounds@Base 1.3
  lp_interval_cmp_upper_bounds@Base 1.3
+ lp_interval_cmp_value@Base 2.0-0ubuntu1
  lp_interval_cmp_with_intersect@Base 1.3
  lp_interval_collapse_to@Base 1.3
  lp_interval_construct@Base 1.3
@@ -331,6 +362,8 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_interval_construct_point@Base 1.3
  lp_interval_construct_zero@Base 1.3
  lp_interval_contains@Base 1.3
+ lp_interval_contains_int@Base 2.0-0ubuntu1
+ lp_interval_count_int@Base 2.0-0ubuntu1
  lp_interval_destruct@Base 1.3
  lp_interval_endpoint_lt@Base 1.13
  lp_interval_full@Base 1.13
@@ -369,8 +402,10 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_cmp@Base 1.3
  lp_polynomial_cmp_type@Base 1.3
  lp_polynomial_constraint_evaluate@Base 1.3
+ lp_polynomial_constraint_evaluate_Zp@Base 2.0-0ubuntu1
  lp_polynomial_constraint_explain_infer_bounds@Base 1.13
  lp_polynomial_constraint_get_feasible_set@Base 1.3
+ lp_polynomial_constraint_get_feasible_set_Zp@Base 2.0-0ubuntu1
  lp_polynomial_constraint_infer_bounds@Base 1.13
  lp_polynomial_constraint_resolve_fm@Base 1.13
  lp_polynomial_construct@Base 1.3
@@ -394,6 +429,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_ensure_order@Base 1.13
  lp_polynomial_eq@Base 1.3
  lp_polynomial_evaluate@Base 1.3
+ lp_polynomial_evaluate_integer@Base 2.0-0ubuntu1
  lp_polynomial_external_clean@Base 1.3
  lp_polynomial_factor_content_free@Base 1.3
  lp_polynomial_factor_square_free@Base 1.3
@@ -402,21 +438,46 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_get_context@Base 1.3
  lp_polynomial_get_variables@Base 1.3
  lp_polynomial_hash@Base 1.3
+ lp_polynomial_hash_set_at@Base 2.0-0ubuntu1
  lp_polynomial_hash_set_clear@Base 1.3
  lp_polynomial_hash_set_close@Base 1.3
  lp_polynomial_hash_set_construct@Base 1.3
  lp_polynomial_hash_set_contains@Base 1.3
+ lp_polynomial_hash_set_delete@Base 2.0-0ubuntu1
  lp_polynomial_hash_set_destruct@Base 1.3
  lp_polynomial_hash_set_insert@Base 1.3
+ lp_polynomial_hash_set_insert_move@Base 2.0-0ubuntu1
+ lp_polynomial_hash_set_insert_vector@Base 2.0-0ubuntu1
+ lp_polynomial_hash_set_intersect@Base 2.0-0ubuntu1
  lp_polynomial_hash_set_is_empty@Base 1.3
+ lp_polynomial_hash_set_new@Base 2.0-0ubuntu1
  lp_polynomial_hash_set_print@Base 1.3
+ lp_polynomial_hash_set_remove@Base 2.0-0ubuntu1
+ lp_polynomial_hash_set_size@Base 2.0-0ubuntu1
+ lp_polynomial_heap_at@Base 2.0-0ubuntu1
+ lp_polynomial_heap_clear@Base 2.0-0ubuntu1
+ lp_polynomial_heap_construct@Base 2.0-0ubuntu1
+ lp_polynomial_heap_delete@Base 2.0-0ubuntu1
+ lp_polynomial_heap_destruct@Base 2.0-0ubuntu1
+ lp_polynomial_heap_is_empty@Base 2.0-0ubuntu1
+ lp_polynomial_heap_new@Base 2.0-0ubuntu1
+ lp_polynomial_heap_peek@Base 2.0-0ubuntu1
+ lp_polynomial_heap_pop@Base 2.0-0ubuntu1
+ lp_polynomial_heap_print@Base 2.0-0ubuntu1
+ lp_polynomial_heap_push@Base 2.0-0ubuntu1
+ lp_polynomial_heap_push_move@Base 2.0-0ubuntu1
+ lp_polynomial_heap_push_vector@Base 2.0-0ubuntu1
+ lp_polynomial_heap_remove@Base 2.0-0ubuntu1
+ lp_polynomial_heap_size@Base 2.0-0ubuntu1
  lp_polynomial_interval_value@Base 1.13
  lp_polynomial_is_assigned@Base 1.3
  lp_polynomial_is_constant@Base 1.3
  lp_polynomial_is_linear@Base 1.13
+ lp_polynomial_is_monomial@Base 2.0-0ubuntu1
  lp_polynomial_is_univariate@Base 1.3
  lp_polynomial_is_univariate_m@Base 1.3
  lp_polynomial_is_zero@Base 1.3
+ lp_polynomial_lc_constant@Base 2.0-0ubuntu1
  lp_polynomial_lc_is_constant@Base 1.3
  lp_polynomial_lc_sgn@Base 1.3
  lp_polynomial_lcm@Base 1.3
@@ -427,6 +488,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_new@Base 1.3
  lp_polynomial_new_copy@Base 1.3
  lp_polynomial_new_from_coefficient@Base 1.3
+ lp_polynomial_pdivrem@Base 2.0-0ubuntu1
  lp_polynomial_pow@Base 1.3
  lp_polynomial_pp@Base 1.3
  lp_polynomial_pp_cont@Base 1.3
@@ -434,6 +496,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_print@Base 1.3
  lp_polynomial_psc@Base 1.3
  lp_polynomial_reduce@Base 1.3
+ lp_polynomial_reduce_degree_Zp@Base 2.0-0ubuntu1
  lp_polynomial_reductum@Base 1.3
  lp_polynomial_reductum_m@Base 1.3
  lp_polynomial_rem@Base 1.3
@@ -445,24 +508,33 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_set_external@Base 1.3
  lp_polynomial_sgn@Base 1.3
  lp_polynomial_shl@Base 1.3
+ lp_polynomial_spdivrem@Base 2.0-0ubuntu1
  lp_polynomial_sprem@Base 1.3
  lp_polynomial_sub@Base 1.3
  lp_polynomial_sub_mul@Base 1.3
+ lp_polynomial_subres@Base 2.0-0ubuntu1
  lp_polynomial_swap@Base 1.3
+ lp_polynomial_to_monomial@Base 2.0-0ubuntu1
  lp_polynomial_to_string@Base 1.3
  lp_polynomial_to_univariate@Base 1.3
+ lp_polynomial_to_univariate_m@Base 2.0-0ubuntu1
  lp_polynomial_top_variable@Base 1.3
  lp_polynomial_traverse@Base 1.3
  lp_polynomial_vector_at@Base 1.3
  lp_polynomial_vector_construct@Base 1.3
+ lp_polynomial_vector_copy@Base 2.0-0ubuntu1
  lp_polynomial_vector_delete@Base 1.3
  lp_polynomial_vector_destruct@Base 1.3
+ lp_polynomial_vector_get_context@Base 2.0-0ubuntu1
  lp_polynomial_vector_new@Base 1.3
+ lp_polynomial_vector_print@Base 2.0-0ubuntu1
  lp_polynomial_vector_push_back@Base 1.3
  lp_polynomial_vector_push_back_coeff@Base 1.3
  lp_polynomial_vector_push_back_coeff_prime@Base 1.3
+ lp_polynomial_vector_push_back_move@Base 2.0-0ubuntu1
  lp_polynomial_vector_reset@Base 1.3
  lp_polynomial_vector_size@Base 1.3
+ lp_polynomial_vector_swap@Base 2.0-0ubuntu1
  lp_rational_add@Base 1.3
  lp_rational_add_integer@Base 1.3
  lp_rational_assign@Base 1.3
@@ -521,6 +593,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_rational_to_string@Base 1.3
  lp_set_output_language@Base 1.3
  lp_set_upolynomial_var_symbol@Base 1.3
+ lp_sign_condition_Zp_valid@Base 2.0-0ubuntu1
  lp_sign_condition_consistent@Base 1.3
  lp_sign_condition_consistent_interval@Base 1.13
  lp_sign_condition_negate@Base 1.3
@@ -535,7 +608,6 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_construct@Base 1.3
  lp_upolynomial_construct_copy@Base 1.3
  lp_upolynomial_construct_copy_K@Base 1.3
- lp_upolynomial_construct_empty@Base 1.3
  lp_upolynomial_construct_from_int@Base 1.3
  lp_upolynomial_construct_from_long@Base 1.3
  lp_upolynomial_construct_power@Base 1.3
@@ -556,7 +628,6 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_extended_gcd@Base 1.3
  lp_upolynomial_factor@Base 1.3
  lp_upolynomial_factor_square_free@Base 1.3
- lp_upolynomial_factor_square_free_primitive@Base 1.3
  lp_upolynomial_factors_add@Base 1.3
  lp_upolynomial_factors_clear@Base 1.3
  lp_upolynomial_factors_construct@Base 1.3
@@ -574,6 +645,8 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_is_primitive@Base 1.3
  lp_upolynomial_is_zero@Base 1.3
  lp_upolynomial_lead_coeff@Base 1.3
+ lp_upolynomial_make_monic@Base 2.0-0ubuntu1
+ lp_upolynomial_make_monic_in_place@Base 2.0-0ubuntu1
  lp_upolynomial_make_primitive_Z@Base 1.3
  lp_upolynomial_mul@Base 1.3
  lp_upolynomial_mul_c@Base 1.3
@@ -587,6 +660,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_reverse_in_place@Base 1.13
  lp_upolynomial_ring@Base 1.3
  lp_upolynomial_roots_count@Base 1.3
+ lp_upolynomial_roots_find_Zp@Base 2.0-0ubuntu1
  lp_upolynomial_roots_isolate@Base 1.3
  lp_upolynomial_set_ring@Base 1.3
  lp_upolynomial_sgn_at_dyadic_rational@Base 1.3
@@ -598,8 +672,18 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_upolynomial_sub@Base 1.3
  lp_upolynomial_subst_x_neg@Base 1.3
  lp_upolynomial_subst_x_pow_in_place@Base 1.13
+ lp_upolynomial_to_polynomial@Base 2.0-0ubuntu1
  lp_upolynomial_to_string@Base 1.3
  lp_upolynomial_unpack@Base 1.3
+ lp_upolynomial_vector_at@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_clear@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_construct@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_delete@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_move_back@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_pop@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_push_back@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_size@Base 2.0-0ubuntu1
+ lp_upolynomial_vector_swap@Base 2.0-0ubuntu1
  lp_value_add@Base 1.13
  lp_value_approx@Base 1.3
  lp_value_assign@Base 1.3
@@ -695,11 +779,6 @@ libpoly.so.0 libpoly0 #MINVER#
  set_output_language@Base 1.3
  set_upolynomial_var_symbol@Base 1.3
  stats_print@Base 1.3
- sturm_seqence_count_roots@Base 1.3
- sturm_seqence_count_roots_dyadic@Base 1.3
- sturm_seqence_count_sign_changes@Base 1.3
- sturm_seqence_count_sign_changes_dyadic@Base 1.3
- sturm_seqence_isolate_roots@Base 1.3
  tags_to_trace@Base 1.3
  tags_to_trace_size@Base 1.3
  trace_disable@Base 1.3
@@ -746,16 +825,16 @@ libpoly.so.0 libpoly0 #MINVER#
  upolynomial_dense_to_upolynomial@Base 1.3
  upolynomial_dense_touch@Base 1.3
  upolynomial_factor_Z@Base 1.3
- upolynomial_factor_Z_square_free@Base 1.3
  upolynomial_factor_Zp@Base 1.3
- upolynomial_factor_berlekamp_square_free@Base 1.3
  upolynomial_factor_bound_landau_mignotte@Base 1.3
  upolynomial_factor_distinct_degree@Base 1.3
+ upolynomial_factor_square_free_primitive@Base 2.0-0ubuntu1
  upolynomial_gcd_euclid@Base 1.3
  upolynomial_gcd_heuristic@Base 1.3
  upolynomial_gcd_subresultant@Base 1.3
  upolynomial_root_bound_cauchy@Base 1.3
  upolynomial_roots_count_sturm@Base 1.3
+ upolynomial_roots_find_Zp@Base 2.0-0ubuntu1
  upolynomial_roots_isolate_sturm@Base 1.3
  upolynomial_var_symbol@Base 1.3
  value_minus_inf@Base 1.13
