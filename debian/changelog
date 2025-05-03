@@ -1,5 +1,5 @@
-libpoly0 (0.2.0-0ubuntu1) focal; urgency=medium
+libpoly0 (2.0-0ubuntu1) focal; urgency=medium
 
-  * Libpoly 0.2.0 Release
+  * Libpoly 2.0 Release
 
  -- Ahmed Irfan <ahmed.irfan@sri.com>  Fri, 2 May 2025 18:46:30 +0000
