@@ -1,8 +1,8 @@
-<img width="300" style="display: block; margin: auto;" src="https://www.csl.sri.com/images/logo_sri.gif"/>
-
 [![CI](https://github.com/SRI-CSL/libpoly/actions/workflows/ci.yml/badge.svg)](https://github.com/SRI-CSL/libpoly/actions/workflows/ci.yml)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/5716/badge.svg)](https://scan.coverity.com/projects/5716)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/SRI-CSL/libpoly)
+
+<img width="100" style="display: block; margin: auto;" src="https://avatars.githubusercontent.com/u/8029212"/>
 
 # SRI LibPoly
 
