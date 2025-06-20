@@ -2,9 +2,9 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/5716/badge.svg)](https://scan.coverity.com/projects/5716)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/SRI-CSL/libpoly)
 
-# LibPoly
+# SRI LibPoly
 
-LibPoly is a C library for manipulating polynomials. The target applications
+SRI LibPoly is a C library for manipulating polynomials. The target applications
 are symbolic reasoning engines, such as SMT solvers, that need to reason about
 polynomial constraints. It is research software under development, so the
 features and the API might change rapidly.
