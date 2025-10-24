@@ -39,14 +39,14 @@ namespace poly {
     Polynomial(Variable v);
 
     /** Construct i * v^n from a custom context. */
-    Polynomial(const Context& c, Integer i, Variable v, unsigned n);
+    Polynomial(const Context& c, const Integer& i, Variable v, unsigned n);
     /** Construct i * v^n. */
-    Polynomial(Integer i, Variable v, unsigned n);
+    Polynomial(const Integer& i, Variable v, unsigned n);
 
     /** Construct from an integer and a custom context. */
-    Polynomial(const Context& c, Integer i);
+    Polynomial(const Context& c, const Integer& i);
     /** Construct from an integer. */
-    Polynomial(Integer i);
+    Polynomial(const Integer& i);
 
     /** Construct from an integer and a custom context. */
     Polynomial(const Context& c, long i);
