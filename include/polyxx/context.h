@@ -6,7 +6,10 @@
 #include "utils.h"
 
 namespace poly {
-
+  /**
+   * The wrapper class for the polynomial context.
+   * Only supports the lp_Z ring right now.
+   */
   class Context {
     /** A variable database. */
     deleting_unique_ptr<lp_variable_db_t> mVariableDB;
@@ -17,18 +20,18 @@ namespace poly {
 
    public:
     Context();
-    /** Get a non-const pointer to the internal lp_variable_db_t. Handle with
-     * care!
+    /** Get a non-const pointer to the internal lp_variable_db_t.
+     * Handle with care!
      */
     lp_variable_db_t* get_variable_db() const;
 
-    /** Get a non-const pointer to the internal lp_variable_order_t. Handle with
-     * care!
+    /** Get a non-const pointer to the internal lp_variable_order_t.
+     * Handle with care!
      */
     lp_variable_order_t* get_variable_order() const;
 
-    /** Get a non-const pointer to the internal lp_polynomial_context_t. Handle
-     * with care!
+    /** Get a non-const pointer to the internal lp_polynomial_context_t.
+     * Handle with care!
      */
     lp_polynomial_context_t* get_polynomial_context() const;
 

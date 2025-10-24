@@ -19,8 +19,7 @@ namespace poly {
     Variable();
     /** Construct from a lp_variable_t. */
     Variable(lp_variable_t var);
-    /** Construct a new variable with the given name in the specified context.
-     */
+    /** Construct a new variable with the given name in the specified context. */
     Variable(const Context& c, const char* name);
     /** Construct a new variable with the given name in the default context. */
     Variable(const char* name);

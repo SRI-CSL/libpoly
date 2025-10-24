@@ -26,7 +26,7 @@ namespace poly {
     Polynomial(lp_polynomial_t* poly);
     /** Copy from an internal lp_polynomial_t pointer. */
     Polynomial(const lp_polynomial_t* poly);
-    /** Construct a zero polynomial from an interval context pointer. */
+    /** Construct a zero polynomial from an internal context pointer. */
     Polynomial(const lp_polynomial_context_t* c);
     /** Construct a zero polynomial from a custom context. */
     Polynomial(const Context& c);
