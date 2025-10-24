@@ -151,6 +151,8 @@ namespace poly {
   Polynomial operator+(const Integer& lhs, const Polynomial& rhs);
   /** Add and assign two polynomials. */
   Polynomial& operator+=(Polynomial& lhs, const Polynomial& rhs);
+  /** Add and assign a polynomial with an integer. */
+  Polynomial& operator+=(Polynomial& lhs, const Integer& rhs);
   /** Compute lhs += rhs1 * rhs2. */
   Polynomial& add_mul(Polynomial& lhs, const Polynomial& rhs1, const Polynomial& rhs2);
 
@@ -164,6 +166,8 @@ namespace poly {
   Polynomial operator-(const Integer& lhs, const Polynomial& rhs);
   /** Subtract and assign two polynomials. */
   Polynomial& operator-=(Polynomial& lhs, const Polynomial& rhs);
+  /** Subtract and assigns a polynomial with an integer. */
+  Polynomial& operator-=(Polynomial& lhs, const Integer& rhs);
   /** Compute lhs -= rhs1 * rhs2. */
   Polynomial& sub_mul(Polynomial& lhs, const Polynomial& rhs1, const Polynomial& rhs2);
 
@@ -175,6 +179,8 @@ namespace poly {
   Polynomial operator*(const Integer& lhs, const Polynomial& rhs);
   /** Multiply and assign two polynomials. */
   Polynomial& operator*=(Polynomial& lhs, const Polynomial& rhs);
+  /** Multiply and assign a polynomial with an integer */
+  Polynomial& operator*=(Polynomial& lhs, const Integer& rhs);
 
   /** Multiply with x^n where x is the main variable. */
   Polynomial shl(const Polynomial& lhs, unsigned n);

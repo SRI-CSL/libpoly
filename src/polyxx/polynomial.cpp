@@ -187,23 +187,30 @@ namespace poly {
     return res;
   }
   Polynomial operator+(const Polynomial& lhs, const Integer& rhs) {
-    lp_monomial_t monomial;
-    lp_monomial_construct(detail::context(lhs), &monomial);
-    lp_monomial_set_coefficient(detail::context(lhs), &monomial,
-                                rhs.get_internal());
     Polynomial res(lhs);
-    lp_polynomial_add_monomial(res.get_internal(), &monomial);
-    lp_monomial_destruct(&monomial);
+    res += rhs;
     return res;
   }
   Polynomial operator+(const Integer& lhs, const Polynomial& rhs) {
-    return rhs + lhs;
+    Polynomial res(rhs);
+    res += lhs;
+    return res;
   }
   Polynomial& operator+=(Polynomial& lhs, const Polynomial& rhs) {
     lp_polynomial_add(lhs.get_internal(), lhs.get_internal(),
                       rhs.get_internal());
     return lhs;
   }
+  Polynomial& operator+=(Polynomial& lhs, const Integer& rhs) {
+    lp_monomial_t monomial;
+    lp_monomial_construct(detail::context(lhs), &monomial);
+    lp_monomial_set_coefficient(detail::context(lhs), &monomial,
+                                rhs.get_internal());
+    lp_polynomial_add_monomial(lhs.get_internal(), &monomial);
+    lp_monomial_destruct(&monomial);
+    return lhs;
+  }
+
   Polynomial& add_mul(Polynomial& lhs, const Polynomial& rhs1,
                       const Polynomial& rhs2) {
     lp_polynomial_add_mul(lhs.get_internal(), rhs1.get_internal(),
@@ -233,6 +240,11 @@ namespace poly {
                       rhs.get_internal());
     return lhs;
   }
+  Polynomial& operator-=(Polynomial& lhs, const Integer& rhs) {
+    lhs += (-rhs);
+    return lhs;
+  }
+
   Polynomial& sub_mul(Polynomial& lhs, const Polynomial& rhs1,
                       const Polynomial& rhs2) {
     lp_polynomial_sub_mul(lhs.get_internal(), rhs1.get_internal(),
@@ -258,6 +270,11 @@ namespace poly {
   Polynomial& operator*=(Polynomial& lhs, const Polynomial& rhs) {
     lp_polynomial_mul(lhs.get_internal(), lhs.get_internal(),
                       rhs.get_internal());
+    return lhs;
+  }
+  Polynomial& operator*=(Polynomial& lhs, const Integer& rhs) {
+    lp_polynomial_mul_integer(lhs.get_internal(), lhs.get_internal(),
+                              rhs.get_internal());
     return lhs;
   }
 
@@ -368,8 +385,8 @@ namespace poly {
   }
   Polynomial discriminant(const Polynomial& p) {
     if (degree(p) == 1) {
-      // Derivative is constant, making the resultant trivial (and resultant()
-      // does not cope with that)
+      // Derivative is constant, making the resultant trivial
+      // (and resultant() does not cope with that)
       // This creates the constant polynomial 1 in the context of p.
       return Polynomial(detail::context(p)) + Integer(1);
     }
