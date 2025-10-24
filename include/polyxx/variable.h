@@ -47,8 +47,7 @@ namespace poly {
   /** Stream the given Variable from the given context.
    * Use as follows: os << stream_variable(c, v) << ...
    */
-  inline detail::variable_printer stream_variable(const Context& c,
-                                                  const Variable& v);
+  detail::variable_printer stream_variable(const Context& c, const Variable& v);
 
   /** Compare two variables for equality. */
   bool operator==(const Variable& lhs, const Variable& rhs);

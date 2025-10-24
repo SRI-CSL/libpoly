@@ -24,8 +24,7 @@ namespace poly {
                Context::get_context().get_variable_db(), v.get_internal());
   }
 
-  detail::variable_printer stream_variable(const Context& c,
-                                           const Variable& v) {
+  detail::variable_printer stream_variable(const Context& c, const Variable& v) {
     return detail::variable_printer{c.get_variable_db(), v.get_internal()};
   }
 
