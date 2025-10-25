@@ -43,10 +43,12 @@ namespace poly {
     /** Construct i * v^n. */
     Polynomial(const Integer& i, Variable v, unsigned n);
 
+    /** Construct a constant polynomial from an internal context pointer. */
+    Polynomial(const lp_polynomial_context_t* c, const Integer& i);
     /** Construct from an integer and a custom context. */
-    Polynomial(const Context& c, const Integer& i);
+    Polynomial(const Context& c, const Integer &i);
     /** Construct from an integer. */
-    Polynomial(const Integer& i);
+    Polynomial(const Integer &i);
 
     /** Construct from an integer and a custom context. */
     Polynomial(const Context& c, long i);
@@ -132,16 +134,28 @@ namespace poly {
 
   /** Compare polynomials. */
   bool operator==(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator==(const Integer& lhs, const Polynomial& rhs);
+  bool operator==(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator!=(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator!=(const Integer& lhs, const Polynomial& rhs);
+  bool operator!=(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator<(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator<(const Integer& lhs, const Polynomial& rhs);
+  bool operator<(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator<=(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator<=(const Integer& lhs, const Polynomial& rhs);
+  bool operator<=(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator>(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator>(const Integer& lhs, const Polynomial& rhs);
+  bool operator>(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator>=(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator>=(const Integer& lhs, const Polynomial& rhs);
+  bool operator>=(const Polynomial& lhs, const Integer& rhs);
 
   /** Add two polynomials. */
   Polynomial operator+(const Polynomial& lhs, const Polynomial& rhs);

@@ -46,11 +46,13 @@ namespace poly {
   }
   Polynomial::Polynomial(const Integer& i, Variable v, unsigned n)
       : Polynomial(Context::get_context(), i, v, n) {}
-  Polynomial::Polynomial(const Context& c, const Integer& i)
+
+  Polynomial::Polynomial(const lp_polynomial_context_t* c, const Integer & i)
       : mPoly(lp_polynomial_alloc(), polynomial_deleter) {
-    lp_polynomial_construct_simple(get_internal(), c.get_polynomial_context(),
+    lp_polynomial_construct_simple(get_internal(), c,
                                    i.get_internal(), lp_variable_null, 0);
   }
+  Polynomial::Polynomial(const Context& c, const Integer& i) : Polynomial(c.get_polynomial_context(), i) {}
   Polynomial::Polynomial(const Integer& i) : Polynomial(Context::get_context(), i){};
   Polynomial::Polynomial(const Context& c, long i)
       : Polynomial(c, Integer(i)) {}
@@ -164,20 +166,66 @@ namespace poly {
   bool operator==(const Polynomial& lhs, const Polynomial& rhs) {
     return lp_polynomial_eq(lhs.get_internal(), rhs.get_internal());
   }
+  bool operator==(const Polynomial& lhs, const Integer& rhs) {
+    Polynomial tmp(detail::context(lhs), rhs);
+    return lp_polynomial_eq(lhs.get_internal(), tmp.get_internal());
+  }
+  bool operator==(const Integer& lhs, const Polynomial& rhs) {
+    Polynomial tmp(detail::context(rhs), lhs);
+    return lp_polynomial_eq(tmp.get_internal(), rhs.get_internal());
+  }
   bool operator!=(const Polynomial& lhs, const Polynomial& rhs) {
+    return !(lhs == rhs);
+  }
+  bool operator!=(const Polynomial& lhs, const Integer& rhs) {
+    return !(lhs == rhs);
+  }
+  bool operator!=(const Integer& lhs, const Polynomial& rhs) {
     return !(lhs == rhs);
   }
   bool operator<(const Polynomial& lhs, const Polynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) < 0;
   }
+  bool operator<(const Polynomial& lhs, const Integer& rhs) {
+    Polynomial tmp(detail::context(lhs), rhs);
+    return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) < 0;
+  }
+  bool operator<(const Integer& lhs, const Polynomial& rhs) {
+    Polynomial tmp(detail::context(rhs), lhs);
+    return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) < 0;
+  }
   bool operator<=(const Polynomial& lhs, const Polynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) <= 0;
+  }
+  bool operator<=(const Polynomial& lhs, const Integer& rhs) {
+    Polynomial tmp(detail::context(lhs), rhs);
+    return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) <= 0;
+  }
+  bool operator<=(const Integer& lhs, const Polynomial& rhs) {
+    Polynomial tmp(detail::context(rhs), lhs);
+    return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) <= 0;
   }
   bool operator>(const Polynomial& lhs, const Polynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) > 0;
   }
+  bool operator>(const Polynomial& lhs, const Integer& rhs) {
+    Polynomial tmp(detail::context(lhs), rhs);
+    return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) > 0;
+  }
+  bool operator>(const Integer& lhs, const Polynomial& rhs) {
+    Polynomial tmp(detail::context(rhs), lhs);
+    return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) > 0;
+  }
   bool operator>=(const Polynomial& lhs, const Polynomial& rhs) {
     return lp_polynomial_cmp(lhs.get_internal(), rhs.get_internal()) >= 0;
+  }
+  bool operator>=(const Polynomial& lhs, const Integer& rhs) {
+    Polynomial tmp(detail::context(lhs), rhs);
+    return lp_polynomial_cmp(lhs.get_internal(), tmp.get_internal()) >= 0;
+  }
+  bool operator>=(const Integer& lhs, const Polynomial& rhs) {
+    Polynomial tmp(detail::context(rhs), lhs);
+    return lp_polynomial_cmp(tmp.get_internal(), rhs.get_internal()) >= 0;
   }
 
   Polynomial operator+(const Polynomial& lhs, const Polynomial& rhs) {
@@ -233,7 +281,7 @@ namespace poly {
     return lhs + (-rhs);
   }
   Polynomial operator-(const Integer& lhs, const Polynomial& rhs) {
-    return -rhs + lhs;
+    return (-rhs) + lhs;
   }
   Polynomial& operator-=(Polynomial& lhs, const Polynomial& rhs) {
     lp_polynomial_sub(lhs.get_internal(), lhs.get_internal(),
@@ -387,8 +435,7 @@ namespace poly {
     if (degree(p) == 1) {
       // Derivative is constant, making the resultant trivial
       // (and resultant() does not cope with that)
-      // This creates the constant polynomial 1 in the context of p.
-      return Polynomial(detail::context(p)) + Integer(1);
+      return Polynomial(detail::context(p), Integer(1));
     }
     return div(resultant(p, derivative(p)), leading_coefficient(p));
   }
