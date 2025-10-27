@@ -58,11 +58,11 @@ namespace poly {
 
     /** Collapse this interval to a single point. */
     void collapse(const DyadicRational& dr);
-    /** The the lower bound. */
+    /** The lower bound. */
     void set_lower(const DyadicRational& dr, bool open);
-    /** The the upper bound. */
+    /** The upper bound. */
     void set_upper(const DyadicRational& dr, bool open);
-    /** The this interval by 2^n. */
+    /** The interval by 2^n. */
     void scale(int n);
   };
 
