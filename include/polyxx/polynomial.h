@@ -50,11 +50,6 @@ namespace poly {
     /** Construct from an integer. */
     Polynomial(const Integer &i);
 
-    /** Construct from an integer and a custom context. */
-    Polynomial(const Context& c, long i);
-    /** Construct from an integer. */
-    Polynomial(long i);
-
     /** Copy from a Polynomial. */
     Polynomial(const Polynomial& p);
     /** Move from a Polynomial. */

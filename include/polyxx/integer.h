@@ -22,9 +22,9 @@ namespace poly {
     /** Constructs zero. */
     Integer();
     /** Constructs from an int. */
-    explicit Integer(int i);
+    Integer(int i);
     /** Constructs from a long. */
-    explicit Integer(long i);
+    Integer(long i);
     /** Constructs from a long into the given ring. */
     Integer(const IntegerRing& ir, long i);
     /** Constructs from a string. */

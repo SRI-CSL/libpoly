@@ -54,9 +54,6 @@ namespace poly {
   }
   Polynomial::Polynomial(const Context& c, const Integer& i) : Polynomial(c.get_polynomial_context(), i) {}
   Polynomial::Polynomial(const Integer& i) : Polynomial(Context::get_context(), i){};
-  Polynomial::Polynomial(const Context& c, long i)
-      : Polynomial(c, Integer(i)) {}
-  Polynomial::Polynomial(long i) : Polynomial(Context::get_context(), i){};
 
   Polynomial::Polynomial(const Polynomial& p)
       : mPoly(lp_polynomial_new_copy(p.get_internal()), polynomial_deleter) {}
