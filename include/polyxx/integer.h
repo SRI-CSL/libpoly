@@ -122,16 +122,28 @@ namespace poly {
 
   /** Compare two integers. */
   bool operator==(const Integer& lhs, const Integer& rhs);
+  bool operator==(const Integer& lhs, long rhs);
+  bool operator==(long lhs, const Integer& rhs);
   /** Compare two integers. */
   bool operator!=(const Integer& lhs, const Integer& rhs);
+  bool operator!=(const Integer& lhs, long rhs);
+  bool operator!=(long lhs, const Integer& rhs);
   /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator<(const Integer& lhs, const Integer& rhs);
+  bool operator<(const Integer& lhs, long rhs);
+  bool operator<(long lhs, const Integer& rhs);
   /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator<=(const Integer& lhs, const Integer& rhs);
+  bool operator<=(const Integer& lhs, long rhs);
+  bool operator<=(long lhs, const Integer& rhs);
   /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator>(const Integer& lhs, const Integer& rhs);
+  bool operator>(const Integer& lhs, long rhs);
+  bool operator>(long lhs, const Integer& rhs);
   /** Compare two integers according to the lexicographic ordering on (lower bound,upper bound). */
   bool operator>=(const Integer& lhs, const Integer& rhs);
+  bool operator>=(const Integer& lhs, long rhs);
+  bool operator>=(long lhs, const Integer& rhs);
 
   /** Compare two integers over the given ring. */
   int compare(const IntegerRing& ir, const Integer& lhs, const Integer& rhs);
