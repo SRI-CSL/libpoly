@@ -27,6 +27,8 @@ namespace poly {
     lp_dyadic_interval_construct_from_integer(get_internal(), a.get_internal(),
                                               a_open, b.get_internal(), b_open);
   }
+  DyadicInterval::DyadicInterval(long i)
+      : DyadicInterval(DyadicRational(i)) {}
   DyadicInterval::DyadicInterval(long a, long b)
       : DyadicInterval(a, true, b, true) {}
   DyadicInterval::DyadicInterval(long a, bool a_open, long b, bool b_open) {
