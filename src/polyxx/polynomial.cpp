@@ -36,15 +36,26 @@ namespace poly {
       : Polynomial(c.get_polynomial_context()) {}
   Polynomial::Polynomial() : Polynomial(Context::get_context()) {}
 
-  Polynomial::Polynomial(const Context& c, Variable v)
-      : Polynomial(c, Integer(1), v, 1) {}
-  Polynomial::Polynomial(Variable v) : Polynomial(Context::get_context(), v) {}
-  Polynomial::Polynomial(const Context& c, const Integer &i, Variable v, unsigned n)
+  Polynomial::Polynomial(const lp_polynomial_context_t* c, const Variable& v)
       : mPoly(lp_polynomial_alloc(), polynomial_deleter) {
-    lp_polynomial_construct_simple(get_internal(), c.get_polynomial_context(),
+    assert(lp_variable_db_is_valid(c->var_db, v.get_internal()));
+    lp_polynomial_construct_simple(get_internal(), c,
+                                   Integer(1).get_internal(),
+                                   v.get_internal(), 1);
+  }
+  Polynomial::Polynomial(const Context& c, const Variable& v)
+      : Polynomial(c.get_polynomial_context(), v) {}
+  Polynomial::Polynomial(const Variable& v) : Polynomial(Context::get_context(), v) {}
+
+  Polynomial::Polynomial(const lp_polynomial_context_t* c, const Integer& i, const Variable& v, unsigned n)
+      : mPoly(lp_polynomial_alloc(), polynomial_deleter) {
+    assert(lp_variable_db_is_valid(c->var_db, v.get_internal()));
+    lp_polynomial_construct_simple(get_internal(), c,
                                    i.get_internal(), v.get_internal(), n);
   }
-  Polynomial::Polynomial(const Integer& i, Variable v, unsigned n)
+  Polynomial::Polynomial(const Context& c, const Integer& i, const Variable& v, unsigned n)
+      : Polynomial(c.get_polynomial_context(), i, v, n) {}
+  Polynomial::Polynomial(const Integer& i, const Variable& v, unsigned n)
       : Polynomial(Context::get_context(), i, v, n) {}
 
   Polynomial::Polynomial(const lp_polynomial_context_t* c, const Integer & i)

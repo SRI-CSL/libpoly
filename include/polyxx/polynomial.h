@@ -33,15 +33,19 @@ namespace poly {
     /** Construct a zero polynomial. */
     Polynomial();
 
+    /** Construct a constant polynomial from an internal context pointer. */
+    Polynomial(const lp_polynomial_context_t* c, const Variable& v);
     /** Construct from a variable and a custom context. */
-    Polynomial(const Context& c, Variable v);
+    Polynomial(const Context& c, const Variable& v);
     /** Construct from a variable. */
-    Polynomial(Variable v);
+    Polynomial(const Variable& v);
 
+    /** Construct a constant polynomial from an internal context pointer. */
+    Polynomial(const lp_polynomial_context_t* c, const Integer& i, const Variable& v, unsigned n);
     /** Construct i * v^n from a custom context. */
-    Polynomial(const Context& c, const Integer& i, Variable v, unsigned n);
+    Polynomial(const Context& c, const Integer& i, const Variable& v, unsigned n);
     /** Construct i * v^n. */
-    Polynomial(const Integer& i, Variable v, unsigned n);
+    Polynomial(const Integer& i, const Variable& v, unsigned n);
 
     /** Construct a constant polynomial from an internal context pointer. */
     Polynomial(const lp_polynomial_context_t* c, const Integer& i);
