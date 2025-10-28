@@ -81,3 +81,22 @@ TEST_CASE("polynomial::operator<<") {
   out << p;
   CHECK(out.str() == "1*x^6 + 2*x^5 + (3*y - 1)");
 }
+
+TEST_CASE("polynomial::constructor") {
+  Variable y("y");
+  Variable x("x");
+  Polynomial p = 1 * pow(x, 6) + 2 * pow(x, 5) + 3 * y - 1;
+  lp_polynomial_t* ptr = p.get_internal();
+
+  Polynomial p_cp(p);
+  Polynomial p_mv(std::move(p));
+  CHECK(ptr == p_mv.get_internal());
+  CHECK(ptr != p_cp.get_internal());
+  CHECK(p_cp == p_mv);
+
+  Polynomial p_mv_a, p_cp_a;
+  p_cp_a = p_cp;
+  p_mv_a = std::move(p_mv);
+  CHECK(p_cp == p_cp_a);
+  CHECK(ptr == p_mv_a.get_internal());
+}

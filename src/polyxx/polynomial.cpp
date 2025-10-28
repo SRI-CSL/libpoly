@@ -5,6 +5,7 @@
 #include "variable_list.h"
 
 #include <cassert>
+#include <utility>
 
 namespace poly {
 
@@ -58,15 +59,15 @@ namespace poly {
 
   Polynomial::Polynomial(const Polynomial& p)
       : mPoly(lp_polynomial_new_copy(p.get_internal()), polynomial_deleter) {}
-  Polynomial::Polynomial(Polynomial&& p)
-      : mPoly(lp_polynomial_new_copy(p.get_internal()), polynomial_deleter) {}
+  Polynomial::Polynomial(Polynomial&& p) noexcept
+      : mPoly(std::move(p.mPoly)) {}
 
   Polynomial& Polynomial::operator=(const Polynomial& p) {
     mPoly.reset(lp_polynomial_new_copy(p.get_internal()));
     return *this;
   }
-  Polynomial& Polynomial::operator=(Polynomial&& p) {
-    mPoly.reset(p.release());
+  Polynomial& Polynomial::operator=(Polynomial&& p) noexcept {
+    mPoly = std::move(p.mPoly);
     return *this;
   }
 
