@@ -9,6 +9,8 @@ namespace poly {
 
   /**
    * Implements a wrapper for lp_variable_t.
+   * WARNING: Variable does not store its context, i.e. the variable database
+   * it belongs to. Only use it with a Polynomial / Variable of the same context!
    */
   class Variable {
     /** The actual variable. */
