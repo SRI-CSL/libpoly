@@ -370,6 +370,7 @@ namespace poly {
     if (degree(p) == 1) {
       // Derivative is constant, making the resultant trivial (and resultant()
       // does not cope with that)
+      // This creates the constant polynomial 1 in the context of p.
       return Polynomial(detail::context(p)) + Integer(1);
     }
     return div(resultant(p, derivative(p)), leading_coefficient(p));
