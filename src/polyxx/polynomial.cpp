@@ -39,19 +39,19 @@ namespace poly {
   Polynomial::Polynomial(const Context& c, Variable v)
       : Polynomial(c, Integer(1), v, 1) {}
   Polynomial::Polynomial(Variable v) : Polynomial(Context::get_context(), v) {}
-  Polynomial::Polynomial(const Context& c, Integer i, Variable v, unsigned n)
+  Polynomial::Polynomial(const Context& c, const Integer &i, Variable v, unsigned n)
       : mPoly(lp_polynomial_alloc(), polynomial_deleter) {
     lp_polynomial_construct_simple(get_internal(), c.get_polynomial_context(),
                                    i.get_internal(), v.get_internal(), n);
   }
-  Polynomial::Polynomial(Integer i, Variable v, unsigned n)
+  Polynomial::Polynomial(const Integer& i, Variable v, unsigned n)
       : Polynomial(Context::get_context(), i, v, n) {}
-  Polynomial::Polynomial(const Context& c, Integer i)
+  Polynomial::Polynomial(const Context& c, const Integer& i)
       : mPoly(lp_polynomial_alloc(), polynomial_deleter) {
     lp_polynomial_construct_simple(get_internal(), c.get_polynomial_context(),
                                    i.get_internal(), lp_variable_null, 0);
   }
-  Polynomial::Polynomial(Integer i) : Polynomial(Context::get_context(), i){};
+  Polynomial::Polynomial(const Integer& i) : Polynomial(Context::get_context(), i){};
   Polynomial::Polynomial(const Context& c, long i)
       : Polynomial(c, Integer(i)) {}
   Polynomial::Polynomial(long i) : Polynomial(Context::get_context(), i){};
@@ -370,7 +370,8 @@ namespace poly {
     if (degree(p) == 1) {
       // Derivative is constant, making the resultant trivial (and resultant()
       // does not cope with that)
-      return Polynomial(Integer(1));
+      // This creates the constant polynomial 1 in the context of p.
+      return Polynomial(detail::context(p)) + Integer(1);
     }
     return div(resultant(p, derivative(p)), leading_coefficient(p));
   }

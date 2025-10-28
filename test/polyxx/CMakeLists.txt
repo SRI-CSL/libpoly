@@ -1,6 +1,7 @@
 set(polyxx_tests
     test_algebraic_number
     test_assignment
+    test_context
     test_dyadic_interval
     test_dyadic_rational
     test_integer
