@@ -23,7 +23,7 @@ namespace poly {
     Context();
 
     /** Wraps the lp context. */
-    explicit Context(lp_polynomial_context_t *ctx);
+    explicit Context(lp_polynomial_context_t* ctx);
 
     /** Copy constructor. */
     Context(const Context& other);

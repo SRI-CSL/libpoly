@@ -50,7 +50,7 @@ namespace poly {
     /** Construct a constant polynomial from an internal context pointer. */
     Polynomial(const lp_polynomial_context_t* c, const Integer& i);
     /** Construct from an integer and a custom context. */
-    Polynomial(const Context& c, const Integer &i);
+    Polynomial(const Context& c, const Integer& i);
     /** Construct from an integer. */
     Polynomial(const Integer &i);
 

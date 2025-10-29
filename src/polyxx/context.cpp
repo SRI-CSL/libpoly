@@ -17,7 +17,7 @@ namespace poly {
         });
   }
 
-  Context::Context(lp_polynomial_context_t *ctx) {
+  Context::Context(lp_polynomial_context_t* ctx) {
     mVariableDB = deleting_unique_ptr<lp_variable_db_t>(
       ctx->var_db,
       [](lp_variable_db_t *ptr) { lp_variable_db_detach(ptr); });
