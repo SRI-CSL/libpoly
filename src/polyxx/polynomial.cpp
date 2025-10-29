@@ -117,7 +117,7 @@ namespace poly {
     return lp_polynomial_degree(p.get_internal());
   }
   Variable main_variable(const Polynomial& p) {
-    return lp_polynomial_top_variable(p.get_internal());
+    return Variable(lp_polynomial_top_variable(p.get_internal()));
   }
   Polynomial coefficient(const Polynomial& p, std::size_t k) {
     Polynomial res(detail::context(p));

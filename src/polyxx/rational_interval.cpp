@@ -1,6 +1,7 @@
 #include "polyxx/rational_interval.h"
 
 #include <cassert>
+#include <iostream>
 
 namespace poly {
 
