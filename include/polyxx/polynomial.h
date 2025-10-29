@@ -52,7 +52,7 @@ namespace poly {
     /** Construct from an integer and a custom context. */
     Polynomial(const Context& c, const Integer& i);
     /** Construct from an integer. */
-    Polynomial(const Integer &i);
+    Polynomial(const Integer& i);
 
     /** Copy from a Polynomial. */
     Polynomial(const Polynomial& p);
