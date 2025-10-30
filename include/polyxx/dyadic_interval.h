@@ -33,12 +33,14 @@ namespace poly {
     /** Construct an open interval. */
     DyadicInterval(const Integer& a, const Integer& b);
     /** Construct an interval from the given bounds. */
-    DyadicInterval(const Integer& a, bool a_open, const Integer& b,
-                   bool b_open);
+    DyadicInterval(const Integer& a, bool a_open,
+                   const Integer& b, bool b_open);
+    /** Construct a point interval. */
+    explicit DyadicInterval(long i);
     /** Construct an open interval. */
-    DyadicInterval(long a, long b);
+    explicit DyadicInterval(long a, long b);
     /** Construct an interval from the given bounds. */
-    DyadicInterval(long a, bool a_open, long b, bool b_open);
+    explicit DyadicInterval(long a, bool a_open, long b, bool b_open);
     /** Copy from a DyadicInterval. */
     DyadicInterval(const DyadicInterval& i);
     /** Move from a DyadicInterval. */
@@ -58,11 +60,11 @@ namespace poly {
 
     /** Collapse this interval to a single point. */
     void collapse(const DyadicRational& dr);
-    /** The the lower bound. */
+    /** The lower bound. */
     void set_lower(const DyadicRational& dr, bool open);
-    /** The the upper bound. */
+    /** The upper bound. */
     void set_upper(const DyadicRational& dr, bool open);
-    /** The this interval by 2^n. */
+    /** The interval by 2^n. */
     void scale(int n);
   };
 

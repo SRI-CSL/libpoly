@@ -80,19 +80,55 @@ namespace poly {
   bool operator==(const Integer& lhs, const Integer& rhs) {
     return compare(IntegerRing::Z, lhs, rhs) == 0;
   }
+  bool operator==(const Integer& lhs, long rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) == 0;
+  }
+  bool operator==(long lhs, const Integer& rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) == 0;
+  }
   bool operator!=(const Integer& lhs, const Integer& rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) != 0;
+  }
+  bool operator!=(const Integer& lhs, long rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) != 0;
+  }
+  bool operator!=(long lhs, const Integer& rhs) {
     return compare(IntegerRing::Z, lhs, rhs) != 0;
   }
   bool operator<(const Integer& lhs, const Integer& rhs) {
     return compare(IntegerRing::Z, lhs, rhs) < 0;
   }
+  bool operator<(const Integer& lhs, long rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) < 0;
+  }
+  bool operator<(long lhs, const Integer& rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) < 0;
+  }
   bool operator<=(const Integer& lhs, const Integer& rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) <= 0;
+  }
+  bool operator<=(const Integer& lhs, long rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) <= 0;
+  }
+  bool operator<=(long lhs, const Integer& rhs) {
     return compare(IntegerRing::Z, lhs, rhs) <= 0;
   }
   bool operator>(const Integer& lhs, const Integer& rhs) {
     return compare(IntegerRing::Z, lhs, rhs) > 0;
   }
+  bool operator>(const Integer& lhs, long rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) > 0;
+  }
+  bool operator>(long lhs, const Integer& rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) > 0;
+  }
   bool operator>=(const Integer& lhs, const Integer& rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) >= 0;
+  }
+  bool operator>=(const Integer& lhs, long rhs) {
+    return compare(IntegerRing::Z, lhs, rhs) >= 0;
+  }
+  bool operator>=(long lhs, const Integer& rhs) {
     return compare(IntegerRing::Z, lhs, rhs) >= 0;
   }
 

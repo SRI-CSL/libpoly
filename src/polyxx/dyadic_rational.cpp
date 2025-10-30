@@ -25,6 +25,7 @@ namespace poly {
     lp_dyadic_rational_construct_from_double(&mDRat, d);
   }
   DyadicRational::DyadicRational(int i) : DyadicRational(i, 0) {}
+  DyadicRational::DyadicRational(long i) : DyadicRational(i, 0) {}
 
   DyadicRational::DyadicRational(const lp_dyadic_rational_t* dr) {
     lp_dyadic_rational_construct_copy(&mDRat, dr);
