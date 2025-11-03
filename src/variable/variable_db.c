@@ -63,9 +63,11 @@ void lp_variable_db_add_variable(lp_variable_db_t* var_db, lp_variable_t var, co
   assert(var_db);
   while (var >= var_db->capacity) {
     lp_variable_db_resize(var_db, 2*var_db->capacity);
+    var_db->size = var_db->capacity < var ? var_db->capacity : var;
   }
   assert(var_db->variable_names[var] == 0);
   var_db->variable_names[var] = strdup(name);
+  var_db->size = var_db->size < var ? var : var_db->size;
 }
 
 void lp_variable_db_construct(lp_variable_db_t* var_db) {
