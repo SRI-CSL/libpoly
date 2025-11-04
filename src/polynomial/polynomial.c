@@ -1177,17 +1177,13 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
     lp_value_construct_none(&x_value_backup);
   }
 
-  lp_polynomial_t* B = lp_polynomial_new(A->ctx);
-  {
-    coefficient_t A_rat;
-    lp_integer_t multiplier;
-    integer_construct(&multiplier);
-    coefficient_construct(A->ctx, &A_rat);
-    coefficient_evaluate_rationals(A->ctx, &A->data, M, &A_rat, &multiplier);
-    coefficient_swap(&B->data, &A_rat);
-    coefficient_destruct(&A_rat);
-    integer_destruct(&multiplier);
-  }
+  lp_polynomial_t B;
+  lp_polynomial_construct(&B, A->ctx);
+
+  lp_integer_t multiplier;
+  integer_construct(&multiplier);
+  coefficient_evaluate_rationals(A->ctx, &A->data, M, &B.data, &multiplier);
+  integer_destruct(&multiplier);
 
   size_t i;
 
@@ -1202,13 +1198,12 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   // Get the reduced polynomial
   lp_polynomial_t A_r;
   lp_polynomial_construct(&A_r, A->ctx);
-  if (x == lp_polynomial_top_variable(B)) {
-    lp_polynomial_reductum_m(&A_r, B, M);
-    assert(x == lp_polynomial_top_variable(B));
+  if (x == lp_polynomial_top_variable(&B)) {
+    lp_polynomial_reductum_m(&A_r, &B, M);
+    assert(x == lp_polynomial_top_variable(&B));
     // Get the square-free factorization
     lp_polynomial_factor_square_free(&A_r, &factors, &multiplicities, &factors_size);
   }
-  lp_polynomial_delete(B);
 
   // Count the max number of roots
   size_t total_degree = 0;
@@ -1311,6 +1306,7 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   free(roots_tmp);
   lp_value_destruct(&x_value_backup);
   lp_polynomial_destruct(&A_r);
+  lp_polynomial_destruct(&B);
 }
 
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
