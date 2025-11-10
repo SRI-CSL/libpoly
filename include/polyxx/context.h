@@ -19,7 +19,18 @@ namespace poly {
     deleting_unique_ptr<lp_polynomial_context_t> mPolynomialContext;
 
    public:
+    /** Constructs a new (empty) context */
     Context();
+
+    /** Wraps the lp context. */
+    explicit Context(lp_polynomial_context_t* ctx);
+
+    /** Copy constructor. */
+    Context(const Context& other);
+
+    /** No assignment as this would mess with internal reference counting. */
+    Context& operator=(const Context& other) = delete;
+
     /** Get a non-const pointer to the internal lp_variable_db_t.
      * Handle with care!
      */

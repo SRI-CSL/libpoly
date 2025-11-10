@@ -9,6 +9,8 @@ namespace poly {
 
   /**
    * Implements a wrapper for lp_variable_t.
+   * WARNING: Variable does not store its context, i.e. the variable database
+   * it belongs to. Only use it with a Polynomial / Variable of the same context!
    */
   class Variable {
     /** The actual variable. */
@@ -18,11 +20,11 @@ namespace poly {
     /** Construct with a null variable. */
     Variable();
     /** Construct from a lp_variable_t. */
-    Variable(lp_variable_t var);
+    explicit Variable(lp_variable_t var);
     /** Construct a new variable with the given name in the specified context. */
-    Variable(const Context& c, const char* name);
+    explicit Variable(const Context& c, const char* name);
     /** Construct a new variable with the given name in the default context. */
-    Variable(const char* name);
+    explicit Variable(const char* name);
 
     /** Get the internal lp_variable_t. Note that it's only a type alias for
      * long.
