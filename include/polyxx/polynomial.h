@@ -57,12 +57,12 @@ namespace poly {
     /** Copy from a Polynomial. */
     Polynomial(const Polynomial& p);
     /** Move from a Polynomial. */
-    Polynomial(Polynomial&& p);
+    Polynomial(Polynomial&& p) noexcept;
 
     /** Copy from a Polynomial. */
     Polynomial& operator=(const Polynomial& p);
     /** Move from a Polynomial. */
-    Polynomial& operator=(Polynomial&& p);
+    Polynomial& operator=(Polynomial&& p) noexcept;
 
     /** Get a non-const pointer to the internal lp_polynomial_t. Handle with
      * care!
