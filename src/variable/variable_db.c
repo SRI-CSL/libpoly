@@ -129,3 +129,7 @@ const char* lp_variable_db_get_name(const lp_variable_db_t* var_db, lp_variable_
   assert(var < var_db->size);
   return var_db->variable_names[var];
 }
+
+int lp_variable_db_is_valid(const lp_variable_db_t* var_db, lp_variable_t var) {
+  return var < var_db->size;
+}

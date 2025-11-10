@@ -16,6 +16,25 @@ namespace poly {
           lp_polynomial_context_detach(ptr);
         });
   }
+
+  Context::Context(lp_polynomial_context_t* ctx) {
+    mVariableDB = deleting_unique_ptr<lp_variable_db_t>(
+      ctx->var_db,
+      [](lp_variable_db_t *ptr) { lp_variable_db_detach(ptr); });
+    mVariableOrder = deleting_unique_ptr<lp_variable_order_t>(
+      ctx->var_order,
+      [](lp_variable_order_t *ptr) { lp_variable_order_detach(ptr); });
+    mPolynomialContext = deleting_unique_ptr<lp_polynomial_context_t>(
+      ctx,
+      [](lp_polynomial_context_t *ptr) { lp_polynomial_context_detach(ptr); });
+
+    lp_variable_db_attach(ctx->var_db);
+    lp_variable_order_attach(ctx->var_order);
+    lp_polynomial_context_attach(ctx);
+  }
+
+  Context::Context(const Context& other) : Context(other.get_polynomial_context()) {}
+
   lp_variable_db_t* Context::get_variable_db() const {
     return const_cast<lp_variable_db_t*>(mVariableDB.get());
   }

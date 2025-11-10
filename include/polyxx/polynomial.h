@@ -33,35 +33,36 @@ namespace poly {
     /** Construct a zero polynomial. */
     Polynomial();
 
+    /** Construct a constant polynomial from an internal context pointer. */
+    Polynomial(const lp_polynomial_context_t* c, const Variable& v);
     /** Construct from a variable and a custom context. */
-    Polynomial(const Context& c, Variable v);
+    Polynomial(const Context& c, const Variable& v);
     /** Construct from a variable. */
-    Polynomial(Variable v);
+    Polynomial(const Variable& v);
 
+    /** Construct a constant polynomial from an internal context pointer. */
+    Polynomial(const lp_polynomial_context_t* c, const Integer& i, const Variable& v, unsigned n);
     /** Construct i * v^n from a custom context. */
-    Polynomial(const Context& c, const Integer& i, Variable v, unsigned n);
+    Polynomial(const Context& c, const Integer& i, const Variable& v, unsigned n);
     /** Construct i * v^n. */
-    Polynomial(const Integer& i, Variable v, unsigned n);
+    Polynomial(const Integer& i, const Variable& v, unsigned n);
 
+    /** Construct a constant polynomial from an internal context pointer. */
+    Polynomial(const lp_polynomial_context_t* c, const Integer& i);
     /** Construct from an integer and a custom context. */
     Polynomial(const Context& c, const Integer& i);
     /** Construct from an integer. */
     Polynomial(const Integer& i);
 
-    /** Construct from an integer and a custom context. */
-    Polynomial(const Context& c, long i);
-    /** Construct from an integer. */
-    Polynomial(long i);
-
     /** Copy from a Polynomial. */
     Polynomial(const Polynomial& p);
     /** Move from a Polynomial. */
-    Polynomial(Polynomial&& p);
+    Polynomial(Polynomial&& p) noexcept;
 
     /** Copy from a Polynomial. */
     Polynomial& operator=(const Polynomial& p);
     /** Move from a Polynomial. */
-    Polynomial& operator=(Polynomial&& p);
+    Polynomial& operator=(Polynomial&& p) noexcept;
 
     /** Get a non-const pointer to the internal lp_polynomial_t. Handle with
      * care!
@@ -132,16 +133,28 @@ namespace poly {
 
   /** Compare polynomials. */
   bool operator==(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator==(const Integer& lhs, const Polynomial& rhs);
+  bool operator==(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator!=(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator!=(const Integer& lhs, const Polynomial& rhs);
+  bool operator!=(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator<(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator<(const Integer& lhs, const Polynomial& rhs);
+  bool operator<(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator<=(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator<=(const Integer& lhs, const Polynomial& rhs);
+  bool operator<=(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator>(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator>(const Integer& lhs, const Polynomial& rhs);
+  bool operator>(const Polynomial& lhs, const Integer& rhs);
   /** Compare polynomials. */
   bool operator>=(const Polynomial& lhs, const Polynomial& rhs);
+  bool operator>=(const Integer& lhs, const Polynomial& rhs);
+  bool operator>=(const Polynomial& lhs, const Integer& rhs);
 
   /** Add two polynomials. */
   Polynomial operator+(const Polynomial& lhs, const Polynomial& rhs);
@@ -151,6 +164,8 @@ namespace poly {
   Polynomial operator+(const Integer& lhs, const Polynomial& rhs);
   /** Add and assign two polynomials. */
   Polynomial& operator+=(Polynomial& lhs, const Polynomial& rhs);
+  /** Add and assign a polynomial with an integer. */
+  Polynomial& operator+=(Polynomial& lhs, const Integer& rhs);
   /** Compute lhs += rhs1 * rhs2. */
   Polynomial& add_mul(Polynomial& lhs, const Polynomial& rhs1, const Polynomial& rhs2);
 
@@ -164,6 +179,8 @@ namespace poly {
   Polynomial operator-(const Integer& lhs, const Polynomial& rhs);
   /** Subtract and assign two polynomials. */
   Polynomial& operator-=(Polynomial& lhs, const Polynomial& rhs);
+  /** Subtract and assigns a polynomial with an integer. */
+  Polynomial& operator-=(Polynomial& lhs, const Integer& rhs);
   /** Compute lhs -= rhs1 * rhs2. */
   Polynomial& sub_mul(Polynomial& lhs, const Polynomial& rhs1, const Polynomial& rhs2);
 
@@ -175,6 +192,8 @@ namespace poly {
   Polynomial operator*(const Integer& lhs, const Polynomial& rhs);
   /** Multiply and assign two polynomials. */
   Polynomial& operator*=(Polynomial& lhs, const Polynomial& rhs);
+  /** Multiply and assign a polynomial with an integer */
+  Polynomial& operator*=(Polynomial& lhs, const Integer& rhs);
 
   /** Multiply with x^n where x is the main variable. */
   Polynomial shl(const Polynomial& lhs, unsigned n);

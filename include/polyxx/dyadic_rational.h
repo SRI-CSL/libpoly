@@ -31,6 +31,8 @@ namespace poly {
     explicit DyadicRational(double d);
     /** Construct from an int. */
     DyadicRational(int i);
+    /** Construct from a long. */
+    DyadicRational(long i);
 
     /** Construct from an internal lp_dyadic_rational_t pointer. */
     explicit DyadicRational(const lp_dyadic_rational_t* dr);
