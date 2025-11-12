@@ -100,3 +100,49 @@ TEST_CASE("polynomial::constructor") {
   CHECK(p_cp == p_cp_a);
   CHECK(ptr == p_mv_a.get_internal());
 }
+
+TEST_CASE("polynomial::evaluate") {
+  Variable x("x");
+  Variable y("y");
+  Polynomial p1 = 1 * pow(x, 6) + 2 * pow(x, 5) + 3 * y - 1;
+  Polynomial p2 = 1 * y * pow(x + 1, 4);
+
+  // full assignment
+  Assignment a;
+  a.set(x, -1);
+  a.set(y, 2);
+  CHECK(a.has(x));
+  CHECK(a.has(y));
+
+  CHECK(evaluate(p1, a) == Value(4));
+  CHECK(evaluate_constraint(p1, a, SignCondition::GE) == true);
+  CHECK(evaluate_constraint(p1, a, SignCondition::LT) == false);
+  CHECK(evaluate_constraint(p1, a, SignCondition::EQ) == false);
+  CHECK(evaluate_constraint_subs(p1, a, SignCondition::GE) == 1);
+  CHECK(evaluate_constraint_subs(p1, a, SignCondition::LT) == 0);
+  CHECK(evaluate_constraint_subs(p1, a, SignCondition::EQ) == 0);
+
+  CHECK(evaluate(p2, a) == Value(0));
+  CHECK(evaluate_constraint(p2, a, SignCondition::GE) == true);
+  CHECK(evaluate_constraint(p2, a, SignCondition::LT) == false);
+  CHECK(evaluate_constraint(p2, a, SignCondition::EQ) == true);
+  CHECK(evaluate_constraint_subs(p2, a, SignCondition::GE) == 1);
+  CHECK(evaluate_constraint_subs(p2, a, SignCondition::LT) == 0);
+  CHECK(evaluate_constraint_subs(p2, a, SignCondition::EQ) == 1);
+
+  // partial assignment
+  a.unset(y);
+  CHECK(a.has(x));
+  CHECK(!a.has(y));
+
+  CHECK(evaluate_constraint_subs(p1, a, SignCondition::GE) == -1);
+  CHECK(evaluate_constraint_subs(p1, a, SignCondition::LT) == -1);
+  CHECK(evaluate_constraint_subs(p1, a, SignCondition::EQ) == -1);
+
+  CHECK(evaluate_constraint(p2, a, SignCondition::GE) == true);
+  CHECK(evaluate_constraint(p2, a, SignCondition::LT) == false);
+  CHECK(evaluate_constraint(p2, a, SignCondition::EQ) == true);
+  CHECK(evaluate_constraint_subs(p2, a, SignCondition::GE) == 1);
+  CHECK(evaluate_constraint_subs(p2, a, SignCondition::LT) == 0);
+  CHECK(evaluate_constraint_subs(p2, a, SignCondition::EQ) == 1);
+}

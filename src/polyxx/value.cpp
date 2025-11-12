@@ -13,6 +13,7 @@ namespace poly {
   }
 
   Value::Value() { lp_value_construct_none(&mValue); }
+  Value::Value(int i) { lp_value_construct_int(get_internal(), i); }
   Value::Value(long i) { lp_value_construct_int(get_internal(), i); }
   Value::Value(const Value& val) {
     lp_value_construct_copy(get_internal(), val.get_internal());

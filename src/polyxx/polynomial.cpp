@@ -165,6 +165,11 @@ namespace poly {
     return lp_polynomial_constraint_evaluate(
         p.get_internal(), to_sign_condition(sc), a.get_internal());
   }
+  int evaluate_constraint_subs(const Polynomial& p, const Assignment& a,
+                               SignCondition sc) {
+    return lp_polynomial_constraint_evaluate_subs(
+      p.get_internal(), to_sign_condition(sc), a.get_internal());
+  }
   Interval evaluate(const Polynomial& p, const IntervalAssignment& a) {
     Interval res;
     lp_polynomial_interval_value(p.get_internal(), a.get_internal(),
