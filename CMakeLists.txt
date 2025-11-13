@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 #
 # Stop warning on cygwin
@@ -67,16 +67,10 @@ add_subdirectory(src)
 add_subdirectory(include)
 
 if(LIBPOLY_BUILD_PYTHON_API)
-
-  # Need the Python binary to run tests
-  find_package(PythonInterp)
-
   # Configure the Python bindings
   add_subdirectory(python)
-
   # Configure the Python tests
   add_subdirectory(test/python)
-
 endif()
 
 if (BUILD_TESTING)

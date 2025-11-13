@@ -13,13 +13,14 @@ set(polypy_SOURCES
     polypyFeasibilitySet.c
 )
 
-find_package(PythonLibs)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
+include_directories(${Python3_INCLUDE_DIRS})
 include_directories(${GMP_INCLUDE_DIR})
 include_directories(${libpoly_SOURCE_DIR}/include)
-include_directories(${PYTHON_INCLUDE_PATH})
 
 add_library(polypy MODULE ${polypy_SOURCES})
+
 set_target_properties(polypy PROPERTIES PREFIX "")
 if (APPLE)
   set_target_properties(polypy PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")

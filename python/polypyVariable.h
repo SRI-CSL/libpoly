@@ -19,8 +19,7 @@
 
 #pragma once
 
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "python.h"
 
 #include <variable_db.h>
 #include <variable_order.h>
