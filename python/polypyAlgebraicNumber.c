@@ -47,22 +47,22 @@ static PyObject*
 AlgebraicNumber_refine(PyObject* self);
 
 static PyObject*
-AlgebraicNumber_add(PyObject* self, PyObject* args);
+AlgebraicNumber_add(PyObject* self, PyObject* other);
 
 static PyObject*
 AlgebraicNumber_neg(PyObject* self);
 
 static PyObject*
-AlgebraicNumber_sub(PyObject* self, PyObject* args);
+AlgebraicNumber_sub(PyObject* self, PyObject* other);
 
 static PyObject*
-AlgebraicNumber_mul(PyObject* self, PyObject* args);
+AlgebraicNumber_mul(PyObject* self, PyObject* other);
 
 static PyObject*
-AlgebraicNumber_div(PyObject* self, PyObject* args);
+AlgebraicNumber_div(PyObject* self, PyObject* other);
 
 static PyObject*
-AlgebraicNumber_pow(PyObject* self, PyObject* args);
+AlgebraicNumber_pow(PyObject* self, PyObject* other);
 
 static PyObject*
 AlgebraicNumber_positive_root(PyObject* self, PyObject* args);
@@ -78,39 +78,39 @@ PyNumberMethods AlgebraicNumber_NumberMethods = {
      AlgebraicNumber_add,              // binaryfunc nb_add;
      AlgebraicNumber_sub,              // binaryfunc nb_subtract;
      AlgebraicNumber_mul,              // binaryfunc nb_multiply;
-     0,                                // binaryfunc nb_remainder;
-     0,                                // binaryfunc nb_divmod;
+     NULL,                             // binaryfunc nb_remainder;
+     NULL,                             // binaryfunc nb_divmod;
      (ternaryfunc)AlgebraicNumber_pow, // ternaryfunc nb_power;
      AlgebraicNumber_neg,              // unaryfunc nb_negative;
-     0,                                // unaryfunc nb_positive;
-     0,                                // unaryfunc nb_absolute;
-     0,                                // inquiry nb_bool;
-     0,                                // unaryfunc nb_invert;
-     0,                                // binaryfunc nb_lshift;
-     0,                                // binaryfunc nb_rshift;
-     0,                                // binaryfunc nb_and;
-     0,                                // binaryfunc nb_xor;
-     0,                                // binaryfunc nb_or;
-     0,                                // unaryfunc nb_int;
-     0,                                // void *nb_reserved;
-     0,                                // unaryfunc nb_float;
-     0,                                // binaryfunc nb_inplace_add;
-     0,                                // binaryfunc nb_inplace_subtract;
-     0,                                // binaryfunc nb_inplace_multiply;
-     0,                                // binaryfunc nb_inplace_remainder;
-     0,                                // ternaryfunc nb_inplace_power;
-     0,                                // binaryfunc nb_inplace_lshift;
-     0,                                // binaryfunc nb_inplace_rshift;
-     0,                                // binaryfunc nb_inplace_and;
-     0,                                // binaryfunc nb_inplace_xor;
-     0,                                // binaryfunc nb_inplace_or;
-     0,                                // binaryfunc nb_floor_divide;
+     NULL,                             // unaryfunc nb_positive;
+     NULL,                             // unaryfunc nb_absolute;
+     NULL,                             // inquiry nb_bool;
+     NULL,                             // unaryfunc nb_invert;
+     NULL,                             // binaryfunc nb_lshift;
+     NULL,                             // binaryfunc nb_rshift;
+     NULL,                             // binaryfunc nb_and;
+     NULL,                             // binaryfunc nb_xor;
+     NULL,                             // binaryfunc nb_or;
+     NULL,                             // unaryfunc nb_int;
+     NULL,                             // void *nb_reserved;
+     NULL,                             // unaryfunc nb_float;
+     NULL,                             // binaryfunc nb_inplace_add;
+     NULL,                             // binaryfunc nb_inplace_subtract;
+     NULL,                             // binaryfunc nb_inplace_multiply;
+     NULL,                             // binaryfunc nb_inplace_remainder;
+     NULL,                             // ternaryfunc nb_inplace_power;
+     NULL,                             // binaryfunc nb_inplace_lshift;
+     NULL,                             // binaryfunc nb_inplace_rshift;
+     NULL,                             // binaryfunc nb_inplace_and;
+     NULL,                             // binaryfunc nb_inplace_xor;
+     NULL,                             // binaryfunc nb_inplace_or;
+     NULL,                             // binaryfunc nb_floor_divide;
      AlgebraicNumber_div,              // binaryfunc nb_true_divide;
-     0,                                // binaryfunc nb_inplace_floor_divide;
-     0,                                // binaryfunc nb_inplace_true_divide;
-     0,                                // unaryfunc nb_index;
-     0,                                // binaryfunc nb_matrix_multiply;
-     0,                                // binaryfunc nb_inplace_matrix_multiply;
+     NULL,                             // binaryfunc nb_inplace_floor_divide;
+     NULL,                             // binaryfunc nb_inplace_true_divide;
+     NULL,                             // unaryfunc nb_index;
+     NULL,                             // binaryfunc nb_matrix_multiply;
+     NULL,                             // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject AlgebraicNumberType = {
@@ -120,48 +120,48 @@ PyTypeObject AlgebraicNumberType = {
     0,                                   // Py_ssize_t tp_itemsize; 
     (destructor)AlgebraicNumber_dealloc, // destructor tp_dealloc;
     0,                                   // printfunc tp_print;
-    0,                                   // getattrfunc tp_getattr;
-    0,                                   // setattrfunc tp_setattr;
-    0,                                   // PyAsyncMethods *tp_as_async
+    NULL,                                // getattrfunc tp_getattr;
+    NULL,                                // setattrfunc tp_setattr;
+    NULL,                                // PyAsyncMethods *tp_as_async
     AlgebraicNumber_str,                 // reprfunc tp_repr;
     &AlgebraicNumber_NumberMethods,      // PyNumberMethods *tp_as_number;
-    0,                                   // PySequenceMethods *tp_as_sequence;
-    0,                                   // PyMappingMethods *tp_as_mapping;
-    0,                                   // hashfunc tp_hash;
-    0,                                   // ternaryfunc tp_call;
+    NULL,                                // PySequenceMethods *tp_as_sequence;
+    NULL,                                // PyMappingMethods *tp_as_mapping;
+    NULL,                                // hashfunc tp_hash;
+    NULL,                                // ternaryfunc tp_call;
     AlgebraicNumber_str,                 // reprfunc tp_str;
-    0,                                   // getattrofunc tp_getattro;
-    0,                                   // setattrofunc tp_setattro;
-    0,                                   // PyBufferProcs *tp_as_buffer;
+    NULL,                                // getattrofunc tp_getattro;
+    NULL,                                // setattrofunc tp_setattro;
+    NULL,                                // PyBufferProcs *tp_as_buffer;
     Py_TPFLAGS_DEFAULT,                  // unsigned long tp_flags;
     "Algebraic number objects",          // const char *tp_doc; 
-    0,                                   // traverseproc tp_traverse;
-    0,                                   // inquiry tp_clear;
+    NULL,                                // traverseproc tp_traverse;
+    NULL,                                // inquiry tp_clear;
     AlgebraicNumber_richcompare,         // richcmpfunc tp_richcompare;
     0,                                   // Py_ssize_t tp_weaklistoffset;
-    0,                                   // getiterfunc tp_iter;
-    0,                                   // iternextfunc tp_iternext;
+    NULL,                                // getiterfunc tp_iter;
+    NULL,                                // iternextfunc tp_iternext;
     AlgebraicNumber_methods,             // struct PyMethodDef *tp_methods;
-    0,                                   // struct PyMemberDef *tp_members;
-    0,                                   // struct PyGetSetDef *tp_getset;
-    0,                                   // struct _typeobject *tp_base;
-    0,                                   // PyObject *tp_dict;
-    0,                                   // descrgetfunc tp_descr_get;
-    0,                                   // descrsetfunc tp_descr_set;
+    NULL,                                // struct PyMemberDef *tp_members;
+    NULL,                                // struct PyGetSetDef *tp_getset;
+    NULL,                                // struct _typeobject *tp_base;
+    NULL,                                // PyObject *tp_dict;
+    NULL,                                // descrgetfunc tp_descr_get;
+    NULL,                                // descrsetfunc tp_descr_set;
     0,                                   // Py_ssize_t tp_dictoffset;
     (initproc)AlgebraicNumber_init,      // initproc tp_init;
-    0,                                   // Pallocfunc tp_alloc;
+    NULL,                                // Pallocfunc tp_alloc;
     AlgebraicNumber_new,                 // newfunc tp_new;
-    0,                                   // freefunc tp_free; 
-    0,                                   // inquiry tp_is_gc; 
-    0,                                   // PyObject *tp_bases;
-    0,                                   // PyObject *tp_mro; 
-    0,                                   // PyObject *tp_cache;
-    0,                                   // PyObject *tp_subclasses;
-    0,                                   // PyObject *tp_weaklist;
-    0,                                   // destructor tp_del;
+    NULL,                                // freefunc tp_free;
+    NULL,                                // inquiry tp_is_gc;
+    NULL,                                // PyObject *tp_bases;
+    NULL,                                // PyObject *tp_mro;
+    NULL,                                // PyObject *tp_cache;
+    NULL,                                // PyObject *tp_subclasses;
+    NULL,                                // PyObject *tp_weaklist;
+    NULL,                                // destructor tp_del;
     0,                                   // unsigned int tp_version_tag;
-    0,                                   // destructor tp_finalize;
+    NULL,                                // destructor tp_finalize;
 };
 
 static void
@@ -190,7 +190,7 @@ PyAlgebraicNumber_create(const lp_algebraic_number_t* a) {
 
 static PyObject*
 AlgebraicNumber_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-  return PyAlgebraicNumber_create(0);
+  return PyAlgebraicNumber_create(NULL);
 }
 
 /** Construct an algebraic number from a polynomial and a root index */
@@ -206,12 +206,12 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       long root_index = PyLong_AsLong(root_index_obj);
       // Get the univariate polynomial
       lp_upolynomial_t* f_u = lp_polynomial_to_univariate(f);
-      if (f_u == 0) {
+      if (f_u == NULL) {
         // Not univariate
         return -1;
       }
       // Check the roots
-      size_t roots_count = lp_upolynomial_roots_count(f_u, 0);
+      size_t roots_count = lp_upolynomial_roots_count(f_u, NULL);
       if (root_index < 0 || root_index >= (long)roots_count) {
         // Not enough roots
         lp_upolynomial_delete(f_u);
@@ -221,8 +221,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       lp_upolynomial_roots_isolate(f_u, roots, &roots_count);
       lp_algebraic_number_destruct(&self->a);
       lp_algebraic_number_construct_copy(&self->a, roots + root_index);
-      size_t i;
-      for (i = 0; i < roots_count; ++ i) {
+      for (size_t i = 0; i < roots_count; ++ i) {
         lp_algebraic_number_destruct(roots + i);
       }
       lp_upolynomial_delete(f_u);
@@ -230,7 +229,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
     } else if (PyUPolynomial_CHECK(f_obj) && PyLong_Check(root_index_obj)) {
       lp_upolynomial_t* f = ((UPolynomialObject*) f_obj)->p;
       long root_index = PyLong_AsLong(root_index_obj);
-      size_t roots_count = lp_upolynomial_roots_count(f, 0);
+      size_t roots_count = lp_upolynomial_roots_count(f, NULL);
       if (root_index < 0 || root_index >= (long)roots_count) {
         // Not enough roots
         return -1;
@@ -239,8 +238,7 @@ AlgebraicNumber_init(AlgebraicNumber* self, PyObject* args)
       lp_upolynomial_roots_isolate(f, roots, &roots_count);
       lp_algebraic_number_destruct(&self->a);
       lp_algebraic_number_construct_copy(&self->a, roots + root_index);
-      size_t i;
-      for (i = 0; i < roots_count; ++i) {
+      for (size_t i = 0; i < roots_count; ++i) {
         lp_algebraic_number_destruct(roots + i);
       }
       free(roots);
@@ -270,7 +268,7 @@ AlgebraicNumber_refine(PyObject* self) {
 
 static PyObject*
 AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op) {
-  PyObject *result = 0;
+  PyObject *result = NULL;
 
   if (!PyAlgebraicNumber_CHECK(other)) {
     result = Py_NotImplemented;
@@ -298,6 +296,8 @@ AlgebraicNumber_richcompare(PyObject* self, PyObject* other, int op) {
     case Py_GE:
       result = cmp >= 0 ? Py_True : Py_False;
       break;
+    default:
+      assert(0);
     }
   }
 

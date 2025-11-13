@@ -38,11 +38,11 @@
 
 #include <structmember.h>
 
-static lp_polynomial_context_t* default_ctx = 0;
+static lp_polynomial_context_t* default_ctx = NULL;
 
 const lp_polynomial_context_t* Polynomial_get_default_context(void) {
   if (!default_ctx) {
-    default_ctx = lp_polynomial_context_new(0, Variable_get_default_db(), (lp_variable_order_t*) VariableOrder_get_default_order());
+    default_ctx = lp_polynomial_context_new(NULL, Variable_get_default_db(), (lp_variable_order_t*) VariableOrder_get_default_order());
   }
   return default_ctx;
 }
@@ -54,7 +54,7 @@ static PyObject*
 Polynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 static PyObject*
-Polynomial_richcompare(PyObject* self, PyObject* args, int op);
+Polynomial_richcompare(PyObject* self, PyObject* other, int op);
 
 static Py_hash_t
 Polynomial_hash(PyObject* self);
@@ -69,25 +69,25 @@ static PyObject*
 Polynomial_reductum(PyObject* self, PyObject* args);
 
 static PyObject*
-Polynomial_sgn(PyObject* self, PyObject* arguments);
+Polynomial_sgn(PyObject* self, PyObject* args);
 
 static PyObject*
 Polynomial_sgn_check(PyObject* self, PyObject* args);
 
 static PyObject*
-Polynomial_rem(PyObject* self, PyObject* args);
+Polynomial_rem(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_prem(PyObject* self, PyObject* args);
+Polynomial_prem(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_sprem(PyObject* self, PyObject* args);
+Polynomial_sprem(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_pdivrem(PyObject* self, PyObject* args);
+Polynomial_pdivrem(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_spdivrem(PyObject* self, PyObject* args);
+Polynomial_spdivrem(PyObject* self, PyObject* other);
 
 static PyObject*
 Polynomial_gcd(PyObject* self, PyObject* args);
@@ -123,28 +123,28 @@ static int
 Polynomial_nonzero(PyObject* self);
 
 static PyObject*
-Polynomial_add(PyObject* self, PyObject* args);
+Polynomial_add(PyObject* self, PyObject* other);
 
 static PyObject*
 Polynomial_neg(PyObject* self);
 
 static PyObject*
-Polynomial_sub(PyObject* self, PyObject* args);
+Polynomial_sub(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_mul(PyObject* self, PyObject* args);
+Polynomial_mul(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_div(PyObject* self, PyObject* args);
+Polynomial_div(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_rem_operator(PyObject* self, PyObject* args);
+Polynomial_rem_operator(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_divmod(PyObject* self, PyObject* args);
+Polynomial_divmod(PyObject* self, PyObject* other);
 
 static PyObject*
-Polynomial_pow(PyObject* self, PyObject* args);
+Polynomial_pow(PyObject* self, PyObject* other);
 
 static PyObject*
 Polynomial_resultant(PyObject* self, PyObject* args);
@@ -226,35 +226,35 @@ PyNumberMethods Polynomial_NumberMethods = {
      Polynomial_divmod,           // binaryfunc nb_divmod;
      (ternaryfunc)Polynomial_pow, // ternaryfunc nb_power;
      Polynomial_neg,              // unaryfunc nb_negative;
-     0,                           // unaryfunc nb_positive;
-     0,                           // unaryfunc nb_absolute;
+     NULL,                        // unaryfunc nb_positive;
+     NULL,                        // unaryfunc nb_absolute;
      Polynomial_nonzero,          // inquiry nb_bool;
-     0,                           // unaryfunc nb_invert;
-     0,                           // binaryfunc nb_lshift;
-     0,                           // binaryfunc nb_rshift;
-     0,                           // binaryfunc nb_and;
-     0,                           // binaryfunc nb_xor;
-     0,                           // binaryfunc nb_or;
-     0,                           // unaryfunc nb_int;
-     0,                           // void *nb_reserved;
-     0,                           // unaryfunc nb_float;
-     0,                           // binaryfunc nb_inplace_add;
-     0,                           // binaryfunc nb_inplace_subtract;
-     0,                           // binaryfunc nb_inplace_multiply;
-     0,                           // binaryfunc nb_inplace_remainder;
-     0,                           // ternaryfunc nb_inplace_power;
-     0,                           // binaryfunc nb_inplace_lshift;
-     0,                           // binaryfunc nb_inplace_rshift;
-     0,                           // binaryfunc nb_inplace_and;
-     0,                           // binaryfunc nb_inplace_xor;
-     0,                           // binaryfunc nb_inplace_or;
-     0,                           // binaryfunc nb_floor_divide;
+     NULL,                        // unaryfunc nb_invert;
+     NULL,                        // binaryfunc nb_lshift;
+     NULL,                        // binaryfunc nb_rshift;
+     NULL,                        // binaryfunc nb_and;
+     NULL,                        // binaryfunc nb_xor;
+     NULL,                        // binaryfunc nb_or;
+     NULL,                        // unaryfunc nb_int;
+     NULL,                        // void *nb_reserved;
+     NULL,                        // unaryfunc nb_float;
+     NULL,                        // binaryfunc nb_inplace_add;
+     NULL,                        // binaryfunc nb_inplace_subtract;
+     NULL,                        // binaryfunc nb_inplace_multiply;
+     NULL,                        // binaryfunc nb_inplace_remainder;
+     NULL,                        // ternaryfunc nb_inplace_power;
+     NULL,                        // binaryfunc nb_inplace_lshift;
+     NULL,                        // binaryfunc nb_inplace_rshift;
+     NULL,                        // binaryfunc nb_inplace_and;
+     NULL,                        // binaryfunc nb_inplace_xor;
+     NULL,                        // binaryfunc nb_inplace_or;
+     NULL,                        // binaryfunc nb_floor_divide;
      Polynomial_div,              // binaryfunc nb_true_divide;
-     0,                           // binaryfunc nb_inplace_floor_divide;
-     0,                           // binaryfunc nb_inplace_true_divide;
-     0,                           // unaryfunc nb_index;
-     0,                           // binaryfunc nb_matrix_multiply;
-     0,                           // binaryfunc nb_inplace_matrix_multiply;
+     NULL,                        // binaryfunc nb_inplace_floor_divide;
+     NULL,                        // binaryfunc nb_inplace_true_divide;
+     NULL,                        // unaryfunc nb_index;
+     NULL,                        // binaryfunc nb_matrix_multiply;
+     NULL,                        // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject PolynomialType = {
@@ -264,48 +264,48 @@ PyTypeObject PolynomialType = {
     0,                              // Py_ssize_t tp_itemsize;
     (destructor)Polynomial_dealloc, // destructor tp_dealloc;
     0,                              // printfunc tp_print;
-    0,                              // getattrfunc tp_getattr;
-    0,                              // setattrfunc tp_setattr;
-    0,                              // PyAsyncMethods *tp_as_async; 
+    NULL,                           // getattrfunc tp_getattr;
+    NULL,                           // setattrfunc tp_setattr;
+    NULL,                           // PyAsyncMethods *tp_as_async;
     Polynomial_str,                 // reprfunc tp_repr;
     &Polynomial_NumberMethods,      // PyNumberMethods *tp_as_number;
-    0,                              // PySequenceMethods *tp_as_sequence;
-    0,                              // PyMappingMethods *tp_as_mapping;
+    NULL,                           // PySequenceMethods *tp_as_sequence;
+    NULL,                           // PyMappingMethods *tp_as_mapping;
     Polynomial_hash,                // hashfunc tp_hash;
-    0,                              // ternaryfunc tp_call;
+    NULL,                           // ternaryfunc tp_call;
     Polynomial_str,                 // reprfunc tp_str;
-    0,                              // getattrofunc tp_getattro;
-    0,                              // setattrofunc tp_setattro;
-    0,                              // PyBufferProcs *tp_as_buffer;
+    NULL,                           // getattrofunc tp_getattro;
+    NULL,                           // setattrofunc tp_setattro;
+    NULL,                           // PyBufferProcs *tp_as_buffer;
     Py_TPFLAGS_DEFAULT,             // unsigned long tp_flags;
     "Polynomial objects",           // const char *tp_doc;
-    0,                              // traverseproc tp_traverse;
-    0,                              // inquiry tp_clear;
+    NULL,                           // traverseproc tp_traverse;
+    NULL,                           // inquiry tp_clear;
     Polynomial_richcompare,         // richcmpfunc tp_richcompare;
     0,                              // Py_ssize_t tp_weaklistoffset;
-    0,                              // getiterfunc tp_iter;
-    0,                              // iternextfunc tp_iternext;
+    NULL,                           // getiterfunc tp_iter;
+    NULL,                           // iternextfunc tp_iternext;
     Polynomial_methods,             // struct PyMethodDef *tp_methods;
-    0,                              // struct PyMemberDef *tp_members;
-    0,                              // struct PyGetSetDef *tp_getset;
-    0,                              // struct _typeobject *tp_base;
-    0,                              // PyObject *tp_dict;
-    0,                              // descrgetfunc tp_descr_get;
-    0,                              // descrsetfunc tp_descr_set;
+    NULL,                           // struct PyMemberDef *tp_members;
+    NULL,                           // struct PyGetSetDef *tp_getset;
+    NULL,                           // struct _typeobject *tp_base;
+    NULL,                           // PyObject *tp_dict;
+    NULL,                           // descrgetfunc tp_descr_get;
+    NULL,                           // descrsetfunc tp_descr_set;
     0,                              // Py_ssize_t tp_dictoffset;
-    0,                              // initproc tp_init;
-    0,                              // allocfunc tp_alloc;
+    NULL,                           // initproc tp_init;
+    NULL,                           // allocfunc tp_alloc;
     Polynomial_new,                 // newfunc tp_new;
-    0,                              // freefunc tp_free;
-    0,                              // inquiry tp_is_gc;
-    0,                              // PyObject *tp_bases;
-    0,                              // PyObject *tp_mro;
-    0,                              // PyObject *tp_cache;
-    0,                              // PyObject *tp_subclasses;
-    0,                              // PyObject *tp_weaklist;
-    0,                              // destructor tp_del;
+    NULL,                           // freefunc tp_free;
+    NULL,                           // inquiry tp_is_gc;
+    NULL,                           // PyObject *tp_bases;
+    NULL,                           // PyObject *tp_mro;
+    NULL,                           // PyObject *tp_cache;
+    NULL,                           // PyObject *tp_subclasses;
+    NULL,                           // PyObject *tp_weaklist;
+    NULL,                           // destructor tp_del;
     0,                              // unsigned int tp_version_tag;
-    0,                              // destructor tp_finalize;
+    NULL,                           // destructor tp_finalize;
 };
 
 static void
@@ -320,8 +320,7 @@ Polynomial_dealloc(Polynomial* self)
 
 PyObject*
 Polynomial_create(lp_polynomial_t* p) {
-  Polynomial *self;
-  self = (Polynomial*)PolynomialType.tp_alloc(&PolynomialType, 0);
+  Polynomial *self = (Polynomial*)PolynomialType.tp_alloc(&PolynomialType, 0);
   lp_polynomial_set_external(p);
   self->p = p;
   return (PyObject*) self;
@@ -329,14 +328,14 @@ Polynomial_create(lp_polynomial_t* p) {
 
 static PyObject*
 Polynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-  return Polynomial_create(0);
+  return Polynomial_create(NULL);
 }
 
 static PyObject*
 Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
-  PyObject *result = 0;
+  PyObject *result = NULL;
 
-  const lp_polynomial_context_t* ctx = 0;
+  const lp_polynomial_context_t* ctx = NULL;
 
   // One of them is a polynomial
   if (PyPolynomial_CHECK(self)) {
@@ -400,6 +399,8 @@ Polynomial_richcompare(PyObject* self, PyObject* other, int op) {
   case Py_GE:
     result = cmp >= 0 ? Py_True : Py_False;
     break;
+  default:
+    assert(0);
   }
 
   if (dec_self) {
@@ -462,7 +463,7 @@ PyObject*
 PyPolynomial_FromLong_or_Int(PyObject* number, const lp_polynomial_context_t* ctx) {
   // The constants
   lp_integer_t c;
-  PyLong_or_Int_to_integer(number, 0, &c);
+  PyLong_or_Int_to_integer(number, NULL, &c);
 
   // The c polynomial
   lp_polynomial_t* p_c = lp_polynomial_alloc();
@@ -1086,11 +1087,10 @@ Polynomial_subres_impl(PyObject* self, PyObject* args, enum subres_type type) {
   // Allocate the polynomials for the sequence
   size_t p1_deg = lp_polynomial_degree(p1->p);
   size_t p2_deg = lp_polynomial_degree(p2->p);
-  int size = p1_deg > p2_deg ? p2_deg + 1 : p1_deg + 1;
+  size_t size = p1_deg > p2_deg ? p2_deg + 1 : p1_deg + 1;
 
   lp_polynomial_t** S = malloc(sizeof(lp_polynomial_t*)*size);
-  int i;
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     S[i] = lp_polynomial_new(p1_ctx);
   }
 
@@ -1107,7 +1107,7 @@ Polynomial_subres_impl(PyObject* self, PyObject* args, enum subres_type type) {
 
   // Copy the polynomials into a list
   PyObject* list = PyList_New(size);
-  for (i = 0; i < size; ++i) {
+  for (size_t i = 0; i < size; ++i) {
     PyObject* p = Polynomial_create(S[i]);
     PyList_SetItem(list, i, p);
   }
@@ -1192,8 +1192,7 @@ Polynomial_mgcd(PyObject* self, PyObject* args) {
   // Copy the polynomials into a list
   size_t size = lp_polynomial_vector_size(mgcd);
   PyObject* list = PyList_New(size);
-  size_t i;
-  for (i = 0; i < size; ++i) {
+  for (size_t i = 0; i < size; ++i) {
     lp_polynomial_t* mgcd_i = lp_polynomial_vector_at(mgcd, i);
     PyObject* p = Polynomial_create(mgcd_i);
     PyList_SetItem(list, i, p);
@@ -1273,12 +1272,12 @@ Polynomial_resultant(PyObject* self, PyObject* args) {
 
 static PyObject*
 Polynomial_extended_gcd(PyObject* self, PyObject* args) {
-  return 0;
+  return NULL;
 }
 
 static PyObject*
 Polynomial_factor(PyObject* self) {
-  return 0;
+  return NULL;
 }
 
 // Creates a python list from the factors, taking over the polynomials
@@ -1288,8 +1287,7 @@ PyObject* factors_to_PyList(lp_polynomial_t** factors, size_t* multiplicities, s
 
   // Copy the constant
     // Copy over the factors
-  size_t i;
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     PyObject* p_i = Polynomial_create(factors[i]);
     Py_INCREF(p_i);
     PyObject* d = PyLong_FromSize_t(multiplicities[i]);
@@ -1308,8 +1306,8 @@ Polynomial_factor_square_free(PyObject* self) {
   // Get arguments
   Polynomial* p = (Polynomial*) self;
   // Factor
-  lp_polynomial_t** factors = 0;
-  size_t* multiplicities = 0;
+  lp_polynomial_t** factors = NULL;
+  size_t* multiplicities = NULL;
   size_t factors_size = 0;
   lp_polynomial_factor_square_free(p->p, &factors, &multiplicities, &factors_size);
   // Create the list
@@ -1323,14 +1321,11 @@ Polynomial_factor_square_free(PyObject* self) {
 
 static PyObject*
 Polynomial_roots_count(PyObject* self, PyObject* args) {
-  return 0;
+  return NULL;
 }
 
 static PyObject*
 Polynomial_roots_isolate(PyObject* self, PyObject* args) {
-
-  size_t i;
-
   if (!PyTuple_Check(args) || PyTuple_Size(args) != 1) {
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
@@ -1362,13 +1357,13 @@ Polynomial_roots_isolate(PyObject* self, PyObject* args) {
   // Generate a list of roots
   PyObject* list = PyList_New(roots_size);
 
-  for (i = 0; i < roots_size; ++ i) {
+  for (size_t i = 0; i < roots_size; ++ i) {
     PyObject* c = PyValue_create(roots + i);
     PyList_SetItem(list, i, c);
   }
 
   // Get rid of the temporaries
-  for (i = 0; i < roots_size; ++ i) {
+  for (size_t i = 0; i < roots_size; ++ i) {
     lp_value_destruct(roots + i);
   }
   free(roots);
@@ -1387,19 +1382,17 @@ Polynomial_derivative(PyObject* self) {
 
 static PyObject*
 Polynomial_sturm_sequence(PyObject* self) {
-  return 0;
+  return NULL;
 }
 
 static PyObject*
 Polynomial_degree(PyObject* self) {
   Polynomial* p = (Polynomial*) self;
-  return PyLong_FromLong(lp_polynomial_degree(p->p));
+  return PyLong_FromUnsignedLong(lp_polynomial_degree(p->p));
 }
 
 static PyObject*
 Polynomial_coefficients(PyObject* self) {
-  size_t i;
-
   lp_polynomial_t* p = ((Polynomial*) self)->p;
   size_t size = lp_polynomial_degree(p) + 1;
 
@@ -1408,7 +1401,7 @@ Polynomial_coefficients(PyObject* self) {
 
   // Copy the polynomials into a list
   PyObject* list = PyList_New(size);
-  for (i = 0; i < size; ++i) {
+  for (size_t i = 0; i < size; ++i) {
     lp_polynomial_t* c_p = lp_polynomial_new(ctx);
     lp_polynomial_get_coefficient(c_p, p, i);
     PyObject* c = Polynomial_create(c_p);
@@ -1431,8 +1424,7 @@ Polynomial_vars(PyObject* self) {
 
   // Copy the polynomials into a list
   PyObject* list = PyList_New(p_vars.list_size);
-  size_t i;
-  for (i = 0; i < p_vars.list_size; ++i) {
+  for (size_t i = 0; i < p_vars.list_size; ++i) {
     PyObject* c = PyVariable_create(p_vars.list[i]);
     PyList_SetItem(list, i, c);
   }
@@ -1459,7 +1451,7 @@ Polynomial_reductum(PyObject* self, PyObject* args) {
     return Py_NotImplemented;
   }
 
-  lp_assignment_t* assignment = 0;
+  lp_assignment_t* assignment = NULL;
 
   if (PyTuple_Size(args) == 1) {
     PyObject* assignment_obj = PyTuple_GetItem(args, 0);
@@ -1567,10 +1559,9 @@ Polynomial_feasible_intervals(PyObject* self, PyObject* args) {
   // The list where we return the arguments
   PyObject* list = PyList_New(feasible->size);
   // Copy over to the list
-  size_t i;
-  for (i = 0; i < feasible->size; ++i) {
-    PyObject* p = PyInterval_create(feasible->intervals + i);
-    PyList_SetItem(list, i, p);
+  for (size_t i = 0; i < feasible->size; ++i) {
+    PyObject* pp = PyInterval_create(feasible->intervals + i);
+    PyList_SetItem(list, i, pp);
   }
   // Remove temp
   lp_feasibility_set_delete(feasible);

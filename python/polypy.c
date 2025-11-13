@@ -35,7 +35,7 @@ Trace_enable(PyObject* self, PyObject* args) {
 #ifndef NDEBUG
   const char *tag;
   if (!PyArg_ParseTuple(args, "s", &tag)) {
-    return 0;
+    return NULL;
   }
   lp_trace_enable(tag);
 #endif
@@ -47,7 +47,7 @@ Trace_disable(PyObject* self, PyObject* args) {
 #ifndef NDEBUG
   const char *tag;
   if (!PyArg_ParseTuple(args, "s", &tag)) {
-    return 0;
+    return NULL;
   }
   lp_trace_disable(tag);
 #endif
@@ -74,9 +74,9 @@ static struct PyModuleDef polypymodule = {
   NULL,
   0, // sizeof polypy struct
   polypy_methods,
-  0,
-  0,
-  0
+  NULL,
+  NULL,
+  NULL
 };
 
 #ifndef PyMODINIT_FUNC  /* declarations for DLL import/export */

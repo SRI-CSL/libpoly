@@ -22,8 +22,6 @@
 #include "polypyInteger.h"
 #include "utils.h"
 
-#include <structmember.h>
-
 static void
 CoefficientRing_dealloc(CoefficientRing* self);
 
@@ -54,48 +52,48 @@ PyTypeObject CoefficientRingType = {
     0,                                   // Py_ssize_t tp_itemsize;
     (destructor)CoefficientRing_dealloc, // destructor tp_dealloc;
     0,                                   // printfunc tp_print;
-    0,                                   // getattrfunc tp_getattr;
-    0,                                   // setattrfunc tp_setattr;
-    0,                                   // PyAsyncMethods *tp_as_async;
-    0,                                   // reprfunc tp_repr;
-    0,                                   // PyNumberMethods *tp_as_number;
-    0,                                   // PySequenceMethods *tp_as_sequence;
-    0,                                   // PyMappingMethods *tp_as_mapping;
-    0,                                   // hashfunc tp_hash;
-    0,                                   // ternaryfunc tp_call;
+    NULL,                                // getattrfunc tp_getattr;
+    NULL,                                // setattrfunc tp_setattr;
+    NULL,                                // PyAsyncMethods *tp_as_async;
+    NULL,                                // reprfunc tp_repr;
+    NULL,                                // PyNumberMethods *tp_as_number;
+    NULL,                                // PySequenceMethods *tp_as_sequence;
+    NULL,                                // PyMappingMethods *tp_as_mapping;
+    NULL,                                // hashfunc tp_hash;
+    NULL,                                // ternaryfunc tp_call;
     CoefficientRing_str,                 // reprfunc tp_str;
-    0,                                   // getattrofunc tp_getattro;
-    0,                                   // setattrofunc tp_setattro;
-    0,                                   // PyBufferProcs *tp_as_buffer;
+    NULL,                                // getattrofunc tp_getattro;
+    NULL,                                // setattrofunc tp_setattro;
+    NULL,                                // PyBufferProcs *tp_as_buffer;
     Py_TPFLAGS_DEFAULT,                  // unsigned long tp_flags;
     "Coefficient ring objects",          // const char *tp_doc;
-    0,                                   // traverseproc tp_traverse;
-    0,                                   // inquiry tp_clear;
+    NULL,                                // traverseproc tp_traverse;
+    NULL,                                // inquiry tp_clear;
     CoefficientRing_richcompare,         // richcmpfunc tp_richcompare;
     0,                                   // Py_ssize_t tp_weaklistoffset;
-    0,                                   // getiterfunc tp_iter;
-    0,                                   // iternextfunc tp_iternext;
+    NULL,                                // getiterfunc tp_iter;
+    NULL,                                // iternextfunc tp_iternext;
     CoefficientRing_methods,             // struct PyMethodDef *tp_methods;
-    0,                                   // struct PyMemberDef *tp_members;
-    0,                                   // struct PyGetSetDef *tp_getset;
-    0,                                   // struct _typeobject *tp_base;
-    0,                                   // PyObject *tp_dict;
-    0,                                   // descrgetfunc tp_descr_get;
-    0,                                   // descrsetfunc tp_descr_set;
+    NULL,                                // struct PyMemberDef *tp_members;
+    NULL,                                // struct PyGetSetDef *tp_getset;
+    NULL,                                // struct _typeobject *tp_base;
+    NULL,                                // PyObject *tp_dict;
+    NULL,                                // descrgetfunc tp_descr_get;
+    NULL,                                // descrsetfunc tp_descr_set;
     0,                                   // Py_ssize_t tp_dictoffset;
     (initproc)CoefficientRing_init,      // initproc tp_init;
-    0,                                   // allocfunc tp_alloc;
+    NULL,                                // allocfunc tp_alloc;
     CoefficientRing_new,                 // newfunc tp_new;
-    0,                                   // freefunc tp_free;
-    0,                                   // inquiry tp_is_gc;
-    0,                                   // PyObject *tp_bases;
-    0,                                   // PyObject *tp_mro;
-    0,                                   // PyObject *tp_cache;
-    0,                                   // PyObject *tp_subclasses;
-    0,                                   // PyObject *tp_weaklist;
-    0,                                   // destructor tp_del;
+    NULL,                                // freefunc tp_free;
+    NULL,                                // inquiry tp_is_gc;
+    NULL,                                // PyObject *tp_bases;
+    NULL,                                // PyObject *tp_mro;
+    NULL,                                // PyObject *tp_cache;
+    NULL,                                // PyObject *tp_subclasses;
+    NULL,                                // PyObject *tp_weaklist;
+    NULL,                                // destructor tp_del;
     0,                                   // unsigned int tp_version_tag;
-    0,                                   // destructor tp_finalize;
+    NULL,                                // destructor tp_finalize;
 };
 
 static void
@@ -117,7 +115,7 @@ PyCoefficientRing_create(lp_int_ring_t* K) {
 
 static PyObject*
 CoefficientRing_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-  return PyCoefficientRing_create(0);
+  return PyCoefficientRing_create(NULL);
 }
 
 
@@ -175,7 +173,7 @@ CoefficientRing_modulus(PyObject* self) {
   CoefficientRing* K = (CoefficientRing*) self;
   if (K && K->K) {
     char* K_str = lp_integer_to_string(&K->K->M);
-    char* p = 0;
+    char* p = NULL;
     PyObject* M = PyLong_FromString(K_str, &p, 10);
     free(K_str);
     return M;
@@ -258,6 +256,8 @@ CoefficientRing_richcompare(PyObject *self, PyObject *other, int op){
     case Py_GE:
       result = cmp >= 0 ? Py_True : Py_False;
       break;
+    default:
+      assert(0);
     }
   }
   return result;

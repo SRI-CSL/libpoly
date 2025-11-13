@@ -59,7 +59,7 @@ void PyLong_or_Int_to_integer(PyObject* o, const lp_int_ring_t* K, lp_integer_t*
 //IAM: unused in the python3 world
 PyObject* integer_to_PyInt(const lp_integer_t* x) {
   char* str = lp_integer_to_string(x);
-  char* str_p = 0;
+  char* str_p = NULL;
   PyObject* result = PyLong_FromString(str, &str_p, 10);
   free(str);
   return result;
@@ -67,7 +67,7 @@ PyObject* integer_to_PyInt(const lp_integer_t* x) {
 
 PyObject* integer_to_PyLong(const lp_integer_t* x) {
   char* str = lp_integer_to_string(x);
-  char* str_p = 0;
+  char* str_p = NULL;
   PyObject* result = PyLong_FromString(str, &str_p, 10);
   free(str);
   return result;
@@ -111,6 +111,6 @@ void PyLong_or_Int_or_float_to_value(PyObject* o, lp_value_t* v) {
     lp_value_construct(v, LP_VALUE_INTEGER, &v_dy_q);
     lp_dyadic_rational_destruct(&v_dy_q);
   } else {
-    lp_value_construct(v, LP_VALUE_NONE, 0);
+    lp_value_construct(v, LP_VALUE_NONE, NULL);
   }
 }

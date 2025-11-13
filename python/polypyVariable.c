@@ -27,7 +27,7 @@
 #include <structmember.h>
 
 /** Default variable database */
-static lp_variable_db_t* default_var_db = 0;
+static lp_variable_db_t* default_var_db = NULL;
 
 void Variable_init_default_db(void) {
   if (default_var_db) {
@@ -69,57 +69,57 @@ PyMethodDef Variable_methods[] = {
 };
 
 static PyObject*
-Variable_add(PyObject* self, PyObject* args);
+Variable_add(PyObject* self, PyObject* other);
 
 static PyObject*
 Variable_neg(PyObject* self);
 
 static PyObject*
-Variable_sub(PyObject* self, PyObject* args);
+Variable_sub(PyObject* self, PyObject* other);
 
 static PyObject*
-Variable_mul(PyObject* self, PyObject* args);
+Variable_mul(PyObject* self, PyObject* other);
 
 static PyObject*
-Variable_pow(PyObject* self, PyObject* args);
+Variable_pow(PyObject* self, PyObject* other);
 
 PyNumberMethods Variable_NumberMethods = {
      Variable_add,              // binaryfunc nb_add;
      Variable_sub,              // binaryfunc nb_subtract;
      Variable_mul,              // binaryfunc nb_multiply;
-     0,                         // binaryfunc nb_remainder;
-     0,                         // binaryfunc nb_divmod;
+     NULL,                      // binaryfunc nb_remainder;
+     NULL,                      // binaryfunc nb_divmod;
      (ternaryfunc)Variable_pow, // ternaryfunc nb_power;
      Variable_neg,              // unaryfunc nb_negative;
-     0,                         // unaryfunc nb_positive;
-     0,                         // unaryfunc nb_absolute;
-     0,                         // inquiry nb_bool;
-     0,                         // unaryfunc nb_invert;
-     0,                         // binaryfunc nb_lshift;
-     0,                         // binaryfunc nb_rshift;
-     0,                         // binaryfunc nb_and;
-     0,                         // binaryfunc nb_xor;
-     0,                         // binaryfunc nb_or;
-     0,                         // unaryfunc nb_int;
-     0,                         // void *nb_reserved;
-     0,                         // unaryfunc nb_float;
-     0,                         // binaryfunc nb_inplace_add;
-     0,                         // binaryfunc nb_inplace_subtract;
-     0,                         // binaryfunc nb_inplace_multiply;
-     0,                         // binaryfunc nb_inplace_remainder;
-     0,                         // ternaryfunc nb_inplace_power;
-     0,                         // binaryfunc nb_inplace_lshift;
-     0,                         // binaryfunc nb_inplace_rshift;
-     0,                         // binaryfunc nb_inplace_and;
-     0,                         // binaryfunc nb_inplace_xor;
-     0,                         // binaryfunc nb_inplace_or;
-     0,                         // binaryfunc nb_floor_divide;
-     0,                         // binaryfunc nb_true_divide;
-     0,                         // binaryfunc nb_inplace_floor_divide;
-     0,                         // binaryfunc nb_inplace_true_divide;
-     0,                         // unaryfunc nb_index;
-     0,                         // binaryfunc nb_matrix_multiply;
-     0,                         // binaryfunc nb_inplace_matrix_multiply;
+     NULL,                      // unaryfunc nb_positive;
+     NULL,                      // unaryfunc nb_absolute;
+     NULL,                      // inquiry nb_bool;
+     NULL,                      // unaryfunc nb_invert;
+     NULL,                      // binaryfunc nb_lshift;
+     NULL,                      // binaryfunc nb_rshift;
+     NULL,                      // binaryfunc nb_and;
+     NULL,                      // binaryfunc nb_xor;
+     NULL,                      // binaryfunc nb_or;
+     NULL,                      // unaryfunc nb_int;
+     NULL,                      // void *nb_reserved;
+     NULL,                      // unaryfunc nb_float;
+     NULL,                      // binaryfunc nb_inplace_add;
+     NULL,                      // binaryfunc nb_inplace_subtract;
+     NULL,                      // binaryfunc nb_inplace_multiply;
+     NULL,                      // binaryfunc nb_inplace_remainder;
+     NULL,                      // ternaryfunc nb_inplace_power;
+     NULL,                      // binaryfunc nb_inplace_lshift;
+     NULL,                      // binaryfunc nb_inplace_rshift;
+     NULL,                      // binaryfunc nb_inplace_and;
+     NULL,                      // binaryfunc nb_inplace_xor;
+     NULL,                      // binaryfunc nb_inplace_or;
+     NULL,                      // binaryfunc nb_floor_divide;
+     NULL,                      // binaryfunc nb_true_divide;
+     NULL,                      // binaryfunc nb_inplace_floor_divide;
+     NULL,                      // binaryfunc nb_inplace_true_divide;
+     NULL,                      // unaryfunc nb_index;
+     NULL,                      // binaryfunc nb_matrix_multiply;
+     NULL,                      // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject VariableType = {
@@ -129,54 +129,53 @@ PyTypeObject VariableType = {
     0,                            // Py_ssize_t tp_itemsize;
     (destructor)Variable_dealloc, // destructor tp_dealloc;
     0,                            // printfunc tp_print;
-    0,                            // getattrfunc tp_getattr;
-    0,                            // setattrfunc tp_setattr;
-    0,                            // PyAsyncMethods *tp_as_async;
+    NULL,                         // getattrfunc tp_getattr;
+    NULL,                         // setattrfunc tp_setattr;
+    NULL,                         // PyAsyncMethods *tp_as_async;
     Variable_repr,                // reprfunc tp_repr;
     &Variable_NumberMethods,      // PyNumberMethods *tp_as_number;
-    0,                            // PySequenceMethods *tp_as_sequence;
-    0,                            // PyMappingMethods *tp_as_mapping;
+    NULL,                         // PySequenceMethods *tp_as_sequence;
+    NULL,                         // PyMappingMethods *tp_as_mapping;
     Variable_hash,                // hashfunc tp_hash;
-    0,                            // ternaryfunc tp_call;
+    NULL,                         // ternaryfunc tp_call;
     Variable_str,                 // reprfunc tp_str;
-    0,                            // getattrofunc tp_getattro;
-    0,                            // setattrofunc tp_setattro;
-    0,                            // PyBufferProcs *tp_as_buffer;
+    NULL,                         // getattrofunc tp_getattro;
+    NULL,                         // setattrofunc tp_setattro;
+    NULL,                         // PyBufferProcs *tp_as_buffer;
     Py_TPFLAGS_DEFAULT,           // unsigned long tp_flags;
     "Variable objects",           // const char *tp_doc;
-    0,                            // traverseproc tp_traverse;
-    0,                            // inquiry tp_clear;
+    NULL,                         // traverseproc tp_traverse;
+    NULL,                         // inquiry tp_clear;
     Variable_richcompare,         // richcmpfunc tp_richcompare;
     0,                            // Py_ssize_t tp_weaklistoffset;
-    0,                            // getiterfunc tp_iter;
-    0,                            // iternextfunc tp_iternext;
+    NULL,                         // getiterfunc tp_iter;
+    NULL,                         // iternextfunc tp_iternext;
     Variable_methods,             // struct PyMethodDef *tp_methods;
-    0,                            // istruct PyMemberDef *tp_members;
-    0,                            // istruct PyGetSetDef *tp_getset;
-    0,                            // istruct _typeobject *tp_base;
-    0,                            // iPyObject *tp_dict;
-    0,                            // idescrgetfunc tp_descr_get;
-    0,                            // idescrsetfunc tp_descr_set;
+    NULL,                         // istruct PyMemberDef *tp_members;
+    NULL,                         // istruct PyGetSetDef *tp_getset;
+    NULL,                         // istruct _typeobject *tp_base;
+    NULL,                         // iPyObject *tp_dict;
+    NULL,                         // idescrgetfunc tp_descr_get;
+    NULL,                         // idescrsetfunc tp_descr_set;
     0,                            // iPy_ssize_t tp_dictoffset;
     (initproc)Variable_init,      // initproc tp_init;
-    0,                            // allocfunc tp_alloc;
+    NULL,                         // allocfunc tp_alloc;
     Variable_new,                 // newfunc tp_new;
-    0,                            // freefunc tp_free;
-    0,                            // inquiry tp_is_gc;
-    0,                            // PyObject *tp_bases;
-    0,                            // PyObject *tp_mro;
-    0,                            // PyObject *tp_cache;
-    0,                            // PyObject *tp_subclasses;
-    0,                            // PyObject *tp_weaklist;
-    0,                            // destructor tp_del;
+    NULL,                         // freefunc tp_free;
+    NULL,                         // inquiry tp_is_gc;
+    NULL,                         // PyObject *tp_bases;
+    NULL,                         // PyObject *tp_mro;
+    NULL,                         // PyObject *tp_cache;
+    NULL,                         // PyObject *tp_subclasses;
+    NULL,                         // PyObject *tp_weaklist;
+    NULL,                         // destructor tp_del;
     0,                            // unsigned int tp_version_tag;
-    0,                            // destructor tp_finalize;
+    NULL,                         // destructor tp_finalize;
 };
 
 PyObject*
 PyVariable_create(lp_variable_t x) {
-  Variable *self;
-  self = (Variable*)VariableType.tp_alloc(&VariableType, 0);
+  Variable *self = (Variable*)VariableType.tp_alloc(&VariableType, 0);
   if (self != NULL) {
     self->x = x;
   }
@@ -238,7 +237,7 @@ static
 lp_polynomial_t* PyLong_Or_Int_to_polynomial(PyObject* number) {
   const lp_polynomial_context_t* ctx = Polynomial_get_default_context();
   lp_integer_t c;
-  PyLong_or_Int_to_integer(number, 0, &c);
+  PyLong_or_Int_to_integer(number, NULL, &c);
   lp_polynomial_t* p_c = lp_polynomial_alloc();
   lp_polynomial_construct_simple(p_c, ctx, &c, 0, 0);
   lp_integer_destruct(&c);
@@ -515,6 +514,8 @@ Variable_richcompare(PyObject *self, PyObject *other, int op){
     case Py_GE:
       result = (x->x >= y->x ? Py_True : Py_False);
       break;
+    default:
+      assert(false);
     }
   }
   return result;

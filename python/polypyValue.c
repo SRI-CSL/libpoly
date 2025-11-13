@@ -51,22 +51,22 @@ static PyObject*
 Value_get_value_between(PyObject* self, PyObject* args);
 
 static PyObject*
-Value_add(PyObject* self, PyObject* args);
+Value_add(PyObject* self, PyObject* other);
 
 static PyObject*
 Value_neg(PyObject* self);
 
 static PyObject*
-Value_sub(PyObject* self, PyObject* args);
+Value_sub(PyObject* self, PyObject* other);
 
 static PyObject*
-Value_mul(PyObject* self, PyObject* args);
+Value_mul(PyObject* self, PyObject* other);
 
 static PyObject*
-Value_div(PyObject* self, PyObject* args);
+Value_div(PyObject* self, PyObject* other);
 
 static PyObject*
-Value_pow(PyObject* self, PyObject* args);
+Value_pow(PyObject* self, PyObject* other);
 
 static PyObject*
 Value_long(PyObject* self);
@@ -84,39 +84,39 @@ PyNumberMethods Value_NumberMethods = {
      Value_add,              // binaryfunc nb_add;
      Value_sub,              // binaryfunc nb_subtract;
      Value_mul,              // binaryfunc nb_multiply;
-     0,                      // binaryfunc nb_remainder;
-     0,                      // binaryfunc nb_divmod;
+     NULL,                   // binaryfunc nb_remainder;
+     NULL,                   // binaryfunc nb_divmod;
      (ternaryfunc)Value_pow, // ternaryfunc nb_power;
      Value_neg,              // unaryfunc nb_negative;
-     0,                      // unaryfunc nb_positive;
-     0,                      // unaryfunc nb_absolute;
-     0,                      // inquiry nb_bool;
-     0,                      // unaryfunc nb_invert;
-     0,                      // binaryfunc nb_lshift;
-     0,                      // binaryfunc nb_rshift;
-     0,                      // binaryfunc nb_and;
-     0,                      // binaryfunc nb_xor;
-     0,                      // binaryfunc nb_or;
+     NULL,                   // unaryfunc nb_positive;
+     NULL,                   // unaryfunc nb_absolute;
+     NULL,                   // inquiry nb_bool;
+     NULL,                   // unaryfunc nb_invert;
+     NULL,                   // binaryfunc nb_lshift;
+     NULL,                   // binaryfunc nb_rshift;
+     NULL,                   // binaryfunc nb_and;
+     NULL,                   // binaryfunc nb_xor;
+     NULL,                   // binaryfunc nb_or;
      Value_long,             // unaryfunc nb_int;
-     0,                      // void *nb_reserved;
+     NULL,                   // void *nb_reserved;
      Value_float,            // unaryfunc nb_float;
-     0,                      // binaryfunc nb_inplace_add;
-     0,                      // binaryfunc nb_inplace_subtract;
-     0,                      // binaryfunc nb_inplace_multiply;
-     0,                      // binaryfunc nb_inplace_remainder;
-     0,                      // ternaryfunc nb_inplace_power;
-     0,                      // binaryfunc nb_inplace_lshift;
-     0,                      // binaryfunc nb_inplace_rshift;
-     0,                      // binaryfunc nb_inplace_and;
-     0,                      // binaryfunc nb_inplace_xor;
-     0,                      // binaryfunc nb_inplace_or;
-     0,                      // binaryfunc nb_floor_divide;
+     NULL,                   // binaryfunc nb_inplace_add;
+     NULL,                   // binaryfunc nb_inplace_subtract;
+     NULL,                   // binaryfunc nb_inplace_multiply;
+     NULL,                   // binaryfunc nb_inplace_remainder;
+     NULL,                   // ternaryfunc nb_inplace_power;
+     NULL,                   // binaryfunc nb_inplace_lshift;
+     NULL,                   // binaryfunc nb_inplace_rshift;
+     NULL,                   // binaryfunc nb_inplace_and;
+     NULL,                   // binaryfunc nb_inplace_xor;
+     NULL,                   // binaryfunc nb_inplace_or;
+     NULL,                   // binaryfunc nb_floor_divide;
      Value_div,              // binaryfunc nb_true_divide;
-     0,                      // binaryfunc nb_inplace_floor_divide;
-     0,                      // binaryfunc nb_inplace_true_divide;
-     0,                      // unaryfunc nb_index;
-     0,                      // binaryfunc nb_matrix_multiply;
-     0,                      // binaryfunc nb_inplace_matrix_multiply;
+     NULL,                   // binaryfunc nb_inplace_floor_divide;
+     NULL,                   // binaryfunc nb_inplace_true_divide;
+     NULL,                   // unaryfunc nb_index;
+     NULL,                   // binaryfunc nb_matrix_multiply;
+     NULL,                   // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject ValueType = {
@@ -126,48 +126,48 @@ PyTypeObject ValueType = {
     0,                           // Py_ssize_t tp_itemsize;
     (destructor)Value_dealloc,   // destructor tp_dealloc;
     0,                           // printfunc tp_print;
-    0,                           // getattrfunc tp_getattr;
-    0,                           // setattrfunc tp_setattr;
-    0,                           // PyAsyncMethods *tp_as_async;
+    NULL,                        // getattrfunc tp_getattr;
+    NULL,                        // setattrfunc tp_setattr;
+    NULL,                        // PyAsyncMethods *tp_as_async;
     Value_str,                   // reprfunc tp_repr;
     &Value_NumberMethods,        // PyNumberMethods *tp_as_number;
-    0,                           // PySequenceMethods *tp_as_sequence;
-    0,                           // PyMappingMethods *tp_as_mapping;
+    NULL,                        // PySequenceMethods *tp_as_sequence;
+    NULL,                        // PyMappingMethods *tp_as_mapping;
     &Value_hash,                 // hashfunc tp_hash;
-    0,                           // ternaryfunc tp_call;
+    NULL,                        // ternaryfunc tp_call;
     Value_str,                   // reprfunc tp_str;
-    0,                           // getattrofunc tp_getattro;
-    0,                           // setattrofunc tp_setattro;
-    0,                           // PyBufferProcs *tp_as_buffer;
+    NULL,                        // getattrofunc tp_getattro;
+    NULL,                        // setattrofunc tp_setattro;
+    NULL,                        // PyBufferProcs *tp_as_buffer;
     Py_TPFLAGS_DEFAULT,          // unsigned long tp_flags;
     "Values of different kinds", // const char *tp_doc;
-    0,                           // traverseproc tp_traverse;
-    0,                           // inquiry tp_clear;
+    NULL,                        // traverseproc tp_traverse;
+    NULL,                        // inquiry tp_clear;
     Value_richcompare,           // richcmpfunc tp_richcompare;
     0,                           // Py_ssize_t tp_weaklistoffset;
-    0,                           // getiterfunc tp_iter;
-    0,                           // iternextfunc tp_iternext;
+    NULL,                        // getiterfunc tp_iter;
+    NULL,                        // iternextfunc tp_iternext;
     Value_methods,               // struct PyMethodDef *tp_methods;
-    0,                           // struct PyMemberDef *tp_members;
-    0,                           // struct PyGetSetDef *tp_getset;
-    0,                           // struct _typeobject *tp_base;
-    0,                           // PyObject *tp_dict;
-    0,                           // descrgetfunc tp_descr_get;
-    0,                           // descrsetfunc tp_descr_set;
+    NULL,                        // struct PyMemberDef *tp_members;
+    NULL,                        // struct PyGetSetDef *tp_getset;
+    NULL,                        // struct _typeobject *tp_base;
+    NULL,                        // PyObject *tp_dict;
+    NULL,                        // descrgetfunc tp_descr_get;
+    NULL,                        // descrsetfunc tp_descr_set;
     0,                           // Py_ssize_t tp_dictoffset;
     (initproc)Value_init,        // initproc tp_init;
-    0,                           // allocfunc tp_alloc;
+    NULL,                        // allocfunc tp_alloc;
     Value_new,                   // newfunc tp_new;
-    0,                           // freefunc tp_free;
-    0,                           // inquiry tp_is_gc;
-    0,                           // PyObject *tp_bases;
-    0,                           // PyObject *tp_mro;
-    0,                           // PyObject *tp_cache;
-    0,                           // PyObject *tp_subclasses;
-    0,                           // PyObject *tp_weaklist;
-    0,                           // destructor tp_del;
+    NULL,                        // freefunc tp_free;
+    NULL,                        // inquiry tp_is_gc;
+    NULL,                        // PyObject *tp_bases;
+    NULL,                        // PyObject *tp_mro;
+    NULL,                        // PyObject *tp_cache;
+    NULL,                        // PyObject *tp_subclasses;
+    NULL,                        // PyObject *tp_weaklist;
+    NULL,                        // destructor tp_del;
     0,                           // unsigned int tp_version_tag;
-    0,                           // destructor tp_finalize;
+    NULL,                        // destructor tp_finalize;
 };
 
 static void
@@ -179,8 +179,7 @@ Value_dealloc(Value* self)
 
 PyObject*
 PyValue_create(const lp_value_t* v) {
-  Value *self;
-  self = (Value*)ValueType.tp_alloc(&ValueType, 0);
+  Value *self = (Value*)ValueType.tp_alloc(&ValueType, 0);
   if (self != NULL) {
     if (v) {
       lp_value_construct_copy(&self->v, v);
@@ -193,7 +192,7 @@ PyValue_create(const lp_value_t* v) {
 
 static PyObject*
 Value_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-  return PyValue_create(0);
+  return PyValue_create(NULL);
 }
 
 /** Construct a value from given number. */
@@ -261,7 +260,7 @@ Value_to_double(PyObject* self) {
 
 static PyObject*
 Value_richcompare(PyObject* self, PyObject* other, int op) {
-  PyObject *result = 0;
+  PyObject *result = NULL;
 
   if (!PyValue_CHECK(other)) {
     result = Py_NotImplemented;

@@ -39,7 +39,7 @@ static int
 UPolynomial_init(UPolynomialObject* self, PyObject* args);
 
 static PyObject*
-UPolynomial_richcompare(PyObject* self, PyObject* args, int op);
+UPolynomial_richcompare(PyObject* self, PyObject* other, int op);
 
 static PyObject*
 UPolynomial_degree(PyObject* self);
@@ -90,13 +90,13 @@ static int
 UPolynomialObject_nonzero(PyObject* self);
 
 static PyObject*
-UPolynomialObject_add(PyObject* self, PyObject* args);
+UPolynomialObject_add(PyObject* self, PyObject* other);
 
 static PyObject*
-UPolynomialObject_sub(PyObject* self, PyObject* args);
+UPolynomialObject_sub(PyObject* self, PyObject* other);
 
 static PyObject*
-UPolynomialObject_mul(PyObject* self, PyObject* args);
+UPolynomialObject_mul(PyObject* self, PyObject* other);
 
 static PyObject*
 UPolynomialObject_div(PyObject* self, PyObject* args);
@@ -108,7 +108,7 @@ static PyObject*
 UPolynomialObject_divmod(PyObject* self, PyObject* args);
 
 static PyObject*
-UPolynomialObject_pow(PyObject* self, PyObject* args);
+UPolynomialObject_pow(PyObject* self, PyObject* other);
 
 static PyObject*
 UPolynomialObject_neg(PyObject* self);
@@ -139,35 +139,35 @@ PyNumberMethods UPolynomial_NumberMethods = {
      UPolynomialObject_divmod,           // binaryfunc nb_divmod;
      (ternaryfunc)UPolynomialObject_pow, // ternaryfunc nb_power;
      UPolynomialObject_neg,              // unaryfunc nb_negative;
-     0,                                  // unaryfunc nb_positive;
-     0,                                  // unaryfunc nb_absolute;
+     NULL,                               // unaryfunc nb_positive;
+     NULL,                               // unaryfunc nb_absolute;
      UPolynomialObject_nonzero,          // inquiry nb_bool;
-     0,                                  // unaryfunc nb_invert;
-     0,                                  // binaryfunc nb_lshift;
-     0,                                  // binaryfunc nb_rshift;
-     0,                                  // binaryfunc nb_and;
-     0,                                  // binaryfunc nb_xor;
-     0,                                  // binaryfunc nb_or;
-     0,                                  // unaryfunc nb_int;
-     0,                                  // void *nb_reserved;
-     0,                                  // unaryfunc nb_float;
-     0,                                  // binaryfunc nb_inplace_add;
-     0,                                  // binaryfunc nb_inplace_subtract;
-     0,                                  // binaryfunc nb_inplace_multiply;
-     0,                                  // binaryfunc nb_inplace_remainder;
-     0,                                  // ternaryfunc nb_inplace_power;
-     0,                                  // binaryfunc nb_inplace_lshift;
-     0,                                  // binaryfunc nb_inplace_rshift;
-     0,                                  // binaryfunc nb_inplace_and;
-     0,                                  // binaryfunc nb_inplace_xor;
-     0,                                  // binaryfunc nb_inplace_or;
-     0,                                  // binaryfunc nb_floor_divide;
+     NULL,                               // unaryfunc nb_invert;
+     NULL,                               // binaryfunc nb_lshift;
+     NULL,                               // binaryfunc nb_rshift;
+     NULL,                               // binaryfunc nb_and;
+     NULL,                               // binaryfunc nb_xor;
+     NULL,                               // binaryfunc nb_or;
+     NULL,                               // unaryfunc nb_int;
+     NULL,                               // void *nb_reserved;
+     NULL,                               // unaryfunc nb_float;
+     NULL,                               // binaryfunc nb_inplace_add;
+     NULL,                               // binaryfunc nb_inplace_subtract;
+     NULL,                               // binaryfunc nb_inplace_multiply;
+     NULL,                               // binaryfunc nb_inplace_remainder;
+     NULL,                               // ternaryfunc nb_inplace_power;
+     NULL,                               // binaryfunc nb_inplace_lshift;
+     NULL,                               // binaryfunc nb_inplace_rshift;
+     NULL,                               // binaryfunc nb_inplace_and;
+     NULL,                               // binaryfunc nb_inplace_xor;
+     NULL,                               // binaryfunc nb_inplace_or;
+     NULL,                               // binaryfunc nb_floor_divide;
      UPolynomialObject_div,              // binaryfunc nb_true_divide;
-     0,                                  // binaryfunc nb_inplace_floor_divide;
-     0,                                  // binaryfunc nb_inplace_true_divide;
-     0,                                  // unaryfunc nb_index;
-     0,                                  // binaryfunc nb_matrix_multiply;
-     0,                                  // binaryfunc nb_inplace_matrix_multiply;
+     NULL,                               // binaryfunc nb_inplace_floor_divide;
+     NULL,                               // binaryfunc nb_inplace_true_divide;
+     NULL,                               // unaryfunc nb_index;
+     NULL,                               // binaryfunc nb_matrix_multiply;
+     NULL,                               // binaryfunc nb_inplace_matrix_multiply;
 };
 
 PyTypeObject UPolynomialType = {
@@ -177,48 +177,48 @@ PyTypeObject UPolynomialType = {
     0,                               // Py_ssize_t tp_itemsize;
     (destructor)UPolynomial_dealloc, // destructor tp_dealloc;
     0,                               // printfunc tp_print;
-    0,                               // getattrfunc tp_getattr;
-    0,                               // setattrfunc tp_setattr;
-    0,                               // PyAsyncMethods *tp_as_async; 
+    NULL,                            // getattrfunc tp_getattr;
+    NULL,                            // setattrfunc tp_setattr;
+    NULL,                            // PyAsyncMethods *tp_as_async;
     UPolynomial_str,                 // reprfunc tp_repr;
     &UPolynomial_NumberMethods,      // PyNumberMethods *tp_as_number;
-    0,                               // PySequenceMethods *tp_as_sequence;
-    0,                               // PyMappingMethods *tp_as_mapping;
-    0,                               // hashfunc tp_hash;
-    0,                               // ternaryfunc tp_call;
+    NULL,                            // PySequenceMethods *tp_as_sequence;
+    NULL,                            // PyMappingMethods *tp_as_mapping;
+    NULL,                            // hashfunc tp_hash;
+    NULL,                            // ternaryfunc tp_call;
     UPolynomial_str,                 // reprfunc tp_str;
-    0,                               // getattrofunc tp_getattro;
-    0,                               // setattrofunc tp_setattro;
-    0,                               // PyBufferProcs *tp_as_buffer;
+    NULL,                            // getattrofunc tp_getattro;
+    NULL,                            // setattrofunc tp_setattro;
+    NULL,                            // PyBufferProcs *tp_as_buffer;
     Py_TPFLAGS_DEFAULT,              // unsigned long tp_flags;
     "Univariate polynomial objects", // const char *tp_doc;
-    0,                               // traverseproc tp_traverse;
-    0,                               // inquiry tp_clear;
+    NULL,                            // traverseproc tp_traverse;
+    NULL,                            // inquiry tp_clear;
     UPolynomial_richcompare,         // richcmpfunc tp_richcompare;
     0,                               // Py_ssize_t tp_weaklistoffset;
-    0,                               // getiterfunc tp_iter;
-    0,                               // iternextfunc tp_iternext;
+    NULL,                            // getiterfunc tp_iter;
+    NULL,                            // iternextfunc tp_iternext;
     UPolynomial_methods,             // struct PyMethodDef *tp_methods;
-    0,                               // struct PyMemberDef *tp_members;
-    0,                               // struct PyGetSetDef *tp_getset;
-    0,                               // struct _typeobject *tp_base;
-    0,                               // PyObject *tp_dict;
-    0,                               // descrgetfunc tp_descr_get;
-    0,                               // descrsetfunc tp_descr_set;
+    NULL,                            // struct PyMemberDef *tp_members;
+    NULL,                            // struct PyGetSetDef *tp_getset;
+    NULL,                            // struct _typeobject *tp_base;
+    NULL,                            // PyObject *tp_dict;
+    NULL,                            // descrgetfunc tp_descr_get;
+    NULL,                            // descrsetfunc tp_descr_set;
     0,                               // Py_ssize_t tp_dictoffset;
     (initproc)UPolynomial_init,      // initproc tp_init;
-    0,                               // allocfunc tp_alloc;
+    NULL,                            // allocfunc tp_alloc;
     UPolynomial_new,                 // newfunc tp_new;
-    0,                               // freefunc tp_free;
-    0,                               // inquiry tp_is_gc;
-    0,                               // PyObject *tp_bases;
-    0,                               // PyObject *tp_mro;
-    0,                               // PyObject *tp_cache;
-    0,                               // PyObject *tp_subclasses;
-    0,                               // PyObject *tp_weaklist;
-    0,                               // destructor tp_del;
+    NULL,                            // freefunc tp_free;
+    NULL,                            // inquiry tp_is_gc;
+    NULL,                            // PyObject *tp_bases;
+    NULL,                            // PyObject *tp_mro;
+    NULL,                            // PyObject *tp_cache;
+    NULL,                            // PyObject *tp_subclasses;
+    NULL,                            // PyObject *tp_weaklist;
+    NULL,                            // destructor tp_del;
     0,                               // unsigned int tp_version_tag;
-    0,                               // destructor tp_finalize;
+    NULL,                            // destructor tp_finalize;
 };
 
 static void
@@ -240,7 +240,7 @@ PyUPolynomial_create(lp_upolynomial_t* p) {
 
 static PyObject*
 UPolynomial_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-  return PyUPolynomial_create(0);
+  return PyUPolynomial_create(NULL);
 }
 
 static int
@@ -271,8 +271,7 @@ UPolynomial_init(UPolynomialObject* self, PyObject* args)
           Py_ssize_t size = PyList_Size(coefficients);
           if (size > 0) {
             long c_ints[size];
-            Py_ssize_t i;
-            for (i = 0; i < size; ++ i) {
+            for (Py_ssize_t i = 0; i < size; ++ i) {
               PyObject* c_i = PyList_GetItem(coefficients, i);
               if (!PyLong_Check(c_i)) {
                 return -1;
@@ -299,7 +298,7 @@ UPolynomial_init(UPolynomialObject* self, PyObject* args)
 
 static PyObject*
 UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
-  PyObject *result = 0;
+  PyObject *result = NULL;
 
   if (!PyUPolynomial_CHECK(other) && !PyLong_Check(other)) {
     //IAM: Surely we can be braver here?
@@ -310,7 +309,7 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
     result = Py_NotImplemented;
   } else {
     lp_upolynomial_t* self_p = ((UPolynomialObject*) self)->p;
-    lp_upolynomial_t* other_p = 0;
+    lp_upolynomial_t* other_p = NULL;
     if (PyUPolynomial_CHECK(other)) {
       other_p = ((UPolynomialObject*) other)->p;
     } else {
@@ -340,6 +339,8 @@ UPolynomial_richcompare(PyObject* self, PyObject* other, int op) {
     case Py_GE:
       result = cmp >= 0 ? Py_True : Py_False;
       break;
+    default:
+      assert(0);
     }
 
     if (PyLong_Check(other)) {
@@ -355,7 +356,7 @@ static PyObject*
 UPolynomial_degree(PyObject* self) {
   UPolynomialObject* p = (UPolynomialObject*) self;
   if (p) {
-    return PyLong_FromLong(lp_upolynomial_degree(p->p));
+    return PyLong_FromUnsignedLong(lp_upolynomial_degree(p->p));
   } else {
     Py_RETURN_NONE;
   }
@@ -363,13 +364,11 @@ UPolynomial_degree(PyObject* self) {
 
 static PyObject*
 UPolynomial_coefficients(PyObject* self) {
-  size_t i;
-
   lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
   size_t size = lp_upolynomial_degree(p) + 1;
 
   lp_integer_t coefficients[size];
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     lp_integer_construct_from_int(lp_Z, coefficients + i, 0);
   }
 
@@ -377,7 +376,7 @@ UPolynomial_coefficients(PyObject* self) {
 
   PyObject* list = PyList_New(size);
 
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     PyObject* c = integer_to_PyLong(coefficients + i);
     PyList_SetItem(list, i, c);
     lp_integer_destruct(coefficients + i);
@@ -584,8 +583,8 @@ UPolynomialObject_divmod(PyObject* self, PyObject* args) {
   UPolynomialObject* p1 = (UPolynomialObject*) self;
   UPolynomialObject* p2 = (UPolynomialObject*) args;
   // To store div, rem
-  lp_upolynomial_t* div = 0;
-  lp_upolynomial_t* rem = 0;
+  lp_upolynomial_t* div = NULL;
+  lp_upolynomial_t* rem = NULL;
   // Divide the polynomials
   lp_upolynomial_div_rem_exact(p1->p, p2->p, &div, &rem);
   // Return the result
@@ -666,8 +665,8 @@ UPolynomial_extended_gcd(PyObject* self, PyObject* args) {
     if (PyUPolynomial_CHECK(arg)) {
       lp_upolynomial_t* p = ((UPolynomialObject*) self)->p;
       lp_upolynomial_t* q = ((UPolynomialObject*) arg)->p;
-      lp_upolynomial_t* u = 0;
-      lp_upolynomial_t* v = 0;
+      lp_upolynomial_t* u = NULL;
+      lp_upolynomial_t* v = NULL;
       lp_upolynomial_t* gcd = lp_upolynomial_extended_gcd(p, q, &u, &v);
 
       PyObject* t = PyTuple_New(3);
@@ -699,8 +698,7 @@ static PyObject* factors_to_PyList(lp_upolynomial_factors_t* factors) {
   PyList_SetItem(factors_list, 0, constant); // Steals the reference
 
   // Copy over the factors
-  size_t i;
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     size_t degree;
     PyObject* p_i = PyUPolynomial_create(lp_upolynomial_factors_get_factor(factors, i, &degree));
     Py_INCREF(p_i);
@@ -794,7 +792,7 @@ UPolynomial_roots_count(PyObject* self, PyObject* args) {
 
   } else if (PyTuple_Size(args) == 0) {
     // count in (-inf, inf)
-    roots = lp_upolynomial_roots_count(p->p, 0);
+    roots = lp_upolynomial_roots_count(p->p, NULL);
   } else {
     Py_RETURN_NONE;
   }
@@ -818,14 +816,13 @@ UPolynomial_roots_isolate(PyObject* self) {
   // Generate a list of floats
   PyObject* list = PyList_New(roots_size);
 
-  size_t i;
-  for (i = 0; i < roots_size; ++ i) {
+  for (size_t i = 0; i < roots_size; ++ i) {
     PyObject* c = PyAlgebraicNumber_create(&roots[i]);
     PyList_SetItem(list, i, c);
   }
 
   // Get rid of the temporaries
-  for (i = 0; i < roots_size; ++ i) {
+  for (size_t i = 0; i < roots_size; ++ i) {
     lp_algebraic_number_destruct(roots + i);
   }
   free(roots);
@@ -846,8 +843,7 @@ static PyObject* upolynomials_to_PyList(lp_upolynomial_t** list, size_t size) {
   PyObject* pylist = PyList_New(size);
 
   // Copy over the polynomials
-  size_t i;
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     PyObject* pylist_i = PyUPolynomial_create(list[i]);
     Py_INCREF(pylist_i);
     PyList_SetItem(pylist, i, pylist_i);
@@ -869,13 +865,12 @@ UPolynomial_sturm_sequence(PyObject* self) {
   return result;
 }
 
-static PyObject* integer_list_to_PyList(lp_integer_t *list, size_t size) {
+static PyObject* integer_list_to_PyList(const lp_integer_t *list, size_t size) {
   // Construct the result
   PyObject* pylist = PyList_New(size);
 
   // Copy over the integers
-  size_t i;
-  for (i = 0; i < size; ++ i) {
+  for (size_t i = 0; i < size; ++ i) {
     PyObject* pylist_i = integer_to_PyLong(&list[i]);
     Py_INCREF(pylist_i);
     PyList_SetItem(pylist, i, pylist_i);
