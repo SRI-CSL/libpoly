@@ -67,6 +67,7 @@ add_subdirectory(src)
 add_subdirectory(include)
 
 if(LIBPOLY_BUILD_PYTHON_API)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
   # Configure the Python bindings
   add_subdirectory(python)
   # Configure the Python tests
