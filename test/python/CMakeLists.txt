@@ -1,7 +1,8 @@
 if(LIBPOLY_BUILD_PYTHON_API)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
     add_custom_target(check
         COMMAND
-            PYTHONPATH=${CMAKE_BINARY_DIR}/python ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/check.py
+            PYTHONPATH=${CMAKE_BINARY_DIR}/python ${Python3_INTERPRETER} ${CMAKE_CURRENT_SOURCE_DIR}/check.py
         DEPENDS
             polypy
         WORKING_DIRECTORY
