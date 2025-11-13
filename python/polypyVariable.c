@@ -515,7 +515,7 @@ Variable_richcompare(PyObject *self, PyObject *other, int op){
       result = (x->x >= y->x ? Py_True : Py_False);
       break;
     default:
-      assert(false);
+      assert(0);
     }
   }
   return result;
