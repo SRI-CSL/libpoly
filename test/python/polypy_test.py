@@ -1,6 +1,12 @@
 import polypy
 import random
-import sympy
+
+try:
+    import sympy
+    _sympy_available = True
+except ImportError:
+    _sympy_available = False
+    sympy = None
 
 PASS = 0
 FAIL = 0
@@ -61,7 +67,13 @@ class SympyWrapper:
 
     enabled = True
 
+    def __init__(self):
+        if not _sympy_available:
+            self.enabled = False
+
     def sympy_from_upolynomial(self, p):
+        if not _sympy_available:
+            raise RuntimeError("sympy is not available")
         coeffs = p.coefficients()
         sympy_p = 0
         x = sympy.symbols('x')
@@ -71,6 +83,8 @@ class SympyWrapper:
         return sympy_p
 
     def sympy_factor(self, p):
+        if not _sympy_available:
+            raise RuntimeError("sympy is not available")
         sympy_p = self.sympy_from_upolynomial(p)
         if (p.ring().modulus() is None):
             return sympy.factor_list(sympy_p)
@@ -78,6 +92,8 @@ class SympyWrapper:
             return sympy.factor_list(sympy_p, modulus=p.ring().modulus())
 
     def sympy_gcd(self, p, q):
+        if not _sympy_available:
+            raise RuntimeError("sympy is not available")
         sympy_p = self.sympy_from_upolynomial(p)
         sympy_q = self.sympy_from_upolynomial(q)
         if (p.ring().modulus() is None):
@@ -86,6 +102,8 @@ class SympyWrapper:
             return sympy.gcd(sympy_p, sympy_q, modulus=p.ring().modulus())
 
     def sympy_extended_gcd(self, p, q):
+        if not _sympy_available:
+            raise RuntimeError("sympy is not available")
         sympy_p = self.sympy_from_upolynomial(p)
         sympy_q = self.sympy_from_upolynomial(q)
         if (p.ring().modulus() is None):
@@ -143,9 +161,11 @@ class SympyWrapper:
 
 
 """
- By default sympy is enabled.
+ By default sympy is enabled if available.
 """
 sympy_checker = SympyWrapper();
+if not _sympy_available:
+    sympy_checker.enabled = False
 
 """
  Initialize the testing.
