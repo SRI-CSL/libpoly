@@ -24,17 +24,10 @@ runs:
         ## gmp and python are already installed in the latest macOS
         # brew install gmp
         # brew install python
-        ## Try to install sympy, but don't fail if it doesn't work (it's optional)
-        ## sympy is optional - tests will work without it
-        ## Use --break-system-packages with --user as recommended by PEP 668
-        set +e  # Don't exit on error
-        if command -v pip3 &> /dev/null; then
-          pip3 install --user --break-system-packages sympy || echo "Warning: Failed to install sympy with pip3, continuing anyway"
-        elif python3 -m pip --version &> /dev/null; then
-          python3 -m pip install --user --break-system-packages sympy || echo "Warning: Failed to install sympy with python3 -m pip, continuing anyway"
-        else
-          python3 -m ensurepip --upgrade || python3 -m ensurepip || true
-          python3 -m pip install --user --break-system-packages sympy || echo "Warning: Failed to install sympy, continuing anyway"
-        fi
-        set -e  # Re-enable exit on error
+        ## Install sympy - use --break-system-packages for CI environment
+        ## First ensure pip is available and up to date
+        python3 -m ensurepip --upgrade || python3 -m ensurepip || true
+        python3 -m pip install --upgrade pip || true
+        ## Install sympy with --break-system-packages flag (required for PEP 668)
+        python3 -m pip install --break-system-packages sympy
         echo "Install Mac dependencies [DONE]"
