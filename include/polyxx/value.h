@@ -29,6 +29,8 @@ namespace poly {
     /** Construct a none value. */
     Value();
     /** Construct from a native integer. */
+    Value(int i);
+    /** Construct from a native integer. */
     Value(long i);
     /** Copy from the given Value. */
     Value(const Value& val);

@@ -117,8 +117,8 @@ namespace poly {
    * assignment. */
   bool is_assigned_over_assignment(const Polynomial& p, const Assignment& a);
   /** Evaluates p over a given assignment and returns an univariate polynomial.
-   * Assumes that a assigns all variable in p but the top variable.
-   * Assumes that a assigns to integer only. */
+   * Assumes that 'a' assigns all variable in p but the top variable.
+   * Assumes that 'a' assigns to integer only. */
   UPolynomial to_univariate(const Polynomial& p, const Assignment& a);
   /** Compute the sign of a polynomial over an assignment. */
   int sgn(const Polynomial& p, const Assignment& a);
@@ -127,6 +127,11 @@ namespace poly {
   /** Evaluate a polynomial constraint over an assignment. */
   bool evaluate_constraint(const Polynomial& p, const Assignment& a,
                            SignCondition sc);
+  /** Checks if a polynomial constraint is fully evaluated over assignment.
+   *  Returns -1 if 'a' does not fully evaluate the constraint.
+   *  Otherwise, returns true if the constraint holds under 'a'. */
+  int evaluate_constraint_subs(const Polynomial& p, const Assignment& a,
+                               SignCondition sc);
   /** Evaluate a polynomial over an interval assignment. The result is only an
    * approximation. */
   Interval evaluate(const Polynomial& p, const IntervalAssignment& a);

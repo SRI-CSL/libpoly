@@ -109,6 +109,12 @@ void lp_polynomial_lc_constant(const lp_polynomial_t* A, lp_integer_t *out);
 /** Get the context of the given polynomial */
 const lp_polynomial_context_t* lp_polynomial_get_context(const lp_polynomial_t* A);
 
+/**
+ * Sets the context of a polynomial.
+ * Warning: variable DB indexes are not checked. Use with caution.
+ */
+void lp_polynomial_set_context(lp_polynomial_t* A, const lp_polynomial_context_t* ctx);
+
 /** Returns all the variables (it will not clear the output list vars) */
 void lp_polynomial_get_variables(const lp_polynomial_t* A, lp_variable_list_t* vars);
 
@@ -374,6 +380,12 @@ lp_polynomial_t* lp_polynomial_constraint_explain_infer_bounds(const lp_polynomi
  * Given a polynomial constraint, as above, evaluate its truth value.
  */
 int lp_polynomial_constraint_evaluate(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
+
+/**
+ * Substitutes the polynomial with M and checks the sign of the resulting real number.
+ * If M does not fully evaluate A to a real, -1 is returned.
+ */
+int lp_polynomial_constraint_evaluate_subs(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, const lp_assignment_t* M);
 
 /**
  * Given a polynomial constraint over an integer ring Zp, evaluate its truth value.
