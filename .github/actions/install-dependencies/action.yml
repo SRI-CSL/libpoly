@@ -12,7 +12,7 @@ runs:
         sudo apt-get install -y cmake
         sudo apt-get install -y libgmp-dev
         sudo apt-get install -y python3-pip
-        pip3 install sympy
+        python3 -m pip install sympy
         echo "Install Linux dependencies [DONE]"
 
     - name: Install Mac Dependencies
@@ -20,9 +20,14 @@ runs:
       shell: bash
       run: |
         echo "Install Mac dependencies"
-        brew update
+        brew update || true
         ## gmp and python are already installed in the latest macOS
         # brew install gmp
         # brew install python
-        pip install sympy
+        ## Install sympy - use --break-system-packages for CI environment
+        ## First ensure pip is available and up to date
+        python3 -m ensurepip --upgrade || python3 -m ensurepip || true
+        python3 -m pip install --upgrade pip || true
+        ## Install sympy with --break-system-packages flag (required for PEP 668)
+        python3 -m pip install --break-system-packages sympy
         echo "Install Mac dependencies [DONE]"
