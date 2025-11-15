@@ -19,8 +19,7 @@
 
 #pragma once
 
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "python.h"
 
 #include "integer.h"
 #include "rational.h"

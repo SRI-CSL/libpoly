@@ -231,7 +231,7 @@ void lp_feasibility_set_int_pick_value(const lp_feasibility_set_int_t* set, lp_i
     // TODO proper implementation
     // get random element between (incl.) 0 and (|K| - size)
     // find and add number of <= element
-    assert(false);
+    assert(0);
   }
 }
 

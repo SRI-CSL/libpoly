@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <Python.h>
+#include "python.h"
 
 #include "algebraic_number.h"
 

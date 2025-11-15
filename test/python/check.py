@@ -5,7 +5,7 @@ import polypy_test
 
 
 def forkexec(test, env):
-    if sys.version_info >= (3,0):  #IAM: (3, 2) might be more accurate...
+    if sys.version_info >= (3,2):
         with open(test) as testf:
             code = compile(testf.read(), test, 'exec') #IAM: explicit compile makes debugging easier.
             exec(code, env, env)
