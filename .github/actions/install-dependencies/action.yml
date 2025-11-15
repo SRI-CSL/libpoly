@@ -12,7 +12,7 @@ runs:
         sudo apt-get install -y cmake
         sudo apt-get install -y libgmp-dev
         sudo apt-get install -y python3-pip
-        pip3 install sympy
+        python3 -m pip install sympy
         echo "Install Linux dependencies [DONE]"
 
     - name: Install Mac Dependencies
@@ -24,5 +24,5 @@ runs:
         ## gmp and python are already installed in the latest macOS
         # brew install gmp
         # brew install python
-        pip install sympy
+        python3 -m pip install sympy
         echo "Install Mac dependencies [DONE]"
