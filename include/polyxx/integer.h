@@ -1,6 +1,15 @@
 #pragma once
 
+// gmpxx.h uses the pre-C++23 `operator"" _mpz` spelling; silence Clang's warning.
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wunknown-warning-option"
+#  pragma clang diagnostic ignored "-Wdeprecated-literal-operator"
+#endif
 #include <gmpxx.h>
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
 
 #include <iosfwd>
 
