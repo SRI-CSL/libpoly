@@ -2255,6 +2255,15 @@ int lp_polynomial_constraint_resolve_fm(
     check_polynomial_assignment(p2, M, x);
   }
 
+  if (p1_sgn == LP_SGN_NE_0 || p2_sgn == LP_SGN_NE_0) {
+    return 0;
+  }
+
+  // TODO check what to do when both are equal
+  if (p1_sgn == LP_SGN_EQ_0 && p2_sgn == LP_SGN_EQ_0) {
+    return 0;
+  }
+
   const lp_polynomial_context_t* ctx = p1->ctx;
   assert(p2->ctx == ctx);
 
@@ -2268,159 +2277,141 @@ int lp_polynomial_constraint_resolve_fm(
   coefficient_reductum_m(ctx, &p2_c, &p2->data, M, assumptions);
 
   int ok = 1;
-  if (coefficient_degree(&p1_c) != 1 || coefficient_top_variable(&p1_c) != x) {
+  if (coefficient_degree(&p1_c) != 1 || coefficient_top_variable(&p1_c) != x ||
+      coefficient_degree(&p2_c) != 1 || coefficient_top_variable(&p2_c) != x ) {
     ok = 0;
-  }
-  if (coefficient_degree(&p2_c) != 1 || coefficient_top_variable(&p2_c) != x) {
-    ok = 0;
+    goto cleanup;
   }
 
-  if (ok) {
+  // Normalize all to be <, <=, ==, or !=
+  if (p1_sgn == LP_SGN_GT_0) {
+    coefficient_neg(ctx, &p1_c, &p1_c);
+    p1_sgn = LP_SGN_LT_0;
+  } else if (p1_sgn == LP_SGN_GE_0) {
+    coefficient_neg(ctx, &p1_c, &p1_c);
+    p1_sgn = LP_SGN_LE_0;
+  }
+  if (p2_sgn == LP_SGN_GT_0) {
+    coefficient_neg(ctx, &p2_c, &p2_c);
+    p2_sgn = LP_SGN_LT_0;
+  } else if (p2_sgn == LP_SGN_GE_0) {
+    coefficient_neg(ctx, &p2_c, &p2_c);
+    p2_sgn = LP_SGN_LE_0;
+  }
 
-    // Normalize all to be <, <=, ==, or !=
-    if (p1_sgn == LP_SGN_GT_0) {
-      coefficient_neg(ctx, &p1_c, &p1_c);
-      p1_sgn = LP_SGN_LT_0;
-    } else if (p1_sgn == LP_SGN_GE_0) {
-      coefficient_neg(ctx, &p1_c, &p1_c);
-      p1_sgn = LP_SGN_LE_0;
-    }
-    if (p2_sgn == LP_SGN_GT_0) {
-      coefficient_neg(ctx, &p2_c, &p2_c);
-      p2_sgn = LP_SGN_LT_0;
-    } else if (p2_sgn == LP_SGN_GE_0) {
-      coefficient_neg(ctx, &p2_c, &p2_c);
-      p2_sgn = LP_SGN_LE_0;
-    }
-
-    // Compute the resultant condition
-    switch (p1_sgn) {
+  // Compute the resultant condition
+  switch (p1_sgn) {
+  case LP_SGN_LT_0:
+    switch (p2_sgn) {
     case LP_SGN_LT_0:
-      switch (p2_sgn) {
-      case LP_SGN_LT_0:
-        *R_sgn = LP_SGN_LT_0;
-        break;
-      case LP_SGN_LE_0:
-        *R_sgn = LP_SGN_LT_0;
-        break;
-      case LP_SGN_EQ_0:
-        *R_sgn = LP_SGN_LT_0;
-        break;
-      case LP_SGN_NE_0:
-        ok = 0;
-        break;
-      case LP_SGN_GT_0:
-      case LP_SGN_GE_0:
-        assert(0);
-      }
-      break;
     case LP_SGN_LE_0:
-      switch (p2_sgn) {
-      case LP_SGN_LT_0:
-        *R_sgn = LP_SGN_LT_0;
-        break;
-      case LP_SGN_LE_0:
-        *R_sgn = LP_SGN_LE_0;
-        break;
-      case LP_SGN_EQ_0:
-        *R_sgn = LP_SGN_LE_0;
-        break;
-      case LP_SGN_NE_0:
-        ok = 0;
-        break;
-      case LP_SGN_GT_0:
-      case LP_SGN_GE_0:
-        assert(0);
-      }
-      break;
     case LP_SGN_EQ_0:
-      switch (p2_sgn) {
-      case LP_SGN_LT_0:
-      case LP_SGN_LE_0:
-      case LP_SGN_EQ_0:
-      case LP_SGN_NE_0:
-        ok = 0;
-        break;
-      case LP_SGN_GT_0:
-      case LP_SGN_GE_0:
-        assert(0);
-      }
+      *R_sgn = LP_SGN_LT_0;
       break;
     case LP_SGN_NE_0:
-      ok = 0;
-      break;
     case LP_SGN_GT_0:
     case LP_SGN_GE_0:
       assert(0);
     }
+    break;
+  case LP_SGN_LE_0:
+    switch (p2_sgn) {
+    case LP_SGN_LT_0:
+      *R_sgn = LP_SGN_LT_0;
+      break;
+    case LP_SGN_LE_0:
+    case LP_SGN_EQ_0:
+      *R_sgn = LP_SGN_LE_0;
+      break;
+    case LP_SGN_NE_0:
+    case LP_SGN_GT_0:
+    case LP_SGN_GE_0:
+      assert(0);
+    }
+    break;
+  case LP_SGN_EQ_0:
+    switch (p2_sgn) {
+    case LP_SGN_LT_0:
+    case LP_SGN_LE_0:
+      *R_sgn = p2_sgn;
+      break;
+    case LP_SGN_EQ_0:
+    case LP_SGN_NE_0:
+    case LP_SGN_GT_0:
+    case LP_SGN_GE_0:
+      assert(0);
+    }
+    break;
+  case LP_SGN_NE_0:
+  case LP_SGN_GT_0:
+  case LP_SGN_GE_0:
+    assert(0);
+  }
 
-    if (ok) {
-      const coefficient_t* p1_lc = coefficient_lc(&p1_c);
-      const coefficient_t* p2_lc = coefficient_lc(&p2_c);
+  const coefficient_t* p1_lc = coefficient_lc(&p1_c);
+  const coefficient_t* p2_lc = coefficient_lc(&p2_c);
 
-      if (p1_lc->type != COEFFICIENT_NUMERIC) {
-        lp_polynomial_vector_push_back_coeff(assumptions, p1_lc);
-      }
-      if (p2_lc->type != COEFFICIENT_NUMERIC) {
-        lp_polynomial_vector_push_back_coeff(assumptions, p2_lc);
-      }
+  if (p1_lc->type != COEFFICIENT_NUMERIC) {
+    lp_polynomial_vector_push_back_coeff(assumptions, p1_lc);
+  }
+  if (p2_lc->type != COEFFICIENT_NUMERIC) {
+    lp_polynomial_vector_push_back_coeff(assumptions, p2_lc);
+  }
 
-      int p1_lc_sgn = coefficient_sgn(ctx, p1_lc, M);
-      int p2_lc_sgn = coefficient_sgn(ctx, p2_lc, M);
+  int p1_lc_sgn = coefficient_sgn(ctx, p1_lc, M);
+  int p2_lc_sgn = coefficient_sgn(ctx, p2_lc, M);
 
-      // The signs must be opposite, unless one of them is ==
-      // In that case we can multiply == with negative, still safe
-      if (p1_lc_sgn == p2_lc_sgn) {
-        if (p1_sgn == LP_SGN_EQ_0) {
-          p2_lc_sgn = -p2_lc_sgn;
-        } else if (p2_sgn == LP_SGN_EQ_0) {
-          p1_lc_sgn = -p1_lc_sgn;
-        }
-      } else {
-        ok = 0;
-      }
+  // The signs must be opposite, unless one of them is ==
+  // In that case we can multiply == with negative, still safe
+  if (p1_lc_sgn == p2_lc_sgn) {
+    if (p1_sgn == LP_SGN_EQ_0) {
+      p2_lc_sgn = -p2_lc_sgn;
+    } else if (p2_sgn == LP_SGN_EQ_0) {
+      p1_lc_sgn = -p1_lc_sgn;
+    }
+  } else {
+    ok = 0;
+    goto cleanup;
+  }
 
-      if (ok) {
-        coefficient_t p1_lc_abs;
-        if (p1_lc_sgn > 0) {
-          coefficient_construct_copy(ctx, &p1_lc_abs, p1_lc);
-        } else {
-          coefficient_construct(ctx, &p1_lc_abs);
-          coefficient_neg(ctx, &p1_lc_abs, p1_lc);
-        }
-        coefficient_t p2_lc_abs;
-        if (p2_lc_sgn > 0) {
-          coefficient_construct_copy(ctx, &p2_lc_abs, p2_lc);
-        } else {
-          coefficient_construct(ctx, &p2_lc_abs);
-          coefficient_neg(ctx, &p2_lc_abs, p2_lc);
-        }
+  coefficient_t p1_lc_abs;
+  if (p1_lc_sgn > 0) {
+    coefficient_construct_copy(ctx, &p1_lc_abs, p1_lc);
+  } else {
+    coefficient_construct(ctx, &p1_lc_abs);
+    coefficient_neg(ctx, &p1_lc_abs, p1_lc);
+  }
+  coefficient_t p2_lc_abs;
+  if (p2_lc_sgn > 0) {
+    coefficient_construct_copy(ctx, &p2_lc_abs, p2_lc);
+  } else {
+    coefficient_construct(ctx, &p2_lc_abs);
+    coefficient_neg(ctx, &p2_lc_abs, p2_lc);
+  }
 
 //        tracef("p1_c = "); coefficient_print(ctx, &p1_c, trace_out); tracef("\n");
 //        tracef("p1_lc_abs = "); coefficient_print(ctx, &p1_lc_abs, trace_out); tracef("\n");
 //        tracef("p2_c = "); coefficient_print(ctx, &p2_c, trace_out); tracef("\n");
 //        tracef("p2_lc_abs = "); coefficient_print(ctx, &p2_lc_abs, trace_out); tracef("\n");
 
-        coefficient_t R_c;
-        coefficient_construct(ctx, &R_c);
+  coefficient_t R_c;
+  coefficient_construct(ctx, &R_c);
 
-        // Compute the resultant polynomial
+  // Compute the resultant polynomial
 //        tracef("R = "); coefficient_print(ctx, &R_c, trace_out); tracef("\n");
-        coefficient_add_mul(ctx, &R_c, &p1_c, &p2_lc_abs);
+  coefficient_add_mul(ctx, &R_c, &p1_c, &p2_lc_abs);
 //        tracef("R = "); coefficient_print(ctx, &R_c, trace_out); tracef("\n");
-        coefficient_add_mul(ctx, &R_c, &p2_c, &p1_lc_abs);
+  coefficient_add_mul(ctx, &R_c, &p2_c, &p1_lc_abs);
 //        tracef("R = "); coefficient_print(ctx, &R_c, trace_out); tracef("\n");
 
-        lp_polynomial_destruct(R);
-        lp_polynomial_construct_from_coefficient(R, ctx, &R_c);
+  lp_polynomial_destruct(R);
+  lp_polynomial_construct_from_coefficient(R, ctx, &R_c);
 
-        coefficient_destruct(&p1_lc_abs);
-        coefficient_destruct(&p2_lc_abs);
-        coefficient_destruct(&R_c);
-      }
-    }
-  }
+  coefficient_destruct(&p1_lc_abs);
+  coefficient_destruct(&p2_lc_abs);
+  coefficient_destruct(&R_c);
 
+cleanup:
   coefficient_destruct(&p1_c);
   coefficient_destruct(&p2_c);
 
