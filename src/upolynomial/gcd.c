@@ -435,6 +435,7 @@ static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p
   return p;
 }
 
+static
 size_t bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const lp_integer_t* A_cont, const lp_integer_t* B_cont) {
   // Get the highest power 2^n such that
   //  2^n >= 2*min(|pp(A)|, |pp(B)|) + 2
@@ -516,14 +517,12 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   integer_construct_from_int(lp_Z, &B_v, 0);
   integer_construct_from_int(lp_Z, &D_v, 0);
 
-  while (D == 0 && (attempts --)) {
+  // The evaluation shifts by up to deg(A) * n bits, an unsigned: past
+  // that, no heuristic (the caller falls back to the subresultant gcd)
+  const size_t deg_A = lp_upolynomial_degree(A);
+  const size_t max_n = deg_A > 0 ? UINT_MAX / deg_A : UINT_MAX;
 
-    // The evaluation shifts by up to deg(A) * n bits, an unsigned: past
-    // that, no heuristic (the caller falls back to the subresultant gcd)
-    size_t deg_A = lp_upolynomial_degree(A);
-    if (n > UINT_MAX || (deg_A > 0 && n > UINT_MAX / deg_A)) {
-      break;
-    }
+  while (D == 0 && n < max_n && (attempts --)) {
 
     // Evaluate A and B
     evaluate_polynomial(A, &A_cont, n, &A_v);
