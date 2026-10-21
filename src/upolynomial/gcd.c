@@ -26,6 +26,7 @@
 #include "utils/statistics.h"
 
 #include <assert.h>
+#include <limits.h>
 
 STAT_DECLARE(int, upolynomial, gcd_euclid)
 STAT_DECLARE(int, upolynomial, gcd_euclid_extended)
@@ -399,6 +400,8 @@ static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p
   // Basically compute digits modulo x_value
   int d = 0;
   while (integer_sgn(lp_Z, p_value)) {
+    // With 2^pow from bound_valuation the value has at most max_size digits
+    assert((size_t) d < max_size);
     integer_div_rem_pow2_Z(&div, &rem, p_value, pow);
 
     if (integer_bits(&rem) + 1 >= pow) {
@@ -432,12 +435,12 @@ static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p
   return p;
 }
 
-int bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const lp_integer_t* A_cont, const lp_integer_t* B_cont) {
+size_t bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const lp_integer_t* A_cont, const lp_integer_t* B_cont) {
   // Get the highest power 2^n such that
   //  2^n >= 2*min(|pp(A)|, |pp(B)|) + 2
 
-  int A_max = 0;
-  int B_max = 0;
+  size_t A_max = 0;
+  size_t B_max = 0;
   size_t k;
 
   lp_integer_t tmp;
@@ -445,7 +448,7 @@ int bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const 
 
   for (k = 0; k < A->size; ++ k) {
     integer_div_Z(&tmp, &A->monomials[k].coefficient, A_cont);
-    int bits = integer_bits(&tmp);
+    size_t bits = integer_bits(&tmp);
     if (bits > A_max) {
       A_max = bits;
     }
@@ -453,7 +456,7 @@ int bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const 
 
   for (k = 0; k < B->size; ++ k) {
     integer_div_Z(&tmp, &B->monomials[k].coefficient, B_cont);
-    int bits = integer_bits(&tmp);
+    size_t bits = integer_bits(&tmp);
     if (bits > B_max) {
       B_max = bits;
     }
@@ -461,7 +464,7 @@ int bound_valuation(const lp_upolynomial_t* A, const lp_upolynomial_t* B, const 
 
   integer_destruct(&tmp);
 
-  int bits_min = A_max > B_max ? B_max : A_max;
+  size_t bits_min = A_max > B_max ? B_max : A_max;
 
   return bits_min + 2;
 }
@@ -506,7 +509,7 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   }
 
   // The number we use for valuation 2^n
-  int n = bound_valuation(A, B, &A_cont, &B_cont);
+  size_t n = bound_valuation(A, B, &A_cont, &B_cont);
 
   lp_integer_t A_v, B_v, D_v;
   integer_construct_from_int(lp_Z, &A_v, 0);
@@ -514,6 +517,13 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
   integer_construct_from_int(lp_Z, &D_v, 0);
 
   while (D == 0 && (attempts --)) {
+
+    // The evaluation shifts by up to deg(A) * n bits, an unsigned: past
+    // that, no heuristic (the caller falls back to the subresultant gcd)
+    size_t deg_A = lp_upolynomial_degree(A);
+    if (n > UINT_MAX || (deg_A > 0 && n > UINT_MAX / deg_A)) {
+      break;
+    }
 
     // Evaluate A and B
     evaluate_polynomial(A, &A_cont, n, &A_v);
