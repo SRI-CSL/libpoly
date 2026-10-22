@@ -398,10 +398,18 @@ static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p
   integer_pow(lp_Z, &P, &P, pow);
 
   // Basically compute digits modulo x_value
-  int d = 0;
+  size_t d = 0;
   while (integer_sgn(lp_Z, p_value)) {
-    // With 2^pow from bound_valuation the value has at most max_size digits
-    assert((size_t) d < max_size);
+    // With 2^pow from bound_valuation the value has at most max_size digits.
+    // More digits mean no gcd of this degree: fail (the caller tries again
+    // or falls back) rather than write past the dense polynomial
+    if (d >= max_size) {
+      upolynomial_dense_destruct(&p_d);
+      integer_destruct(&div);
+      integer_destruct(&rem);
+      integer_destruct(&P);
+      return 0;
+    }
     integer_div_rem_pow2_Z(&div, &rem, p_value, pow);
 
     if (integer_bits(&rem) + 1 >= pow) {
@@ -539,7 +547,7 @@ lp_upolynomial_t* upolynomial_gcd_heuristic(const lp_upolynomial_t* A, const lp_
     D = reconstruct_polynomial(lp_upolynomial_degree(A) + 1, &D_v, n, &d);
 
     // Check if it divides both (B is smaller degree)
-    if (!lp_upolynomial_divides(D, B) || !lp_upolynomial_divides(D, A)) {
+    if (D && (!lp_upolynomial_divides(D, B) || !lp_upolynomial_divides(D, A))) {
       lp_upolynomial_delete(D);
       D = 0;
     }
