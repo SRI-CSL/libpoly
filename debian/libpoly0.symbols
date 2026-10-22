@@ -1,5 +1,4 @@
 libpoly.so.0 libpoly0 #MINVER#
- bound_valuation@Base 1.3
  coefficient_add@Base 1.3
  coefficient_add_monomial@Base 1.3
  coefficient_add_mul@Base 1.3
