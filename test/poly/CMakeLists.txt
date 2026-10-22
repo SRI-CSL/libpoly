@@ -1,5 +1,6 @@
 set(poly_tests
     test_feasible_int_set
+    test_upolynomial_gcd
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -std=c++11")
