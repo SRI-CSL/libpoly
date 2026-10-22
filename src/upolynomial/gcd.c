@@ -399,17 +399,9 @@ static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p
 
   // Basically compute digits modulo x_value
   size_t d = 0;
-  while (integer_sgn(lp_Z, p_value)) {
-    // With 2^pow from bound_valuation the value has at most max_size digits.
-    // More digits mean no gcd of this degree: fail (the caller tries again
-    // or falls back) rather than write past the dense polynomial
-    if (d >= max_size) {
-      upolynomial_dense_destruct(&p_d);
-      integer_destruct(&div);
-      integer_destruct(&rem);
-      integer_destruct(&P);
-      return 0;
-    }
+  // With 2^pow from bound_valuation the value has at most max_size digits.
+  // More digits mean no gcd of this degree
+  while (integer_sgn(lp_Z, p_value) && d < max_size) {
     integer_div_rem_pow2_Z(&div, &rem, p_value, pow);
 
     if (integer_bits(&rem) + 1 >= pow) {
@@ -423,16 +415,22 @@ static lp_upolynomial_t* reconstruct_polynomial(size_t max_size, lp_integer_t* p
 
     d ++;
   }
-  upolynomial_dense_touch(&p_d, d - 1);
 
-  // We only care about primitive GCDs in the reconstruction
-  upolynomial_dense_mk_primitive_Z(&p_d, 1);
+  lp_upolynomial_t* p = NULL;
 
-  // Now, multiply with cont
-  upolynomial_dense_mult_c(&p_d, lp_Z, cont);
+  // check if we were successful
+  if (integer_sgn(lp_Z, p_value) == 0) {
+    upolynomial_dense_touch(&p_d, d - 1);
 
-  // Get the sparse representation
-  lp_upolynomial_t* p = upolynomial_dense_to_upolynomial(&p_d, lp_Z);
+    // We only care about primitive GCDs in the reconstruction
+    upolynomial_dense_mk_primitive_Z(&p_d, 1);
+
+    // Now, multiply with cont
+    upolynomial_dense_mult_c(&p_d, lp_Z, cont);
+
+    // Get the sparse representation
+    p = upolynomial_dense_to_upolynomial(&p_d, lp_Z);
+  }
 
   // Free temporaries
   upolynomial_dense_destruct(&p_d);
