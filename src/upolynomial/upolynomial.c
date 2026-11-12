@@ -1157,6 +1157,33 @@ void lp_upolynomial_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t**
   free(S_dense);
 }
 
+void lp_upolynomial_signed_remainder_sequence(const lp_upolynomial_t* f, const lp_upolynomial_t* g, lp_upolynomial_t*** S, size_t* size) {
+  if (trace_is_enabled("roots")) {
+    tracef("upolynomial_roots_signed_remainder_sequence(");
+    lp_upolynomial_print(f, trace_out); tracef(", ");
+    lp_upolynomial_print(g, trace_out); tracef(")\n");
+  }
+  assert(f->K == lp_Z);
+  assert(g->K == lp_Z);
+
+  size_t f_deg = lp_upolynomial_degree(f);
+  size_t g_deg = lp_upolynomial_degree(g);
+  size_t min_deg = f_deg < g_deg ? f_deg : g_deg;
+  upolynomial_dense_t* S_dense = (upolynomial_dense_t*) malloc((min_deg + 3)*sizeof(upolynomial_dense_t));
+
+  upolynomial_compute_signed_remainder_sequence(f, g, S_dense, size);
+
+  (*S) = (lp_upolynomial_t**) malloc((*size)*sizeof(lp_upolynomial_t*));
+
+  size_t i;
+  for (i = 0; i < *size; ++ i) {
+    (*S)[i] = upolynomial_dense_to_upolynomial(S_dense + i, lp_Z);
+    upolynomial_dense_destruct(S_dense + i);
+  }
+
+  free(S_dense);
+}
+
 void lp_upolynomial_roots_find_Zp(const lp_upolynomial_t* f, lp_integer_t** roots, size_t* roots_size) {
   if (trace_is_enabled("roots")) {
     tracef("upolynomial_roots_find_Zp("); lp_upolynomial_print(f, trace_out); tracef(")\n");
