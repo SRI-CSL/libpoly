@@ -146,3 +146,86 @@ TEST_CASE("polynomial::evaluate") {
   CHECK(evaluate_constraint_subs(p2, a, SignCondition::LT) == 0);
   CHECK(evaluate_constraint_subs(p2, a, SignCondition::EQ) == 1);
 }
+
+TEST_CASE("polynomial::infeasible_regions") {
+  Variable x("x");
+  Variable y("y");
+  Polynomial p = pow(y, 2) - x;
+  Assignment a;
+
+  // y^2 - 4 has the roots -2 and 2
+  a.set(x, 4);
+  std::vector<Value> roots;
+  std::vector<Interval> regions = infeasible_regions(p, a, SignCondition::LT, roots);
+  REQUIRE(roots.size() == 2);
+  CHECK(roots[0] == Value(-2));
+  CHECK(roots[1] == Value(2));
+  REQUIRE(regions.size() == 2);
+  CHECK(regions[0] == Interval(Value::minus_infty(), true, -2, false));
+  CHECK(regions[1] == Interval(2, false, Value::plus_infty(), true));
+  CHECK(regions == infeasible_regions(p, a, SignCondition::LT));
+
+  // the roots are appended, the regions are point intervals at the roots
+  regions = infeasible_regions(p, a, SignCondition::NE, roots);
+  REQUIRE(roots.size() == 4);
+  CHECK(roots[0] == Value(-2));
+  CHECK(roots[1] == Value(2));
+  CHECK(roots[2] == Value(-2));
+  CHECK(roots[3] == Value(2));
+  REQUIRE(regions.size() == 2);
+  CHECK(regions[0] == Interval(Value(-2)));
+  CHECK(regions[1] == Interval(Value(2)));
+  CHECK(regions == infeasible_regions(p, a, SignCondition::NE));
+
+  // y^2 - 2 has the roots -sqrt(2) and sqrt(2)
+  a.set(x, 2);
+  roots.clear();
+  regions = infeasible_regions(p, a, SignCondition::GE, roots);
+  CHECK(roots == isolate_real_roots(p, a));
+  REQUIRE(roots.size() == 2);
+  CHECK(is_algebraic_number(roots[0]));
+  CHECK(is_algebraic_number(roots[1]));
+  CHECK(roots[0] < roots[1]);
+  REQUIRE(regions.size() == 1);
+  CHECK(regions[0] == Interval(roots[0], true, roots[1], true));
+  CHECK(regions == infeasible_regions(p, a, SignCondition::GE));
+
+  // y^2 has a double root at 0
+  a.set(x, 0);
+  roots.clear();
+  regions = infeasible_regions(p, a, SignCondition::LE, roots);
+  REQUIRE(roots.size() == 1);
+  CHECK(roots[0] == Value(0));
+  REQUIRE(regions.size() == 2);
+  CHECK(regions[0] == Interval(Value::minus_infty(), true, 0, true));
+  CHECK(regions[1] == Interval(0, true, Value::plus_infty(), true));
+  CHECK(regions == infeasible_regions(p, a, SignCondition::LE));
+
+  // y^2 + 1 has no real roots
+  a.set(x, -1);
+  roots.clear();
+  regions = infeasible_regions(p, a, SignCondition::LT, roots);
+  CHECK(roots.empty());
+  REQUIRE(regions.size() == 1);
+  CHECK(is_full(regions[0]));
+  CHECK(infeasible_regions(p, a, SignCondition::GT, roots).empty());
+  CHECK(roots.empty());
+}
+
+TEST_CASE("polynomial::infeasible_regions constant under assignment") {
+  Variable x("x");
+  Variable y("y");
+  // evaluates to the constant 3 for x = 1
+  Polynomial p = (x - 1) * y + 3;
+  Assignment a;
+  a.set(x, 1);
+
+  std::vector<Value> roots;
+  std::vector<Interval> regions = infeasible_regions(p, a, SignCondition::LT, roots);
+  CHECK(roots.empty());
+  REQUIRE(regions.size() == 1);
+  CHECK(is_full(regions[0]));
+
+  CHECK(infeasible_regions(p, a, SignCondition::GT, roots).empty());
+  CHECK(roots.empty());
+}
