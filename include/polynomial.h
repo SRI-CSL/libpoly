@@ -350,6 +350,13 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M);
 
 /**
+ * Same as lp_polynomial_constraint_get_feasible_set(), but additionally hands
+ * back the real roots of A(M(x1), ..., M(xn), y) that the feasible set was
+ * computed from.
+ */
+lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set_with_roots(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M, lp_value_t** roots, size_t* roots_size);
+
+/**
  * Given a polynomial A(x1, ..., xn, y) with y being the top variable, a sign
  * condition, and an assignment M that assigns x1, ..., xn, the function returns
  * a subset of Zp where

@@ -538,9 +538,21 @@ namespace poly {
 
   std::vector<Interval> infeasible_regions(const Polynomial& p,
                                            const Assignment& a,
-                                           SignCondition sc) {
-    lp_feasibility_set_t* feasible = lp_polynomial_constraint_get_feasible_set(
-        p.get_internal(), to_sign_condition(sc), 0, a.get_internal());
+                                           SignCondition sc,
+                                           std::vector<Value>& roots) {
+    lp_value_t* root_values;
+    std::size_t roots_size;
+    lp_feasibility_set_t* feasible =
+        lp_polynomial_constraint_get_feasible_set_with_roots(
+            p.get_internal(), to_sign_condition(sc), 0, a.get_internal(),
+            &root_values, &roots_size);
+
+    roots.reserve(roots.size() + roots_size);
+    for (std::size_t i = 0; i < roots_size; ++i) {
+      roots.emplace_back(&root_values[i]);
+      lp_value_destruct(&root_values[i]);
+    }
+    free(root_values);
 
     std::vector<Interval> regions;
 
@@ -579,4 +591,10 @@ namespace poly {
     return regions;
   }
 
+  std::vector<Interval> infeasible_regions(const Polynomial& p,
+                                           const Assignment& a,
+                                           SignCondition sc) {
+    std::vector<Value> roots;
+    return infeasible_regions(p, a, sc, roots);
+  }
 }  // namespace poly
