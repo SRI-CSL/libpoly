@@ -536,6 +536,56 @@ namespace poly {
     return res;
   }
 
+  namespace {
+    /** Compute the complement of a feasible set as a list of intervals. Takes
+     * ownership of `feasible` and deletes it. */
+    std::vector<Interval> complement_to_regions(lp_feasibility_set_t* feasible) {
+      std::vector<Interval> regions;
+
+      Value last_value = Value::minus_infty();
+      int last_open = 0;
+
+      for (std::size_t i = 0; i < feasible->size; ++i) {
+        const lp_interval_t& cur = feasible->intervals[i];
+        Value lower(&cur.a);
+
+        if (lower.get_internal()->type == LP_VALUE_MINUS_INFINITY) {
+          // Do nothing if we start at -infty.
+        } else if (last_value < lower) {
+          // There is an infeasible open interval
+          regions.emplace_back(last_value, !last_open, lower, !cur.a_open);
+        } else if (last_open && cur.a_open && last_value == lower) {
+          // There is an infeasible point interval
+          regions.emplace_back(last_value);
+        }
+        if (cur.is_point) {
+          last_value = std::move(lower);
+          last_open = false;
+        } else {
+          last_value = Value(&cur.b);
+          last_open = cur.b_open;
+        }
+      }
+
+      if (last_value.get_internal()->type != LP_VALUE_PLUS_INFINITY) {
+        // Add missing interval to +infty
+        regions.emplace_back(last_value, !last_open, Value::plus_infty(), true);
+      }
+
+      lp_feasibility_set_delete(feasible);
+
+      return regions;
+    }
+  }  // namespace
+
+  std::vector<Interval> infeasible_regions(const Polynomial& p,
+                                           const Assignment& a,
+                                           SignCondition sc) {
+    lp_feasibility_set_t* feasible = lp_polynomial_constraint_get_feasible_set(
+        p.get_internal(), to_sign_condition(sc), 0, a.get_internal());
+    return complement_to_regions(feasible);
+  }
+
   std::vector<Interval> infeasible_regions(const Polynomial& p,
                                            const Assignment& a,
                                            SignCondition sc,
@@ -544,8 +594,8 @@ namespace poly {
     std::size_t roots_size;
     lp_feasibility_set_t* feasible =
         lp_polynomial_constraint_get_feasible_set_with_roots(
-            p.get_internal(), to_sign_condition(sc), 0, a.get_internal(),
-            &root_values, &roots_size);
+          p.get_internal(), to_sign_condition(sc), 0,
+          a.get_internal(), &root_values, &roots_size);
 
     roots.reserve(roots.size() + roots_size);
     for (std::size_t i = 0; i < roots_size; ++i) {
@@ -554,47 +604,6 @@ namespace poly {
     }
     free(root_values);
 
-    std::vector<Interval> regions;
-
-    Value last_value = Value::minus_infty();
-    int last_open = 0;
-
-    for (std::size_t i = 0; i < feasible->size; ++i) {
-      const lp_interval_t& cur = feasible->intervals[i];
-      Value lower(&cur.a);
-
-      if (lower.get_internal()->type == LP_VALUE_MINUS_INFINITY) {
-        // Do nothing if we start at -infty.
-      } else if (last_value < lower) {
-        // There is an infeasible open interval
-        regions.emplace_back(last_value, !last_open, lower, !cur.a_open);
-      } else if (last_open && cur.a_open && last_value == lower) {
-        // There is an infeasible point interval
-        regions.emplace_back(last_value);
-      }
-      if (cur.is_point) {
-        last_value = std::move(lower);
-        last_open = false;
-      } else {
-        last_value = Value(&cur.b);
-        last_open = cur.b_open;
-      }
-    }
-
-    if (last_value.get_internal()->type != LP_VALUE_PLUS_INFINITY) {
-      // Add missing interval to +infty
-      regions.emplace_back(last_value, !last_open, Value::plus_infty(), true);
-    }
-
-    lp_feasibility_set_delete(feasible);
-
-    return regions;
-  }
-
-  std::vector<Interval> infeasible_regions(const Polynomial& p,
-                                           const Assignment& a,
-                                           SignCondition sc) {
-    std::vector<Value> roots;
-    return infeasible_regions(p, a, sc, roots);
+    return complement_to_regions(feasible);
   }
 }  // namespace poly

@@ -1312,16 +1312,17 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
 static
 lp_feasibility_set_t* polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M, lp_value_t** roots_out, size_t* roots_size_out) {
 
-  if (roots_out) {
-    *roots_out = 0;
-    *roots_size_out = 0;
-  }
-
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", "); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
   }
 
   assert(!lp_polynomial_is_constant(A));
+  assert ((roots_out == NULL) == (roots_size_out == NULL));
+
+  if (roots_out) {
+    *roots_out = NULL;
+    *roots_size_out = 0;
+  }
 
   // Make sure we're in the right order
   lp_polynomial_external_clean(A);
@@ -1528,11 +1529,10 @@ lp_feasibility_set_t* polynomial_constraint_get_feasible_set(const lp_polynomial
 }
 
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
-  return polynomial_constraint_get_feasible_set(A, sgn_condition, negated, M, 0, 0);
+  return polynomial_constraint_get_feasible_set(A, sgn_condition, negated, M, NULL, NULL);
 }
 
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set_with_roots(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M, lp_value_t** roots, size_t* roots_size) {
-  assert(roots && roots_size);
   return polynomial_constraint_get_feasible_set(A, sgn_condition, negated, M, roots, roots_size);
 }
 

@@ -352,7 +352,11 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
 /**
  * Same as lp_polynomial_constraint_get_feasible_set(), but additionally hands
  * back the real roots of A(M(x1), ..., M(xn), y) that the feasible set was
- * computed from.
+ * computed from. The roots are distinct and sorted in increasing order.
+ *
+ * On return, *roots points to an array of *roots_size constructed values that
+ * is owned by the caller: destruct each value with lp_value_destruct() and
+ * release the array with free(). *roots may be NULL.
  */
 lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set_with_roots(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M, lp_value_t** roots, size_t* roots_size);
 
