@@ -255,8 +255,17 @@ namespace poly {
   std::vector<Value> isolate_real_roots(const Polynomial& p,
                                         const Assignment& a);
 
+  /** Compute the regions where the constraint `p sc 0` is violated, with `a`
+   * assigning all but the main variable of `p`. */
   std::vector<Interval> infeasible_regions(const Polynomial& p,
                                            const Assignment& a,
                                            SignCondition sc);
+
+  /** Same as above, but additionally appends to `roots` the real roots of `p`
+   * (with respect to `a`) */
+  std::vector<Interval> infeasible_regions(const Polynomial& p,
+                                           const Assignment& a,
+                                           SignCondition sc,
+                                           std::vector<Value>& roots);
 
 }  // namespace poly
