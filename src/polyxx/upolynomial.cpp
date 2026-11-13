@@ -325,6 +325,20 @@ namespace poly {
     return res;
   }
 
+  std::vector<UPolynomial> signed_remainder_sequence(const UPolynomial& p,
+                                                     const UPolynomial& q) {
+    lp_upolynomial_t** seq;
+    std::size_t size;
+    lp_upolynomial_signed_remainder_sequence(p.get_internal(),
+                                             q.get_internal(), &seq, &size);
+    std::vector<UPolynomial> res;
+    for (std::size_t i = 0; i < size; ++i) {
+      res.emplace_back(seq[i]);
+    }
+    free(seq);
+    return res;
+  }
+
   std::size_t count_real_roots(const UPolynomial& p,
                                const RationalInterval& ri) {
     return lp_upolynomial_roots_count(p.get_internal(), ri.get_internal());

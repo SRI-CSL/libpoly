@@ -239,6 +239,99 @@ TEST_CASE("upolynomial::sturm_sequence") {
   CHECK(seq[4] == UPolynomial({-1}));
 }
 
+namespace {
+  int sign_variations(const std::vector<UPolynomial>& seq, bool plus_inf) {
+    int variations = 0;
+    int last = 0;
+    for (const auto& p : seq) {
+      int s = sgn(leading_coefficient(p));
+      if (!plus_inf && degree(p) % 2 == 1) s = -s;
+      if (s == 0) continue;
+      if (last != 0 && s != last) ++variations;
+      last = s;
+    }
+    return variations;
+  }
+  int tarski_query(const UPolynomial& p, const UPolynomial& q) {
+    auto seq = signed_remainder_sequence(p, derivative(p) * q);
+    return sign_variations(seq, false) - sign_variations(seq, true);
+  }
+}
+
+TEST_CASE("upolynomial::signed_remainder_sequence") {
+  {
+    UPolynomial p({-2, -5, -7, -1, 3});
+    CHECK(signed_remainder_sequence(p, derivative(p)) == sturm_sequence(p));
+  }
+  {
+    auto seq = signed_remainder_sequence(UPolynomial({-2, 0, 1}), UPolynomial({0, 0, 2}));
+    CHECK(seq.size() == 3);
+    CHECK(seq[0] == UPolynomial({-2, 0, 1}));
+    CHECK(seq[1] == UPolynomial({0, 0, 1}));
+    CHECK(seq[2] == UPolynomial({1}));
+  }
+  {
+    auto seq = signed_remainder_sequence(UPolynomial({-2, 0, 1}), UPolynomial({0, 0, -2}));
+    CHECK(seq.size() == 3);
+    CHECK(seq[0] == UPolynomial({-2, 0, 1}));
+    CHECK(seq[1] == UPolynomial({0, 0, -1}));
+    CHECK(seq[2] == UPolynomial({1}));
+  }
+  {
+    auto seq = signed_remainder_sequence(UPolynomial({4, 0, -2}), UPolynomial({0, 4}));
+    CHECK(seq.size() == 3);
+    CHECK(seq[0] == UPolynomial({2, 0, -1}));
+    CHECK(seq[1] == UPolynomial({0, 1}));
+    CHECK(seq[2] == UPolynomial({-1}));
+  }
+  {
+    auto seq = signed_remainder_sequence(UPolynomial({-1, 1}), UPolynomial({-2, 0, 1}));
+    CHECK(seq.size() == 4);
+    CHECK(seq[0] == UPolynomial({-1, 1}));
+    CHECK(seq[1] == UPolynomial({-2, 0, 1}));
+    CHECK(seq[2] == UPolynomial({1, -1}));
+    CHECK(seq[3] == UPolynomial({1}));
+  }
+  {
+    auto seq = signed_remainder_sequence(UPolynomial({3}), UPolynomial({-2, 0, 1}));
+    CHECK(seq.size() == 3);
+    CHECK(seq[0] == UPolynomial({1}));
+    CHECK(seq[1] == UPolynomial({-2, 0, 1}));
+    CHECK(seq[2] == UPolynomial({-1}));
+  }
+  {
+    UPolynomial p = UPolynomial({-1, 1}) * UPolynomial({-2, 0, 1});
+    auto seq = signed_remainder_sequence(p, UPolynomial({-2, 0, 1}));
+    CHECK(seq.size() == 2);
+    CHECK(seq[0] == p);
+    CHECK(seq[1] == UPolynomial({-2, 0, 1}));
+  }
+  {
+    UPolynomial p({-2, 0, 1});
+    CHECK(signed_remainder_sequence(p, UPolynomial()) == std::vector<UPolynomial>({p}));
+  }
+  {
+    UPolynomial p = UPolynomial({3, 1}) * UPolynomial({-1, 1}) * UPolynomial({-2, 1});
+    CHECK(tarski_query(p, UPolynomial({1})) == 3);
+    CHECK(tarski_query(p, UPolynomial({-1})) == -3);
+    CHECK(tarski_query(-p, UPolynomial({1})) == 3);
+    CHECK(tarski_query(p, UPolynomial({0, 1})) == 1);
+    CHECK(tarski_query(-p, UPolynomial({0, 1})) == 1);
+    CHECK(tarski_query(p, UPolynomial({-1, 1})) == 0);
+    CHECK(tarski_query(p, UPolynomial({-2, 0, 1})) == 1);
+    CHECK(tarski_query(p, UPolynomial({2, 0, 0, -1})) == 1);
+    CHECK(tarski_query(p, UPolynomial({1, 0, 0, 0, 1})) == 3);
+    CHECK(tarski_query(p, p) == 0);
+  }
+  {
+    UPolynomial p = pow(UPolynomial({1, 1}), 2) * pow(UPolynomial({-2, 1}), 3);
+    CHECK(tarski_query(p, UPolynomial({1})) == 2);
+    CHECK(tarski_query(p, UPolynomial({0, 1})) == 0);
+    CHECK(tarski_query(p, UPolynomial({-1, 0, 3})) == 2);
+    CHECK(tarski_query(p, UPolynomial({-1, -1})) == -1);
+  }
+}
+
 TEST_CASE("upolynomial::count_real_roots") {
   {
     UPolynomial p = UPolynomial({-2, 0, 1})*UPolynomial({-2, 0, 1}) * UPolynomial({-3, 0, 1});

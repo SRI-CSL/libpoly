@@ -41,6 +41,18 @@
 void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_dense_t* S, size_t* size);
 
 /**
+ * Compute the signed remainder sequence of f and g, i.e. the sequence
+ *
+ *  S[0] = f
+ *  S[1] = g
+ *
+ *  a*S[i-2] = Q*S[i-1] + b*S[i]
+ *
+ * with a*b < 0.
+ */
+void upolynomial_compute_signed_remainder_sequence(const lp_upolynomial_t* f, const lp_upolynomial_t* g, upolynomial_dense_t* S, size_t* size);
+
+/**
  * Count the number of real roots that the polynomial f has in the given open
  * interval. The polynomial f should be square-free.
  */
