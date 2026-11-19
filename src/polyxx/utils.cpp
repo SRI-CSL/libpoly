@@ -1,5 +1,6 @@
 #include "polyxx/utils.h"
 
+#include <cstdlib>
 #include <iostream>
 
 namespace poly {

@@ -5,6 +5,8 @@
 
 #include "upolynomial_factors.h"
 
+#include <cstdlib>
+
 namespace poly {
 
   /** A deleter for an std::unique_ptr holding a lp_upolynomial_t pointer */

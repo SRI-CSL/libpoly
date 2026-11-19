@@ -5,6 +5,7 @@
 #include "variable_list.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <utility>
 
 namespace poly {
