@@ -1,0 +1,69 @@
+name: Build and test yices2 against a libpoly checkout
+
+inputs:
+  libpoly-dir:
+    description: Path to the libpoly source tree to build and install
+    required: true
+  yices2-dir:
+    description: Path to the yices2 source tree
+    required: true
+  mode:
+    description: yices2 build mode (debug or release)
+    required: true
+  cc:
+    required: false
+    default: gcc
+  cxx:
+    required: false
+    default: g++
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake libgmp-dev gperf autoconf automake libtool
+
+    - name: Build and install libpoly
+      shell: bash
+      run: |
+        mkdir -p "${{ inputs.libpoly-dir }}/build"
+        cd "${{ inputs.libpoly-dir }}/build"
+        CC=${{ inputs.cc }} CXX=${{ inputs.cxx }} cmake -DCMAKE_BUILD_TYPE=Release -DLIBPOLY_BUILD_PYTHON_API=OFF -DBUILD_TESTING=OFF ..
+        make -j"$(nproc)"
+        sudo make install
+
+    # yices2 needs CUDD for MCSAT; same version as yices2's own CI.
+    - name: Build and install CUDD
+      shell: bash
+      run: |
+        git clone https://github.com/ivmai/cudd.git
+        cd cudd
+        git checkout tags/cudd-3.0.0
+        autoreconf -fi
+        CC=${{ inputs.cc }} CXX=${{ inputs.cxx }} ./configure --enable-shared
+        make -j"$(nproc)"
+        sudo make install
+
+    - name: Build yices2
+      shell: bash
+      working-directory: ${{ inputs.yices2-dir }}
+      run: |
+        export LD_LIBRARY_PATH=/usr/local/lib/:${LD_LIBRARY_PATH}
+        autoconf
+        CC=${{ inputs.cc }} CXX=${{ inputs.cxx }} CFLAGS='-Werror' ./configure --enable-mcsat
+        make -j"$(nproc)" MODE=${{ inputs.mode }}
+
+    - name: Test yices2
+      shell: bash
+      working-directory: ${{ inputs.yices2-dir }}
+      env:
+        TIME_LIMIT: ${{ inputs.mode == 'debug' && '120' || '60' }}
+        REGRESS_EXCLUDE_FILTER: ${{ inputs.mode == 'debug' && 'simple_processors_002_002_0008.smt2$' || '' }}
+      run: |
+        export LD_LIBRARY_PATH=/usr/local/lib/:${LD_LIBRARY_PATH}
+        make MODE=${{ inputs.mode }} check
+        make MODE=${{ inputs.mode }} test
+        make MODE=${{ inputs.mode }} check-api

@@ -1,0 +1,124 @@
+name: yices2 downstream
+
+# Builds yices2 against the libpoly code under test and runs yices2's own
+# test suites, so API/ABI/behaviour breakage is caught before merge.
+# Needs no secrets, so it also runs for pull requests from forks.
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'python/**'
+      - 'test/python/**'
+  workflow_dispatch:
+    inputs:
+      yices2-ref:
+        description: yices2 branch, tag or commit to test against
+        required: false
+        default: master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.yices2-ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Pin one yices2 commit so the PR run and the baseline test the same code.
+  resolve:
+    name: resolve yices2 commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+    steps:
+      - id: resolve
+        shell: bash
+        env:
+          REF: ${{ inputs.yices2-ref || 'master' }}
+        run: |
+          sha=$(git ls-remote https://github.com/SRI-CSL/yices2 "$REF" | head -n1 | cut -f1)
+          # A full commit SHA is not a ref name, so ls-remote finds nothing.
+          if [ -z "$sha" ] && echo "$REF" | grep -Eq '^[0-9a-f]{40}$'; then sha="$REF"; fi
+          [ -n "$sha" ] || { echo "cannot resolve yices2 ref '$REF'"; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Testing against yices2 $sha" >> "$GITHUB_STEP_SUMMARY"
+
+  yices2:
+    name: yices2 (${{ matrix.mode }}) with this libpoly
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [debug, release]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: libpoly
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          repository: SRI-CSL/yices2
+          ref: ${{ needs.resolve.outputs.sha }}
+          path: yices2
+          persist-credentials: false
+      - uses: ./libpoly/.github/actions/yices2-check
+        with:
+          libpoly-dir: libpoly
+          yices2-dir: yices2
+          mode: ${{ matrix.mode }}
+
+  # If a job above fails, repeat with the base commit of the PR. If yices2
+  # fails there too, the failure is not caused by this change. The job itself
+  # stays green; the verdict is in the step summary.
+  baseline:
+    name: baseline (${{ matrix.mode }}, yices2 with base libpoly)
+    needs: [resolve, yices2]
+    if: failure() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [debug, release]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: libpoly
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: libpoly-base
+          persist-credentials: false
+      - uses: actions/checkout@v5
+        with:
+          repository: SRI-CSL/yices2
+          ref: ${{ needs.resolve.outputs.sha }}
+          path: yices2
+          persist-credentials: false
+      - id: check
+        continue-on-error: true
+        uses: ./libpoly/.github/actions/yices2-check
+        with:
+          libpoly-dir: libpoly-base
+          yices2-dir: yices2
+          mode: ${{ matrix.mode }}
+      - name: Verdict
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.check.outcome }}
+          MODE: ${{ matrix.mode }}
+        run: |
+          if [ "$OUTCOME" = "success" ]; then
+            msg="yices2 ($MODE) passes with the base libpoly but failed with this PR: the PR likely broke yices2."
+            echo "::warning::$msg"
+          else
+            msg="yices2 ($MODE) also fails with the base libpoly (or the build broke): probably not caused by this PR. Check the log to be sure."
+            echo "::notice::$msg"
+          fi
+          echo "$msg" >> "$GITHUB_STEP_SUMMARY"
