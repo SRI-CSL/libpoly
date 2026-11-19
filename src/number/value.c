@@ -1252,8 +1252,8 @@ void lp_value_neg(lp_value_t* neg, const lp_value_t* a) {
 void lp_value_mul(lp_value_t* mul, const lp_value_t* a, const lp_value_t* b) {
 
   lp_value_t a_new, b_new;
-  const lp_value_t *a_to_use;
-  const lp_value_t *b_to_use;
+  const lp_value_t *a_to_use = a;
+  const lp_value_t *b_to_use = b;
 
   // Check for infinities
   if (lp_value_is_infinity(a) || lp_value_is_infinity(b)) {
