@@ -8,7 +8,7 @@ inputs:
     description: Path to the yices2 source tree
     required: true
   mode:
-    description: yices2 build mode (debug or release)
+    description: yices2 build mode (devel = optimised with assertions)
     required: true
   cc:
     required: false
@@ -31,7 +31,11 @@ runs:
       run: |
         mkdir -p "${{ inputs.libpoly-dir }}/build"
         cd "${{ inputs.libpoly-dir }}/build"
-        CC=${{ inputs.cc }} CXX=${{ inputs.cxx }} cmake -DCMAKE_BUILD_TYPE=Release -DLIBPOLY_BUILD_PYTHON_API=OFF -DBUILD_TESTING=OFF ..
+        # Optimised but with assertions enabled: the stock Release flags add
+        # -DNDEBUG, so override them with plain -O2.
+        CC=${{ inputs.cc }} CXX=${{ inputs.cxx }} cmake -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_C_FLAGS_RELEASE=-O2 -DCMAKE_CXX_FLAGS_RELEASE=-O2 \
+          -DLIBPOLY_BUILD_PYTHON_API=OFF -DBUILD_TESTING=OFF ..
         make -j"$(nproc)"
         sudo make install
 
@@ -60,8 +64,8 @@ runs:
       shell: bash
       working-directory: ${{ inputs.yices2-dir }}
       env:
-        TIME_LIMIT: ${{ inputs.mode == 'debug' && '120' || '60' }}
-        REGRESS_EXCLUDE_FILTER: ${{ inputs.mode == 'debug' && 'simple_processors_002_002_0008.smt2$' || '' }}
+        TIME_LIMIT: ${{ inputs.mode == 'release' && '60' || '120' }}
+        REGRESS_EXCLUDE_FILTER: ${{ inputs.mode != 'release' && 'simple_processors_002_002_0008.smt2$' || '' }}
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib/:${LD_LIBRARY_PATH}
         make MODE=${{ inputs.mode }} check

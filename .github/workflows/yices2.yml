@@ -1,6 +1,6 @@
 name: yices2 downstream
 
-# Builds yices2 against the libpoly code under test and runs yices2's own
+# Builds yices2 (devel mode: optimised, assertions on) against the libpoly code under test and runs yices2's own
 # test suites, so API/ABI/behaviour breakage is caught before merge.
 # Needs no secrets, so it also runs for pull requests from forks.
 
@@ -46,14 +46,10 @@ jobs:
           echo "Testing against yices2 $sha" >> "$GITHUB_STEP_SUMMARY"
 
   yices2:
-    name: yices2 (${{ matrix.mode }}) with this libpoly
+    name: yices2 (devel) with this libpoly
     needs: resolve
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        mode: [debug, release]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -69,21 +65,17 @@ jobs:
         with:
           libpoly-dir: libpoly
           yices2-dir: yices2
-          mode: ${{ matrix.mode }}
+          mode: devel
 
   # If a job above fails, repeat with the base commit of the PR. If yices2
   # fails there too, the failure is not caused by this change. The job itself
   # stays green; the verdict is in the step summary.
   baseline:
-    name: baseline (${{ matrix.mode }}, yices2 with base libpoly)
+    name: baseline (yices2 with base libpoly)
     needs: [resolve, yices2]
     if: failure() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        mode: [debug, release]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -107,12 +99,12 @@ jobs:
         with:
           libpoly-dir: libpoly-base
           yices2-dir: yices2
-          mode: ${{ matrix.mode }}
+          mode: devel
       - name: Verdict
         shell: bash
         env:
           OUTCOME: ${{ steps.check.outcome }}
-          MODE: ${{ matrix.mode }}
+          MODE: devel
         run: |
           if [ "$OUTCOME" = "success" ]; then
             msg="yices2 ($MODE) passes with the base libpoly but failed with this PR: the PR likely broke yices2."
