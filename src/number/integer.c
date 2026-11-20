@@ -288,3 +288,4 @@ void lp_integer_lcm_Z(lp_integer_t* lcm, const lp_integer_t* a, const lp_integer
 size_t lp_integer_hash(const lp_integer_t* a) {
   return integer_hash(a);
 }
+#error "deliberate failure to test the yices2 baseline job - do not merge"
