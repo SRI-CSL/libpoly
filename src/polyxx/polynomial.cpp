@@ -599,8 +599,10 @@ namespace poly {
 
     roots.reserve(roots.size() + roots_size);
     for (std::size_t i = 0; i < roots_size; ++i) {
-      roots.emplace_back(&root_values[i]);
-      lp_value_destruct(&root_values[i]);
+      // Move the root into the vector without a deep copy. Afterwards,
+      // root_values[i] holds a none value, which needs no destruction.
+      roots.emplace_back();
+      lp_value_swap(roots.back().get_internal(), &root_values[i]);
     }
     free(root_values);
 
