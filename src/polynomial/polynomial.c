@@ -1309,13 +1309,20 @@ void lp_polynomial_roots_isolate(const lp_polynomial_t* A, const lp_assignment_t
   lp_polynomial_destruct(&B);
 }
 
-lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
+static
+lp_feasibility_set_t* polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M, lp_value_t** roots_out, size_t* roots_size_out) {
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set("); lp_polynomial_print(A, trace_out); tracef(", "); lp_sign_condition_print(sgn_condition, trace_out); tracef(")\n");
   }
 
   assert(!lp_polynomial_is_constant(A));
+  assert ((roots_out == NULL) == (roots_size_out == NULL));
+
+  if (roots_out) {
+    *roots_out = NULL;
+    *roots_size_out = 0;
+  }
 
   // Make sure we're in the right order
   lp_polynomial_external_clean(A);
@@ -1499,11 +1506,17 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
   // Remove the signs array
   free(signs);
 
-  // Remove the roots
-  for (i = 0; i < roots_size; ++ i) {
-    lp_value_destruct(roots + i);
+  if (roots_out) {
+    // Hand the roots over to the caller
+    *roots_out = roots;
+    *roots_size_out = roots_size;
+  } else {
+    // Remove the roots
+    for (i = 0; i < roots_size; ++ i) {
+      lp_value_destruct(roots + i);
+    }
+    free(roots);
   }
-  free(roots);
 
   if (trace_is_enabled("polynomial")) {
     tracef("polynomial_get_feasible_set(");
@@ -1513,6 +1526,14 @@ lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynom
   }
 
   return result;
+}
+
+lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M) {
+  return polynomial_constraint_get_feasible_set(A, sgn_condition, negated, M, NULL, NULL);
+}
+
+lp_feasibility_set_t* lp_polynomial_constraint_get_feasible_set_with_roots(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, const lp_assignment_t* M, lp_value_t** roots, size_t* roots_size) {
+  return polynomial_constraint_get_feasible_set(A, sgn_condition, negated, M, roots, roots_size);
 }
 
 int lp_polynomial_constraint_infer_bounds(const lp_polynomial_t* A, lp_sign_condition_t sgn_condition, int negated, lp_interval_assignment_t* M) {

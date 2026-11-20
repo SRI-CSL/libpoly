@@ -405,6 +405,7 @@ libpoly.so.0 libpoly0 #MINVER#
  lp_polynomial_constraint_explain_infer_bounds@Base 1.13
  lp_polynomial_constraint_get_feasible_set@Base 1.3
  lp_polynomial_constraint_get_feasible_set_Zp@Base 2.0-0ubuntu1
+ lp_polynomial_constraint_get_feasible_set_with_roots@Base 2.2-0ubuntu1
  lp_polynomial_constraint_infer_bounds@Base 1.13
  lp_polynomial_constraint_resolve_fm@Base 1.13
  lp_polynomial_construct@Base 1.3
