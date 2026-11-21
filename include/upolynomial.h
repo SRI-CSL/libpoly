@@ -361,6 +361,13 @@ lp_upolynomial_factors_t* lp_upolynomial_factor_square_free(const lp_upolynomial
 void lp_upolynomial_sturm_sequence(const lp_upolynomial_t* f, lp_upolynomial_t*** S, size_t* size);
 
 /**
+ * Return the signed remainder sequence of the given polynomials. The arrays S
+ * will be allocated, and the user should de-allocate it. The size parameter
+ * will be updated with the size of the array.
+ */
+void lp_upolynomial_signed_remainder_sequence(const lp_upolynomial_t* f, const lp_upolynomial_t* g, lp_upolynomial_t*** S, size_t* size);
+
+/**
  * Counts the number of real roots in the given interval. If the interval is
  * 0, it counts through (-inf, inf).
  */

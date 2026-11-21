@@ -223,6 +223,10 @@ namespace poly {
   /** Compute the sturm sequence of a polynomial. */
   std::vector<UPolynomial> sturm_sequence(const UPolynomial& p);
 
+  /** Compute the signed remainder sequence of two polynomials. */
+  std::vector<UPolynomial> signed_remainder_sequence(const UPolynomial& p,
+                                                     const UPolynomial& q);
+
   class AlgebraicNumber;
   class RationalInterval;
 

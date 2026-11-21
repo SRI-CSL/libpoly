@@ -101,6 +101,87 @@ void upolynomial_compute_sturm_sequence(const lp_upolynomial_t* f, upolynomial_d
   *size = i + 1;
 }
 
+void upolynomial_compute_signed_remainder_sequence(const lp_upolynomial_t* f, const lp_upolynomial_t* g, upolynomial_dense_t* S, size_t* size) {
+
+  if (trace_is_enabled("roots")) {
+    tracef("upolynomial_compute_signed_remainder_sequence(");
+    lp_upolynomial_print(f, trace_out); tracef(", ");
+    lp_upolynomial_print(g, trace_out); tracef("\n");
+  }
+
+  lp_integer_t a;
+  integer_construct_from_int(lp_Z, &a, 0);
+
+  // Min size for the polynomials
+  size_t f_deg = lp_upolynomial_degree(f);
+  size_t g_deg = lp_upolynomial_degree(g);
+  size_t capacity = (f_deg > g_deg ? f_deg : g_deg) + 1;
+
+  // f[0] = pp(f)
+  upolynomial_dense_construct_p(&S[0], capacity, f);
+  if (!upolynomial_dense_is_zero(&S[0])) {
+    upolynomial_dense_mk_primitive_Z(&S[0], 0);
+  }
+
+  if (trace_is_enabled("roots")) {
+    tracef("S[0] = ");
+    upolynomial_dense_print(&S[0], trace_out);
+    tracef("\n");
+  }
+
+  // f[1] = pp(g)
+  upolynomial_dense_construct_p(&S[1], capacity, g);
+  if (!upolynomial_dense_is_zero(&S[1])) {
+    upolynomial_dense_mk_primitive_Z(&S[1], 0);
+  }
+
+  if (trace_is_enabled("roots")) {
+    tracef("S[1] = ");
+    upolynomial_dense_print(&S[1], trace_out);
+    tracef("\n");
+  }
+
+  // Until we hit a constant polynomial
+  size_t i = 1;
+  while (S[i].size > 1) {
+    i ++;
+    upolynomial_dense_construct(&S[i], capacity);
+    if (S[i-2].size < S[i-1].size) {
+      // S[i] = -S[i-2]
+      upolynomial_dense_assign(&S[i], &S[i-2]);
+      upolynomial_dense_negate(&S[i], lp_Z);
+    } else {
+      // Compute a*S[i-2] = div*S[i-1] + b*S[i]
+      upolynomial_dense_reduce_Z(&S[i-2], &S[i-1], &a, &S[i]);
+      if (!upolynomial_dense_is_zero(&S[i])) {
+        upolynomial_dense_mk_primitive_Z(&S[i], 0);
+      }
+
+      // If the coefficient of the reduction is not negative, we have to flip
+      // the sign
+      if (integer_sgn(lp_Z, &a) > 0) {
+        upolynomial_dense_negate(&S[i], lp_Z);
+      }
+    }
+
+    if (trace_is_enabled("roots")) {
+      tracef("S[%zu] = ", i); upolynomial_dense_print(&S[i], trace_out); tracef("\n");
+    }
+  }
+
+  // Remove the temp
+  integer_destruct(&a);
+
+  // Remove the zero remainder
+  if (upolynomial_dense_is_zero(&S[i])) {
+    upolynomial_dense_destruct(&S[i]);
+    i --;
+  }
+
+  // Size
+  *size = i + 1;
+}
+
 /**
  * Compute the number sgn_changes(a) given Sturm sequence and a. If a is 0 or
  * 1 as a pointer, we evaluate at -inf, +inf respectively.
